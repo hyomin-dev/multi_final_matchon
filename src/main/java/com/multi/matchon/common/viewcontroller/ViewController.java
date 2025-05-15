@@ -1,13 +1,14 @@
-package com.multi.matchon.controller;
+package com.multi.matchon.common.viewcontroller;
+
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class LoginController {
+public class ViewController {
 
-    @GetMapping("/login")
-    public String loginPage() {
+    @GetMapping({"/","/main"})
+    public String mainPage(){
         return "main/main";
     }
 }

@@ -25,7 +25,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     generate-ddl: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show_sql: true
   output:
     ansi:
@@ -45,3 +45,16 @@ spring:
     username: ${DB_PROD_USER}
     password: ${DB_PROD_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+    show_sql: true
+  output:
+    ansi:
+      enabled: ALWAYS
+
+
+

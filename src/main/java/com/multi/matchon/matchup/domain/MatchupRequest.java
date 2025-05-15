@@ -1,0 +1,46 @@
+package com.multi.matchon.matchup.domain;
+
+import com.multi.matchon.common.domain.BaseEntity;
+import com.multi.matchon.member.domain.Member;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Table(name="matchup_request")
+//@Setter: JPA entity에서 setter사용은 자제, test용
+public class MatchupRequest extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="matchup_request_id")
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="matchup_board_id", nullable = false)
+    private MatchupBoard matchupBoard;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="applicant_id",nullable = false)
+    private Member member;
+
+    @Column(name="self_intro",nullable = false, columnDefinition = "TEXT")
+    private String selfIntro;
+
+    @Column(name="participant_count",nullable = false)
+    private Integer participantCount;
+
+    @Column(name="status",nullable = false)
+    @Builder.Default
+    private MatchupStatus matchupStatus = MatchupStatus.PENDING;
+
+    @Column(name="is_deleted")
+    @Builder.Default
+    private Boolean isDeleted=false;
+
+}

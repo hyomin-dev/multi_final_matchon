@@ -1,0 +1,72 @@
+package com.multi.matchon.matchup.domain;
+
+
+import com.multi.matchon.common.domain.BaseEntity;
+import com.multi.matchon.common.domain.SportsType;
+import com.multi.matchon.member.domain.Member;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Table(name="matchup_board")
+//@Setter: JPA entity에서 setter사용은 자제, test용
+public class MatchupBoard extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="matchup_board_id")
+    private Long id;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="writer_id",nullable = false)
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="sports_type_id",nullable = false)
+    private SportsType sportsType;
+
+    @Column(name="reservation_attachment_enabled", nullable = false, columnDefinition = "BOOLEAN NOT NULL DEFAULT TRUE CHECK (reservation_attachment_enabled=true)")
+    private Boolean reservationAttachmentEnabled;
+
+    @Column(name="team_intro",nullable = false,columnDefinition = "TEXT")
+    private String teamIntro;
+
+    @Column(name="sports_facility_name",nullable = false,columnDefinition = "VARCHAR(100)")
+    private String sportsFacilityName;
+
+    @Column(name="sports_facility_address",nullable = false, columnDefinition = "VARCHAR(100)")
+    private String sportsFacilityAddress;
+
+    @Column(name="match_datetime",nullable = false)
+    private LocalDateTime matchDatetime;
+
+    @Column(name="match_duration",nullable = false)
+    private LocalTime matchDuration;
+
+    @Column(name="current_participant_count",nullable = false)
+    private Integer currentParticipantCount;
+
+    @Column(name="max_participants",nullable = false)
+    private Integer maxParticipants;
+
+    @Column(name="min_manner_temperature",nullable = false)
+    private Double minMannerTemperature;
+
+    @Column(name="match_description",nullable = false, columnDefinition = "TEXT")
+    private String matchDescription;
+
+    @Column(name="is_deleted")
+    @Builder.Default
+    private Boolean isDeleted=false;
+
+}
