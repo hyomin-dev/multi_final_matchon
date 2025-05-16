@@ -62,10 +62,14 @@ create table stadium (
 
 -- positions
 CREATE TABLE positions (
-	
+
     position_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     sports_type_id BIGINT,
-    position_name VARCHAR(50) NOT NULL,
+    position_name ENUM('goalkeeper', 'center_back', 'left_right_back', 'left_right_wing_back', 'central_defensive_midfielder', 'central_midfielder', 'central_attacking_midfielder', 'left_right_wing', 'striker_center_forward', 'second_striker', 'left_right_winger',
+        'pivo', 'ala', 'fixo', 'flying_goal_keeper',
+        'starting_pitcher', 'relief_pitcher', 'closer', 'infielder', 'outfielder', 'first_baseman' , 'second_baseman', 'third_baseman', 'shortstop', 'left_fielder', 'center_fielder', 'right_fielder', 'catcher', 'designated_hitter',
+        'point_gaurd', 'shooting_gaurd', 'small_forward', 'power_forward', 'center'
+        ) NOT NULL,
     CONSTRAINT FK_positions_2_sports_type FOREIGN KEY (sports_type_id) REFERENCES sports_type(sports_type_id) -- positions:sports_type = N:1
 );
 
