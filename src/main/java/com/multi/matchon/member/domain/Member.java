@@ -32,7 +32,7 @@ public class Member extends BaseTimeEntity {
     @Column(name="member_password",nullable = false, columnDefinition = "VARCHAR(100)")
     private String memberPassword;
 
-    @Column(name="member_name", nullable = false, columnDefinition = "VARCHAR(50)")
+    @Column(name="member_name", columnDefinition = "VARCHAR(50)")
     private String memberName;
 
     @Column(name="member_role", nullable = false)
@@ -40,27 +40,26 @@ public class Member extends BaseTimeEntity {
     private MemberRole memberRole;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="sports_type_id", nullable = false)
+    @JoinColumn(name="sports_type_id")
     private SportsType sportsType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="position_id",nullable = false)
+    @JoinColumn(name="position_id")
     private Positions positions;
 
-    @Column(name="preferred_time", nullable = false)
+    @Column(name="preferred_time")
     @Enumerated(value = EnumType.STRING)
     private TimeType timeType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="team_id",nullable = false)
+    @JoinColumn(name="team_id")
     private Team team;
 
-    @Column(name="my_temperature",nullable = false)
-    @Builder.Default
-    private Double myTemperature = 36.5;
+    @Column(name="my_temperature")
+    private Double myTemperature; // nullable: 사용자만 사용
 
-    @Column(name="picture_attachment_enabled",columnDefinition = "BOOLEAN DEFAULT TRUE CHECK (picture_attachment_enabled=true)", nullable = false)
-    private Boolean pictureAttachmentEnabled;
+    @Column(name = "picture_attachment_enabled")
+    private Boolean pictureAttachmentEnabled; // nullable : 관리자는 null 가능, 사용자는 회원가입 시 true로 설정
 
     @Column(name="is_deleted", nullable = false)
     @Builder.Default
