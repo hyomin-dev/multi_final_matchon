@@ -56,5 +56,6 @@ spring:
     ansi:
       enabled: ALWAYS
 
-
+jwt:
+  secret: ${JWT_SECRET}
 
