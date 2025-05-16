@@ -21,10 +21,8 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/main", "/signup", "/login", "/css/**", "/img/**", "/js/**").permitAll() // 모두 허용
-                        .requestMatchers("/header-footer-test").permitAll()
                         .anyRequest().authenticated()
                 );
-
 
         return http.build();
     }

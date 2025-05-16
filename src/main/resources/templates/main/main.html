@@ -1,58 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Matchon - Main</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
-
+    <title>Main Page</title>
 </head>
 <body>
-<div class="hero">
-
-    <div class="navbar">
-        <div>
-            <img src="/img/matchon_logo.png" alt="Matchon Logo" class="logo">
-        </div>
-        <div class="center">
-            <a th:href="@{/introduction}">INTRODUCTION</a>
-            <a th:href="@{/matchup}">MATCHUP</a>
-            <a th:href="@{/guest}">GUEST</a>
-            <a th:href="@{/stadium}">STADIUM</a>
-            <a th:href="@{/community}">COMMUNITY</a>
-            <a th:href="@{/schedule}">SCHEDULE</a>
-            <a th:href="@{/cs}">CS</a>
-            <a th:href="@{/team}">TEAM</a>
-            <a th:href="@{/shop}">SHOP</a>
-        </div>
-        <div class="icons">
-            <img src="/img/chat-white.png">
-            <img src="/img/bell-white.png">
-        </div>
-        <div class="auth">
-            <th:block sec:authorize="isAnonymous()">
-                <a th:href="@{/login}" class="btn">LOGIN</a>
-                <a th:href="@{/signup}" class="btn">SIGN UP</a>
-            </th:block>
-            <th:block sec:authorize="isAuthenticated()">
-                <a th:href="@{/my}" class="btn">MY</a>
-                <a th:href="@{/logout}" class="btn">LOGOUT</a>
-            </th:block>
-        </div>
-    </div>
-
-    <div class="hero-text">
-        <h1>Wanna Match?</h1>
-        <h1>You're On!</h1>
-        <button th:onclick="|location.href='@{/introduction}'|">GO!</button>
-    </div>
-
-    <footer class="footer">
-        team@matchon.com | 02-123-123
-    </footer>
-
-
-</div>
+<h2>🎮 메인 페이지입니다</h2>
+<a th:href="@{/login}"><button>로그인</button></a>
+<a th:href="@{/signup}"><button>회원가입</button></a>
 </body>
 </html>
-

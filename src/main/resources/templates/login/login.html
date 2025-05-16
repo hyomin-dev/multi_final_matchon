@@ -2,17 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>로그인</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
 </head>
 <body>
 <h2>로그인 페이지</h2>
-<div th:replace="~{common/header::header}"></div>
 <form th:action="@{/auth/login}" method="post">
     <input type="email" name="email" placeholder="이메일" required /><br/>
     <input type="password" name="password" placeholder="비밀번호" required /><br/>
     <button type="submit">로그인</button>
 </form>
-<div th:replace="~{common/footer::footer}"></div>
 </body>
 </html>
