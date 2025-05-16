@@ -1,6 +1,7 @@
 #wrap{
     min-height:calc(100vh - 340px); /* footer, header, margin 크기 빼기 */
 }
+
 .footer{
     height: 60px;
     margin: 0 auto;
