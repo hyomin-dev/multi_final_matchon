@@ -1,16 +1,9 @@
-.footer {
-    /*position: fixed; !* 푸터를 고정 *!*/
-    /*bottom: 30px;*/
-    /*left: 0;*/
-    /*right: 0;*/
+#wrap{
+    min-height:calc(100vh - 300px); /* footer, header 크기 빼기 */
+}
+.footer{
+    height: 24px;
     text-align: center;
-    font-family: 'Comfortaa', sans-serif;
-    font-size: 24px;
-    padding: 10px;
-    /*background-color: #E7EBE8;*/
-    color: black;
-    margin-top: auto; /* footer가 항상 하단에 있도록 설정 */
-    /*z-index: 1000; !* 다른 요소 위에 표시 *!*/
 }
 
 .navy_hr{
