@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     }
 
     // 그 외 모든 예외 처리 (Optional)
-    @ExceptionHandler(Exception.class)
+    //@ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleException(Exception ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", "알 수 없는 오류가 발생했습니다.");
