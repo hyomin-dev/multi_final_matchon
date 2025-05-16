@@ -42,4 +42,12 @@ public class GlobalExceptionHandler {
         error.put("error", "알 수 없는 오류가 발생했습니다.");
         return ResponseEntity.internalServerError().body(error);
     }
+
+    // 모든 예외 상세 메시지 반환 (개발용)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getClass().getSimpleName() + ": " + ex.getMessage());
+        return ResponseEntity.internalServerError().body(error);
+    }
 }
