@@ -36,6 +36,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/main", "/signup", "/signup/**", "/login", "/auth/**", "/api/common/datacontroller/**", "/css/**", "/img/**", "/js/**", "/favicon.ico").permitAll()
+
                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
