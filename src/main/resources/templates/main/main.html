@@ -1,47 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="/css/globals.css" />
-    <link rel="stylesheet" href="/css/style.css" />
+    <title>Main Page</title>
 </head>
 <body>
-<div class="screen">
-    <div class="div">
-        <div class="information">INFORMATION</div>
-        <div class="overlap-group">
-            <img class="fi-rr-caret-left" src="/img/left.png" />
-            <img class="img" src="/img/right.png" />
-            <div class="overlap"><div class="sign-up">SIGN UP</div></div>
-            <div class="div-wrapper"><div class="text-wrapper">LOGIN</div></div>
-            <div class="go-wrapper"><div class="go">GO!</div></div>
-            <div class="introduction">INTRODUCTION</div>
-            <div class="match-up">MATCHUP</div>
-            <div class="guest">GUEST</div>
-            <div class="stadium">STADIUM</div>
-            <div class="community">COMMUNITY</div>
-            <div class="schedule">SCHEDULE</div>
-            <div class="text-wrapper-2">CS</div>
-            <div class="team">TEAM</div>
-            <div class="shop">SHOP</div>
-            <img class="fi-rr-comments" src="/img/chat.png">  <!-- 채팅 -->
-            <img class="fi-rr-bell" src="/img/bell.png"> <!-- 알림 -->
-            <img class="fi-rr-marker" src="/img/marker.png" /> <!-- 위치 -->
-            <img class="chatgpt-image" src="/img/matchon_logo.png" /> <!-- 로고 이미지 -->
-            <p class="wanna-match-you-re">
-                <span class="span">WANNA </span>
-                <span class="text-wrapper-3">MATCH?</span>
-                </br>
-                <span class="span">YOU'RE</span>
-                <span class="text-wrapper-4">ON</span>
-                <span class="span">!</span>
-            </p>
-        </div>
-        <div class="text-wrapper-5">team@matchon.com | 02-123-123</div>
-        <div class="frame"></div>
-    </div>
-</div>
+<h2>🎮 메인 페이지입니다</h2>
+<a th:href="@{/login}"><button>로그인</button></a>
+<a th:href="@{/signup}"><button>회원가입</button></a>
 </body>
 </html>

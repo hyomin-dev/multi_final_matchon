@@ -11,4 +11,14 @@ public class ViewController {
     public String mainPage(){
         return "main/main";
     }
+
+    @GetMapping("/login")
+    public String loginPage(){
+        return "login/login";
+    }
+
+    @GetMapping("/signup")
+    public String signupPage(){
+        return "signup/signup";
+    }
 }
