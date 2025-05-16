@@ -25,7 +25,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     generate-ddl: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show_sql: true
   output:
     ansi:
