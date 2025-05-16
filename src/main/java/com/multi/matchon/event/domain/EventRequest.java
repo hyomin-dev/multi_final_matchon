@@ -2,6 +2,7 @@ package com.multi.matchon.event.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.common.domain.SportsType;
+import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -54,7 +55,7 @@ public class EventRequest extends BaseEntity {
 
     @Column(name="event_status",nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private EventStatus eventStatus;
+    private Status eventStatus;
 
     @Column(name="is_deleted")
     @Builder.Default

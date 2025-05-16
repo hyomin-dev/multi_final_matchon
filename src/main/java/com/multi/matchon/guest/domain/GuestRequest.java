@@ -1,6 +1,7 @@
 package com.multi.matchon.guest.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
+import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -53,8 +54,8 @@ public class GuestRequest extends BaseEntity {
     @Column(name="match_description",nullable = false,columnDefinition = "TEXT")
     private String matchDescription;
 
-    @Column(name="status",nullable = false, columnDefinition = "ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING'")
-    private GuestStatus guestStatus;
+    @Column(name="status",nullable = false, columnDefinition = "ENUM('PENDING', 'APPROVED', 'DENIED') NOT NULL DEFAULT 'PENDING'")
+    private Status guestStatus;
 
     @Column(name="is_deleted")
     @Builder.Default

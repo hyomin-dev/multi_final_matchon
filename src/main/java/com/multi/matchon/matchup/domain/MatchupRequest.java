@@ -1,6 +1,7 @@
 package com.multi.matchon.matchup.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
+import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,7 @@ public class MatchupRequest extends BaseEntity {
 
     @Column(name="status",nullable = false)
     @Builder.Default
-    private MatchupStatus matchupStatus = MatchupStatus.PENDING;
+    private Status matchupStatus = Status.PENDING;
 
     @Column(name="is_deleted")
     @Builder.Default
