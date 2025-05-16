@@ -1,8 +1,11 @@
 #wrap{
-    min-height:calc(100vh - 300px); /* footer, header 크기 빼기 */
+    min-height:calc(100vh - 340px); /* footer, header, margin 크기 빼기 */
 }
 .footer{
-    height: 24px;
+    height: 60px;
+    margin: 0 auto;
+    width: 100%;
+    font-size: 24px;
     text-align: center;
 }
 
