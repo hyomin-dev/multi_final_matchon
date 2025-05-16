@@ -21,4 +21,9 @@ public class ViewController {
     public String signupPage(){
         return "signup/signup";
     }
+
+    @GetMapping("/header-footer-test")
+    public String test(){
+        return "common/header_footer_use";
+    }
 }
