@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>MATCHON</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <style>
+        a {
+            display:block;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+    <h1>MATCHUP 참가 요청 상세보기</h1>
+    <a th:href="@{/matchup/request/edit}" disabled="true">수정하기</a>
+    <a th:href="@{/matchup/request/delete}">취소하기</a>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>
