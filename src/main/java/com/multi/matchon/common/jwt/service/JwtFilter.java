@@ -31,6 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
         String token = resolveToken(request);
+
         if(token==null){
             if(request.getCookies()!=null){
                 for(Cookie cookie : request.getCookies()){
@@ -47,7 +48,6 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
 
         // 2. 토큰이 있을 경우 → 유효성 검증 및 SecurityContext 설정
         if (token != null && jwtTokenProvider.validateToken(token)) {
