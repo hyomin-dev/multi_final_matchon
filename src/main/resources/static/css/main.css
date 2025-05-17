@@ -91,3 +91,9 @@ body, html {
     margin-top: auto; /* footer가 항상 하단에 있도록 설정 */
     z-index: 1000; /* 다른 요소 위에 표시 */
 }
+
+#chatbot-img{
+    position: fixed;
+    right: 3%;
+    bottom: 8%;
+}

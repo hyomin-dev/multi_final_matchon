@@ -14,3 +14,9 @@
     border-top: 1px solid #000080;
 
 }
+
+#chatbot-img{
+    position: fixed;
+    right: 3%;
+    bottom: 8%;
+}
