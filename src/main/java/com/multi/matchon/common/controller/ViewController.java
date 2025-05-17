@@ -1,4 +1,4 @@
-package com.multi.matchon.common.viewcontroller;
+package com.multi.matchon.common.controller;
 
 
 import org.springframework.stereotype.Controller;

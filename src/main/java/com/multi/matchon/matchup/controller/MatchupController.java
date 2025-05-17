@@ -112,17 +112,4 @@ public class MatchupController {
         return "matchup/matchup-request-my";
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

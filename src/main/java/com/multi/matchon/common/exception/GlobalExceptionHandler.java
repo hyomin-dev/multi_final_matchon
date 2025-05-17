@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // 예외 핸들러가 Security보다 우선 실행되도록 어노테이션 추가
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.multi.matchon") // matchon 패키지 내부에 있는 모든 Controller를 스캔함
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler {
 
