@@ -31,14 +31,13 @@
             <img src="/img/bell-white.png">
         </div>
         <div class="auth">
-            <th:block sec:authorize="isAnonymous()">
-                <a th:href="@{/login}" class="btn">LOGIN</a>
-                <a th:href="@{/signup}" class="btn">SIGN UP</a>
-            </th:block>
-            <th:block sec:authorize="isAuthenticated()">
-                <a th:href="@{/my}" class="btn">MY</a>
-                <a th:href="@{/logout}" class="btn">LOGOUT</a>
-            </th:block>
+            <!-- 로그인 전 -->
+            <a id="btn-login" th:href="@{/login}" class="btn">LOGIN</a>
+            <a id="btn-signup" th:href="@{/signup/user}" class="btn">SIGN UP</a>
+
+            <!-- 로그인 후 -->
+            <a id="btn-mypage" href="/mypage" class="btn" style="display: none;">MY</a>
+            <a id="btn-logout" href="javascript:logout()" class="btn" style="display: none;">LOGOUT</a>
         </div>
     </div>
 
@@ -60,5 +59,37 @@
 
 
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const accessToken = localStorage.getItem("accessToken");
+
+
+        const loginBtn = document.getElementById("btn-login");
+        const signupBtn = document.getElementById("btn-signup");
+        const myBtn = document.getElementById("btn-mypage");
+        const logoutBtn = document.getElementById("btn-logout");
+
+        if (accessToken) {
+            // 로그인 상태
+            if (loginBtn) loginBtn.style.display = "none";
+            if (signupBtn) signupBtn.style.display = "none";
+            if (myBtn) myBtn.style.display = "inline-block";
+            if (logoutBtn) logoutBtn.style.display = "inline-block";
+        } else {
+            // 비로그인 상태
+            if (loginBtn) loginBtn.style.display = "inline-block";
+            if (signupBtn) signupBtn.style.display = "inline-block";
+            if (myBtn) myBtn.style.display = "none";
+            if (logoutBtn) logoutBtn.style.display = "none";
+        }
+    });
+
+    function logout() {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        alert("로그아웃 되었습니다.");
+        window.location.href = "/main";
+    }
+</script>
 </body>
 </html>

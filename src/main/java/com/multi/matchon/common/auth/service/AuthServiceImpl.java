@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -109,13 +110,22 @@ public class AuthServiceImpl implements AuthService{
         String accessToken = jwtTokenProvider.createAccessToken(member.getMemberEmail(), member.getMemberRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberEmail());
 
-        RefreshToken token = RefreshToken.builder()
-                .member(member)
-                .refreshTokenData(refreshToken)
-                .refreshTokenExpiredDate(LocalDateTime.now().plusDays(14))
-                .build();
+        // 기존 RefreshToken 존재 여부 확인
+        Optional<RefreshToken> existingToken = refreshTokenRepository.findByMember(member);
 
-        refreshTokenRepository.save(token);
+        if (existingToken.isPresent()) {
+            // 기존 토큰 갱신 (update)
+            RefreshToken token = existingToken.get();
+            token.update(refreshToken, LocalDateTime.now().plusDays(14));
+        } else {
+            // 새로 저장 (insert)
+            RefreshToken token = RefreshToken.builder()
+                    .member(member)
+                    .refreshTokenData(refreshToken)
+                    .refreshTokenExpiredDate(LocalDateTime.now().plusDays(14))
+                    .build();
+            refreshTokenRepository.save(token);
+        }
 
         return new TokenResponseDto(accessToken, refreshToken);
     }
@@ -132,7 +142,7 @@ public class AuthServiceImpl implements AuthService{
         Member member = memberRepository.findByMemberEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
-        RefreshToken saved = refreshTokenRepository.findByMemberId(member.getId())
+        RefreshToken saved = refreshTokenRepository.findByMember(member)
                 .orElseThrow(() -> new RuntimeException("저장된 RefreshToken 없음"));
 
         if (!saved.getRefreshTokenData().equals(refreshToken)) {
