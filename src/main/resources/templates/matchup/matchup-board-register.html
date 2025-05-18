@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>MATCHON</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-board-register.css}">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script th:src="@{/js/matchup/matchup-board-register.js}" defer></script>
+
+
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+    <div class="content">
+        <h1>MATCHUP 글 작성</h1>
+        <form th:action="@{/matchup/board/register}" method="post" enctype="multipart/form-data">
+            <label>
+                종목:
+                <select class="sports"></select>
+            </label>
+            <label>
+                소속팀:
+                <select class="team"></select>
+            </label>
+            <label>
+                팀 소개:
+                <textarea cols="30" rows="5" placeholder="팀 소개">
+
+                </textarea>
+            </label>
+            <label>
+                경기장 예약 내역:
+                <input type="file">
+            </label>
+            <label>
+                경기장명:
+                <input type="text" placeholder="경기장명">
+            </label>
+            <label>
+                경기장 주소:
+                <input type="text" id="sports-facility-address" placeholder="주소">
+                <input type="button" onclick="getAddress()" value="우편번호 찾기">
+            </label>
+            <label>
+                경기 날짜:
+                <input type="datetime-local">
+            </label>
+            <label>
+                현재 참가 인원:
+                <select class="current-participants" size="8"></select>
+            </label>
+            <label>
+                총 모집 인원:
+                <select class="max-participants" size="8"></select>
+            </label>
+            <label>
+                하한 매너 온도:
+                <select class="manner-temperature" size="8"></select>
+            </label>
+            <label>
+                경기 방식 소개:
+                <textarea cols="30" rows="5" placeholder="팀 소개">
+                </textarea>
+            </label>
+
+            <div class="btn">
+                <button type="submit">등록하기</button>
+                <button type="button" class="cancel-btn">취소하기</button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+<!--<<<<<<< HEAD-->
+<!--=======-->
+<!--<script>-->
+<!--    document.addEventListener("DOMContentLoaded",()=>{-->
+<!--        getSportsType();-->
+
+<!--        const cancelBtn = document.querySelector(".cancel-btn");-->
+
+
+
+
+<!--        cancelBtn.addEventListener("click",()=>{-->
+<!--            window.history.back();-->
+<!--        })-->
+
+
+<!--    })-->
+<!--    async function getSportsType(){-->
+<!--        const response = await fetch("/sports-types")-->
+<!--        if(!response.ok)-->
+<!--            throw new Error(`HTTP error! Status:${response.status}`)-->
+<!--        const data = await response.json();-->
+<!--        //console.log(data); // data 확인-->
+<!--        //console.log(data.length); // data 길이 확인-->
+<!--        const selectBtn = document.querySelector(".sports");-->
+<!--        for(let i=0;i<data.length;i++){-->
+<!--            const option = document.createElement("option")-->
+<!--            option.value = data[i].sportsTypeName;-->
+<!--            option.innerHTML = data[i].sportsTypeName;-->
+<!--            selectBtn.appendChild(option);-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
+<!--&gt;>>>>>> develop-->
+</body>
+</html>

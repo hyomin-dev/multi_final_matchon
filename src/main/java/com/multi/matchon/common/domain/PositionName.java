@@ -11,6 +11,5 @@ public enum PositionName {
     LEFT_RIGHT_WING,
     STRIKER_CENTER_FORWARD,
     SECOND_STRIKER,
-    LEFT_RIGHT_WINGER,
-
+    LEFT_RIGHT_WINGER
 }

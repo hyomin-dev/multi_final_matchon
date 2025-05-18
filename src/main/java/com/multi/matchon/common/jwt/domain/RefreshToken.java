@@ -16,27 +16,37 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name="refresh_token")
-//@Setter: JPA entity에서 setter사용은 자제, test용
+@Table(name = "refresh_token")
 public class RefreshToken {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="refresh_token_id")
+    @Column(name = "refresh_token_id")
     private Long id;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="member_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(name="refresh_token_data",nullable = false,columnDefinition = "VARCHAR(512)")
+    @Column(name = "refresh_token_data", nullable = false, columnDefinition = "VARCHAR(512)")
     private String refreshTokenData;
 
-    @Column(name="refresh_token_expired_date",nullable = false)
+    @Column(name = "refresh_token_expired_date", nullable = false)
     private LocalDateTime refreshTokenExpiredDate;
 
-    @Column(name="created_date", nullable = false)
-    @CurrentTimestamp
+    @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 
+    // @CurrentTimestamp는 Hibernate에서 기본 제공하지 않는 어노테이션
+    // 이 필드를 자동으로 LocalDateTime.now() 채움
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = LocalDateTime.now();
+    }
 
+    // 토큰 정보 업데이트 메서드
+    public void update(String newRefreshTokenData, LocalDateTime newExpiryDate) {
+        this.refreshTokenData = newRefreshTokenData;
+        this.refreshTokenExpiredDate = newExpiryDate;
+    }
 }

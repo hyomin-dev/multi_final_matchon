@@ -1,6 +1,7 @@
 package com.multi.matchon.customerservice.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
+import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,7 @@ public class Inquiry extends BaseEntity {
 
     @Column(name="inquiry_status",nullable = false)
     @Builder.Default
-    private InquiryStatus inquiryStatus = InquiryStatus.WAITING;
+    private Status inquiryStatus = Status.PENDING;
 
     @Column(name="is_deleted")
     @Builder.Default

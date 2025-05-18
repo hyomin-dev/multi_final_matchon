@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>MATCHON</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+  <style>
+    a {
+      display:block;
+    }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+  <h1>MATCHUP 참가 요청 작성</h1>
+  <form th:action="@{/matchup/request}" method="post" >
+    <button type="submit">요청하기</button>
+    <button type="button" class="cancel-btn">취소하기</button>
+  </form>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+<script>
+  document.addEventListener("DOMContentLoaded",()=>{
+    const cancelBtn = document.querySelector(".cancel-btn");
+    cancelBtn.addEventListener("click",()=>{
+      window.history.back();
+    })
+  })
+</script>
+</body>
+</html>

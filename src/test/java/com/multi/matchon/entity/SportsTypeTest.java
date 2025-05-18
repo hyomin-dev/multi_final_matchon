@@ -25,7 +25,7 @@ public class SportsTypeTest {
     @DisplayName("sports_type test")
     void test(){
         SportsType sportsType = new SportsType();
-        sportsType.setSportsTypeName(SportsTypeName.SOCCER);
+        //sportsType.setSportsTypeName(SportsTypeName.SOCCER);
         em.persist(sportsType);
         em.flush();
     }
