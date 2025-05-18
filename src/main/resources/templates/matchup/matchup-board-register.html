@@ -29,6 +29,7 @@
                 팀 소개:
                 <textarea cols="30" rows="5" placeholder="팀 소개" class="teamIntro">
 
+
                 </textarea>
             </label>
             <label>
@@ -38,6 +39,7 @@
             <label>
                 경기장명:
                 <input type="text" placeholder="경기장명" class="sports-facility-name">
+
             </label>
             <label>
                 경기장 주소:
@@ -47,6 +49,7 @@
             <label>
                 경기 날짜:
                 <input type="datetime-local" id="matchDate">
+
             </label>
             <label>
                 현재 참가 인원:
@@ -63,6 +66,7 @@
             <label>
                 경기 방식 소개:
                 <textarea cols="30" rows="5" placeholder="경기 방식 소개" class="matchIntro">
+
                 </textarea>
             </label>
 
@@ -77,5 +81,42 @@
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
+<<<<<<< HEAD
+=======
+<!--<<<<<<< HEAD-->
+<!--=======-->
+<!--<script>-->
+<!--    document.addEventListener("DOMContentLoaded",()=>{-->
+<!--        getSportsType();-->
+
+<!--        const cancelBtn = document.querySelector(".cancel-btn");-->
+
+
+
+
+<!--        cancelBtn.addEventListener("click",()=>{-->
+<!--            window.history.back();-->
+<!--        })-->
+
+
+<!--    })-->
+<!--    async function getSportsType(){-->
+<!--        const response = await fetch("/sports-types")-->
+<!--        if(!response.ok)-->
+<!--            throw new Error(`HTTP error! Status:${response.status}`)-->
+<!--        const data = await response.json();-->
+<!--        //console.log(data); // data 확인-->
+<!--        //console.log(data.length); // data 길이 확인-->
+<!--        const selectBtn = document.querySelector(".sports");-->
+<!--        for(let i=0;i<data.length;i++){-->
+<!--            const option = document.createElement("option")-->
+<!--            option.value = data[i].sportsTypeName;-->
+<!--            option.innerHTML = data[i].sportsTypeName;-->
+<!--            selectBtn.appendChild(option);-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
+<!--&gt;>>>>>> develop-->
+>>>>>>> develop
 </body>
 </html>
