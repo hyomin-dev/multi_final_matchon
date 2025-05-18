@@ -28,7 +28,7 @@ public class AwsS3Utils {
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String saveFile(String dirName, String fileName, MultipartFile multipartFile) {
+    public void saveFile(String dirName, String fileName, MultipartFile multipartFile) {
         String replaceFileName = fileName + "." + FilenameUtils.getExtension(multipartFile.getResource().getFilename());
 
         String s3Key = dirName + replaceFileName;
@@ -49,7 +49,7 @@ public class AwsS3Utils {
 
             s3Client.putObjectAcl(aclRequest); //개별권한설정
             log.info("[AwsS3Utils] File Uploaded Successfully: " + s3Key);
-            return replaceFileName;
+            //return replaceFileName;
         } catch (IOException e) {
             log.error("[AwsS3Utils] File Upload Failed: " + s3Key, e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");

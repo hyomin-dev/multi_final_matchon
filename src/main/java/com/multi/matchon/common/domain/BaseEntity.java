@@ -1,21 +1,27 @@
 package com.multi.matchon.common.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @MappedSuperclass
 @Getter
+@EntityListeners({AuditingEntityListener.class})
 public abstract class BaseEntity {
     @CreationTimestamp
     @Column(name="created_date")
     private LocalDateTime createdDate;
 
     @Column(name="created_person", columnDefinition = "VARCHAR(100)")
+    @CreatedBy
     private String createdPerson;
 
     @UpdateTimestamp
@@ -23,5 +29,6 @@ public abstract class BaseEntity {
     private LocalDateTime modifiedDate;
 
     @Column(name="modified_person", columnDefinition = "VARCHAR(100)")
+    @LastModifiedBy
     private String modifiedPerson;
 }

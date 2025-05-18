@@ -1,11 +1,13 @@
 package com.multi.matchon.matchup.controller;
 
 
+import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,9 +42,9 @@ public class MatchupController {
 
 
     @PostMapping("/board/register")
-    public String boardRegister(@ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto){
-        log.info("{}", reqMatchupBoardDto);
-        matchupService.boardRegister(reqMatchupBoardDto);
+    public String boardRegister(@ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
+        //log.info("{}", reqMatchupBoardDto);
+        matchupService.boardRegister(reqMatchupBoardDto, user);
         log.info("matchup 게시글 등록 완료");
         return "matchup/matchup-board-list";
     }

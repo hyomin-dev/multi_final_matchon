@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded",()=>{
-    getSportsType();
-    getTeam();
+    getSportsType(); // 종목 가져옴
+    getTeam(); // 현재 사용자의 팀 정보를 가져옴
     setCurrentParticipants();
     setMannerTemperature();
 
@@ -84,6 +84,7 @@ function getAddress() {
         }
     }).open();
 }
+
 function setCurrentParticipants(){
 
     const selectCur = document.querySelector("#currentParticipants");

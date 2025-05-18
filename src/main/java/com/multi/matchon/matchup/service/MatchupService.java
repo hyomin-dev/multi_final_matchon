@@ -1,5 +1,12 @@
 package com.multi.matchon.matchup.service;
 
+import com.multi.matchon.common.auth.dto.CustomUser;
+import com.multi.matchon.common.domain.Attachment;
+import com.multi.matchon.common.domain.BoardType;
+import com.multi.matchon.common.domain.SportsType;
+import com.multi.matchon.common.domain.SportsTypeName;
+import com.multi.matchon.common.repository.AttachmentRepository;
+import com.multi.matchon.common.repository.SportsTypeRepository;
 import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
@@ -11,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +39,8 @@ public class MatchupService{
 
 
     private final MatchupBoardRepository matchupBoardRepository;
+    private final SportsTypeRepository sportsTypeRepository;
+    private final AttachmentRepository attachmentRepository;
     private final AwsS3Utils awsS3Utils;
 
 
@@ -43,15 +53,40 @@ public class MatchupService{
         return matchupBoards;
     }
 
-    public void boardRegister(ReqMatchupBoardDto reqMatchupBoardDto) {
-        insertFile(reqMatchupBoardDto);
-        log.info("대기");
-    }
+    public void boardRegister(ReqMatchupBoardDto reqMatchupBoardDto, CustomUser user) {
 
-    public void insertFile(ReqMatchupBoardDto reqMatchupBoardDto){
+        MatchupBoard newMatchupBoard = MatchupBoard.builder()
+                .member(user.getMember())
+                .sportsType(sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardDto.getSportsType())).orElseThrow(()-> new IllegalArgumentException(reqMatchupBoardDto.getSportsType()+"는 지원하지 않는 종목입니다.")))
+                .reservationAttachmentEnabled(true)
+                .teamIntro(reqMatchupBoardDto.getTeamIntro())
+                .sportsFacilityName(reqMatchupBoardDto.getSportsFacilityName())
+                .sportsFacilityAddress(reqMatchupBoardDto.getSportsFacilityAddress())
+                .matchDatetime(reqMatchupBoardDto.getMatchDate())
+                .matchDuration(LocalTime.of(reqMatchupBoardDto.getMatchDuration()/60,reqMatchupBoardDto.getMatchDuration()%60))
+                .currentParticipantCount(reqMatchupBoardDto.getCurrentParticipants())
+                .maxParticipants(reqMatchupBoardDto.getMaxParticipants())
+                .minMannerTemperature(reqMatchupBoardDto.getMinMannerTemperature())
+                .matchDescription(reqMatchupBoardDto.getMatchIntro())
+                .build();
+        MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
+        insertFile(reqMatchupBoardDto, matchupBoard);
+
+    }
+    public void insertFile(ReqMatchupBoardDto reqMatchupBoardDto, MatchupBoard matchupBoard){
         String fileName = UUID.randomUUID().toString().replace("-","");
         awsS3Utils.saveFile(FILE_DIR, fileName, reqMatchupBoardDto.getReservationFile());
+        Attachment attachment = Attachment.builder()
+                .boardType(BoardType.MATCHUP_BOARD)
+                .boardNumber(matchupBoard.getId())
+                .fileOrder(0)
+                .originalName(reqMatchupBoardDto.getReservationFile().getOriginalFilename())
+                .savedName(fileName+reqMatchupBoardDto.getReservationFile().getOriginalFilename().substring(reqMatchupBoardDto.getReservationFile().getOriginalFilename().indexOf(".")))
+                .savePath(FILE_DIR)
+                .build();
+        attachmentRepository.save(attachment);
+
+
     }
 
-    //public void
 }
