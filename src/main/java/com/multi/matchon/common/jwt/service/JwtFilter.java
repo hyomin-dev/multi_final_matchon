@@ -34,7 +34,6 @@ public class JwtFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         String token = resolveToken(request);
 
-
         // 쿠키에서 찾기
         if(token==null){
             if(request.getCookies()!=null){
