@@ -27,7 +27,7 @@ public class MatchupController {
     @PostMapping("/board/register")
     public String boardRegister(String tmp){
         log.info("matchup 게시글 등록 완료");
-        return "matchup/matchup-list";
+        return "matchup/matchup-board-list";
     }
 
     // 게시글 상세 조회
@@ -66,7 +66,7 @@ public class MatchupController {
 
     @GetMapping("/board/delete")                    public String boardDelete(){
         log.info("matchup 게시글 삭제 완료");
-        return "matchup/matchup-list";
+        return "matchup/matchup-board-list";
     }
 
     // 참가 요청
