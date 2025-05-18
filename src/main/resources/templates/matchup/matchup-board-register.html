@@ -30,6 +30,7 @@
             <label>
                 팀 소개:
                 <textarea cols="30" rows="5" placeholder="팀 소개" th:field="*{teamIntro}">
+
                 </textarea>
             </label>
             <label>
@@ -39,11 +40,11 @@
             <label>
                 경기장명:
                 <input type="text" placeholder="경기장명" th:field="*{sportsFacilityName}">
-
             </label>
             <label>
                 경기장 주소:
                 <input type="text" th:field="*{sportsFacilityAddress}" placeholder="주소">
+
                 <input type="button" onclick="getAddress()" value="우편번호 찾기">
             </label>
             <label>
@@ -65,7 +66,6 @@
             <label>
                 경기 방식 소개:
                 <textarea cols="30" rows="5" placeholder="경기 방식 소개" th:field="*{matchIntro}">
-
                 </textarea>
             </label>
 
