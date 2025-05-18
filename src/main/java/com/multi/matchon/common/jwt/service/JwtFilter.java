@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
@@ -31,6 +33,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
         String token = resolveToken(request);
+
+        // 쿠키에서 찾기
         if(token==null){
             if(request.getCookies()!=null){
                 for(Cookie cookie : request.getCookies()){
@@ -42,14 +46,17 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
-        // 1. 토큰이 없고 인증 제외 경로일 경우: 그냥 통과
-        if (token == null && isExcludedPath(uri)) {
-            filterChain.doFilter(request, response);
+        // 토큰이 없고 인증 제외 경로가 아닌 경우 : 직접 401 응답 주고 끝
+        if (token == null && !isExcludedPath(uri)) {
+            log.warn("[JwtFilter] 인증이 필요한 경로인데 토큰이 없습니다. uri: {}", uri);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\":\"로그인이 필요합니다.\"}");
             return;
         }
 
-
-        // 2. 토큰이 있을 경우 → 유효성 검증 및 SecurityContext 설정
+        // 토큰이 존재하는 경우 검증 및 인증 정보 설정
         if (token != null && jwtTokenProvider.validateToken(token)) {
             String email = jwtTokenProvider.getEmailFromToken(token);
             CustomUser userDetails = (CustomUser) customUserDetailsService.loadUserByUsername(email);
@@ -59,11 +66,11 @@ public class JwtFilter extends OncePerRequestFilter {
             );
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            log.info("[JwtFilter] 인증 성공: {}", email);
         }
 
-        // 3. 토큰이 없고 인증 제외 경로도 아닌 경우 → SecurityContext에 인증 정보 없음
-        // 나중에 AuthenticationEntryPoint가 401 처리함 (정상 동작)
-
+        // 인증 제외 경로거나 정상 인증된 경우 계속 진행
         filterChain.doFilter(request, response);
     }
 

@@ -1,12 +1,13 @@
 package com.multi.matchon.matchup.service;
 
+
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.Attachment;
 import com.multi.matchon.common.domain.BoardType;
-import com.multi.matchon.common.domain.SportsType;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
+
 import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
@@ -39,8 +40,10 @@ public class MatchupService{
 
 
     private final MatchupBoardRepository matchupBoardRepository;
+
     private final SportsTypeRepository sportsTypeRepository;
     private final AttachmentRepository attachmentRepository;
+
     private final AwsS3Utils awsS3Utils;
 
 

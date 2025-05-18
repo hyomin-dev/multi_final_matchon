@@ -87,7 +87,7 @@ CREATE TABLE member (
     member_email VARCHAR(100) NOT NULL UNIQUE,
     member_password VARCHAR(100) NOT NULL,
     member_name VARCHAR(50),
-    member_role ENUM('USER', 'ADMIN', 'HOSt') NOT NULL,   
+    member_role ENUM('USER', 'ADMIN', 'HOST') NOT NULL,
     position_id BIGINT,
     preferred_time ENUM('WEEKDAY_MORNING', 'WEEKDAY_AFTERNOON', 'WEEKDAY_EVENING', 'WEEKEND_MORNING', 'WEEKEND_AFTERNOON', 'WEEKEND_EVENING'),
     team_id BIGINT,

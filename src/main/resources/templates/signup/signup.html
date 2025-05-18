@@ -1,19 +1,68 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
     <title>회원가입</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
 </head>
 <body>
-<h2>회원가입 페이지</h2>
-<form th:action="@{/auth/signup}" method="post">
-    <input type="email" name="email" placeholder="이메일" required /><br/>
-    <input type="password" name="password" placeholder="비밀번호" required /><br/>
-    <select name="role">
-        <option value="USER">사용자</option>
-        <option value="HOST">주최자</option>
-        <option value="ADMIN">관리자</option>
-    </select><br/>
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+
+<!-- role 선택 -->
+<select id="roleSelect" onchange="changeRole()">
+    <option value="user" selected>사용자</option>
+    <option value="host">주최자</option>
+</select>
+
+<h2>회원가입</h2>
+
+<form id="signupForm">
+    <input type="email" id="email" placeholder="이메일" required />
+    <input type="password" id="password" placeholder="비밀번호" required />
+    <input type="text" id="name" placeholder="이름" required />
+
     <button type="submit">회원가입</button>
 </form>
+
+<script>
+    document.getElementById("signupForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const role = document.getElementById("roleSelect").value;
+        const url = role === "host" ? "/auth/signup/host" : "/auth/signup/user";
+
+        const payload = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+            name: document.getElementById("name").value,
+            sportsTypeId: 1 // 축구 고정 (SOCCER)
+        };
+
+        if (role === "user") {
+            payload.positionId = null;
+        }
+
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("회원가입 성공!");
+                    window.location.href = "/login";
+                } else {
+                    return res.json().then(data => {
+                        alert(data.error || "회원가입 실패");
+                    });
+                }
+            });
+    });
+
+</script>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
 </body>
 </html>

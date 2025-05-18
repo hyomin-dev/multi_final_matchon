@@ -1,7 +1,9 @@
 package com.multi.matchon.matchup.controller;
 
 
+
 import com.multi.matchon.common.auth.dto.CustomUser;
+
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +47,7 @@ public class MatchupController {
     public String boardRegister(@ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
         //log.info("{}", reqMatchupBoardDto);
         matchupService.boardRegister(reqMatchupBoardDto, user);
+
         log.info("matchup 게시글 등록 완료");
         return "matchup/matchup-board-list";
     }

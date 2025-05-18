@@ -33,7 +33,7 @@
         <div class="auth">
             <!-- 로그인 전 -->
             <a id="btn-login" th:href="@{/login}" class="btn">LOGIN</a>
-            <a id="btn-signup" th:href="@{/signup/user}" class="btn">SIGN UP</a>
+            <a id="btn-signup" th:href="@{/signup}" class="btn">SIGN UP</a>
 
             <!-- 로그인 후 -->
             <a id="btn-mypage" href="/mypage" class="btn" style="display: none;">MY</a>
@@ -87,6 +87,10 @@
     function logout() {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+
+        // 쿠키도 삭제 (있다면)
+        document.cookie = "Authorization=; path=/; max-age=0";
+
         alert("로그아웃 되었습니다.");
         window.location.href = "/main";
     }

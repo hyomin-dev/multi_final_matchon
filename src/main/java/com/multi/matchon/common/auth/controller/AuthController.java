@@ -1,10 +1,13 @@
 package com.multi.matchon.common.auth.controller;
 
 import com.multi.matchon.common.auth.service.AuthService;
-import com.multi.matchon.member.dto.req.HostSignupRequestDto;
+import com.multi.matchon.common.jwt.repository.RefreshTokenRepository;
+import com.multi.matchon.common.jwt.service.JwtTokenProvider;
+import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.dto.req.LoginRequestDto;
-import com.multi.matchon.member.dto.req.UserSignupRequestDto;
+import com.multi.matchon.member.dto.req.SignupRequestDto;
 import com.multi.matchon.member.dto.res.TokenResponseDto;
+import com.multi.matchon.member.repository.MemberRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -20,18 +23,22 @@ import java.time.Duration;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final MemberRepository memberRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @PostMapping("/signup/user")
-    public ResponseEntity<String> signupUser(@Valid @RequestBody UserSignupRequestDto requestDto) {
+    public ResponseEntity<String> signupUser(@RequestBody SignupRequestDto requestDto) {
         authService.signupUser(requestDto);
         return ResponseEntity.ok("사용자 회원가입 성공");
     }
 
     @PostMapping("/signup/host")
-    public ResponseEntity<String> signupHost(@Valid @RequestBody HostSignupRequestDto requestDto) {
+    public ResponseEntity<String> signupHost(@RequestBody SignupRequestDto requestDto) {
         authService.signupHost(requestDto);
         return ResponseEntity.ok("주최자 회원가입 성공");
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto requestDto) {
@@ -46,6 +53,31 @@ public class AuthController {
         return ResponseEntity.ok().headers(headers).body(tokenResponse);
 
         //return ResponseEntity.ok(tokenResponse);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@CookieValue(value = "Authorization", required = false) String token) {
+        if (token != null) {
+            String email = jwtTokenProvider.getEmailFromToken(token);
+            Member member = memberRepository.findByMemberEmail(email)
+                    .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+            // DB의 RefreshToken 삭제
+            refreshTokenRepository.findByMember(member)
+                    .ifPresent(refreshTokenRepository::delete);
+
+            // accessToken 쿠키 제거
+            ResponseCookie deleteCookie = ResponseCookie.from("Authorization", "")
+                    .path("/")
+                    .maxAge(0)
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                    .body("로그아웃 완료");
+        }
+
+        return ResponseEntity.badRequest().body("토큰이 없습니다.");
     }
 
     @PostMapping("/reissue")
