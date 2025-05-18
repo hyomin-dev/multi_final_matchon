@@ -30,10 +30,6 @@ public class HostProfile extends BaseTimeEntity {
     @Column(name="host_name", nullable = false, columnDefinition = "VARCHAR(100)")
     private String hostName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="sports_type_id",nullable = false)
-    private SportsType sportsType;
-
     @Column(name="picture_attachment_enabled",nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE CHECK (picture_attachment_enabled = TRUE)")
     @Builder.Default
     private Boolean pictureAttachmentEnabled=true;

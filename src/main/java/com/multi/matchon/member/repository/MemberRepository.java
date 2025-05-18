@@ -11,7 +11,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByMemberEmail(String email);
 
     @Query("SELECT m FROM Member m " +
-            "JOIN FETCH m.sportsType st " +
+            //"JOIN FETCH m.sportsType st " +
             "JOIN FETCH m.positions p " +
             "WHERE m.memberEmail = :email")
     Optional<Member> findWithFetchJoinByEmail(@Param("email") String email);

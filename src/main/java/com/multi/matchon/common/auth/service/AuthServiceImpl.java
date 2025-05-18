@@ -40,27 +40,27 @@ public class AuthServiceImpl implements AuthService{
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
-        if (dto.getSportsTypeId() == null) {
-            throw new IllegalArgumentException("종목 ID는 필수입니다.");
-        }
+//        if (dto.getSportsTypeId() == null) {
+//            throw new IllegalArgumentException("종목 ID는 필수입니다.");
+//        }
 
-        if (dto.getPositionId() == null) {
-            throw new IllegalArgumentException("포지션 ID는 필수입니다.");
-        }
+//        if (dto.getPositionId() == null) {
+//            throw new IllegalArgumentException("포지션 ID는 필수입니다.");
+//        }
 
-        SportsType sportstype = sportsTypeRepository.findById(dto.getSportsTypeId())
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 종목 ID입니다."));
+//        SportsType sportstype = sportsTypeRepository.findById(dto.getSportsTypeId())
+//                .orElseThrow(() -> new IllegalArgumentException("잘못된 종목 ID입니다."));
 
-        Positions position = positionsRepository.findById(dto.getPositionId())
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 포지션 ID입니다."));
+//        Positions position = positionsRepository.findById(dto.getPositionId())
+//                .orElseThrow(() -> new IllegalArgumentException("잘못된 포지션 ID입니다."));
 
         Member member = Member.builder()
                 .memberEmail(dto.getEmail())
                 .memberPassword(passwordEncoder.encode(dto.getPassword()))
                 .memberName(dto.getName())
                 .memberRole(MemberRole.USER)
-                .sportsType(sportstype)
-                .positions(position)
+                //.sportsType(sportstype)
+                //.positions(position)
                 .myTemperature(36.5)
                 .pictureAttachmentEnabled(true)
                 .isDeleted(false)
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements AuthService{
                 .memberPassword(passwordEncoder.encode(dto.getPassword()))
                 .memberName(dto.getName())
                 .memberRole(MemberRole.HOST)
-                .sportsType(sportsType)
+                //.sportsType(sportsType)
                 .pictureAttachmentEnabled(true)
                 .isDeleted(false)
                 .build();

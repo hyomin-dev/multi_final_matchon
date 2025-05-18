@@ -19,12 +19,9 @@ public class Positions {
     @Column(name="position_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="sports_type_id",nullable = false)
-    private SportsType sportsType;
-
-    @Column(name="position_name", nullable = false, columnDefinition = "VARCHAR(50)")
-    private String positionName;
+    @Enumerated(EnumType.STRING)
+    @Column(name="position_name", nullable = false, columnDefinition = "ENUM('GOALKEEPER', 'CENTER_BACK', 'LEFT_RIGHT_BACK', 'LEFT_RIGHT_WING_BACK', 'CENTRAL_DEFENSIVE_MIDFIELDER', 'CENTRAL_MIDFIELDER', 'CENTRAL_ATTACKING_MIDFIELDER', 'LEFT_RIGHT_WING', 'STRIKER_CENTER_FORWARD', 'SECOND_STRIKER', 'LEFT_RIGHT_WINGER') NOT NULL")
+    private PositionName positionName;
 
 
 }

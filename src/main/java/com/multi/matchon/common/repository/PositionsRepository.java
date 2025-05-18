@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PositionsRepository extends JpaRepository<Positions, Long> {
-    List<Positions> findBySportsTypeId(Long sportsTypeId);
+    //List<Positions> findBySportsTypeId(Long sportsTypeId);
 }

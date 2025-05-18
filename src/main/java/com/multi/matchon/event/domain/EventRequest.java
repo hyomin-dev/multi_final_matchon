@@ -43,10 +43,6 @@ public class EventRequest extends BaseEntity {
     @JoinColumn(name="host_profile_id",nullable = false)
     private HostProfile hostProfile;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="sports_type_id",nullable = false)
-    private SportsType sportsType;
-
     @Column(name="event_method", nullable = false,columnDefinition = "VARCHAR(100)")
     private String eventMethod;
 

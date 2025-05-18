@@ -29,10 +29,10 @@ public class DataController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/positions")
-    public List<PositionsDto> getPositionsBySportsType(@RequestParam Long sportsTypeId) {
-        return positionsRepository.findBySportsTypeId(sportsTypeId).stream()
-                .map(p -> new PositionsDto(p.getId(), p.getPositionName()))
-                .collect(Collectors.toList());
-    }
+//    @GetMapping("/positions")
+//    public List<PositionsDto> getPositionsBySportsType(@RequestParam Long sportsTypeId) {
+//        return positionsRepository.findBySportsTypeId(sportsTypeId).stream()
+//                .map(p -> new PositionsDto(p.getId(), p.getPositionName().toString()))
+//                .collect(Collectors.toList());
+//    }
 }
