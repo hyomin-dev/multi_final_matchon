@@ -4,6 +4,8 @@
     <title>MATCHON</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <script th:src="@{/js/matchup/matchup-board-list.js}" defer></script>
+
     <style>
         a {
           display:block;
@@ -15,13 +17,13 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
     <h1>MATCHUP 글 목록</h1>
-    <a th:href="@{/matchup/board/my}">내가 작성한 글 목록</a>
-    <a th:href="@{/matchup/request/my}">내가 요청한 목록</a>
+    <a >내가 작성한 글 목록</a> <!-- /matchup/board/my-->
+    <a >내가 요청한 목록</a> <!-- /matchup/request/my -->
 
-
-    <a th:href="@{/matchup/board/register}">글 작성하기</a>
-    <a th:href="@{/matchup/board/detail}">글 상세보기</a>
-    <a th:href="@{#}" disabled="true">문의하기</a>
+    <a th:href="@{/matchup/board/register}">글 작성하기 cookie</a>
+    <button id="register">글 작성하기</button> <!-- /matchup/board/register-->
+    <a >글 상세보기</a> <!-- /matchup/board/detail-->
+    <a th:href="@{#}" disabled="true">문의하기</a> <!-- /matchup/board/my-->
 
 
 </div>

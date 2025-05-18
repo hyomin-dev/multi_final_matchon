@@ -17,8 +17,14 @@ public class ViewController {
         return "login/login";
     }
 
-    @GetMapping("/signup")
-    public String signupPage(){
-        return "signup/signup";
+
+    @GetMapping("/signup/user")
+    public String userSignup() {
+        return "signup/user"; // 사용자 회원가입 화면
+    }
+
+    @GetMapping("/signup/host")
+    public String hostSignup() {
+        return "signup/host"; // 주최자 회원가입 화면
     }
 }

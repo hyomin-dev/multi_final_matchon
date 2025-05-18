@@ -6,15 +6,23 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     const cancelBtn = document.querySelector(".cancel-btn");
     const form = document.querySelector("form");
-    form.addEventListener("submit",()=>{
-        alert("test");
-    })
+    form.addEventListener("submit", (event)=>{
+        submitCheck(event)
+    }
+    )
 
 
     cancelBtn.addEventListener("click",()=>{
         window.history.back();
     })
 })
+
+function submitCheck(e){
+    alert("testteetwet")
+
+    //e.preventDefault();
+}
+
 async function getSportsType(){
     const response = await fetch("/sports-types")
     if(!response.ok)

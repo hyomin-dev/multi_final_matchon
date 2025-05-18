@@ -50,4 +50,5 @@ public class GlobalExceptionHandler {
         error.put("error", ex.getClass().getSimpleName() + ": " + ex.getMessage());
         return ResponseEntity.internalServerError().body(error);
     }
+
 }

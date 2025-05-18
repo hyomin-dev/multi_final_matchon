@@ -1,12 +1,15 @@
 package com.multi.matchon.matchup.controller;
 
+import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.matchup.service.MatchupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/matchup")
@@ -18,11 +21,17 @@ public class MatchupController {
 
 
     // 게시글 작성하기
+//    @ResponseBody
+//    @GetMapping("/board/register")
+//    public ResponseEntity<ApiResponse> boardRegister(){
+//        return ResponseEntity.ok(ApiResponse.ok("/matchup/matchup-board-register"));
+//    }
 
     @GetMapping("/board/register")
     public String boardRegister(){
-        return "matchup/matchup-board-register";
+        return "/matchup/matchup-board-register";
     }
+
 
     @PostMapping("/board/register")
     public String boardRegister(String tmp){
@@ -64,7 +73,8 @@ public class MatchupController {
         return "matchup/matchup-board-detail";
     }
 
-    @GetMapping("/board/delete")                    public String boardDelete(){
+    @GetMapping("/board/delete")
+    public String boardDelete(){
         log.info("matchup 게시글 삭제 완료");
         return "matchup/matchup-board-list";
     }

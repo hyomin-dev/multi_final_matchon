@@ -7,8 +7,12 @@ import com.multi.matchon.member.dto.req.UserSignupRequestDto;
 import com.multi.matchon.member.dto.res.TokenResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +36,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto requestDto) {
         TokenResponseDto tokenResponse = authService.login(requestDto);
-        return ResponseEntity.ok(tokenResponse);
+        ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization",tokenResponse.getAccessToken())
+                .httpOnly(true)
+                .path("/")
+                .maxAge(Duration.ofHours(1))
+                .build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE,accessTokenCookie.toString());
+        return ResponseEntity.ok().headers(headers).body(tokenResponse);
+
+        //return ResponseEntity.ok(tokenResponse);
     }
 
     @PostMapping("/reissue")
