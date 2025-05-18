@@ -18,7 +18,8 @@ document.addEventListener("DOMContentLoaded",()=>{
 })
 
 function submitCheck(e){
-    alert("testteetwet")
+    alert("submit")
+    document.querySelector("#teamName").disabled=false;
 
     //e.preventDefault();
 }
@@ -30,7 +31,7 @@ async function getSportsType(){
     const data = await response.json();
     //console.log(data); // data 확인
     //console.log(data.length); // data 길이 확인
-    const selectBtn = document.querySelector(".sports");
+    const selectBtn = document.querySelector("#sportsType");
     for(let i=0;i<data.length;i++){
         const option = document.createElement("option")
         option.value = data[i].sportsTypeName;
@@ -39,12 +40,21 @@ async function getSportsType(){
     }
 }
 
+
 async function getTeam(){
-    const selectBtn = document.querySelector(".team");
-    const option = document.createElement("option")
-    option.value = "Team1";
-    option.textContent = "Team1";
-    selectBtn.appendChild(option);
+    const email = document.querySelector("#user-info").dataset.email;
+    const team = document.querySelector("#teamName");
+    const response = await fetch(`/member/search?email=${email}`);
+    if(!response.ok)
+        throw new Error(`HTTP error! Status:${response.status}`)
+    const data = await response.json();
+    if(data.data.trim()==='' || data.data===null){
+        alert("MATCHUP 글 작성은 소속팀이 있어야 합니다.")
+        window.history.back();
+    }
+    team.value=data.data;
+    team.textContent = data.data;
+
 }
 
 function getAddress() {
@@ -63,15 +73,15 @@ function getAddress() {
                 addr = data.jibunAddress;
             }
 
-            document.getElementById("sports-facility-address").value = addr;
+            document.querySelector("#sportsFacilityAddress").value = addr;
             // 커서를 상세주소 필드로 이동한다.
-            document.getElementById("sports-facility-address").focus();
+            document.querySelector("#sportsFacilityAddress").focus();
         }
     }).open();
 }
 function setCurrentParticipants(){
-    const selectCur = document.querySelector(".current-participants");
-    const selectMax = document.querySelector(".max-participants");
+    const selectCur = document.querySelector("#currentParticipants");
+    const selectMax = document.querySelector("#maxParticipants");
     for(let i=1; i<=30;i++){
         const option1 = document.createElement("option");
         const option2 = document.createElement("option");
@@ -85,7 +95,7 @@ function setCurrentParticipants(){
 }
 
 function setMannerTemperature(){
-    const selectManner = document.querySelector(".manner-temperature");
+    const selectManner = document.querySelector("#minMannerTemperature");
     for(let i=30;i<=40;i+=0.5){
         const option = document.createElement("option");
         option.value = i;

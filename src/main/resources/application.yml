@@ -8,6 +8,18 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      s3:
+        bucket: sample-s3-multi16
+        base-url: https://sample-s3-multi16.s3.sa-east-1.amazonaws.com/attachments/
+      region:
+        static: ${S3_REGION}
+      stack:
+        auto: false
 
 ---
 
@@ -35,6 +47,10 @@ spring:
       name: user
       password: 1234
       roles: USER
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
 
 ---
 spring:
@@ -55,6 +71,10 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
 
 jwt:
   secret: ${JWT_SECRET}

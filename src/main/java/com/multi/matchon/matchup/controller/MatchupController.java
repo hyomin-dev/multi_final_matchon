@@ -1,15 +1,12 @@
 package com.multi.matchon.matchup.controller;
 
-import com.multi.matchon.common.dto.res.ApiResponse;
+import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/matchup")
@@ -28,13 +25,17 @@ public class MatchupController {
 //    }
 
     @GetMapping("/board/register")
-    public String boardRegister(){
-        return "/matchup/matchup-board-register";
+    public ModelAndView boardRegister(ModelAndView mv){
+        mv.setViewName("/matchup/matchup-board-register");
+        mv.addObject("ReqMatchupBoardDto",new ReqMatchupBoardDto());
+        return mv;
     }
 
 
     @PostMapping("/board/register")
-    public String boardRegister(String tmp){
+    public String boardRegister(@ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto){
+        log.info("{}", reqMatchupBoardDto);
+        matchupService.boardRegister(reqMatchupBoardDto);
         log.info("matchup 게시글 등록 완료");
         return "matchup/matchup-board-list";
     }
