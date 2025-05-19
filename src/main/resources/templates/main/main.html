@@ -85,14 +85,20 @@
     });
 
     function logout() {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-
-        // 쿠키도 삭제 (있다면)
-        document.cookie = "Authorization=; path=/; max-age=0";
-
-        alert("로그아웃 되었습니다.");
-        window.location.href = "/main";
+        fetch('/auth/logout', {
+            method: 'POST',
+            credentials: 'include' // 쿠키 포함해서 요청
+        })
+            .then(res => {
+            if (res.ok) {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+                alert("로그아웃 되었습니다.");
+                window.location.href = "/main";
+            } else {
+                alert("로그아웃 실패");
+            }
+        });
     }
 </script>
 </body>
