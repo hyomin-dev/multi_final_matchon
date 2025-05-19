@@ -39,7 +39,7 @@ public class MatchupController {
     @GetMapping("/board/register")
     public ModelAndView boardRegister(ModelAndView mv){
         mv.setViewName("/matchup/matchup-board-register");
-        //mv.addObject("ReqMatchupBoardDto",new ReqMatchupBoardDto());
+        mv.addObject("ReqMatchupBoardDto",new ReqMatchupBoardDto());
         return mv;
     }
 
@@ -63,10 +63,10 @@ public class MatchupController {
 
     @GetMapping
     public ModelAndView showMatchupListPage(ModelAndView mv){
-        PageRequest pageRequest = PageRequest.of(0,4);
-        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest);
+        //PageRequest pageRequest = PageRequest.of(0,4);
+        //PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest);
         mv.setViewName("matchup/matchup-board-list");
-        mv.addObject("pageResponseDto",pageResponseDto);
+        //mv.addObject("pageResponseDto",pageResponseDto);
         return mv;
     }
 
