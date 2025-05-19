@@ -30,11 +30,6 @@ public class MatchupController {
 
 
     // 게시글 작성하기
-//    @ResponseBody
-//    @GetMapping("/board/register")
-//    public ResponseEntity<ApiResponse> boardRegister(){
-//        return ResponseEntity.ok(ApiResponse.ok("/matchup/matchup-board-register"));
-//    }
 
     @GetMapping("/board/register")
     public ModelAndView boardRegister(ModelAndView mv){
@@ -72,9 +67,9 @@ public class MatchupController {
 
     @GetMapping("/board/list")
     @ResponseBody
-    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size ){
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size, @RequestParam("sportsType") String sportsType, @RequestParam("region") String region, @RequestParam("date") String date ){
         PageRequest pageRequest = PageRequest.of(page,size);
-        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest);
+        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest, sportsType, region, date);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
     }
 
@@ -85,13 +80,21 @@ public class MatchupController {
         return "tmp";
     }
 
-
     // 게시글 내가 작성한 글 목록 조회
 
     @GetMapping("/board/my")
     public String boardMy(){
         return "matchup/matchup-board-my";
     }
+
+    @GetMapping("/board/my/list")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findMyAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user){
+        PageRequest pageRequest = PageRequest.of(page,size);
+        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findMyAllWithPaging(pageRequest, user);
+        return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
+    }
+
 
     // 게시글 수정/삭제
 
