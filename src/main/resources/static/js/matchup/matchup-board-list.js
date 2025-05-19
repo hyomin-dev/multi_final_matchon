@@ -28,6 +28,10 @@ async function initList(){
     const pagingArea = document.querySelector("#paging-container");
 
     content.forEach(c=>{
+        const date = new Date(c.matchDatetime);
+        const month = date.getMonth()+1;
+        //const
+
         const card = document.createElement("div");
         card.className = "matchup-card";
         card.innerHTML = `
