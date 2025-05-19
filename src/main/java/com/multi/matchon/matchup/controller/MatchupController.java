@@ -4,10 +4,14 @@ package com.multi.matchon.matchup.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 
+import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -39,9 +43,7 @@ public class MatchupController {
         mv.setViewName("/matchup/matchup-board-register");
         mv.addObject("ReqMatchupBoardDto",new ReqMatchupBoardDto());
         return mv;
-
     }
-
 
     @PostMapping("/board/register")
     public String boardRegister(@ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
@@ -62,10 +64,24 @@ public class MatchupController {
     // 게시글 전체 목록 조회
 
     @GetMapping
-    public String boardAllList(){
+    public String showMatchupListPage(){
         //matchupService.findAll();
         return "matchup/matchup-board-list";
     }
+
+//    @GetMapping("/board/list")
+//    public ResponseEntity<ApiResponse<ResMatchupBoardDto>> getBoardListTest(){
+//        //PageRequest pageRequest = PageRequest.of(1,4, new Sort(Dire)
+//
+//    }
+
+    @GetMapping("/board/list")
+    public String getBoardListTest(){
+        //PageRequest pageRequest = PageRequest.of(1,4, new Sort(Dire)
+        matchupService.findAll();
+        return "tmp";
+    }
+
 
     // 게시글 내가 작성한 글 목록 조회
 
