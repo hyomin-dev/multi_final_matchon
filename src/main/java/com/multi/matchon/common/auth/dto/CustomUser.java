@@ -17,6 +17,10 @@ public class CustomUser implements UserDetails {
         this.member = member;
     }
 
+    public Member getMember() {
+        return this.member;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(() -> "ROLE_" + member.getMemberRole().name());
