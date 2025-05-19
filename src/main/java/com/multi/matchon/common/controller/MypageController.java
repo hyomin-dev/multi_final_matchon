@@ -2,11 +2,7 @@ package com.multi.matchon.common.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.service.MypageService;
-import com.multi.matchon.common.service.S3Service;
-import com.multi.matchon.common.util.AwsS3Utils;
-import com.multi.matchon.event.repository.HostProfileRepository;
 import com.multi.matchon.member.domain.Member;
-import com.multi.matchon.member.domain.MemberRole;
 import com.multi.matchon.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.ui.Model;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Map;
 
@@ -30,7 +25,6 @@ public class MypageController {
 
     private final MemberService memberService;
     private final MypageService mypageService;
-    private final S3Service s3Service;
 
     @GetMapping
     @Transactional(readOnly = true)
@@ -47,7 +41,7 @@ public class MypageController {
     public String uploadProfile(@AuthenticationPrincipal CustomUser user,
                                 @RequestParam MultipartFile profileImage) {
         Member member = memberService.findForMypage(user.getUsername());
-        s3Service.uploadProfileImage(member.getId(), profileImage);
+        mypageService.uploadProfileImage(member, profileImage);
         return "redirect:/mypage";
     }
 
