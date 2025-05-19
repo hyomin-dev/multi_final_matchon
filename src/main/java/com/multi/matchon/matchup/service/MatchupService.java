@@ -9,7 +9,7 @@ import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
 
-import com.multi.matchon.common.util.AwsS3Utils;
+
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
@@ -34,7 +34,7 @@ import java.util.UUID;
 @Transactional
 public class MatchupService{
 
-    @Value("${spring.cloud.aws.s3.base-url}")
+    //@Value("${spring.cloud.aws.s3.base-url}")
     private String S3_URL;
     private String FILE_DIR = "attachments/";
     private String FILE_URL;
@@ -49,7 +49,7 @@ public class MatchupService{
     private final SportsTypeRepository sportsTypeRepository;
     private final AttachmentRepository attachmentRepository;
 
-    private final AwsS3Utils awsS3Utils;
+//    private final AwsS3Utils awsS3Utils;
 
 
 
@@ -78,24 +78,24 @@ public class MatchupService{
                 .matchDescription(reqMatchupBoardDto.getMatchIntro())
                 .build();
         MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
-        insertFile(reqMatchupBoardDto, matchupBoard);
+//        insertFile(reqMatchupBoardDto, matchupBoard);
 
     }
-    public void insertFile(ReqMatchupBoardDto reqMatchupBoardDto, MatchupBoard matchupBoard){
-        String fileName = UUID.randomUUID().toString().replace("-","");
-        awsS3Utils.saveFile(FILE_DIR, fileName, reqMatchupBoardDto.getReservationFile());
-        Attachment attachment = Attachment.builder()
-                .boardType(BoardType.MATCHUP_BOARD)
-                .boardNumber(matchupBoard.getId())
-                .fileOrder(0)
-                .originalName(reqMatchupBoardDto.getReservationFile().getOriginalFilename())
-                .savedName(fileName+reqMatchupBoardDto.getReservationFile().getOriginalFilename().substring(reqMatchupBoardDto.getReservationFile().getOriginalFilename().indexOf(".")))
-                .savePath(FILE_DIR)
-                .build();
-        attachmentRepository.save(attachment);
-
-
-    }
+//    public void insertFile(ReqMatchupBoardDto reqMatchupBoardDto, MatchupBoard matchupBoard){
+//        String fileName = UUID.randomUUID().toString().replace("-","");
+//        awsS3Utils.saveFile(FILE_DIR, fileName, reqMatchupBoardDto.getReservationFile());
+//        Attachment attachment = Attachment.builder()
+//                .boardType(BoardType.MATCHUP_BOARD)
+//                .boardNumber(matchupBoard.getId())
+//                .fileOrder(0)
+//                .originalName(reqMatchupBoardDto.getReservationFile().getOriginalFilename())
+//                .savedName(fileName+reqMatchupBoardDto.getReservationFile().getOriginalFilename().substring(reqMatchupBoardDto.getReservationFile().getOriginalFilename().indexOf(".")))
+//                .savePath(FILE_DIR)
+//                .build();
+//        attachmentRepository.save(attachment);
+//
+//
+//    }
 
     public void findBoardListTest() {
         Pageable pageRequest1 = PageRequest.of(0,4);
