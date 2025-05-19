@@ -30,9 +30,9 @@ public class AwsS3Utils {
 
     public void saveFile(String dirName, String fileName, MultipartFile multipartFile) {
 
-        String replaceFileName = fileName + "." + FilenameUtils.getExtension(multipartFile.getResource().getFilename());
+        // String replaceFileName = fileName + "." + FilenameUtils.getExtension(multipartFile.getResource().getFilename());
 
-        String s3Key = dirName + replaceFileName;
+        String s3Key = dirName + fileName;
 
         System.out.println("======>    "+s3Key);
         try (InputStream inputStream = multipartFile.getInputStream()) {

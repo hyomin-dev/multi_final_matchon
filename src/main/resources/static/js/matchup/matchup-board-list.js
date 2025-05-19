@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
 async function loadItems(page, sportsType='', region='', dateFilter=''){
     const response = await fetch(`/matchup/board/list?page=${page-1}&sportsType=${sportsType}&region=${region}&date=${dateFilter}`,{
+
         method: "GET",
         headers: {
             "Authorization": "Bearer " + localStorage.getItem("accessToken")
@@ -45,6 +46,7 @@ async function loadItems(page, sportsType='', region='', dateFilter=''){
 
     renderList(items);
     renderPagination(pageInfo,sportsType, region, dateFilter);
+
 
 }
 function renderList(items){
@@ -85,6 +87,7 @@ function renderList(items){
 }
 
 function renderPagination(pageInfo, sportsType, region, dateFilter){
+
     // 프론트는 페이지 시작번호 1부터로 헷갈림
     const pageBlockSize = 5;
     // 프론트 측 page 시작 번호 1부터 변경
@@ -105,6 +108,7 @@ function renderPagination(pageInfo, sportsType, region, dateFilter){
         firstBtn.textContent = "<<";
         firstBtn.addEventListener("click",()=>{
             loadItems(1, sportsType, region, dateFilter);
+
         });
         pagingArea.appendChild(firstBtn);
     }
@@ -115,6 +119,7 @@ function renderPagination(pageInfo, sportsType, region, dateFilter){
         prevBtn.textContent = "<";
         prevBtn.addEventListener("click",()=>{
             loadItems(startPage-1, sportsType, region, dateFilter);
+
         });
         pagingArea.appendChild(prevBtn);
     }
@@ -138,6 +143,7 @@ function renderPagination(pageInfo, sportsType, region, dateFilter){
         nextBtn.textContent = ">";
         nextBtn.addEventListener("click",()=>{
             loadItems(endPage+1, sportsType, region, dateFilter);
+
         })
         pagingArea.appendChild(nextBtn);
     }
