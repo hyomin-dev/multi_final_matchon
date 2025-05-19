@@ -84,6 +84,17 @@ public class AuthServiceImpl implements AuthService{
         memberRepository.save(member);
     }
 
+    @Override
+    @Transactional
+    public void logout(String token) {
+        String email = jwtTokenProvider.getEmailFromToken(token);
+
+        Member member = memberRepository.findByMemberEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        refreshTokenRepository.deleteByMember(member);
+    }
+
 
     @Override
     @Transactional

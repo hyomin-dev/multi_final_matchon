@@ -45,21 +45,22 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         // 2. 토큰이 유효하면 SecurityContext 설정
-        if (token != null) {
-            if (jwtTokenProvider.validateToken(token)) {
-                String email = jwtTokenProvider.getEmailFromToken(token);
-                CustomUser userDetails = (CustomUser) customUserDetailsService.loadUserByUsername(email);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getEmailFromToken(token);
+            CustomUser userDetails = (CustomUser) customUserDetailsService.loadUserByUsername(email);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
 
-                log.info("[JwtFilter] 인증 성공 - 사용자: {}", email);
-            } else {
-                log.warn("[JwtFilter] 토큰이 존재하지만 유효하지 않음 (만료 또는 위조)");
-            }
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            log.info("[JwtFilter] 인증 성공 - 사용자: {}", email);
+        } else if (token != null) {
+            log.warn("[JwtFilter] 토큰 유효성 검사 실패 or 만료");
+            SecurityContextHolder.clearContext();
         }
+
 
         // 3. 필터 계속 진행
         filterChain.doFilter(request, response);

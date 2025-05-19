@@ -58,22 +58,13 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue(value = "Authorization", required = false) String token) {
         if (token != null) {
-
-            // 토큰에서 이메일 추출
-            String email = jwtTokenProvider.getEmailFromToken(token);
-
-            // 이메일로 사용자 조회
-            Member member = memberRepository.findByMemberEmail(email)
-                    .orElseThrow(() -> new RuntimeException("사용자 없음"));
-
-            // DB의 RefreshToken 삭제
-            refreshTokenRepository.findByMember(member)
-                    .ifPresent(refreshTokenRepository::delete);
+            authService.logout(token);
 
             // accessToken 쿠키 제거
             ResponseCookie deleteCookie = ResponseCookie.from("Authorization", "")
                     .path("/")
                     .maxAge(0)
+                    .httpOnly(true)
                     .build();
 
             return ResponseEntity.ok()
