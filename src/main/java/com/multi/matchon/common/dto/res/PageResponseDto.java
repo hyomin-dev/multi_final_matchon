@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PageResponseDto<T> {
-    private List<T> content; // 현재 페이지에 전달할 목록
+    private List<T> items; // 현재 페이지에 전달할 목록
     private PageInfoDto pageInfo; // 페이지 관련 정보를 담고 있는 DTO
 
     @Data

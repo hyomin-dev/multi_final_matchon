@@ -122,7 +122,7 @@ public class MatchupService{
         System.out.println("resMatchupBoardDtos5 = " + resMatchupBoardDtos5);
 
         PageResponseDto<ResMatchupBoardListDto> pageResponseDtos = PageResponseDto.<ResMatchupBoardListDto>builder()
-                .content(resMatchupBoardDtos1.getContent())
+                .items(resMatchupBoardDtos1.getContent())
                 .pageInfo(PageResponseDto.PageInfoDto.builder()
                         .page(resMatchupBoardDtos1.getNumber())
                         .size(resMatchupBoardDtos1.getNumberOfElements())
@@ -139,7 +139,7 @@ public class MatchupService{
     public PageResponseDto<ResMatchupBoardListDto> findAllWithPaging(PageRequest pageRequest) {
         Page<ResMatchupBoardListDto> page = matchupBoardRepository.findBoardListWithPaging(pageRequest);
        return PageResponseDto.<ResMatchupBoardListDto>builder()
-                .content(page.getContent())
+                .items(page.getContent())
                 .pageInfo(PageResponseDto.PageInfoDto.builder()
                         .page(page.getNumber())
                         .size(page.getNumberOfElements())

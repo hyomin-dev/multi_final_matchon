@@ -8,6 +8,8 @@ import com.multi.matchon.member.dto.req.LoginRequestDto;
 import com.multi.matchon.member.dto.req.SignupRequestDto;
 import com.multi.matchon.member.dto.res.TokenResponseDto;
 import com.multi.matchon.member.repository.MemberRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +28,7 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+
 
     @PostMapping("/signup/user")
     public ResponseEntity<String> signupUser(@RequestBody SignupRequestDto requestDto) {
@@ -48,6 +51,7 @@ public class AuthController {
                 .path("/")
                 .maxAge(Duration.ofHours(1))
                 .build();
+
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE,accessTokenCookie.toString());
         return ResponseEntity.ok().headers(headers).body(tokenResponse);
@@ -55,9 +59,33 @@ public class AuthController {
         //return ResponseEntity.ok(tokenResponse);
     }
 
+    private String resolveToken(HttpServletRequest request) {
+
+        // 1. Authorization 헤더
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+
+        // 2. 쿠키에서 Authorization
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("Authorization".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+
+
+        return null;
+    }
+
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(value = "Authorization", required = false) String token) {
-        if (token != null) {
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String token = resolveToken(request);
+
+        if (token != null && jwtTokenProvider.validateToken(token)) {
             authService.logout(token);
 
             // accessToken 쿠키 제거
@@ -72,7 +100,7 @@ public class AuthController {
                     .body("로그아웃 완료");
         }
 
-        return ResponseEntity.badRequest().body("토큰이 없습니다.");
+        return ResponseEntity.badRequest().body("유효한 토큰이 없습니다.");
     }
 
     @PostMapping("/reissue")
