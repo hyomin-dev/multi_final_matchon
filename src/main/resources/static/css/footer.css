@@ -1,5 +1,6 @@
 #wrap{
     width: 85%;
+    margin: 0 auto;
     min-height:calc(100vh - 340px); /* footer, header, margin 크기 빼기 */
 }
 
@@ -18,6 +19,6 @@
 
 #chatbot-img{
     position: fixed;
-    right: 3%;
-    bottom: 8%;
+    right: 1%;
+    bottom: 6%;
 }
