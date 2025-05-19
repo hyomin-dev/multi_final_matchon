@@ -24,7 +24,7 @@
         </div>
         <div class="auth">
             <a id="btn-login" th:href="@{/login}" class="btn">LOGIN</a>
-            <a id="btn-signup" th:href="@{/signup/user}" class="btn">SIGN UP</a>
+            <a id="btn-signup" th:href="@{/signup}" class="btn">SIGN UP</a>
 
             <a id="btn-mypage" href="/mypage" class="btn" style="display: none;">MY</a>
             <a id="btn-logout" href="javascript:logout()" class="btn" style="display: none;">LOGOUT</a>
@@ -35,6 +35,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const accessToken = localStorage.getItem("accessToken");
+
 
             const loginBtn = document.getElementById("btn-login");
             const signupBtn = document.getElementById("btn-signup");
@@ -56,11 +57,23 @@
             }
         });
 
+
+
         function logout() {
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-            alert("로그아웃 되었습니다.");
-            window.location.href = "/main";
+            fetch('/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+            })
+                .then(res => {
+                    if (res.ok) {
+                        localStorage.removeItem("accessToken");
+                        localStorage.removeItem("refreshToken");
+                        alert("로그아웃 되었습니다.");
+                        window.location.href = "/main";
+                    } else {
+                        alert("로그아웃 실패");
+                    }
+                });
         }
     </script>
 </th:block>

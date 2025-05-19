@@ -7,6 +7,8 @@ import com.multi.matchon.common.jwt.repository.RefreshTokenRepository;
 import com.multi.matchon.common.jwt.service.JwtTokenProvider;
 import com.multi.matchon.common.repository.PositionsRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
+import com.multi.matchon.event.domain.HostProfile;
+import com.multi.matchon.event.repository.HostProfileRepository;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.domain.MemberRole;
 import com.multi.matchon.member.dto.req.LoginRequestDto;
@@ -31,6 +33,7 @@ public class AuthServiceImpl implements AuthService{
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final HostProfileRepository hostProfileRepository;
 
     @Override
     @Transactional
@@ -81,7 +84,16 @@ public class AuthServiceImpl implements AuthService{
                 .isDeleted(false)
                 .build();
 
-        memberRepository.save(member);
+        // flush해서 ID 바로 반영
+        Member savedMember = memberRepository.saveAndFlush(member);
+
+        // hostProfile 생성
+        HostProfile hostProfile = HostProfile.builder()
+                .member(member)
+                .hostName("") // 사용자가 나중에 입력
+                .build();
+
+        hostProfileRepository.save(hostProfile);
     }
 
     @Override
