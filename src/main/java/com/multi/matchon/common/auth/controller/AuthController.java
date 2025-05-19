@@ -98,6 +98,7 @@ public class AuthController {
         if (token != null && jwtTokenProvider.validateToken(token)) {
             authService.logout(token); // DB에서 refreshToken 삭제
 
+
             // accessToken 쿠키 제거
             ResponseCookie deleteAccessToken = ResponseCookie.from("Authorization", "")
                     .path("/")
