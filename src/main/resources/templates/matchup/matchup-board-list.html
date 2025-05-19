@@ -5,6 +5,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <script th:src="@{/js/matchup/matchup-board-list.js}" defer></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-board-list.css}">
 
     <style>
         a {
@@ -17,13 +18,23 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
     <h1>MATCHUP 글 목록</h1>
-    <a >내가 작성한 글 목록</a> <!-- /matchup/board/my-->
-    <a >내가 요청한 목록</a> <!-- /matchup/request/my -->
-
     <a th:href="@{/matchup/board/register}">글 작성하기</a>
-    <a th:href="@{/matchup/board/list}">글 목록 조회테스트</a>
+    <a th:href="@{#}">내가 작성한 글 목록</a> <!-- /matchup/board/my-->
+    <a th:href="@{#}">내가 요청한 목록</a> <!-- /matchup/request/my -->
+    <a th:href="@{/matchup/board/listtest}">글 목록 조회테스트</a>
+
     <a >글 상세보기</a> <!-- /matchup/board/detail-->
     <a th:href="@{#}" disabled="true">문의하기</a> <!-- /matchup/board/my-->
+
+    <div id="board-container">
+
+    </div>
+
+    <div id="paging-container">
+
+    </div>
+
+
 
 
 </div>

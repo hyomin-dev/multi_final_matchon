@@ -1,0 +1,48 @@
+
+.matchup-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.matchup-left, .matchup-right {
+    width: 100px;
+    text-align: center;
+}
+
+.inquiry-btn {
+    margin-top: 8px;
+    border: 1px solid #f66;
+    background-color: white;
+    color: #f66;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.matchup-info {
+    flex: 1;
+    padding: 0 16px;
+}
+
+.match-datetime {
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.manner-graph .line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.triangle {
+    color: #333;
+}
+
