@@ -34,51 +34,54 @@ public class JwtFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         String token = resolveToken(request);
 
-        // 쿠키에서 찾기
-        if(token==null){
-            if(request.getCookies()!=null){
-                for(Cookie cookie : request.getCookies()){
-                    if("Authorization".equals(cookie.getName())){
-                        token = cookie.getValue();
-                        break;
-                    }
-                }
-            }
-        }
-
-        // 토큰이 없고 인증 제외 경로가 아닌 경우 : 직접 401 응답 주고 끝
+        // 1. 토큰이 없고, 인증 제외 경로도 아니면 → 직접 401 응답
         if (token == null && !isExcludedPath(uri)) {
-            log.warn("[JwtFilter] 인증이 필요한 경로인데 토큰이 없습니다. uri: {}", uri);
+            log.warn("[JwtFilter] 인증이 필요한 경로인데 토큰이 없습니다. URI: {}", uri);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\":\"로그인이 필요합니다.\"}");
+            response.getWriter().write("{\"error\":\"로그인이 필요한 서비스입니다.\"}");
             return;
         }
 
-        // 토큰이 존재하는 경우 검증 및 인증 정보 설정
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            String email = jwtTokenProvider.getEmailFromToken(token);
-            CustomUser userDetails = (CustomUser) customUserDetailsService.loadUserByUsername(email);
+        // 2. 토큰이 유효하면 SecurityContext 설정
+        if (token != null) {
+            if (jwtTokenProvider.validateToken(token)) {
+                String email = jwtTokenProvider.getEmailFromToken(token);
+                CustomUser userDetails = (CustomUser) customUserDetailsService.loadUserByUsername(email);
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            log.info("[JwtFilter] 인증 성공: {}", email);
+                log.info("[JwtFilter] 인증 성공 - 사용자: {}", email);
+            } else {
+                log.warn("[JwtFilter] 토큰이 존재하지만 유효하지 않음 (만료 또는 위조)");
+            }
         }
 
-        // 인증 제외 경로거나 정상 인증된 경우 계속 진행
+        // 3. 필터 계속 진행
         filterChain.doFilter(request, response);
     }
 
+
+    // 토큰을 Authorization 헤더 또는 쿠키에서 추출
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
+
+        // 쿠키에서 Authorization 값을 찾음
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("Authorization".equals(cookie.getName())) {
+                    return cookie.getValue(); // Bearer 없이 accessToken 그대로 저장했기 때문에 그대로 반환
+                }
+            }
+        }
+
         return null;
     }
 
