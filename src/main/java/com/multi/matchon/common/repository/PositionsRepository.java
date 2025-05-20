@@ -11,4 +11,5 @@ public interface PositionsRepository extends JpaRepository<Positions, Long> {
 
     Optional<Positions> findByPositionName(PositionName positionName);
 
+
 }
