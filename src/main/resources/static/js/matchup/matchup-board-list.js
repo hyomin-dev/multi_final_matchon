@@ -32,9 +32,7 @@ async function loadItems(page, sportsType='', region='', dateFilter=''){
     const response = await fetch(`/matchup/board/list?page=${page-1}&sportsType=${sportsType}&region=${region}&date=${dateFilter}`,{
 
         method: "GET",
-        headers: {
-            "Authorization": "Bearer " + localStorage.getItem("accessToken")
-        }
+        credentials: "include"
     });
     if(!response.ok)
         throw new Error(`HTTP error! Status:${response.status}`)
@@ -211,7 +209,10 @@ function checkStatus(item){
 async function getMyMannerTemperature(){
 
     const email = document.querySelector("#user-info").dataset.email;
-    const response  = await fetch(`/member/search-temperature?email=${email}`)
+    const response  = await fetch(`/member/search-temperature?email=${email}`,{
+        method: "GET",
+        credentials: "include"
+    })
     if(!response.ok)
         throw new Error(`HTTP error! Status:${response.status}`)
     const data = await response.json();
