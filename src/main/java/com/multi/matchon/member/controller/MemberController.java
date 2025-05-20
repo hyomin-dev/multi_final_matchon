@@ -19,9 +19,17 @@ public class MemberController {
     private final MemberService memberService;
 
     @ResponseBody
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponse<String>> searchByEmail(@RequestParam("email") String email){
-        String teamName = memberService.searchByEmail(email);
+    @GetMapping("/search-with-team-teamname")
+    public ResponseEntity<ApiResponse<String>> getTeamNameByMemberEmail(@RequestParam("email") String email){
+        String teamName = memberService.getTeamNameByMemberEmail(email);
         return ResponseEntity.ok().body(ApiResponse.ok(teamName));
+    }
+
+
+    @ResponseBody
+    @GetMapping("/search-temperature")
+    public ResponseEntity<ApiResponse<Double>> getTemperatureByMemberEmail(@RequestParam("email") String email){
+        Double myTemperature = memberService.getTemperatureByMemberEmail(email);
+        return ResponseEntity.ok().body(ApiResponse.ok(myTemperature));
     }
 }

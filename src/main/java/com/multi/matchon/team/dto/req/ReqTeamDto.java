@@ -23,4 +23,5 @@ public class ReqTeamDto {
 
     private Double teamRatingAverage;
 
+
 }

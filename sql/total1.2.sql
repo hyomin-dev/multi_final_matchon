@@ -287,7 +287,7 @@ CREATE TABLE matchup_board(
 CREATE TABLE matchup_request(
 	matchup_request_id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	matchup_board_id BIGINT NOT NULL,
-	applicant_id BIGINT NOT NULL, 
+	applicant_id BIGINT NOT NULL,
 	self_intro TEXT NOT NULL,
 	participant_count INT NOT NULL,
 	status ENUM('pending', 'approved', 'denied') NOT NULL DEFAULT 'pending',

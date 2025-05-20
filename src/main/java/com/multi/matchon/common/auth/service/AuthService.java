@@ -10,6 +10,8 @@ public interface AuthService {
 
     void signupHost(SignupRequestDto dto);
 
+    void logout(String token);
+
     TokenResponseDto login(LoginRequestDto dto);
 
     TokenResponseDto reissue(String refreshToken);

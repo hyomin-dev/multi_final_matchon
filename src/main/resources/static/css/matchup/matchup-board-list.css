@@ -1,0 +1,44 @@
+
+h1{
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+}
+
+td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    vertical-align: top;
+}
+
+.center {
+    text-align: center;
+}
+
+.btn {
+    display: inline-block;
+    padding: 4px 8px;
+    border: 1px solid #e67e92;
+    color: #e67e92;
+    border-radius: 5px;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.temp {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.status {
+    font-weight: bold;
+}
+
+#paging-container{
+    text-align: center;
+}

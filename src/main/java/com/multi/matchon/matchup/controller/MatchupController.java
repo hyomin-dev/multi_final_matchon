@@ -4,17 +4,19 @@ package com.multi.matchon.matchup.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 
+import com.multi.matchon.common.dto.res.ApiResponse;
+import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -28,20 +30,13 @@ public class MatchupController {
 
 
     // 게시글 작성하기
-//    @ResponseBody
-//    @GetMapping("/board/register")
-//    public ResponseEntity<ApiResponse> boardRegister(){
-//        return ResponseEntity.ok(ApiResponse.ok("/matchup/matchup-board-register"));
-//    }
 
     @GetMapping("/board/register")
     public ModelAndView boardRegister(ModelAndView mv){
         mv.setViewName("/matchup/matchup-board-register");
         mv.addObject("ReqMatchupBoardDto",new ReqMatchupBoardDto());
         return mv;
-
     }
-
 
     @PostMapping("/board/register")
     public String boardRegister(@ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
@@ -62,9 +57,27 @@ public class MatchupController {
     // 게시글 전체 목록 조회
 
     @GetMapping
-    public String boardAllList(){
-        //matchupService.findAll();
-        return "matchup/matchup-board-list";
+    public ModelAndView showMatchupListPage(ModelAndView mv){
+        //PageRequest pageRequest = PageRequest.of(0,4);
+        //PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest);
+        mv.setViewName("matchup/matchup-board-list");
+        //mv.addObject("pageResponseDto",pageResponseDto);
+        return mv;
+    }
+
+    @GetMapping("/board/list")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size, @RequestParam("sportsType") String sportsType, @RequestParam("region") String region, @RequestParam("date") String date ){
+        PageRequest pageRequest = PageRequest.of(page,size);
+        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest, sportsType, region, date);
+        return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
+    }
+
+    @GetMapping("/board/listtest")
+    public String findBoardListTest(){
+        //PageRequest pageRequest = PageRequest.of(1,4, new Sort(Dire)
+        matchupService.findBoardListTest();
+        return "tmp";
     }
 
     // 게시글 내가 작성한 글 목록 조회
@@ -73,6 +86,15 @@ public class MatchupController {
     public String boardMy(){
         return "matchup/matchup-board-my";
     }
+
+    @GetMapping("/board/my/list")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findMyAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user){
+        PageRequest pageRequest = PageRequest.of(page,size);
+        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findMyAllWithPaging(pageRequest, user);
+        return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
+    }
+
 
     // 게시글 수정/삭제
 
