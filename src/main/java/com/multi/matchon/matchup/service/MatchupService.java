@@ -200,6 +200,7 @@ public class MatchupService{
                 .writer(matchupBoard.getMember().getMemberEmail())
                 .teamName(matchupBoard.getMember().getTeam().getTeamName())
                 .teamIntro(matchupBoard.getTeamIntro())
+
                 .sportsTypeName(matchupBoard.getSportsType().getSportsTypeName())
                 .sportsFacilityName(matchupBoard.getSportsFacilityName())
                 .sportsFacilityAddress(matchupBoard.getSportsFacilityAddress())

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
   <title>MATCHON</title>
   <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
   <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-
-<!--  <script th:src="@{/js/matchup/matchup-board-detail.js}" defer></script>-->
+  <script th:src="@{/js/matchup/matchup-board-detail.js}" defer></script>
   <style>
     a {
       display:block;
@@ -17,49 +17,51 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
   <h1>MATCHUP 글 상세보기</h1>
-<!--  <div id="matchup-board-detail-dto"-->
-<!--       th:data-boardId="${resMatchupBoardDto.boardId}"-->
-<!--       th:data-writer="${resMatchupBoardDto.writer}"-->
-<!--       th:data-teamName="${resMatchupBoardDto.teamName}"-->
-<!--       th:data-sportsType="${resMatchupBoardDto.sportsTypeName}"-->
-<!--       th:data-teamIntro="${resMatchupBoardDto.teamIntro}"-->
-<!--       th:data-sportsFacilityName="${resMatchupBoardDto.sportsFacilityName}"-->
-<!--       th:data-sportsFacilityAddress="${resMatchupBoardDto.sportsFacilityAddress}"-->
-<!--       th:data-matchDate="${#temporals.format(resMatchupBoardDto.matchDatetime, 'yyyy-MM-dd HH:mm')}"-->
-<!--       th:data-matchDuration="${resMatchupBoardDto.matchDuration}"-->
-<!--       th:data-currentParticipantCount="${resMatchupBoardDto.currentParticipantCount}"-->
-<!--       th:data-maxParticipants="${resMatchupBoardDto.maxParticipants}"-->
-<!--       th:data-minMannerTemperature="${resMatchupBoardDto.minMannerTemperature}"-->
-<!--       th:data-matchDescription="${resMatchupBoardDto.matchDescription}"-->
-<!--       th:data-originalName="${resMatchupBoardDto.originalName}"-->
-<!--       th:data-savedName="${resMatchupBoardDto.savedName}"-->
-<!--       th:data-savedPath="${resMatchupBoardDto.savedPath}"-->
-<!--       th:data-myTemperature="${resMatchupBoardDto.myTemperature}">-->
-<!--  </div>-->
+  <div id="matchup-board-detail-dto"
+       th:data-board-id="${resMatchupBoardDto.boardId}"
+       th:data-writer="${resMatchupBoardDto.writer}"
+       th:data-team-name="${resMatchupBoardDto.teamName}"
+       th:data-sports-type="${resMatchupBoardDto.sportsTypeName}"
+       th:data-team-intro="${resMatchupBoardDto.teamIntro}"
+       th:data-sports-facility-name="${resMatchupBoardDto.sportsFacilityName}"
+       th:data-sports-facility-address="${resMatchupBoardDto.sportsFacilityAddress}"
+       th:data-match-date="${#temporals.format(resMatchupBoardDto.matchDatetime, 'yyyy-MM-dd HH:mm')}"
+       th:data-match-duration="${resMatchupBoardDto.matchDuration}"
+       th:data-current-participant-count="${resMatchupBoardDto.currentParticipantCount}"
+       th:data-max-participants="${resMatchupBoardDto.maxParticipants}"
+       th:data-min-manner-temperature="${resMatchupBoardDto.minMannerTemperature}"
+       th:data-match-description="${resMatchupBoardDto.matchDescription}"
+       th:data-original-name="${resMatchupBoardDto.originalName}"
+       th:data-saved-name="${resMatchupBoardDto.savedName}"
+       th:data-saved-path="${resMatchupBoardDto.savedPath}"
+       th:data-my-temperature="${resMatchupBoardDto.myTemperature}"
+       th:data-base-url="${@environment.getProperty('S3_BASE_URL')}"
+  >
+  </div>
   <table>
     <tr>
       <th>종목: </th>
-<!--      <td th:text="${resMatchupBoardDto.sportsTypeName}"></td>-->
+      <td th:text="${resMatchupBoardDto.sportsTypeName}"></td>
     </tr>
     <tr>
       <th>소속팀:</th>
-<!--      <td th:text="${resMatchupBoardDto.teamName}"></td>-->
+      <td th:text="${resMatchupBoardDto.teamName}"></td>
     </tr>
     <tr>
       <th>팀 소개:</th>
-<!--      <td th:text="${resMatchupBoardDto.teamIntro}"></td>-->
+      <td th:text="${resMatchupBoardDto.teamIntro}"></td>
     </tr>
     <tr>
       <th>경기장 예약내역:</th>
-<!--      <td th:text="${resMatchupBoardDto.originalName}"></td>-->
+      <td th:text="${resMatchupBoardDto.originalName}"></td>
     </tr>
     <tr>
       <th>경기장명:</th>
-<!--      <td th:text="${resMatchupBoardDto.sportsFacilityName}"></td>-->
+      <td th:text="${resMatchupBoardDto.sportsFacilityName}"></td>
     </tr>
     <tr>
       <th>경기장 주소:</th>
-<!--      <td th:text="${resMatchupBoardDto.sportsFacilityAddress}"></td>-->
+      <td th:text="${resMatchupBoardDto.sportsFacilityAddress}"></td>
     </tr>
     <tr>
       <th>경기장 위치</th>
@@ -83,7 +85,7 @@
     </tr>
     <tr>
       <th>경기 진행 방식</th>
-<!--      <td th:text="${resMatchupBoardDto.matchDescription}"></td>-->
+      <td th:text="${resMatchupBoardDto.matchDescription}"></td>
     </tr>
   </table>
   <a th:href="@{/matchup/board/edit}" disabled="true">수정하기(내가 작성한 경우)</a>
@@ -92,29 +94,13 @@
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
+<!--<script defer>-->
+<!--  const myTemperature = document.querySelector("#matchup-board-detail-dto").dataset.myTemperature;-->
+<!--  console.log(myTemperature);-->
 
-<!--<script th:inline="javascript">-->
-<!--  // const detailDto = document.querySelector("#matchup-board-detail-dto");-->
-<!--  // const savedName = detailDto.dataset.savedName;-->
-<!--  // const savedPath = detailDto.dataset.savedPath;-->
-<!--  // //console.log(${[[@environment.getProperty('spring.cloud.aws.s3.base-url')]]})-->
-<!--  // console.log(savedName);-->
-<!--  // console.log(savedPath);-->
-
-<!--  // async function getFile(){-->
-<!--  //   const response = await fetch(`${[[${@environment.getProperty('spring.cloud.aws.s3.base-url')}]]}/${savedPath}${savedName}`,{-->
-<!--  //     method: "GET",-->
-<!--  //     credentials: "include"-->
-<!--  //   })-->
-<!--  //   if(!response.ok)-->
-<!--  //     throw new Error(`HTTP error! Status:${response.status}`)-->
-<!--  //   const data = await response.json();-->
-<!--  //   console.log(data);-->
-<!--  // }-->
-<!--  // getFile();-->
-
-
-
+<!--  const url = document.querySelector("#matchup-board-detail-dto").dataset.baseUrl;-->
+<!--  console.log(url);-->
 <!--</script>-->
+
 </body>
 </html>

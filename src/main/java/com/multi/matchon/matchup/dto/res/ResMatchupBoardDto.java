@@ -42,6 +42,7 @@ public class ResMatchupBoardDto {
 
     private Double minMannerTemperature;
 
+
     private String matchDescription;
 
     private String originalName;
@@ -51,4 +52,5 @@ public class ResMatchupBoardDto {
     private String savedPath;
 
     private Double myTemperature;
+
 }
