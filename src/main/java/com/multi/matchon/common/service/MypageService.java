@@ -3,9 +3,6 @@ package com.multi.matchon.common.service;
 import com.multi.matchon.common.domain.*;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.PositionsRepository;
-import com.multi.matchon.common.domain.Attachment;
-import com.multi.matchon.common.domain.BoardType;
-import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.event.domain.HostProfile;
 import com.multi.matchon.event.repository.HostProfileRepository;
@@ -111,6 +108,5 @@ public class MypageService {
         member.setTimeType(timeType);
         member.setMyTemperature(temperature);
     }
-
 }
 
