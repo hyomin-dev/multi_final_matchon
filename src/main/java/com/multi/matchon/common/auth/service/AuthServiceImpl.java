@@ -28,8 +28,6 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService{
 
     private final MemberRepository memberRepository;
-    private final SportsTypeRepository sportsTypeRepository;
-    private final PositionsRepository positionsRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -42,18 +40,12 @@ public class AuthServiceImpl implements AuthService{
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
-        // 항상 SOCCER 종목으로 설정
-        SportsType soccer = sportsTypeRepository.findBySportsTypeName(SportsTypeName.SOCCER)
-                .orElseThrow(() -> new IllegalArgumentException("SOCCER 종목이 존재하지 않습니다."));
-
 
         Member member = Member.builder()
                 .memberEmail(dto.getEmail())
                 .memberPassword(passwordEncoder.encode(dto.getPassword()))
                 .memberName(dto.getName())
                 .memberRole(MemberRole.USER)
-                .sportsType(soccer)
-                //.positions(position)
                 .myTemperature(36.5)
                 .pictureAttachmentEnabled(true)
                 .isDeleted(false)
@@ -69,17 +61,12 @@ public class AuthServiceImpl implements AuthService{
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
-        // 항상 SOCCER 종목으로 설정
-        SportsType soccer = sportsTypeRepository.findBySportsTypeName(SportsTypeName.SOCCER)
-                .orElseThrow(() -> new IllegalArgumentException("SOCCER 종목이 존재하지 않습니다."));
-
 
         Member member = Member.builder()
                 .memberEmail(dto.getEmail())
                 .memberPassword(passwordEncoder.encode(dto.getPassword()))
                 .memberName(dto.getName())
                 .memberRole(MemberRole.HOST)
-                .sportsType(soccer)
                 .pictureAttachmentEnabled(true)
                 .isDeleted(false)
                 .build();

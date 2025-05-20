@@ -1,13 +1,14 @@
 package com.multi.matchon.common.service;
 
-import com.multi.matchon.common.domain.Attachment;
-import com.multi.matchon.common.domain.BoardType;
+import com.multi.matchon.common.domain.*;
 import com.multi.matchon.common.repository.AttachmentRepository;
+import com.multi.matchon.common.repository.PositionsRepository;
 import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.event.domain.HostProfile;
 import com.multi.matchon.event.repository.HostProfileRepository;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.domain.MemberRole;
+import com.multi.matchon.common.domain.Positions;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @Transactional
 public class MypageService {
 
+    private final PositionsRepository positionsRepository;
     private final HostProfileRepository hostProfileRepository;
     private final AwsS3Utils awsS3Utils;
     private final AttachmentRepository attachmentRepository;
@@ -43,11 +45,6 @@ public class MypageService {
         data.put("memberRole", member.getMemberRole() != null ? member.getMemberRole().name() : "UNKNOWN");
         data.put("memberName", member.getMemberName());
 
-        if (member.getSportsType() != null && member.getSportsType().getSportsTypeName() != null) {
-            data.put("sportsName", member.getSportsType().getSportsTypeName().name());
-        } else {
-            data.put("sportsName", "미지정");
-        }
 
         data.put("myTemperature", member.getMyTemperature());
         data.put("teamName", member.getTeam() != null ? member.getTeam().getTeamName() : "팀이 없습니다");
@@ -100,6 +97,16 @@ public class MypageService {
                 .build();
 
         attachmentRepository.save(attachment);
+    }
+
+    @Transactional
+    public void updateMypage(Member member, PositionName positionName, TimeType timeType, Double temperature) {
+        Positions position = positionsRepository.findByPositionName(positionName)
+                .orElseThrow(() -> new IllegalArgumentException("해당 포지션이 존재하지 않습니다."));
+
+        member.setPositions(position);
+        member.setTimeType(timeType);
+        member.setMyTemperature(temperature);
     }
 }
 
