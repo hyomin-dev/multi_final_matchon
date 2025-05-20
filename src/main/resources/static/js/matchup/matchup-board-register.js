@@ -48,7 +48,7 @@ async function getSportsType(){
 async function getTeam(){
     const email = document.querySelector("#user-info").dataset.email;
     const team = document.querySelector("#teamName");
-    const response = await fetch(`/member/search?email=${email}`);
+    const response = await fetch(`/member/search-with-team-teamname?email=${email}`);
     if(!response.ok)
         throw new Error(`HTTP error! Status:${response.status}`)
     const data = await response.json();

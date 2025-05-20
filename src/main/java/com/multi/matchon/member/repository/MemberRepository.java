@@ -20,6 +20,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // Optional<Member> findWithFetchJoinByEmail(@Param("email") String email);
 
     @Query("select m from Member m join fetch m.team where m.memberEmail =:email")
-    Optional<Member> findByEmailWithTeam(@Param("email") String email);
+    Optional<Member> findByMemberEmailWithTeam(@Param("email") String email);
+
 
 }
