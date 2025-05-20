@@ -10,11 +10,7 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByMemberEmail(String email);
 
-    @Query("SELECT m FROM Member m " +
-            "JOIN FETCH m.sportsType st " +
-            "LEFT JOIN FETCH m.positions p " +
-            "LEFT JOIN FETCH m.team t " +
-            "WHERE m.memberEmail = :email")
+    @Query("SELECT m FROM Member m LEFT JOIN FETCH m.positions p LEFT JOIN FETCH m.team t WHERE m.memberEmail = :email")
     Optional<Member> findForMypage(@Param("email") String email);
 
     // Optional<Member> findWithFetchJoinByEmail(@Param("email") String email);

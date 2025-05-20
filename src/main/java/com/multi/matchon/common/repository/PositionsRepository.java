@@ -5,9 +5,11 @@ import com.multi.matchon.common.domain.Positions;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PositionsRepository extends JpaRepository<Positions, Long> {
 
-    List<Positions> findByPositionName  (PositionName sportsTypeId);
+    Optional<Positions> findByPositionName(PositionName positionName);
+
 
 }

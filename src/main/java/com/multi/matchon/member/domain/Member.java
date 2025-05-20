@@ -6,10 +6,7 @@ import com.multi.matchon.common.domain.SportsType;
 import com.multi.matchon.common.domain.TimeType;
 import com.multi.matchon.team.domain.Team;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
@@ -39,19 +36,21 @@ public class Member extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private MemberRole memberRole;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="position_id")
     private Positions positions;
 
+    @Setter
     @Column(name="preferred_time")
     @Enumerated(value = EnumType.STRING)
     private TimeType timeType;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="team_id")
     private Team team;
 
+    @Setter
     @Column(name="my_temperature")
     private Double myTemperature; // nullable: 사용자만 사용
 
