@@ -15,8 +15,13 @@ public class ReqTeamDto {
 
     private String recruitmentStatus;
 
-    private MultipartFile teamIntroduction;
+    private String teamIntroduction;
+
+    private MultipartFile teamImageFile;
 
     private String positionName;
+
+    private Double teamRatingAverage;
+
 
 }

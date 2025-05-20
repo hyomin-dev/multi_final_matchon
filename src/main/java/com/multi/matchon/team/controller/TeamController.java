@@ -39,8 +39,8 @@ public class TeamController {
         //log.info("{}", reqMatchupBoardDto);
 //        teamService.teamRegister(reqTeamDto, user);
 
-        log.info("matchup 게시글 등록 완료");
-        return "matchup/matchup-board-list";
+        log.info("team 등록 완료");
+        return "team/team-list";
     }
 
 }
