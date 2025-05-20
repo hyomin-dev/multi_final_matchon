@@ -19,9 +19,9 @@
             <a th:href="@{/matchup}">MATCHUP</a>
             <a th:href="@{/guest}">GUEST</a>
             <a th:href="@{/stadium}">STADIUM</a>
-<!--            <div class="community">-->
-<!--                <a href="/list" style="text-decoration: none; color: inherit;">COMMUNITY</a>-->
-<!--            </div>-->
+            <!--            <div class="community">-->
+            <!--                <a href="/list" style="text-decoration: none; color: inherit;">COMMUNITY</a>-->
+            <!--            </div>-->
             <a th:href="@{/community}">COMMUNITY</a>
             <a th:href="@{/schedule}">SCHEDULE</a>
             <a th:href="@{/cs}">CS</a>
@@ -68,37 +68,37 @@
             method: 'GET',
             credentials: 'include'
         }).then(res => res.json())
-           .then(data => {
-               const loginBtn = document.getElementById("btn-login");
-               const signupBtn = document.getElementById("btn-signup");
-               const myBtn = document.getElementById("btn-mypage");
-               const adminBtn = document.getElementById("btn-admin");
-               const logoutBtn = document.getElementById("btn-logout");
+            .then(data => {
+                const loginBtn = document.getElementById("btn-login");
+                const signupBtn = document.getElementById("btn-signup");
+                const myBtn = document.getElementById("btn-mypage");
+                const adminBtn = document.getElementById("btn-admin");
+                const logoutBtn = document.getElementById("btn-logout");
 
-               if (data.role === "ADMIN") {
-                   // 관리자
-                   if (loginBtn) loginBtn.style.display = "none";
-                   if (signupBtn) signupBtn.style.display = "none";
-                   if (adminBtn) adminBtn.style.display = "inline-block";
-                   if (myBtn) myBtn.style.display = "none";
-                   if (logoutBtn) logoutBtn.style.display = "inline-block";
-               } else {
-                   // 일반 유저
-                   if (loginBtn) loginBtn.style.display = "none";
-                   if (signupBtn) signupBtn.style.display = "none";
-                   if (adminBtn) adminBtn.style.display = "none";
-                   if (myBtn) myBtn.style.display = "inline-block";
-                   if (logoutBtn) logoutBtn.style.display = "inline-block";
-               }
-           })
-           .catch(() => {
-               // 로그인 안 되어 있을 경우
-               document.getElementById("btn-login").style.display = "inline-block";
-               document.getElementById("btn-signup").style.display = "inline-block";
-               document.getElementById("btn-mypage").style.display = "none";
-               document.getElementById("btn-admin").style.display = "none";
-               document.getElementById("btn-logout").style.display = "none";
-           });
+                if (data.role === "ADMIN") {
+                    // 관리자
+                    if (loginBtn) loginBtn.style.display = "none";
+                    if (signupBtn) signupBtn.style.display = "none";
+                    if (adminBtn) adminBtn.style.display = "inline-block";
+                    if (myBtn) myBtn.style.display = "none";
+                    if (logoutBtn) logoutBtn.style.display = "inline-block";
+                } else {
+                    // 일반 유저
+                    if (loginBtn) loginBtn.style.display = "none";
+                    if (signupBtn) signupBtn.style.display = "none";
+                    if (adminBtn) adminBtn.style.display = "none";
+                    if (myBtn) myBtn.style.display = "inline-block";
+                    if (logoutBtn) logoutBtn.style.display = "inline-block";
+                }
+            })
+            .catch(() => {
+                // 로그인 안 되어 있을 경우
+                document.getElementById("btn-login").style.display = "inline-block";
+                document.getElementById("btn-signup").style.display = "inline-block";
+                document.getElementById("btn-mypage").style.display = "none";
+                document.getElementById("btn-admin").style.display = "none";
+                document.getElementById("btn-logout").style.display = "none";
+            });
     });
 
     // secureFetch: API 요청 → accessToken 만료 시 자동 재발급 → 다시 요청
