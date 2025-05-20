@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <title>MATCHON</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-board-register.css}">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script th:src="@{/js/matchup/matchup-board-register.js}" defer></script>
+
+
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+    <div class="content">
+        <h1>MATCHUP 글 작성</h1>
+        <div id="user-info" th:data-email="${#authentication.name}"></div>
+        <form th:object="${ReqMatchupBoardDto}" th:action="@{/matchup/board/register}" method="post" enctype="multipart/form-data">
+            <label>
+                종목:
+                <select th:field="*{sportsType}" required></select>
+            </label>
+            <label>
+                소속팀:
+                <input type="text" th:field="*{teamName}" disabled>
+            </label>
+            <label>
+                팀 소개:
+                <textarea cols="30" rows="5" placeholder="팀 소개를 입력하세요." th:field="*{teamIntro}" required>
+                </textarea>
+            </label>
+            <label>
+                경기장 예약 내역:
+                <input type="file" th:field="*{reservationFile}" required>
+            </label>
+            <label>
+                경기장명:
+                <input type="text" placeholder="경기장명" th:field="*{sportsFacilityName}" required>
+            </label>
+            <label>
+                경기장 주소:
+                <input type="text" th:field="*{sportsFacilityAddress}" placeholder="주소 찾기 버튼을 누르세요." required readonly>
+                <input type="button" onclick="getAddress()" value="주소 찾기">
+            </label>
+            <label>
+                경기 날짜:
+                <input type="datetime-local" th:field="*{matchDate}" required>
+            </label>
+            <label>
+                경기 진행 시간:
+                <select size="5" th:field="*{matchDuration}" required>
+                    <option th:value="30">30분</option>
+                    <option th:value="60">1시간</option>
+                    <option th:value="90">1시간 30분</option>
+                    <option th:value="120">2시간</option>
+                    <option th:value="150">2시간 30분</option>
+                    <option th:value="180">3시간</option>
+                </select>
+            </label>
+            <label>
+                현재 참가 인원:
+                <select size="5" th:field="*{currentParticipants}" required></select>
+            </label>
+            <label>
+                총 모집 인원:
+                <select size="5" th:field="*{maxParticipants}" required></select>
+            </label>
+            <label>
+                하한 매너 온도:
+                <select size="5" th:field="*{minMannerTemperature}" required></select>
+            </label>
+            <label>
+                경기 방식 소개:
+                <textarea cols="30" rows="5" placeholder="경기 방식 소개" th:field="*{matchIntro}" required>
+                </textarea>
+            </label>
+
+            <div class="btn">
+                <button type="submit">등록하기</button>
+                <button type="button" class="cancel-btn">취소하기</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package com.multi.matchon.common.viewcontroller;
+package com.multi.matchon.common.controller;
 
 
 import org.springframework.stereotype.Controller;
@@ -11,4 +11,16 @@ public class ViewController {
     public String mainPage(){
         return "main/main";
     }
+
+    @GetMapping("/login")
+    public String loginPage(){
+        return "login/login";
+    }
+
+
+    @GetMapping("/signup")
+    public String userSignup() {
+        return "signup/signup";
+    }
+
 }

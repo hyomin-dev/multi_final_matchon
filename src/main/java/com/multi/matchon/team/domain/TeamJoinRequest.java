@@ -2,6 +2,7 @@ package com.multi.matchon.team.domain;
 
 
 import com.multi.matchon.common.domain.BaseEntity;
+import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class TeamJoinRequest extends BaseEntity {
     private Member member;
 
     @Column(name="join_request_status",nullable = false)
-    private JoinRequestStatus joinRequestStatus;
+    private Status joinRequestStatus;
 
     @Column(name="is_deleted", nullable = false)
     @Builder.Default

@@ -62,10 +62,14 @@ create table stadium (
 
 -- positions
 CREATE TABLE positions (
-	
+
     position_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     sports_type_id BIGINT,
-    position_name VARCHAR(50) NOT NULL,
+    position_name ENUM('goalkeeper', 'center_back', 'left_right_back', 'left_right_wing_back', 'central_defensive_midfielder', 'central_midfielder', 'central_attacking_midfielder', 'left_right_wing', 'striker_center_forward', 'second_striker', 'left_right_winger',
+        'pivo', 'ala', 'fixo', 'flying_goal_keeper',
+        'starting_pitcher', 'relief_pitcher', 'closer', 'infielder', 'outfielder', 'first_baseman' , 'second_baseman', 'third_baseman', 'shortstop', 'left_fielder', 'center_fielder', 'right_fielder', 'catcher', 'designated_hitter',
+        'point_gaurd', 'shooting_gaurd', 'small_forward', 'power_forward', 'center'
+        ) NOT NULL,
     CONSTRAINT FK_positions_2_sports_type FOREIGN KEY (sports_type_id) REFERENCES sports_type(sports_type_id) -- positions:sports_type = N:1
 );
 
@@ -99,8 +103,8 @@ CREATE TABLE member (
     position_id BIGINT,
     preferred_time ENUM('weekday_morning', 'weekday_afternoon', 'weekday_evening', 'weekend_morning', 'weekend_afternoon', 'weekend_evening'),
     team_id BIGINT,
-    my_temperature DOUBLE DEFAULT 36.5,
-    picture_attachment_enabled BOOLEAN DEFAULT TRUE CHECK (picture_attachment_enabled = TRUE),
+    my_temperature DOUBLE,
+    picture_attachment_enabled BOOLEAN,
     created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     modified_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     is_deleted BOOLEAN DEFAULT FALSE,
@@ -129,7 +133,7 @@ CREATE TABLE inquiry (
     inquiry_category ENUM('team_guest', 'event', 'tutorial', 'manner_temperature', 'community', 'account', 'report') NOT NULL,
     inquiry_title VARCHAR(100) NOT NULL,
     inquiry_content TEXT NOT NULL,
-    inquiry_status ENUM('waiting', 'complete') DEFAULT 'waiting',
+    inquiry_status ENUM('pending', 'completed') DEFAULT 'pending',
     created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_person VARCHAR(100),
     modified_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -283,10 +287,10 @@ CREATE TABLE matchup_board(
 CREATE TABLE matchup_request(
 	matchup_request_id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	matchup_board_id BIGINT NOT NULL,
-	applicant_id BIGINT NOT NULL, 
-	self_intro TEXT NOT NULL,	
-	participant_count INT NOT NULL,	
-	status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+	applicant_id BIGINT NOT NULL,
+	self_intro TEXT NOT NULL,
+	participant_count INT NOT NULL,
+	status ENUM('pending', 'approved', 'denied') NOT NULL DEFAULT 'pending',
 	created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	created_person VARCHAR(50) NOT NULL,
 	modified_date DATETIME DEFAULT current_timestamp on update current_timestamp,
@@ -369,7 +373,7 @@ CREATE TABLE event_request (
     sports_type_id BIGINT NOT NULL,
     event_method VARCHAR(100) NOT NULL,
     event_contact VARCHAR(50) NOT NULL,
-    event_status ENUM('waiting', 'approved', 'denied') DEFAULT 'waiting',
+    event_status ENUM('pending', 'approved', 'denied') DEFAULT 'pending',
     created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_person VARCHAR(100),
     modified_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -438,8 +442,8 @@ CREATE TABLE guest_request(
 	sports_facility_address VARCHAR(100) NOT NULL, 
 	match_date DATETIME NOT NULL,
 	match_duration TIME NOT NULL,
-	match_description TEXT NOT NULL, 
-	status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+	match_description TEXT NOT NULL,
+	status ENUM('pending', 'approved', 'denied') NOT NULL DEFAULT 'pending',
 	created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	created_person VARCHAR(50) NOT NULL,
 	modified_date DATETIME DEFAULT current_timestamp on update current_timestamp,

@@ -2,6 +2,7 @@ package com.multi.matchon.event.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.common.domain.SportsType;
+import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,10 +43,6 @@ public class EventRequest extends BaseEntity {
     @JoinColumn(name="host_profile_id",nullable = false)
     private HostProfile hostProfile;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="sports_type_id",nullable = false)
-    private SportsType sportsType;
-
     @Column(name="event_method", nullable = false,columnDefinition = "VARCHAR(100)")
     private String eventMethod;
 
@@ -54,7 +51,7 @@ public class EventRequest extends BaseEntity {
 
     @Column(name="event_status",nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private EventStatus eventStatus;
+    private Status eventStatus;
 
     @Column(name="is_deleted")
     @Builder.Default

@@ -1,0 +1,49 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 32px;
+    height: 200px;
+}
+
+.logo{
+    position: relative;
+    top:-30px;
+    height: 250px;
+}
+
+.navbar .center a{
+    display: inline-block;
+    margin: 27px 10px;
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:24px;
+}
+
+.navbar .icons img{
+    display: inline-block;
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 27px 15px;
+    cursor: pointer;
+}
+
+.navbar .auth a{
+    display: inline-block;
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 17px 15px;
+}
+
+.auth .btn{
+    padding: 20px 30px;
+    border: solid black 1px;
+    border-radius: 10px;
+}
+
+.blue_hr{
+    border-top: 10px solid #255E93;
+
+}

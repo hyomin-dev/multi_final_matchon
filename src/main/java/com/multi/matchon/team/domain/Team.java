@@ -30,10 +30,6 @@ public class Team extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private RegionType teamRegion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="sports_type",nullable = false)
-    private SportsType sportsType;
-
     @Column(name="team_rating_average",nullable = false)
     private Double teamRatingAverage;
 

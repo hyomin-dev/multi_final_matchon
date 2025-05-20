@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>MATCHON</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <script th:src="@{/js/matchup/matchup-board-my.js}" defer></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-board-my.css}">
+    <style>
+        a {
+            display:block;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+    <h1>MATCHUP 내가 작성한 글 목록</h1>
+
+    <a th:href="@{/matchup/detail}"><button>글 상세보기</button></a>
+    <a th:href="@{/matchup/board/register}"><button>글 작성하기</button></a>
+
+    <div id="board-container">
+
+    </div>
+
+    <div id="paging-container">
+
+    </div>
+
+
+
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>MATCHON</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+  <style>
+    a {
+      display:block;
+    }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+  <h1>MATCHUP 글 상세보기</h1>
+  <a th:href="@{/matchup/board/edit}" disabled="true">수정하기(내가 작성한 경우)</a>
+
+  <a th:href="@{#}">문의하기</a>
+  <a th:href="@{/matchup/request}">참가요청</a>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>
