@@ -12,6 +12,7 @@ import com.multi.matchon.common.repository.SportsTypeRepository;
 
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
 import jakarta.annotation.PostConstruct;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -99,44 +101,44 @@ public class MatchupService{
 //
 //    }
 
-    public void findBoardListTest() {
-        Pageable pageRequest1 = PageRequest.of(0,4);
-        Pageable pageRequest2 = PageRequest.of(1,4);
-        Pageable pageRequest3 = PageRequest.of(2,4);
-        Pageable pageRequest4 = PageRequest.of(3,4);
-        Pageable pageRequest5 = PageRequest.of(4,4);
-
-        List<ResMatchupBoardListDto> resMatchupBoardDtos = matchupBoardRepository.findBoardListTest();
-        Page<ResMatchupBoardListDto> resMatchupBoardDtos1 = matchupBoardRepository.findBoardListTest2(pageRequest1);
-        Page<ResMatchupBoardListDto> resMatchupBoardDtos2 = matchupBoardRepository.findBoardListTest2(pageRequest2);
-        Page<ResMatchupBoardListDto> resMatchupBoardDtos3 = matchupBoardRepository.findBoardListTest2(pageRequest3);
-        Page<ResMatchupBoardListDto> resMatchupBoardDtos4 = matchupBoardRepository.findBoardListTest2(pageRequest4);
-        Page<ResMatchupBoardListDto> resMatchupBoardDtos5 = matchupBoardRepository.findBoardListTest2(pageRequest5);
-
-
-
-
-        System.out.println("resMatchupBoardDtos = " + resMatchupBoardDtos);
-        System.out.println("resMatchupBoardDtos1 = " + resMatchupBoardDtos1);
-        System.out.println("resMatchupBoardDtos2 = " + resMatchupBoardDtos2);
-        System.out.println("resMatchupBoardDtos3 = " + resMatchupBoardDtos3);
-        System.out.println("resMatchupBoardDtos4 = " + resMatchupBoardDtos4);
-        System.out.println("resMatchupBoardDtos5 = " + resMatchupBoardDtos5);
-
-        PageResponseDto<ResMatchupBoardListDto> pageResponseDtos = PageResponseDto.<ResMatchupBoardListDto>builder()
-                .items(resMatchupBoardDtos1.getContent())
-                .pageInfo(PageResponseDto.PageInfoDto.builder()
-                        .page(resMatchupBoardDtos1.getNumber())
-                        .size(resMatchupBoardDtos1.getNumberOfElements())
-                        .totalElements(resMatchupBoardDtos1.getTotalElements())
-                        .totalPages(resMatchupBoardDtos1.getTotalPages())
-                        .isFirst(resMatchupBoardDtos1.isFirst())
-                        .isLast(resMatchupBoardDtos1.isLast())
-                        .build())
-                .build();
-
-        System.out.println();
-    }
+//    public void findBoardListTest() {
+//        Pageable pageRequest1 = PageRequest.of(0,4);
+//        Pageable pageRequest2 = PageRequest.of(1,4);
+//        Pageable pageRequest3 = PageRequest.of(2,4);
+//        Pageable pageRequest4 = PageRequest.of(3,4);
+//        Pageable pageRequest5 = PageRequest.of(4,4);
+//
+//        List<ResMatchupBoardListDto> resMatchupBoardDtos = matchupBoardRepository.findBoardListTest();
+//        Page<ResMatchupBoardListDto> resMatchupBoardDtos1 = matchupBoardRepository.findBoardListTest2(pageRequest1);
+//        Page<ResMatchupBoardListDto> resMatchupBoardDtos2 = matchupBoardRepository.findBoardListTest2(pageRequest2);
+//        Page<ResMatchupBoardListDto> resMatchupBoardDtos3 = matchupBoardRepository.findBoardListTest2(pageRequest3);
+//        Page<ResMatchupBoardListDto> resMatchupBoardDtos4 = matchupBoardRepository.findBoardListTest2(pageRequest4);
+//        Page<ResMatchupBoardListDto> resMatchupBoardDtos5 = matchupBoardRepository.findBoardListTest2(pageRequest5);
+//
+//
+//
+//
+//        System.out.println("resMatchupBoardDtos = " + resMatchupBoardDtos);
+//        System.out.println("resMatchupBoardDtos1 = " + resMatchupBoardDtos1);
+//        System.out.println("resMatchupBoardDtos2 = " + resMatchupBoardDtos2);
+//        System.out.println("resMatchupBoardDtos3 = " + resMatchupBoardDtos3);
+//        System.out.println("resMatchupBoardDtos4 = " + resMatchupBoardDtos4);
+//        System.out.println("resMatchupBoardDtos5 = " + resMatchupBoardDtos5);
+//
+//        PageResponseDto<ResMatchupBoardListDto> pageResponseDtos = PageResponseDto.<ResMatchupBoardListDto>builder()
+//                .items(resMatchupBoardDtos1.getContent())
+//                .pageInfo(PageResponseDto.PageInfoDto.builder()
+//                        .page(resMatchupBoardDtos1.getNumber())
+//                        .size(resMatchupBoardDtos1.getNumberOfElements())
+//                        .totalElements(resMatchupBoardDtos1.getTotalElements())
+//                        .totalPages(resMatchupBoardDtos1.getTotalPages())
+//                        .isFirst(resMatchupBoardDtos1.isFirst())
+//                        .isLast(resMatchupBoardDtos1.isLast())
+//                        .build())
+//                .build();
+//
+//        System.out.println();
+//    }
 
     public PageResponseDto<ResMatchupBoardListDto> findAllWithPaging(PageRequest pageRequest, String sportsType, String region, String date  ) {
         SportsTypeName sportsTypeName;
@@ -183,4 +185,79 @@ public class MatchupService{
                 .build();
 
     }
+
+    public ResMatchupBoardDto findBoardByBoardId(Long boardId) {
+
+        MatchupBoard matchupBoard = matchupBoardRepository.findByIdWithMemberWithTeamWithSportsType(boardId).orElseThrow(()->new IllegalArgumentException(boardId +"번 게시글이 존재하지 않습니다."));
+
+        List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
+
+        if(attachments.isEmpty())
+            throw new IllegalArgumentException(boardId +"번 게시글이 존재하지 않습니다.");
+
+       return ResMatchupBoardDto.builder()
+                .boardId(matchupBoard.getId())
+                .writer(matchupBoard.getMember().getMemberEmail())
+                .teamName(matchupBoard.getMember().getTeam().getTeamName())
+                .sportsTypeName(matchupBoard.getSportsType().getSportsTypeName())
+                .sportsFacilityName(matchupBoard.getSportsFacilityName())
+                .sportsFacilityAddress(matchupBoard.getSportsFacilityAddress())
+                .matchDatetime(matchupBoard.getMatchDatetime())
+                .matchDuration(matchupBoard.getMatchDuration())
+                .currentParticipantCount(matchupBoard.getCurrentParticipantCount())
+                .maxParticipants(matchupBoard.getMaxParticipants())
+                .minMannerTemperature(matchupBoard.getMinMannerTemperature())
+                .originalName(attachments.get(0).getOriginalName())
+                .savedName(attachments.get(0).getSavedName())
+                .savedPath(attachments.get(0).getSavePath())
+                .build();
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

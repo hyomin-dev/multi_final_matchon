@@ -61,7 +61,7 @@ public class TeamService {
         Team newTeam = Team.builder()
                 .teamName(reqTeamDto.getTeamName())
                 .teamRegion(RegionType.valueOf(reqTeamDto.getTeamRegion()))
-//                .position(PositionsRepository.findByPositionName(PositionName.valueOf(reqTeamDto.getPositionName())))
+                .position(positionsRepository.findByPositionName(PositionName.valueOf(reqTeamDto.getPositionName())))
                 .teamRatingAverage(reqTeamDto.getTeamRatingAverage())
                 .recruitmentStatus(false)
                 .teamIntroduction(reqTeamDto.getTeamIntroduction())
