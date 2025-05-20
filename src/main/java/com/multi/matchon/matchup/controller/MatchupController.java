@@ -7,6 +7,7 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import lombok.RequiredArgsConstructor;
@@ -50,8 +51,12 @@ public class MatchupController {
     // 게시글 상세 조회
 
     @GetMapping("/board/detail")
-    public String boardDetail(){
-        return "matchup/matchup-board-detail";
+    public ModelAndView boardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv){
+        log.info("matchup-board-id: {}",boardId);
+        ResMatchupBoardDto reqMatchupBoardDto = matchupService.findBoardByBoardId(boardId);
+
+        mv.setViewName("matchup/matchup-board-detail");
+        return mv;
     }
 
     // 게시글 전체 목록 조회
@@ -73,12 +78,12 @@ public class MatchupController {
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
     }
 
-    @GetMapping("/board/listtest")
-    public String findBoardListTest(){
-        //PageRequest pageRequest = PageRequest.of(1,4, new Sort(Dire)
-        matchupService.findBoardListTest();
-        return "tmp";
-    }
+//    @GetMapping("/board/listtest")
+//    public String findBoardListTest(){
+//        //PageRequest pageRequest = PageRequest.of(1,4, new Sort(Dire)
+//        matchupService.findBoardListTest();
+//        return "tmp";
+//    }
 
     // 게시글 내가 작성한 글 목록 조회
 

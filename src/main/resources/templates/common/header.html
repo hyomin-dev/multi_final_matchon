@@ -26,7 +26,8 @@
             <a id="btn-login" th:href="@{/login}" class="btn">LOGIN</a>
             <a id="btn-signup" th:href="@{/signup}" class="btn">SIGN UP</a>
 
-            <a id="btn-mypage" href="/mypage" class="btn" style="display: none;">MY</a>
+            <a id="btn-mypage" th:href="@{/mypage}" class="btn" style="display: none;">MY</a>
+            <a id="btn-admin" th:href="@{/admin}" class="btn" style="display: none;">ADMIN</a>
             <a id="btn-logout" href="javascript:logout()" class="btn" style="display: none;">LOGOUT</a>
         </div>
     </div>
@@ -34,45 +35,90 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const accessToken = localStorage.getItem("accessToken");
+            fetch('/auth/check', {
+                method: 'GET',
+                credentials: 'include'
+            }).then(res => res.json())
+                .then(data => {
+                    const loginBtn = document.getElementById("btn-login");
+                    const signupBtn = document.getElementById("btn-signup");
+                    const myBtn = document.getElementById("btn-mypage");
+                    const adminBtn = document.getElementById("btn-admin");
+                    const logoutBtn = document.getElementById("btn-logout");
 
-
-            const loginBtn = document.getElementById("btn-login");
-            const signupBtn = document.getElementById("btn-signup");
-            const myBtn = document.getElementById("btn-mypage");
-            const logoutBtn = document.getElementById("btn-logout");
-
-            if (accessToken) {
-                // 로그인 상태
-                if (loginBtn) loginBtn.style.display = "none";
-                if (signupBtn) signupBtn.style.display = "none";
-                if (myBtn) myBtn.style.display = "inline-block";
-                if (logoutBtn) logoutBtn.style.display = "inline-block";
-            } else {
-                // 비로그인 상태
-                if (loginBtn) loginBtn.style.display = "inline-block";
-                if (signupBtn) signupBtn.style.display = "inline-block";
-                if (myBtn) myBtn.style.display = "none";
-                if (logoutBtn) logoutBtn.style.display = "none";
-            }
+                    if (data.role === "ADMIN") {
+                        // 관리자
+                        if (loginBtn) loginBtn.style.display = "none";
+                        if (signupBtn) signupBtn.style.display = "none";
+                        if (adminBtn) adminBtn.style.display = "inline-block";
+                        if (myBtn) myBtn.style.display = "none";
+                        if (logoutBtn) logoutBtn.style.display = "inline-block";
+                    } else {
+                        // 일반 유저
+                        if (loginBtn) loginBtn.style.display = "none";
+                        if (signupBtn) signupBtn.style.display = "none";
+                        if (adminBtn) adminBtn.style.display = "none";
+                        if (myBtn) myBtn.style.display = "inline-block";
+                        if (logoutBtn) logoutBtn.style.display = "inline-block";
+                    }
+                })
+                .catch(() => {
+                    // 로그인 안 되어 있을 경우
+                    document.getElementById("btn-login").style.display = "inline-block";
+                    document.getElementById("btn-signup").style.display = "inline-block";
+                    document.getElementById("btn-mypage").style.display = "none";
+                    document.getElementById("btn-admin").style.display = "none";
+                    document.getElementById("btn-logout").style.display = "none";
+                });
         });
 
+        // secureFetch: API 요청 → accessToken 만료 시 자동 재발급 → 다시 요청
+        function secureFetch(url, options = {}) {
+            const method = options.method || 'GET';
+            const headers = options.headers || {};
+            const body = options.body || null;
 
+            return fetch(url, {
+                method: method,
+                headers: headers,
+                body: body,
+                credentials: 'include'
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        // accessToken 만료 → refreshToken으로 재발급 시도
+                        return fetch('/auth/reissue', {
+                            method: 'POST',
+                            credentials: 'include'
+                        })
+                            .then(reissueRes => {
+                                if (reissueRes.ok) {
+                                    return fetch(url, {
+                                        method: method,
+                                        headers: headers,
+                                        body: body,
+                                        credentials: 'include'
+                                    });
+                                } else {
+                                    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                                    window.location.href = "/login";
+                                    throw new Error("세션 만료");
+                                }
+                            });
+                    }
+                    return response;
+                });
+        }
 
+        // 로그아웃 처리 → accessToken, refreshToken 쿠키 삭제
         function logout() {
             fetch('/auth/logout', {
                 method: 'POST',
-                credentials: 'include',
+                credentials: 'include'
             })
                 .then(res => {
-                    if (res.ok) {
-                        localStorage.removeItem("accessToken");
-                        localStorage.removeItem("refreshToken");
-                        alert("로그아웃 되었습니다.");
-                        window.location.href = "/main";
-                    } else {
-                        alert("로그아웃 실패");
-                    }
+                    alert("로그아웃 되었습니다.");
+                    window.location.href = "/main";
                 });
         }
     </script>

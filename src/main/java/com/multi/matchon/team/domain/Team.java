@@ -2,7 +2,7 @@ package com.multi.matchon.team.domain;
 
 
 import com.multi.matchon.common.domain.BaseEntity;
-import com.multi.matchon.common.domain.SportsType;
+import com.multi.matchon.common.domain.Positions;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +30,10 @@ public class Team extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private RegionType teamRegion;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="position_id",nullable = false)
+    private Positions position;
+
     @Column(name="team_rating_average",nullable = false)
     private Double teamRatingAverage;
 
@@ -47,6 +51,7 @@ public class Team extends BaseEntity {
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
+
 
 
 
