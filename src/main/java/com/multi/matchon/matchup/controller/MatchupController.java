@@ -53,8 +53,8 @@ public class MatchupController {
     @GetMapping("/board/detail")
     public ModelAndView boardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv){
         log.info("matchup-board-id: {}",boardId);
-        ResMatchupBoardDto reqMatchupBoardDto = matchupService.findBoardByBoardId(boardId);
-
+        ResMatchupBoardDto resMatchupBoardDto = matchupService.findBoardByBoardId(boardId);
+        mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-detail");
         return mv;
     }

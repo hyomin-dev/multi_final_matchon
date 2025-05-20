@@ -4,6 +4,8 @@
   <title>MATCHON</title>
   <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
   <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+
+<!--  <script th:src="@{/js/matchup/matchup-board-detail.js}" defer></script>-->
   <style>
     a {
       display:block;
@@ -15,12 +17,104 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
   <h1>MATCHUP 글 상세보기</h1>
+<!--  <div id="matchup-board-detail-dto"-->
+<!--       th:data-boardId="${resMatchupBoardDto.boardId}"-->
+<!--       th:data-writer="${resMatchupBoardDto.writer}"-->
+<!--       th:data-teamName="${resMatchupBoardDto.teamName}"-->
+<!--       th:data-sportsType="${resMatchupBoardDto.sportsTypeName}"-->
+<!--       th:data-teamIntro="${resMatchupBoardDto.teamIntro}"-->
+<!--       th:data-sportsFacilityName="${resMatchupBoardDto.sportsFacilityName}"-->
+<!--       th:data-sportsFacilityAddress="${resMatchupBoardDto.sportsFacilityAddress}"-->
+<!--       th:data-matchDate="${#temporals.format(resMatchupBoardDto.matchDatetime, 'yyyy-MM-dd HH:mm')}"-->
+<!--       th:data-matchDuration="${resMatchupBoardDto.matchDuration}"-->
+<!--       th:data-currentParticipantCount="${resMatchupBoardDto.currentParticipantCount}"-->
+<!--       th:data-maxParticipants="${resMatchupBoardDto.maxParticipants}"-->
+<!--       th:data-minMannerTemperature="${resMatchupBoardDto.minMannerTemperature}"-->
+<!--       th:data-matchDescription="${resMatchupBoardDto.matchDescription}"-->
+<!--       th:data-originalName="${resMatchupBoardDto.originalName}"-->
+<!--       th:data-savedName="${resMatchupBoardDto.savedName}"-->
+<!--       th:data-savedPath="${resMatchupBoardDto.savedPath}"-->
+<!--       th:data-myTemperature="${resMatchupBoardDto.myTemperature}">-->
+<!--  </div>-->
+  <table>
+    <tr>
+      <th>종목: </th>
+<!--      <td th:text="${resMatchupBoardDto.sportsTypeName}"></td>-->
+    </tr>
+    <tr>
+      <th>소속팀:</th>
+<!--      <td th:text="${resMatchupBoardDto.teamName}"></td>-->
+    </tr>
+    <tr>
+      <th>팀 소개:</th>
+<!--      <td th:text="${resMatchupBoardDto.teamIntro}"></td>-->
+    </tr>
+    <tr>
+      <th>경기장 예약내역:</th>
+<!--      <td th:text="${resMatchupBoardDto.originalName}"></td>-->
+    </tr>
+    <tr>
+      <th>경기장명:</th>
+<!--      <td th:text="${resMatchupBoardDto.sportsFacilityName}"></td>-->
+    </tr>
+    <tr>
+      <th>경기장 주소:</th>
+<!--      <td th:text="${resMatchupBoardDto.sportsFacilityAddress}"></td>-->
+    </tr>
+    <tr>
+      <th>경기장 위치</th>
+      <td>카카오맵 표시</td>
+    </tr>
+    <tr>
+      <th>경기 진행 시간</th>
+      <td>자바스크립트 계산</td>
+    </tr>
+    <tr>
+      <th>참가인원</th>
+      <td>자바스크립트 계산</td>
+    </tr>
+    <tr>
+      <th>신청 가능 여부</th>
+      <td>자바스크립트 계산</td>
+    </tr>
+    <tr>
+      <th>매너온도</th>
+      <td>자바스크립트 계산</td>
+    </tr>
+    <tr>
+      <th>경기 진행 방식</th>
+<!--      <td th:text="${resMatchupBoardDto.matchDescription}"></td>-->
+    </tr>
+  </table>
   <a th:href="@{/matchup/board/edit}" disabled="true">수정하기(내가 작성한 경우)</a>
-
   <a th:href="@{#}">문의하기</a>
   <a th:href="@{/matchup/request}">참가요청</a>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
+
+<!--<script th:inline="javascript">-->
+<!--  // const detailDto = document.querySelector("#matchup-board-detail-dto");-->
+<!--  // const savedName = detailDto.dataset.savedName;-->
+<!--  // const savedPath = detailDto.dataset.savedPath;-->
+<!--  // //console.log(${[[@environment.getProperty('spring.cloud.aws.s3.base-url')]]})-->
+<!--  // console.log(savedName);-->
+<!--  // console.log(savedPath);-->
+
+<!--  // async function getFile(){-->
+<!--  //   const response = await fetch(`${[[${@environment.getProperty('spring.cloud.aws.s3.base-url')}]]}/${savedPath}${savedName}`,{-->
+<!--  //     method: "GET",-->
+<!--  //     credentials: "include"-->
+<!--  //   })-->
+<!--  //   if(!response.ok)-->
+<!--  //     throw new Error(`HTTP error! Status:${response.status}`)-->
+<!--  //   const data = await response.json();-->
+<!--  //   console.log(data);-->
+<!--  // }-->
+<!--  // getFile();-->
+
+
+
+<!--</script>-->
 </body>
 </html>
