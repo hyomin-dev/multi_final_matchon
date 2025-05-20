@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
+
 @RequiredArgsConstructor
 @Service
 public class MemberService {
@@ -18,9 +18,17 @@ public class MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     }
 
-    public String searchByEmail(String email) {
-        Member member = memberRepository.findByEmailWithTeam(email).orElseThrow(() -> new IllegalArgumentException("잘못된 종목 ID입니다."));
+    @Transactional(readOnly = true)
+    public String getTeamNameByMemberEmail(String email) {
+        Member member = memberRepository.findByMemberEmailWithTeam(email).orElseThrow(() -> new IllegalArgumentException("잘못된 email입니다."));
 
         return member.getTeam().getTeamName();
+    }
+
+    @Transactional(readOnly = true)
+    public Double getTemperatureByMemberEmail(String email) {
+        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new IllegalArgumentException("잘못된 email 입니다."));
+
+        return member.getMyTemperature();
     }
 }

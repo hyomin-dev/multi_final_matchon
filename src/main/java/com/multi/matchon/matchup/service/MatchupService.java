@@ -23,7 +23,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -136,9 +138,39 @@ public class MatchupService{
         System.out.println();
     }
 
-    public PageResponseDto<ResMatchupBoardListDto> findAllWithPaging(PageRequest pageRequest) {
-        Page<ResMatchupBoardListDto> page = matchupBoardRepository.findBoardListWithPaging(pageRequest);
+    public PageResponseDto<ResMatchupBoardListDto> findAllWithPaging(PageRequest pageRequest, String sportsType, String region, String date  ) {
+        SportsTypeName sportsTypeName;
+        if(sportsType.isBlank())
+            sportsTypeName = null;
+        else
+            sportsTypeName = SportsTypeName.valueOf(sportsType);
+
+        if(region.isBlank())
+            region = null;
+
+        LocalDate matchDate = null;
+        if(!date.isBlank())
+            matchDate = LocalDate.parse(date);
+
+        Page<ResMatchupBoardListDto> page = matchupBoardRepository.findBoardListWithPaging(pageRequest, sportsTypeName, region, matchDate);
        return PageResponseDto.<ResMatchupBoardListDto>builder()
+                .items(page.getContent())
+                .pageInfo(PageResponseDto.PageInfoDto.builder()
+                        .page(page.getNumber())
+                        .size(page.getNumberOfElements())
+                        .totalElements(page.getTotalElements())
+                        .totalPages(page.getTotalPages())
+                        .isFirst(page.isFirst())
+                        .isLast(page.isLast())
+                        .build())
+                .build();
+
+    }
+
+    public PageResponseDto<ResMatchupBoardListDto> findMyAllWithPaging(PageRequest pageRequest, CustomUser user) {
+
+        Page<ResMatchupBoardListDto> page = matchupBoardRepository.findByMemberEmailBoardListWithPaging(pageRequest, user.getMember().getMemberEmail());
+        return PageResponseDto.<ResMatchupBoardListDto>builder()
                 .items(page.getContent())
                 .pageInfo(PageResponseDto.PageInfoDto.builder()
                         .page(page.getNumber())
