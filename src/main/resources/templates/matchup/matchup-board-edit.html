@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <title>MATCHON</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-board-edit.css}">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script th:src="@{/js/matchup/matchup-board-edit.js}" defer></script>
+
     <style>
         a {
             display:block;
@@ -15,21 +19,98 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
     <h1>MATCHUP 글 수정하기</h1>
-    <form th:action="@{/matchup/board/edit}" method="post" enctype="multipart/form-data" >
-        <button type="submit">저장하기</button>
-        <button type="button" class="cancel-btn">취소하기</button>
-    </form>
-    <a th:href="@{/matchup/board/delete}">삭제하기</a>
+    <div class="content">
+        <h1>MATCHUP 글 작성</h1>
+        <div id="matchup-board-edit-dto"
+             th:data-board-id="${resMatchupBoardDto.boardId}"
+             th:data-writer="${resMatchupBoardDto.writer}"
+             th:data-team-name="${resMatchupBoardDto.teamName}"
+             th:data-sports-type-name="${resMatchupBoardDto.sportsTypeName}"
+             th:data-team-intro="${resMatchupBoardDto.teamIntro}"
+             th:data-sports-facility-name="${resMatchupBoardDto.sportsFacilityName}"
+             th:data-sports-facility-address="${resMatchupBoardDto.sportsFacilityAddress}"
+             th:data-match-datetime="${resMatchupBoardDto.matchDatetime}"
+             th:data-match-duration="${resMatchupBoardDto.matchDuration}"
+             th:data-current-participant-count="${resMatchupBoardDto.currentParticipantCount}"
+             th:data-max-participants="${resMatchupBoardDto.maxParticipants}"
+             th:data-min-manner-temperature="${resMatchupBoardDto.minMannerTemperature}"
+             th:data-match-description="${resMatchupBoardDto.matchDescription}"
+             th:data-original-name="${resMatchupBoardDto.originalName}"
+             th:data-saved-name="${resMatchupBoardDto.savedName}"
+             th:data-my-temperature="${resMatchupBoardDto.myTemperature}"
+             th:data-login-member="${#authentication.name}"
+        >
+        </div>
+        <form th:object="${resMatchupBoardDto}" th:action="@{/matchup/board/edit}" method="post" enctype="multipart/form-data" >
+            <label>
+                종목:
+                <select th:field="*{sportsTypeName}" required></select>
+            </label>
+            <label>
+                소속팀:
+                <input type="text" th:field="*{teamName}" disabled>
+            </label>
+            <label>
+                팀 소개:
+                <textarea cols="30" rows="5" th:field="*{teamIntro}" required>
+                </textarea>
+            </label>
+            <label>
+                경기장 예약 내역:
+                <input type="text" th:field="*{originalName}" required>
+            </label>
+            <label>
+                경기장명:
+                <input type="text" placeholder="경기장명" th:field="*{sportsFacilityName}" required>
+            </label>
+            <label>
+                경기장 주소:
+                <input type="text" th:field="*{sportsFacilityAddress}"required readonly>
+                <input type="button" onclick="getAddress()" value="주소 찾기">
+            </label>
+            <label>
+                경기 날짜:
+<!--                <input type="datetime-local" value="2025-05-21T15:30" required>-->
+                <input type="datetime-local" th:value="${resMatchupBoardDto.matchDatetime}" required>
+            </label>
+            <label>
+                경기 진행 시간:
+                <select size="5" id="matchDuration" name="matchDuration">
+                    <option th:value="'00:30:00'"  th:selected="${resMatchupBoardDto.matchDuration != null and resMatchupBoardDto.matchDuration.toSecondOfDay() / 60 == 30}">30분</option>
+                    <option th:value="'01:00:00'"  th:selected="${resMatchupBoardDto.matchDuration != null and resMatchupBoardDto.matchDuration.toSecondOfDay() / 60 == 60}">1시간</option>
+                    <option th:value="'01:30:00'"  th:selected="${resMatchupBoardDto.matchDuration != null and resMatchupBoardDto.matchDuration.toSecondOfDay() / 60 == 90}">1시간 30분</option>
+                    <option th:value="'02:00:00'" th:selected="${resMatchupBoardDto.matchDuration != null and resMatchupBoardDto.matchDuration.toSecondOfDay() / 60 == 120}">2시간</option>
+                    <option th:value="'02:30:00'" th:selected="${resMatchupBoardDto.matchDuration != null and resMatchupBoardDto.matchDuration.toSecondOfDay() / 60 == 150}">2시간 30분</option>
+                    <option th:value="'03:00:00'" th:selected="${resMatchupBoardDto.matchDuration != null and resMatchupBoardDto.matchDuration.toSecondOfDay() / 60 == 180}">3시간</option>
+                </select>
+            </label>
+            <label>
+                현재 참가 인원:
+                <input type="text" th:field="*{currentParticipantCount}" required readonly>
+            </label>
+            <label>
+                총 모집 인원:
+                <select size="5" th:field="*{maxParticipants}" required></select>
+            </label>
+            <label>
+                하한 매너 온도:
+                <select size="5" th:field="*{minMannerTemperature}" required></select>
+            </label>
+            <label>
+                경기 방식 소개:
+                <textarea cols="30" rows="5" th:field="*{matchDescription}" required>
+                </textarea>
+            </label>
+
+            <div class="btn">
+                <button type="submit" disabled>저장하기</button>
+                <button type="button" class="cancel-btn">삭제하기</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
-<script>
-    document.addEventListener("DOMContentLoaded",()=>{
-        const cancelBtn = document.querySelector(".cancel-btn");
-        cancelBtn.addEventListener("click",()=>{
-            window.history.back();
-        })
-    })
-</script>
+
 </body>
 </html>

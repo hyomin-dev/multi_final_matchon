@@ -10,8 +10,10 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.service.MatchupService;
+import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +37,7 @@ public class MatchupController {
     @GetMapping("/board/register")
     public ModelAndView boardRegister(ModelAndView mv){
         mv.setViewName("/matchup/matchup-board-register");
-        mv.addObject("ReqMatchupBoardDto",new ReqMatchupBoardDto());
+        mv.addObject("reqMatchupBoardDto",new ReqMatchupBoardDto());
         return mv;
     }
 
@@ -104,8 +106,12 @@ public class MatchupController {
     // 게시글 수정/삭제
 
     @GetMapping("/board/edit")
-    public String boardEdit(){
-        return "matchup/matchup-board-edit";
+    public ModelAndView boardEdit(@RequestParam("boardId") Long boardId, ModelAndView mv){
+
+        ResMatchupBoardDto resMatchupBoardDto = matchupService.findBoardByBoardId(boardId);
+        mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
+        mv.setViewName("matchup/matchup-board-edit");
+        return mv;
     }
 
     @PostMapping("/board/edit")
@@ -160,6 +166,16 @@ public class MatchupController {
     @GetMapping("/request/delete")
     public String requestDelete(){
         return "matchup/matchup-request-my";
+    }
+
+
+    // 첨부 파일 가져오기
+    @GetMapping("/attachment")
+    public ResponseEntity<ApiResponse<S3Resource>> getAttachment(@RequestParam("saved-name") String savedName) {
+
+        S3Resource resource = matchupService.getAttachment(savedName);
+
+        return ResponseEntity.ok().body(ApiResponse.ok(resource));
     }
 
 }

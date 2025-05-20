@@ -7,7 +7,7 @@
   <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
   <script th:src="@{/js/matchup/matchup-board-detail.js}" defer></script>
   <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
-
+  <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-board-detail.css}">
   <style>
     a {
       display:block;
@@ -23,7 +23,7 @@
        th:data-board-id="${resMatchupBoardDto.boardId}"
        th:data-writer="${resMatchupBoardDto.writer}"
        th:data-team-name="${resMatchupBoardDto.teamName}"
-       th:data-sports-type="${resMatchupBoardDto.sportsTypeName}"
+       th:data-sports-type-name="${resMatchupBoardDto.sportsTypeName}"
        th:data-team-intro="${resMatchupBoardDto.teamIntro}"
        th:data-sports-facility-name="${resMatchupBoardDto.sportsFacilityName}"
        th:data-sports-facility-address="${resMatchupBoardDto.sportsFacilityAddress}"
@@ -36,6 +36,7 @@
        th:data-original-name="${resMatchupBoardDto.originalName}"
        th:data-saved-name="${resMatchupBoardDto.savedName}"
        th:data-my-temperature="${resMatchupBoardDto.myTemperature}"
+       th:data-login-member="${#authentication.name}"
   >
   </div>
 
@@ -43,6 +44,10 @@
     <tr>
       <th>종목: </th>
       <td th:text="${resMatchupBoardDto.sportsTypeName}"></td>
+    </tr>
+    <tr>
+      <th>작성자: </th>
+      <td id="writer"></td>
     </tr>
     <tr>
       <th>소속팀:</th>
@@ -62,7 +67,7 @@
     </tr>
     <tr>
       <th>경기장 주소:</th>
-
+      <td th:text="${resMatchupBoardDto.sportsFacilityAddress}"></td>
     </tr>
     <tr>
       <th>경기장 위치</th>
@@ -80,30 +85,29 @@
     </tr>
     <tr>
       <th>신청 가능 여부</th>
-      <td>자바스크립트 계산</td>
+      <td id="status"></td>
     </tr>
     <tr>
-      <th>매너온도</th>
-      <td>자바스크립트 계산</td>
+      <th > 입장 가능 매너 온도</th>
+      <td th:text="${resMatchupBoardDto.minMannerTemperature}"></td>
     </tr>
     <tr>
-      <th>경기 진행 방식</th>
-      <td th:text="${resMatchupBoardDto.matchDescription}"></td>
+      <th>내 매너 온도</th>
+      <td th:text="${resMatchupBoardDto.myTemperature}"></td>
     </tr>
   </table>
-  <a th:href="@{/matchup/board/edit}" disabled="true">수정하기(내가 작성한 경우)</a>
-  <a th:href="@{#}">문의하기</a>
-  <a th:href="@{/matchup/request}">참가요청</a>
+  <th:block th:if="${resMatchupBoardDto.writer == #authentication.name}">
+    <a th:href="@{/matchup/board/edit(boardId=${resMatchupBoardDto.boardId})}" id="modify">수정하기</a>
+
+  </th:block>
+  <th:block th:unless="${resMatchupBoardDto.writer == #authentication.name}">
+    <a th:href="@{/matchup/}">문의하기</a>
+    <a th:href="@{#}">참가요청</a>
+  </th:block>
+
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
-<!--<script defer>-->
-<!--  const myTemperature = document.querySelector("#matchup-board-detail-dto").dataset.myTemperature;-->
-<!--  console.log(myTemperature);-->
-
-<!--  const url = document.querySelector("#matchup-board-detail-dto").dataset.baseUrl;-->
-<!--  console.log(url);-->
-<!--</script>-->
 
 </body>
 </html>

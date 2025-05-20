@@ -7,28 +7,32 @@ document.addEventListener("DOMContentLoaded",()=>{
 async function setContent(){
     const detailDto = document.querySelector("#matchup-board-detail-dto");
 
-    const boardId = detailDto.dataset.boardId;
+    const boardId = Number(detailDto.dataset.boardId);
     const writer = detailDto.dataset.writer;
     const sportsFacilityName = detailDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = detailDto.dataset.sportsFacilityAddress;
     const matchDatetime = detailDto.dataset.matchDatetime;
     const matchDuration = detailDto.dataset.matchDuration;
-    const currentParticipantCount = detailDto.dataset.currentParticipantCount;
-    const maxParticipants = detailDto.dataset.maxParticipants;
-    const minMannerTemperature = detailDto.dataset.minMannerTemperature;
+    const currentParticipantCount = Number(detailDto.dataset.currentParticipantCount);
+    const maxParticipants = Number(detailDto.dataset.maxParticipants);
+    const minMannerTemperature = Number(detailDto.dataset.minMannerTemperature);
     const originalName = detailDto.dataset.originalName;
     const savedName = detailDto.dataset.savedName;
     const savedPath = detailDto.dataset.savedPath;
-    const myTemperature = detailDto.dataset.myTemperature;
-    const baseUrl = detailDto.dataset.baseUrl;
+    const myTemperature = Number(detailDto.dataset.myTemperature);
+    const loginMember = detailDto.dataset.loginMember;
+    //const baseUrl = detailDto.dataset.baseUrl;
     //console.log(sportsFacilityAddress);
     //console.log(matchDatetime);
 
+    setWriter(writer, loginMember);
     drawMap(sportsFacilityAddress, sportsFacilityName);
     calTime(matchDatetime, matchDuration);
-    calParticipants(currentParticipantCount, maxParticipants);
+    checkStatus(matchDatetime, currentParticipantCount, maxParticipants, writer, loginMember, minMannerTemperature, myTemperature);
+    setButton(matchDatetime, writer, loginMember);
 
-    // const response = await fetch(`/get/attachment?saved-name=${savedName}`,{
+
+    // const response = await fetch(`/matchup/attachment?saved-name=${savedName}`,{
     //     method: "GET",
     //     credentials: "include"
     //     })
@@ -38,7 +42,16 @@ async function setContent(){
     // console.log(data);
 }
 
-function drawMap(address){
+function setWriter(writer, loginMember){
+    const writerEle = document.querySelector("#writer");
+    if(writer===loginMember)
+        writerEle.innerHTML = "나";
+    else
+        writerEle.innerHTML = writer;
+}
+
+
+function drawMap(address, sportsFacilityName){
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div
         mapOption = {
             center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
@@ -67,7 +80,7 @@ function drawMap(address){
 
             // 인포윈도우로 장소에 대한 설명을 표시합니다
             var infowindow = new kakao.maps.InfoWindow({
-                content: '<div style="width:150px;text-align:center;padding:6px 0;">${sportsFacilityName}</div>'
+                content: '<div style="width:150px;text-align:center;padding:6px 0;">'+sportsFacilityName+'</div>'
             });
             infowindow.open(map, marker);
 
@@ -79,10 +92,10 @@ function drawMap(address){
 
 function calTime(matchDatetime, matchDuration){
     //console.log(matchDatetime);
-    console.log(matchDuration);
+    //console.log(matchDuration);
 
     const date = new Date(matchDatetime);
-    console.log(date);
+    //console.log(date);
     const matchDateEle = document.querySelector("#match-date");
 
     const month = date.getMonth()+1;
@@ -115,8 +128,47 @@ function calTime(matchDatetime, matchDuration){
 
 }
 
-function calParticipants(currentParticipantCount, maxParticipants){
+function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, writer, loginMember, minMannerTemperature, myTemperature){
+    const statusEle = document.querySelector("#status");
 
+    // console.log(currentParticipantCount)
+    // console.log(maxParticipants)
+
+    // 공통: 경기 날짜 지나면 경기종료
+    const matchDate = new Date(matchDatetime);
+    const now = new Date();
+    if(matchDate<now)
+        statusEle.innerHTML = "경기 종료"
+    else if(writer === loginMember){
+        // 경우1: 사용자가 쓴 글
+        // 신청 가능 여부: 모집 중, 모집 완료, 경기 종료
+
+        if(currentParticipantCount < maxParticipants)
+            statusEle.innerHTML =  "모집 가능";
+        else
+            statusEle.innerHTML = "모집 완료";
+    }else{
+        // 경우2: 다른 사람의 글
+        // 신청 가능 여부: 신청 가능, 신청 마감, 입장 불가, 경기 종료
+        if(minMannerTemperature>myTemperature)
+            statusEle.innerHTML = "입장 불가";
+        else if(currentParticipantCount < maxParticipants)
+            statusEle.innerHTML = "신청 가능";
+        else
+            statusEle.innerHTML = "신청 불가";
+    }
+}
+
+function setButton(matchDatetime, writer, loginMember){
+    const matchDate = new Date(matchDatetime);
+    const now = new Date();
+    if(writer === loginMember && matchDate<now){
+       const modifyBtn = document.querySelector("#modify");
+       modifyBtn.addEventListener("click",(e)=>{
+           alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+           e.preventDefault();
+       })
+    }
 }
 
 
