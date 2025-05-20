@@ -74,12 +74,15 @@ public class TeamService {
         Team savedTeam = teamBoardRepository.save(newTeam);
 
         for (String posName : reqTeamDto.getRecruitingPositions()) {
-            PositionName enumVal = PositionName.valueOf(posName.trim());
-            Positions posEntity = positionsRepository.findByPositionName(enumVal);
+
+            PositionName enumValue = PositionName.valueOf(posName.trim());
+            Positions position = positionsRepository.findByPositionName(enumValue)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid position name: " + posName));
 
             RecruitingPosition rp = RecruitingPosition.builder()
                     .team(savedTeam)
-                    .positions(posEntity)
+                    .positions(position)
+
                     .build();
 
             recruitingPositionRepository.save(rp);
