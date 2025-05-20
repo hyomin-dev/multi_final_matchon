@@ -2,15 +2,18 @@ package com.multi.matchon.team.service;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.PositionName;
+import com.multi.matchon.common.domain.Positions;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.PositionsRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
 
 import com.multi.matchon.matchup.domain.MatchupBoard;
+import com.multi.matchon.team.domain.RecruitingPosition;
 import com.multi.matchon.team.domain.RegionType;
 import com.multi.matchon.team.domain.Team;
 import com.multi.matchon.team.dto.req.ReqTeamDto;
+import com.multi.matchon.team.repository.RecruitingPositionRepository;
 import com.multi.matchon.team.repository.TeamNameRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +46,8 @@ public class TeamService {
 
     private final TeamNameRepository teamBoardRepository;
 
+    private final RecruitingPositionRepository recruitingPositionRepository;
+
     private final PositionsRepository positionsRepository;
     private final AttachmentRepository attachmentRepository;
 
@@ -61,14 +66,29 @@ public class TeamService {
         Team newTeam = Team.builder()
                 .teamName(reqTeamDto.getTeamName())
                 .teamRegion(RegionType.valueOf(reqTeamDto.getTeamRegion()))
-//                .position(positionsRepository.findByPositionName(PositionName.valueOf(reqTeamDto.getPositionName())))
                 .teamRatingAverage(reqTeamDto.getTeamRatingAverage())
                 .recruitmentStatus(false)
                 .teamIntroduction(reqTeamDto.getTeamIntroduction())
                 .teamAttachmentEnabled(true)
                 .build();
-        Team team = teamBoardRepository.save(newTeam);
-        insertFile(reqTeamDto, team);
+        Team savedTeam = teamBoardRepository.save(newTeam);
+
+        for (String posName : reqTeamDto.getRecruitingPositions()) {
+
+            PositionName enumValue = PositionName.valueOf(posName.trim());
+            Positions position = positionsRepository.findByPositionName(enumValue)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid position name: " + posName));
+
+            RecruitingPosition rp = RecruitingPosition.builder()
+                    .team(savedTeam)
+                    .positions(position)
+
+                    .build();
+
+            recruitingPositionRepository.save(rp);
+        }
+
+        insertFile(reqTeamDto, savedTeam);
     }
 
     private void insertFile(ReqTeamDto reqTeamDto, Team team) {

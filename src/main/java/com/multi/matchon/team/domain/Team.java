@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-//@Setter: JPA entity에서 setter사용은 자제, test용
 @Table(name="team", uniqueConstraints = {@UniqueConstraint(name="UK_team_name",columnNames = {"team_name"})
 })
 public class Team extends BaseEntity {
