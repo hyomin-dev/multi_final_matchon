@@ -27,6 +27,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults()) // CORS 허용 추가
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
@@ -35,9 +36,9 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/main", "/signup", "/signup/**", "/login", "/auth/**", "/api/common/datacontroller/**", "/css/**", "/img/**", "/js/**", "/favicon.ico").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 경로
-                .anyRequest().authenticated()
+                        .requestMatchers("/", "/main", "/signup", "/signup/**", "/login", "/auth/**", "/api/common/datacontroller/**", "/css/**", "/img/**", "/js/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 경로
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
