@@ -8,9 +8,8 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 async function loadItems(page){
     const response = await fetch(`/matchup/board/my/list?page=${page-1}`,{
         method: "GET",
-        headers: {
-            "Authorization": "Bearer " + localStorage.getItem("accessToken")
-        }
+        credentials: "include"
+
     });
     if(!response.ok)
         throw new Error(`HTTP error! Status:${response.status}`)

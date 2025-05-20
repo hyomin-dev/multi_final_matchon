@@ -27,7 +27,10 @@ function submitCheck(e){
 }
 
 async function getSportsType(){
-    const response = await fetch("/sports-types")
+    const response = await fetch("/sports-types",{
+        method: "GET",
+        credentials: "include"
+    })
     if(!response.ok)
         throw new Error(`HTTP error! Status:${response.status}`)
     const data = await response.json();
@@ -48,7 +51,10 @@ async function getSportsType(){
 async function getTeam(){
     const email = document.querySelector("#user-info").dataset.email;
     const team = document.querySelector("#teamName");
-    const response = await fetch(`/member/search-with-team-teamname?email=${email}`);
+    const response = await fetch(`/member/search-with-team-teamname?email=${email}`,{
+        method: "GET",
+        credentials: "include"
+    });
     if(!response.ok)
         throw new Error(`HTTP error! Status:${response.status}`)
     const data = await response.json();
