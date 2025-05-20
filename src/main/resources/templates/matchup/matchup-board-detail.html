@@ -6,6 +6,8 @@
   <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
   <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
   <script th:src="@{/js/matchup/matchup-board-detail.js}" defer></script>
+  <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
+
   <style>
     a {
       display:block;
@@ -25,7 +27,7 @@
        th:data-team-intro="${resMatchupBoardDto.teamIntro}"
        th:data-sports-facility-name="${resMatchupBoardDto.sportsFacilityName}"
        th:data-sports-facility-address="${resMatchupBoardDto.sportsFacilityAddress}"
-       th:data-match-date="${#temporals.format(resMatchupBoardDto.matchDatetime, 'yyyy-MM-dd HH:mm')}"
+       th:data-match-datetime="${resMatchupBoardDto.matchDatetime}"
        th:data-match-duration="${resMatchupBoardDto.matchDuration}"
        th:data-current-participant-count="${resMatchupBoardDto.currentParticipantCount}"
        th:data-max-participants="${resMatchupBoardDto.maxParticipants}"
@@ -33,11 +35,10 @@
        th:data-match-description="${resMatchupBoardDto.matchDescription}"
        th:data-original-name="${resMatchupBoardDto.originalName}"
        th:data-saved-name="${resMatchupBoardDto.savedName}"
-       th:data-saved-path="${resMatchupBoardDto.savedPath}"
        th:data-my-temperature="${resMatchupBoardDto.myTemperature}"
-       th:data-base-url="${@environment.getProperty('S3_BASE_URL')}"
   >
   </div>
+
   <table>
     <tr>
       <th>종목: </th>
@@ -61,19 +62,21 @@
     </tr>
     <tr>
       <th>경기장 주소:</th>
-      <td th:text="${resMatchupBoardDto.sportsFacilityAddress}"></td>
+
     </tr>
     <tr>
       <th>경기장 위치</th>
-      <td>카카오맵 표시</td>
+      <td>
+        <div id="map" style="width:100%;height:350px;"></div>
+      </td>
     </tr>
     <tr>
-      <th>경기 진행 시간</th>
-      <td>자바스크립트 계산</td>
+      <th>경기 날짜</th>
+      <td id="match-date"></td>
     </tr>
     <tr>
       <th>참가인원</th>
-      <td>자바스크립트 계산</td>
+      <td th:text="${'('+ resMatchupBoardDto.currentParticipantCount + ' / '+resMatchupBoardDto.maxParticipants + ')'}"></td>
     </tr>
     <tr>
       <th>신청 가능 여부</th>

@@ -55,13 +55,16 @@ async function getTeam(){
         method: "GET",
         credentials: "include"
     });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    if(data.data.trim()==='' || data.data===null){
+    if(!response.ok){
+        //throw new Error(`HTTP error! Status:${response.status}`)
         alert("MATCHUP 글 작성은 소속팀이 있어야 합니다.")
         window.history.back();
     }
+
+    const data = await response.json();
+    // if(data.data.trim()==='' || data.data===null){
+    //
+    // }
     team.value=data.data;
     team.textContent = data.data;
 

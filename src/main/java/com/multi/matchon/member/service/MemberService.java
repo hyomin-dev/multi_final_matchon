@@ -20,7 +20,7 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public String getTeamNameByMemberEmail(String email) {
-        Member member = memberRepository.findByMemberEmailWithTeam(email).orElseThrow(() -> new IllegalArgumentException("잘못된 email입니다."));
+        Member member = memberRepository.findByMemberEmailWithTeam(email).orElseThrow(() -> new IllegalArgumentException("이 email을 가진 회원은 소속팀이 없습니다."));
 
         return member.getTeam().getTeamName();
     }
