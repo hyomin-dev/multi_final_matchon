@@ -39,8 +39,6 @@ public class Member extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private MemberRole memberRole;
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="position_id")
     private Positions positions;
@@ -49,9 +47,6 @@ public class Member extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private TimeType timeType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sports_type_id")
-    private SportsType sportsType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="team_id")

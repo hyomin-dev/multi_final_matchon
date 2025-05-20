@@ -32,9 +32,7 @@ async function loadItems(page, sportsType='', region='', dateFilter=''){
     const response = await fetch(`/matchup/board/list?page=${page-1}&sportsType=${sportsType}&region=${region}&date=${dateFilter}`,{
 
         method: "GET",
-        headers: {
-            "Authorization": "Bearer " + localStorage.getItem("accessToken")
-        }
+        credentials: "include"
     });
     if(!response.ok)
         throw new Error(`HTTP error! Status:${response.status}`)
@@ -64,7 +62,10 @@ function renderList(items){
                     <td class="center">
                         <div><strong>작성자: ${item.writer}</strong></div>
                         <div><strong>팀 이름: ${item.teamName}</strong></div>
-                        <button class="chat-1-1">문의 하기</button>
+                        <div>
+                            <a href="/matchup/board/detail?matchup-board-id=${item.boardId}"><button class="detail">상세보기</button></a>
+                            <button class="chat-1-1">문의 하기</button>
+                        </div>                       
                     </td>
                     <td class="center">
                         <div><strong>종목: ${item.sportsTypeName}</strong></div>
@@ -82,6 +83,10 @@ function renderList(items){
             </table>            
                 `;
         boardArea.appendChild(card);
+        // /board/detail
+        document.querySelector(".detail").addEventListener("click",()=>{
+
+        })
 
     })
 }
@@ -204,7 +209,10 @@ function checkStatus(item){
 async function getMyMannerTemperature(){
 
     const email = document.querySelector("#user-info").dataset.email;
-    const response  = await fetch(`/member/search-temperature?email=${email}`)
+    const response  = await fetch(`/member/search-temperature?email=${email}`,{
+        method: "GET",
+        credentials: "include"
+    })
     if(!response.ok)
         throw new Error(`HTTP error! Status:${response.status}`)
     const data = await response.json();

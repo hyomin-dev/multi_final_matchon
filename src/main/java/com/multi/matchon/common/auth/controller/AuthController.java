@@ -66,7 +66,7 @@ public class AuthController {
 
         // accessToken → HttpOnly 쿠키로 발급 (JS 접근 불가)
         ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", tokenResponse.getAccessToken())
-                .httpOnly(true)
+                .httpOnly(false)
                 .path("/")
                 .maxAge(Duration.ofHours(1))
                 .build();
