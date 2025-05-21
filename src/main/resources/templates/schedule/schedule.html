@@ -15,7 +15,7 @@
         }
 
         #wrap {
-            padding: 30px 0 30px 0;
+            padding: 30px 0;
         }
 
         .container {
@@ -108,7 +108,8 @@
             align-items: center;
             padding-top: 6px;
             cursor: pointer;
-            border: 1px solid #ddd;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
             border-left: none;
             border-right: none;
             transition: background-color 0.3s;
@@ -143,6 +144,7 @@
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
+
 <div id="wrap">
     <div class="container">
         <div class="header">
@@ -153,12 +155,17 @@
                 <span class="region-dot" style="background-color:#FFEDA3;"></span> 영남권
                 <span class="region-dot" style="background-color:#C7FAB8;"></span> 호남권
                 <span class="region-dot" style="background-color:#B5DBFF;"></span> 충청권
-                <span class="region-dot" style="background-color:#E7D0FF;"></span> 경상권
+                <span class="region-dot" style="background-color:#E7D0FF;"></span> 강원권
             </div>
         </div>
 
         <div class="month-title" id="monthYear"></div>
-        <button class="register-btn" onclick="submitSelectedDate()">등록하기</button>
+
+        <button class="register-btn"
+                onclick="submitSelectedDate()"
+                th:if="${#authorization.expression('hasRole(''HOST'')')}">
+            등록하기
+        </button>
 
         <div class="calendar-wrapper">
             <img src="/img/back.png" class="calendar-nav-img left-arrow" onclick="changeMonth(-1)">
@@ -167,7 +174,12 @@
         </div>
     </div>
 </div>
+
 <div th:replace="~{common/footer::footer}"></div>
+
+<script th:inline="javascript">
+    const userRole = /*[[${#authentication.principal.member.memberRole}]]*/ "USER";  // 권한 전달
+</script>
 
 <script>
     const calendar = document.getElementById("calendar");
@@ -217,7 +229,6 @@
             const dayNum = document.createElement("div");
             dayNum.classList.add("day-number");
 
-            // 일요일 색상 처리
             if (new Date(year, month, day).getDay() === 0) {
                 dayNum.classList.add("sunday");
             }
@@ -225,7 +236,6 @@
             dayNum.textContent = day;
             cell.appendChild(dayNum);
 
-            // 라벨 예시
             if (day === 3 || day === 14) {
                 const label = document.createElement("div");
                 label.classList.add("event-label");
@@ -234,6 +244,8 @@
             }
 
             cell.onclick = () => {
+                if (userRole !== "HOST") return;  // 일반 사용자 클릭 막기
+
                 if (selectedCell) {
                     selectedCell.classList.remove("selected");
                 }
@@ -266,7 +278,7 @@
             alert("날짜를 선택해주세요.");
             return;
         }
-        window.location.href = `/events/new?selectedDate=${selectedDate}`;
+        window.location.href = `/event/new?selectedDate=${selectedDate}`;
     }
 
     renderCalendar(currentYear, currentMonth);

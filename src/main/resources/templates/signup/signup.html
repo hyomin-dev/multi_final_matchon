@@ -4,6 +4,78 @@
     <title>회원가입</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <style>
+        /* 전체 감싸는 박스 */
+        #wrap {
+            max-width: 400px;
+            margin: 80px auto;
+            font-family: 'Noto Sans KR', sans-serif;
+            position: relative;
+        }
+
+        /* 드롭다운 - 왼쪽 정렬 */
+        #roleSelect {
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: #2e5c9a;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            appearance: none;
+        }
+
+        /* 드롭다운 펼쳤을 때 */
+        #roleSelect option {
+            background-color: #ffffff;
+            color: #222;
+        }
+
+        /* 제목 가운데 정렬 + 밑줄 */
+        #wrap h2 {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 4px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        /* 입력 필드 */
+        #signupForm input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #aaa;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        /* 버튼 스타일 */
+        #signupForm button[type="submit"] {
+            width: 100%;
+            background-color: #eabdc2;
+            border: 1px solid #c88c95;
+            color: white;
+            font-weight: bold;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #signupForm button[type="submit"]:hover {
+            background-color: #d78e98;
+        }
+
+    </style>
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
@@ -15,7 +87,7 @@
     <option value="host">주최자</option>
 </select>
 
-<h2>회원가입</h2>
+<h2>SIGN UP</h2>
 
 <form id="signupForm">
     <input type="email" id="email" placeholder="이메일" required />
