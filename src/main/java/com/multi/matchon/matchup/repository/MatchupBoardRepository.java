@@ -25,6 +25,9 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     @Query("select t1 from MatchupBoard t1 join fetch t1.member join fetch t1.sportsType where t1.isDeleted=false")
     List<MatchupBoard> findAllWithMemberAndWithSportsType();
 
+    @Query("select t1 from MatchupBoard t1 join fetch t1.sportsType where t1.id=:boardId and t1.isDeleted=false ")
+    Optional<MatchupBoard> findByIdAndIsDeleted(@Param("boardId") Long boardId);
+
 
     @Query("""
             select new com.multi.matchon.matchup.dto.res
@@ -78,6 +81,8 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
 
     @Query("select t1 from MatchupBoard t1 join fetch t1.member t2 join fetch t1.member.team t3 join fetch t1.sportsType t4 where t1.id=:boardId and t1.isDeleted=false")
     Optional<MatchupBoard> findByIdWithMemberWithTeamWithSportsType(@Param("boardId") Long boardId);
+
+
 
 
 //    @Query("""

@@ -26,11 +26,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -84,24 +87,44 @@ public class MatchupService{
                 .matchDescription(reqMatchupBoardDto.getMatchDescription())
                 .build();
         MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
-        insertFile(reqMatchupBoardDto, matchupBoard);
+        insertFile(reqMatchupBoardDto.getReservationFile(), matchupBoard);
 
     }
-    public void insertFile(ReqMatchupBoardDto reqMatchupBoardDto, MatchupBoard matchupBoard){
+    public void insertFile(MultipartFile multipartFile, MatchupBoard matchupBoard){
         String fileName = UUID.randomUUID().toString().replace("-","");
-        awsS3Utils.saveFile(FILE_DIR, fileName, reqMatchupBoardDto.getReservationFile());
+        awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
         Attachment attachment = Attachment.builder()
                 .boardType(BoardType.MATCHUP_BOARD)
                 .boardNumber(matchupBoard.getId())
                 .fileOrder(0)
-                .originalName(reqMatchupBoardDto.getReservationFile().getOriginalFilename())
-                .savedName(fileName+reqMatchupBoardDto.getReservationFile().getOriginalFilename().substring(reqMatchupBoardDto.getReservationFile().getOriginalFilename().indexOf(".")))
+                .originalName(multipartFile.getOriginalFilename())
+                .savedName(fileName+multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")))
                 .savePath(FILE_DIR)
                 .build();
         attachmentRepository.save(attachment);
+    }
+
+    public void updateFile(MultipartFile multipartFile, MatchupBoard findMatchupBoard){
+        String fileName = UUID.randomUUID().toString().replace("-","");
+
+        List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, findMatchupBoard.getId());
+        if(findAttachments.isEmpty())
+            throw new IllegalArgumentException(BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
+
+        findAttachments.get(0).update(multipartFile.getOriginalFilename(), fileName+multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")), FILE_DIR);
+
+        attachmentRepository.save(findAttachments.get(0));
+
+        awsS3Utils.deleteFile(FILE_DIR, fileName);
+
+        awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
+
+
 
 
     }
+
+
 
 //    public void findBoardListTest() {
 //        Pageable pageRequest1 = PageRequest.of(0,4);
@@ -219,10 +242,59 @@ public class MatchupService{
 
     }
 
-    public S3Resource getAttachment(String savedName) {
-        String presignedUrl = awsS3Utils.createPresignedGetUrl(FILE_DIR, savedName);
+    public void boardEdit(ResMatchupBoardDto resMatchupBoardDto) {
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findByIdAndIsDeleted(resMatchupBoardDto.getBoardId()).orElseThrow(()->new IllegalArgumentException(resMatchupBoardDto.getBoardId()+"번 게시글이 없습니다."));
+
+        findMatchupBoard.update(
+                sportsTypeRepository.findBySportsTypeName(resMatchupBoardDto.getSportsTypeName()).orElseThrow(()-> new IllegalArgumentException(resMatchupBoardDto.getSportsTypeName()+"는 지원하지 않는 종목입니다.")),
+                resMatchupBoardDto.getTeamIntro(),
+                resMatchupBoardDto.getSportsFacilityName(),
+                resMatchupBoardDto.getSportsFacilityAddress(),
+                resMatchupBoardDto.getMatchDatetime(),
+                resMatchupBoardDto.getMatchDuration(),
+                resMatchupBoardDto.getCurrentParticipantCount(),
+                resMatchupBoardDto.getMaxParticipants(),
+                resMatchupBoardDto.getMinMannerTemperature(),
+                resMatchupBoardDto.getMatchDescription()
+        );
+        matchupBoardRepository.save(findMatchupBoard);
+
+        //if(resMatchupBoardDto.getReservationFile())
+        System.out.println("Tt");
+
+        if(!Objects.requireNonNull(resMatchupBoardDto.getReservationFile().getOriginalFilename()).isBlank()){
+
+            updateFile(resMatchupBoardDto.getReservationFile(), findMatchupBoard);
+
+        }
+    }
+
+    public S3Resource getAttachmentFile(String savedName) throws IOException {
         S3Resource resource = awsS3Utils.downloadFile(FILE_DIR, savedName);
         return resource;
+    }
+
+    public String getAttachmentURL(String savedName) throws IOException {
+        String presignedUrl = awsS3Utils.createPresignedGetUrl(FILE_DIR, savedName);
+
+        return presignedUrl;
+    }
+
+
+    public void boardDelete(Long boardId) {
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findByIdAndIsDeleted(boardId).orElseThrow(()->new IllegalArgumentException(boardId+"번 게시글이 없습니다."));
+
+        findMatchupBoard.delete(true);
+
+        matchupBoardRepository.save(findMatchupBoard);
+
+        List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
+        if(findAttachments.isEmpty())
+            throw new IllegalArgumentException(BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
+        findAttachments.get(0).delete(true);
+
+        attachmentRepository.save(findAttachments.get(0));
+
     }
 }
 

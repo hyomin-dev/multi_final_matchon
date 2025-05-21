@@ -32,14 +32,26 @@ async function setContent(){
     setButton(matchDatetime, writer, loginMember);
 
 
-    // const response = await fetch(`/matchup/attachment?saved-name=${savedName}`,{
-    //     method: "GET",
-    //     credentials: "include"
-    //     })
-    // if(!response.ok)
+    const response = await fetch(`/matchup/attachment/presigned-url?saved-name=${savedName}`,{
+        method: "GET",
+        credentials: "include"
+        })
+    if(!response.ok)
+        throw new Error(`HTTP error! Status:${response.status}`)
+    const data = await response.json();
+    //console.log(data.data);
+    document.querySelector("#reservationUrl").href = data.data;
+
+
+    //아래는 CORS 막아놔서 안됨
+    // const response2 = await fetch(data.data);
+    // if(!response2.ok)
     //     throw new Error(`HTTP error! Status:${response.status}`)
-    // const data = await response.json();
-    // console.log(data);
+    // const data2 = await response2.json();
+    // console.log(data2);
+
+
+
 }
 
 function setWriter(writer, loginMember){
