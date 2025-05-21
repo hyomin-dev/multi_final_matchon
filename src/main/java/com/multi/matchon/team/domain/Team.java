@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -46,6 +49,9 @@ public class Team extends BaseEntity {
     @Column(name="team_attachment_enabled",nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE check (team_attachment_enabled=true)")
     @Builder.Default
     private Boolean teamAttachmentEnabled = true;
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecruitingPosition> recruitingPositions = new ArrayList<>();
 
     @Column(name="is_deleted")
     @Builder.Default

@@ -31,9 +31,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createRefreshToken(String email) {
+    public String createRefreshToken(String email, MemberRole role) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role.name()) // role 포함해야 getRoleFromToken이 null 안 됨
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
                 .signWith(secretKey)
@@ -56,6 +57,20 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public MemberRole getRoleFromToken(String token) {
+        String role = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
+        if (role == null) {
+            throw new IllegalArgumentException("JWT 토큰에 role 정보가 없습니다.");
+        }
+
+        return MemberRole.valueOf(role);
     }
 }
 

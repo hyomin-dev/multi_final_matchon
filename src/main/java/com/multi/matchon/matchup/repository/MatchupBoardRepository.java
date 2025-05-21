@@ -19,11 +19,14 @@ import java.util.Optional;
 public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Long> {
     List<MatchupBoard> findAll();
 
-    @Query("select t1 from MatchupBoard t1 join fetch t1.member")
+    @Query("select t1 from MatchupBoard t1 join fetch t1.member where t1.isDeleted=false")
     List<MatchupBoard> findAllWithMember();
 
-    @Query("select t1 from MatchupBoard t1 join fetch t1.member join fetch t1.sportsType")
+    @Query("select t1 from MatchupBoard t1 join fetch t1.member join fetch t1.sportsType where t1.isDeleted=false")
     List<MatchupBoard> findAllWithMemberAndWithSportsType();
+
+    @Query("select t1 from MatchupBoard t1 join fetch t1.sportsType where t1.id=:boardId and t1.isDeleted=false ")
+    Optional<MatchupBoard> findByIdAndIsDeleted(@Param("boardId") Long boardId);
 
 
     @Query("""
@@ -46,7 +49,8 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             join t1.sportsType t4
             where (:sportsType is null or t4.sportsTypeName =:sportsType) and
                     (:region is null or t1.sportsFacilityAddress like concat('%', :region, '%')) and
-                    (:matchDate is null or DATE(t1.matchDatetime) >=:matchDate)
+                    (:matchDate is null or DATE(t1.matchDatetime) >=:matchDate) and
+                    (t1.isDeleted=false)
             order by t1.createdDate DESC
             """)
     Page<ResMatchupBoardListDto> findBoardListWithPaging(Pageable pageable, @Param("sportsType") SportsTypeName sportsType, @Param("region") String region, @Param("matchDate") LocalDate matchDate);
@@ -69,14 +73,16 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             join t1.member t2
             join t2.team t3
             join t1.sportsType t4
-            where t2.memberEmail =:email
+            where t2.memberEmail =:email and t1.isDeleted=false
             order by t1.matchDatetime DESC
             """)
     Page<ResMatchupBoardListDto> findByMemberEmailBoardListWithPaging(Pageable pageable, @Param("email") String email);
 
 
-    @Query("select t1 from MatchupBoard t1 join fetch t1.member t2 join fetch t1.member.team t3 join fetch t1.sportsType t4 where t1.id=:boardId")
+    @Query("select t1 from MatchupBoard t1 join fetch t1.member t2 join fetch t1.member.team t3 join fetch t1.sportsType t4 where t1.id=:boardId and t1.isDeleted=false")
     Optional<MatchupBoard> findByIdWithMemberWithTeamWithSportsType(@Param("boardId") Long boardId);
+
+
 
 
 //    @Query("""

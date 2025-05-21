@@ -15,7 +15,7 @@ public class ReqTeamDto {
 
     private String teamRegion;
 
-    private String recruitmentStatus;
+    private Boolean recruitmentStatus;
 
     private String teamIntroduction;
 

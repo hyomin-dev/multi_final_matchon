@@ -8,6 +8,8 @@
 </head>
 <body class="flex-layout">
 <div class="page-wrapper">
+
+<body>
 <div th:replace="~{common/header::header}"></div>
 
 <h2 class="page-title" th:text="${selectedCategory != null} ? ${selectedCategory.displayName} : '자유게시판'">자유게시판</h2>
@@ -57,7 +59,9 @@
 
     <a th:if="${boardsPage.hasNext()}" th:href="@{/community(page=${boardsPage.number + 1})}">다음</a>
 </div>
+
 </div>
+
 <div th:replace="~{common/footer::footer}"></div>
 </body>
 </html>
