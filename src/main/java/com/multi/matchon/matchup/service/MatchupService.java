@@ -109,14 +109,19 @@ public class MatchupService{
         String fileName = UUID.randomUUID().toString().replace("-","");
 
         List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, findMatchupBoard.getId());
+
         if(findAttachments.isEmpty())
             throw new IllegalArgumentException(BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
+
+        String savedName = findAttachments.get(0).getSavedName();
+
+        awsS3Utils.deleteFile(FILE_DIR, savedName.substring(0,savedName.indexOf(".")));
 
         findAttachments.get(0).update(multipartFile.getOriginalFilename(), fileName+multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")), FILE_DIR);
 
         attachmentRepository.save(findAttachments.get(0));
 
-        awsS3Utils.deleteFile(FILE_DIR, fileName);
+
 
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
 
