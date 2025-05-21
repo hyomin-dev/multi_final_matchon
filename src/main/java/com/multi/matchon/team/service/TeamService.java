@@ -4,15 +4,18 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.PositionName;
 import com.multi.matchon.common.domain.Positions;
 import com.multi.matchon.common.domain.SportsTypeName;
+import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.PositionsRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
 
 import com.multi.matchon.matchup.domain.MatchupBoard;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.team.domain.RecruitingPosition;
 import com.multi.matchon.team.domain.RegionType;
 import com.multi.matchon.team.domain.Team;
 import com.multi.matchon.team.dto.req.ReqTeamDto;
+import com.multi.matchon.team.dto.res.ResTeamDto;
 import com.multi.matchon.team.repository.RecruitingPositionRepository;
 import com.multi.matchon.team.repository.TeamNameRepository;
 import jakarta.annotation.PostConstruct;
@@ -20,10 +23,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.connection.RedisListCommands;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -67,8 +73,7 @@ public class TeamService {
                 .teamName(reqTeamDto.getTeamName())
                 .teamRegion(RegionType.valueOf(reqTeamDto.getTeamRegion()))
                 .teamRatingAverage(reqTeamDto.getTeamRatingAverage())
-                .recruitmentStatus(false)
-                .teamIntroduction(reqTeamDto.getTeamIntroduction())
+                .recruitmentStatus(reqTeamDto.getRecruitmentStatus())                .teamIntroduction(reqTeamDto.getTeamIntroduction())
                 .teamAttachmentEnabled(true)
                 .build();
         Team savedTeam = teamBoardRepository.save(newTeam);
@@ -92,5 +97,42 @@ public class TeamService {
     }
 
     private void insertFile(ReqTeamDto reqTeamDto, Team team) {
+    }
+
+    public PageResponseDto<ResTeamDto> findAllWithPaging(
+            PageRequest pageRequest,
+            String recruitingPosition,
+            String region,
+            Double teamRatingAverage) {
+
+        // Convert enums safely
+        PositionName positionName = null;
+        if (recruitingPosition != null && !recruitingPosition.isBlank()) {
+            positionName = PositionName.valueOf(recruitingPosition.trim());
+        }
+
+        RegionType regionType = null;
+        if (region != null && !region.isBlank()) {
+            regionType = RegionType.valueOf(region.trim());
+        }
+
+
+        Page<Team> teamPage = teamBoardRepository.findTeamListWithPaging(
+                positionName, regionType, teamRatingAverage, pageRequest);
+
+
+        Page<ResTeamDto> dtoPage = teamPage.map(ResTeamDto::from);
+
+        return PageResponseDto.<ResTeamDto>builder()
+                .items(dtoPage.getContent())
+                .pageInfo(PageResponseDto.PageInfoDto.builder()
+                        .page(dtoPage.getNumber())
+                        .size(dtoPage.getNumberOfElements())
+                        .totalElements(dtoPage.getTotalElements())
+                        .totalPages(dtoPage.getTotalPages())
+                        .isFirst(dtoPage.isFirst())
+                        .isLast(dtoPage.isLast())
+                        .build())
+                .build();
     }
 }

@@ -63,8 +63,7 @@ function renderList(items){
                         <div><strong>작성자: ${item.writer}</strong></div>
                         <div><strong>팀 이름: ${item.teamName}</strong></div>
                         <div>
-                            <a href="/matchup/board/detail?matchup-board-id=${item.boardId}"><button class="detail">상세보기</button></a>
-                            <button class="chat-1-1">문의 하기</button>
+                            <a href="/matchup/board/detail?matchup-board-id=${item.boardId}"><button class="detail">상세보기</button></a>                           
                         </div>                       
                     </td>
                     <td class="center">

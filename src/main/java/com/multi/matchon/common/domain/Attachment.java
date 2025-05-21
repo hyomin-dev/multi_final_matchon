@@ -47,6 +47,14 @@ public class Attachment extends BaseEntity {
     private Boolean isDeleted=false;
 
 
+    public void update(String originalFilename, String savedName, String savePath) {
+        this.originalName = originalFilename;
+        this.savedName = savedName;
+        this.savePath = savePath;
 
+    }
 
+    public void delete(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }

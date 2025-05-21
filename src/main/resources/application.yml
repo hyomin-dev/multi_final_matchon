@@ -24,6 +24,9 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
 
+matchon:
+  kakao-api: ${KAKAO_API_KEY}
+
 ---
 
 spring:
@@ -80,4 +83,7 @@ spring:
       max-request-size: 20MB
 
 
+
+file:
+  upload-dir: C:/upload-dir
 

@@ -1,5 +1,8 @@
 package com.multi.matchon.team.dto.res;
 
+
+import com.multi.matchon.team.domain.Team;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Data
 @NoArgsConstructor
@@ -20,7 +25,8 @@ public class ResTeamDto {
 
     private String teamRegion;
 
-    private String recruitmentStatus;
+    private Boolean RecruitmentStatus;
+
 
     private String teamIntroduction;
 
@@ -30,4 +36,21 @@ public class ResTeamDto {
 
     private Double teamRatingAverage;
 
+
+    public static ResTeamDto from(Team team) {
+        return ResTeamDto.builder()
+                .teamName(team.getTeamName())
+                .teamRegion(team.getTeamRegion().name())
+                .teamRatingAverage(team.getTeamRatingAverage())
+                .RecruitmentStatus(team.getRecruitmentStatus())
+                .recruitingPositions(
+                        team.getRecruitingPositions().stream()
+                                .map(rp -> rp.getPositions().getPositionName().name())
+                                .collect(Collectors.toList())
+                )
+                .build();
+    }
+
 }
+
+

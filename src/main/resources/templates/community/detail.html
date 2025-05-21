@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>게시글 상세</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/community.css}">
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+
+<div class="content-box">
+    <div class="post-header">
+        <h2 th:text="${board.title}" class="post-title">제목</h2>
+        <div class="post-meta">
+            <span><strong>카테고리:</strong> <span th:text="${board.category.displayName}"></span></span>
+            <span><strong>작성일:</strong> <span th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></span></span>
+        </div>
+    </div>
+
+    <div class="post-body">
+        <p th:text="${board.content}" class="post-content"></p>
+
+        <div th:if="${board.boardAttachmentEnabled}" class="attachment-box">
+            <strong>첨부파일:</strong>
+            <a th:href="@{'/uploads/' + ${board.attachmentPath}}"
+               th:text="${board.attachmentOriginalName}" download></a>
+        </div>
+    </div>
+
+    <div class="post-actions">
+        <a th:href="@{/community}" class="back-link"> 목록으로 </a>
+    </div>
+</div>
+
+<div class="comment-section">
+    <h3>댓글</h3>
+    <form th:action="@{'/community/' + ${board.id} + '/comments'}"
+          th:object="${commentRequest}" method="post">
+        <textarea th:field="*{content}" placeholder="댓글을 입력하세요."></textarea>
+        <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" style="color:red;"></div>
+        <button type="submit">댓글 작성</button>
+    </form>
+
+    <ul>
+        <li th:each="comment : ${comments}">
+            <p th:text="${comment.content}"></p>
+            <small th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}"></small>
+        </li>
+    </ul>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>
+
+
+
+
