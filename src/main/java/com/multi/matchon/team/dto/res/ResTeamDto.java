@@ -37,13 +37,16 @@ public class ResTeamDto {
     private Double teamRatingAverage;
 
 
+
     public static ResTeamDto from(Team team, String imageUrl) {
+
         return ResTeamDto.builder()
                 .teamName(team.getTeamName())
                 .teamRegion(team.getTeamRegion().name())
                 .teamRatingAverage(team.getTeamRatingAverage())
                 .RecruitmentStatus(team.getRecruitmentStatus())
                 .imageUrl(imageUrl)
+
                 .recruitingPositions(
                         team.getRecruitingPositions().stream()
                                 .map(rp -> rp.getPositions().getPositionName().name())

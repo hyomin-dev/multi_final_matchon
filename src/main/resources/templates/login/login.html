@@ -4,12 +4,66 @@
     <title>로그인</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <style>
+        #wrap {
+            max-width: 400px;
+            margin: 60px auto;
+            text-align: center;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /* 제목 스타일 */
+        #wrap h2 {
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid #111;
+            display: inline-block;
+            padding-bottom: 4px;
+            margin-bottom: 25px;
+        }
+
+        /* 인풋 필드 */
+        #loginForm input[type="email"],
+        #loginForm input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 14px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        /* 로그인 버튼 */
+        #loginForm button[type="submit"] {
+            width: 100%;
+            background-color: #eabdc2;
+            border: 1px solid #c88c95;
+            color: white;
+            font-weight: bold;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.2s ease;
+        }
+
+        #loginForm button[type="submit"]:hover {
+            background-color: #d78e98;
+        }
+
+        /* 플레이스홀더 색상 */
+        #loginForm input::placeholder {
+            color: #aaa;
+        }
+    </style>
 </head>
 <body>
 
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
-    <h2>로그인 페이지</h2>
+    <h2>LOGIN</h2>
     <form id="loginForm">
         <input type="email" id="email" placeholder="이메일" required /><br/>
         <input type="password" id="password" placeholder="비밀번호" required /><br/>

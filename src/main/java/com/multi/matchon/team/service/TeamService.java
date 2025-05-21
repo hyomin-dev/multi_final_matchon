@@ -1,7 +1,9 @@
 package com.multi.matchon.team.service;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
+
 import com.multi.matchon.common.domain.*;
+
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.PositionsRepository;
@@ -176,6 +178,43 @@ public class TeamService {
 
             return ResTeamDto.from(team, imageUrl);
         });
+
+        return PageResponseDto.<ResTeamDto>builder()
+                .items(dtoPage.getContent())
+                .pageInfo(PageResponseDto.PageInfoDto.builder()
+                        .page(dtoPage.getNumber())
+                        .size(dtoPage.getNumberOfElements())
+                        .totalElements(dtoPage.getTotalElements())
+                        .totalPages(dtoPage.getTotalPages())
+                        .isFirst(dtoPage.isFirst())
+                        .isLast(dtoPage.isLast())
+                        .build())
+                .build();
+    }
+
+    public PageResponseDto<ResTeamDto> findAllWithPaging(
+            PageRequest pageRequest,
+            String recruitingPosition,
+            String region,
+            Double teamRatingAverage) {
+
+        // Convert enums safely
+        PositionName positionName = null;
+        if (recruitingPosition != null && !recruitingPosition.isBlank()) {
+            positionName = PositionName.valueOf(recruitingPosition.trim());
+        }
+
+        RegionType regionType = null;
+        if (region != null && !region.isBlank()) {
+            regionType = RegionType.valueOf(region.trim());
+        }
+
+
+        Page<Team> teamPage = teamBoardRepository.findTeamListWithPaging(
+                positionName, regionType, teamRatingAverage, pageRequest);
+
+
+        Page<ResTeamDto> dtoPage = teamPage.map(ResTeamDto::from);
 
         return PageResponseDto.<ResTeamDto>builder()
                 .items(dtoPage.getContent())

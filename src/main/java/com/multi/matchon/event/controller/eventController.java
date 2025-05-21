@@ -1,14 +1,28 @@
 package com.multi.matchon.event.controller;
 
+import com.multi.matchon.common.auth.dto.CustomUser;
+import com.multi.matchon.common.auth.service.CustomUserDetailsService;
+import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.event.domain.EventRegionType;
 import com.multi.matchon.event.domain.EventRequest;
+import com.multi.matchon.event.domain.HostProfile;
+import com.multi.matchon.event.dto.req.EventCreateRequestDto;
+import com.multi.matchon.event.dto.res.CalendarDayDto;
+import com.multi.matchon.event.dto.res.EventSummaryDto;
 import com.multi.matchon.event.repository.EventRepository;
+import com.multi.matchon.event.repository.HostProfileRepository;
+import com.multi.matchon.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.DayOfWeek;
@@ -22,6 +36,7 @@ import java.util.List;
 public class eventController {
 
     private final EventRepository eventRepository;
+    private final HostProfileRepository hostProfileRepository;
 
     @GetMapping("/schedule")
     public String getSchedule(@RequestParam(required = false) Integer year,
@@ -39,15 +54,15 @@ public class eventController {
                 ? eventRepository.findByEventDateBetweenAndEventRegionType(start, end, region)
                 : eventRepository.findByEventDateBetween(start, end);
 
-        List<CalendarDay> days = new ArrayList<>();
+        List<CalendarDayDto> days = new ArrayList<>();
         for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
             LocalDate finalDate = date;
-            List<EventSummary> dailyEvents = events.stream()
+            List<EventSummaryDto> dailyEvents = events.stream()
                     .filter(e -> e.getEventDate().equals(finalDate))
-                    .map(e -> new EventSummary(e.getEventTitle(), colorForRegion(e.getEventRegionType())))
+                    .map(e -> new EventSummaryDto(e.getEventTitle()))
                     .toList();
 
-            days.add(new CalendarDay(date, ym.getMonthValue() == date.getMonthValue(), dailyEvents));
+            days.add(new CalendarDayDto(date, ym.getMonthValue() == date.getMonthValue(), dailyEvents));
         }
 
         model.addAttribute("calendarDays", days);
@@ -56,34 +71,49 @@ public class eventController {
         return "schedule/schedule";
     }
 
-    private String colorForRegion(EventRegionType region) {
-        return switch (region) {
-            case CAPITAL_REGION -> "#f28b82"; // example colors
-            case YEONGNAM_REGION -> "#fbbc04";
-            case HONAM_REGION -> "#34a853";
-            case CHUNGCHEONG_REGION -> "#4285f4";
-            case GANGWON_REGION -> "#9c27b0";
-            case JEJU -> "#ff6d00";
-        };
+    // GET: 대회 등록 폼
+    @GetMapping("/event/new")
+    @PreAuthorize("hasRole('HOST')")
+    public String showEventForm(
+            @RequestParam("selectedDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
+            @AuthenticationPrincipal CustomUser customUser,
+            Model model) {
+
+        Member member = customUser.getMember();
+
+        HostProfile hostProfile = hostProfileRepository.findByMember(member)
+                .orElseThrow(() -> new IllegalStateException("호스트 프로필이 없습니다."));
+
+        model.addAttribute("selectedDate", selectedDate);
+        model.addAttribute("hostName", hostProfile.getHostName());
+        return "event/register-event";
     }
 
-    @Getter
-    @AllArgsConstructor
-    public static class CalendarDay {
-        private LocalDate date;
-        private boolean currentMonth;
-        private List<EventSummary> events;
+    // POST: 대회 등록 처리
+    @PostMapping("/event/new")
+    @PreAuthorize("hasRole('HOST')")
+    public String createEvent(@AuthenticationPrincipal CustomUser customUser,
+                              @ModelAttribute EventCreateRequestDto dto) {
 
-        public int getDayOfMonth() {
-            return date.getDayOfMonth();
-        }
+        Member member = customUser.getMember();
+
+        HostProfile hostProfile = hostProfileRepository.findByMember(member)
+                .orElseThrow(() -> new IllegalStateException("호스트 프로필이 없습니다."));
+
+        EventRequest event = EventRequest.builder()
+                .member(member)
+                .hostProfile(hostProfile)
+                .eventDate(dto.getEventDate())
+                .eventRegionType(dto.getEventRegionType())
+                .eventTitle(dto.getEventTitle())
+                .eventMethod(dto.getEventMethod())
+                .eventContact(dto.getEventContact())
+                .eventStatus(Status.PENDING) // 상태 기본값: PENDING
+                .build();
+
+        eventRepository.save(event);
+        return "redirect:/schedule";
     }
 
-    @Getter
-    @AllArgsConstructor
-    public static class EventSummary {
-        private String eventTitle;
-        private String regionColor;
-    }
 }
 
