@@ -117,10 +117,10 @@ public class MatchupService{
 
         awsS3Utils.deleteFile(FILE_DIR, savedName.substring(0,savedName.indexOf(".")));
 
+
         findAttachments.get(0).update(multipartFile.getOriginalFilename(), fileName+multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")), FILE_DIR);
 
         attachmentRepository.save(findAttachments.get(0));
-
 
 
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
