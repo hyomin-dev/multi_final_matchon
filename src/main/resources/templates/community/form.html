@@ -6,7 +6,8 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/community.css}">
 </head>
-<body>
+<body class="flex-layout">
+<div class="page-wrapper">
 <div th:replace="~{common/header::header}"></div>
 
 <h2 style="text-align: center;">게시글 작성</h2>
@@ -47,7 +48,7 @@
     </div>
 </form>
 </div>
-
+</div>
 <div th:replace="~{common/footer::footer}"></div>
 </body>
 </html>
