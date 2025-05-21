@@ -3,6 +3,7 @@ package com.multi.matchon.matchup.repository;
 
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.matchup.domain.MatchupBoard;
+import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -83,6 +84,19 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     Optional<MatchupBoard> findByIdWithMemberWithTeamWithSportsType(@Param("boardId") Long boardId);
 
 
+    @Query("""
+            select new com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto(
+            t2.sportsTypeName,
+            t1.sportsFacilityName,
+            t1.sportsFacilityAddress,
+            t1.matchDatetime,
+            t1.matchDuration,
+            t1.currentParticipantCount,
+            t1.maxParticipants)
+            from MatchupBoard t1 join t1.sportsType t2
+            where t1.id =:boardId and t1.isDeleted=false
+            """)
+    Optional<ReqMatchupRequestDto> findReqMatchupRequestDtoByBoardId(@Param("boardId") Long boardId);
 
 
 //    @Query("""

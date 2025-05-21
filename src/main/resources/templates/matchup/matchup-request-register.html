@@ -4,6 +4,11 @@
   <title>MATCHON</title>
   <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
   <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+  <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
+  <script th:src="@{/js/matchup/matchup-request-register.js}" defer></script>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-request-register.css}">
+
+
   <style>
     a {
       display:block;
@@ -15,20 +20,61 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
   <h1>MATCHUP 참가 요청 작성</h1>
-  <form th:action="@{/matchup/request}" method="post" >
+  <div id="matchup-request-register-dto"
+       th:data-sports-type-name="${reqMatchupRequestDto.sportsTypeName}"
+       th:data-sports-facility-address="${reqMatchupRequestDto.sportsFacilityAddress}"
+       th:data-match-datetime="${reqMatchupRequestDto.matchDatetime}"
+       th:data-match-duration="${reqMatchupRequestDto.matchDuration}"
+       th:data-current-participant-count="${reqMatchupRequestDto.currentParticipantCount}"
+       th:data-max-participants="${reqMatchupRequestDto.maxParticipants}"
+  >
+
+  </div>
+  <table>
+    <tr>
+      <th>종목: </th>
+      <td th:text="${reqMatchupRequestDto.sportsTypeName}"></td>
+    </tr>
+    <tr>
+      <th>경기장명:</th>
+      <td th:text="${reqMatchupRequestDto.sportsFacilityName}"></td>
+    </tr>
+    <tr>
+      <th>경기장 주소:</th>
+      <td th:text="${reqMatchupRequestDto.sportsFacilityAddress}"></td>
+    </tr>
+    <tr>
+      <th>경기장 위치</th>
+      <td>
+        <div id="map" style="width:100%;height:350px;"></div>
+      </td>
+    </tr>
+    <tr>
+      <th>경기 날짜</th>
+      <td id="match-date"></td>
+    </tr>
+    <tr>
+      <th>현재 정원</th>
+      <td th:text="${'('+ reqMatchupRequestDto.currentParticipantCount + ' / '+reqMatchupRequestDto.maxParticipants + ')'}"></td>
+    </tr>
+  </table>
+
+  <form th:object="${reqMatchupRequestDto}" th:action="@{/matchup/request}" method="post" >
+    <label>
+      소개:
+      <input type="text" th:field="*{selfIntro}" placeholder="자기 소개를 입력하세요." required>
+    </label>
+    <label>
+      참가 인원:
+      <select size="5" th:field="*{participantCount}" required></select>
+    </label>
+
+
     <button type="submit">요청하기</button>
     <button type="button" class="cancel-btn">취소하기</button>
   </form>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
-<script>
-  document.addEventListener("DOMContentLoaded",()=>{
-    const cancelBtn = document.querySelector(".cancel-btn");
-    cancelBtn.addEventListener("click",()=>{
-      window.history.back();
-    })
-  })
-</script>
 </body>
 </html>

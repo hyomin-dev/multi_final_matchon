@@ -7,6 +7,7 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
+import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.service.MatchupService;
@@ -137,8 +138,11 @@ public class MatchupController {
     // 참가 요청
 
     @GetMapping("/request")
-    public String requestRegister(@RequestParam("boardId") Long boardId){
-        return "matchup/matchup-request-register";
+    public ModelAndView requestRegister(@RequestParam("boardId") Long boardId, ModelAndView mv){
+        ReqMatchupRequestDto reqMatchupRequestDto = matchupService.findReqMatchupRequestDtoByBoardId(boardId);
+        mv.addObject("reqMatchupRequestDto",reqMatchupRequestDto);
+        mv.setViewName("matchup/matchup-request-register");
+        return mv;
     }
 
     @PostMapping("/request")
@@ -168,7 +172,7 @@ public class MatchupController {
     }
 
     @PostMapping("/request/edit")
-    public String requestEdit(String tmp){
+    public String requestEdit(@ModelAttribute ReqMatchupRequestDto reqMatchupRequestDto){
         return "matchup/matchup-request-my";
     }
 
@@ -196,6 +200,7 @@ public class MatchupController {
         return ResponseEntity.ok().headers(headers).body(resource);
     }
 
+    // presignedUrl 반환
     @GetMapping("/attachment/presigned-url")
     public ResponseEntity<ApiResponse<String>> getAttachmentUrl(@RequestParam("saved-name") String savedName) throws IOException {
 
