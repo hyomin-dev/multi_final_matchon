@@ -137,7 +137,7 @@ public class MatchupController {
     // 참가 요청
 
     @GetMapping("/request")
-    public String requestRegister(){
+    public String requestRegister(@RequestParam("boardId") Long boardId){
         return "matchup/matchup-request-register";
     }
 
