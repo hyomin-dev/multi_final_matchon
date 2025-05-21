@@ -106,7 +106,9 @@ public class AuthServiceImpl implements AuthService{
         }
 
         String accessToken = jwtTokenProvider.createAccessToken(member.getMemberEmail(), member.getMemberRole());
-        String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberEmail());
+
+        // RefreshToken에도 반드시 role 포함!
+        String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberEmail(), member.getMemberRole());
 
         // 기존 RefreshToken 존재 여부 확인
         Optional<RefreshToken> existingToken = refreshTokenRepository.findByMember(member);
