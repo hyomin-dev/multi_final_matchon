@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>STADIUM</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+
+    <style>
+        .titlestadium {
+            text-align: center;
+        }
+
+        .region-tabs-stadium {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-weight: bold;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .stadium-card {
+            display: flex;
+            align-items: flex-start;
+            border-top: 1px solid #ccc;
+            padding: 20px 0;
+        }
+
+        .stadium-card img {
+            width: 150px;
+            height: 100px;
+            background-color: #eee;
+            margin-right: 20px;
+            object-fit: cover;
+        }
+
+        .stadium-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stadium-location {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .stadium-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+
+    <h1 class="titlestadium">구장 목록</h1>
+
+    <div class="region-tabs-stadium">
+        <div>서울</div>
+        <div>경기</div>
+        <div>강원</div>
+        <div>충청</div>
+        <div>전라</div>
+        <div>제주</div>
+        <div>경상</div>
+    </div>
+
+    <div class="stadium-card">
+        <img src="" alt="경기장 이미지1">
+        <div class="stadium-location">경기 / 고양시</div>
+        <div class="stadium-name">고양 AoA 풋살 스타디움</div>
+    </div>
+
+    <div class="stadium-card">
+        <img src="" alt="경기장 이미지2">
+        <div class="stadium-location">경기 / 고양시</div>
+        <div class="stadium-name">고양 데일리 그라운드 풋살장 마두점</div>
+    </div>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

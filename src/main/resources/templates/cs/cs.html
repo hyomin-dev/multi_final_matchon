@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CS</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #aaa; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        .pagination {
+            display: flex; justify-content: center; align-items: center;
+            gap: 12px; font-size: 18px; margin-top: 20px;
+        }
+        .pagination button {
+            background: none; border: none; font-size: 24px;
+            cursor: pointer; color: #333;
+        }
+        .pagination button:hover { color: #007bff; }
+        .pagination .page-number { font-weight: bold; font-size: 20px; }
+        .titlefaq, .title2faq { text-align: center; }
+        .btnsubmit, .btn1 { float: right; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+
+    <h1 class="titlefaq">FAQ</h1>
+    <p class="title2faq">자주 묻는 질문</p>
+
+    <form method="get" th:action="@{/cs}">
+        <div class="filter-cs">
+            <select name="category" onchange="this.form.submit()">
+            <option value="" th:selected="${category == null}">전체 보기</option>
+            <option value="HOWTOUSE" th:selected="${category != null and category.name() == 'HOWTOUSE'}">이용방법</option>
+            <option value="ACCOUNT" th:selected="${category != null and category.name() == 'ACCOUNT'}">계정</option>
+            <option value="TEAM_GUEST" th:selected="${category != null and category.name() == 'TEAM_GUEST'}">Team / Guest</option>
+            <option value="SHOP" th:selected="${category != null and category.name() == 'SHOP'}">쇼핑몰</option>
+            <option value="REPORT" th:selected="${category != null and category.name() == 'REPORT'}">신고</option>
+            <option value="MANNER_TEMPERATURE" th:selected="${category != null and category.name() == 'MANNER_TEMPERATURE'}">매너온도</option>
+            </select>
+
+
+
+            <input type="text" name="search" placeholder="검색">
+            <button type="submit">검색</button>
+
+            <button class="btn1">1:1 문의 작성</button>
+            <br><br>
+
+            <table border="1">
+                <thead>
+                <tr>
+                    <th>No</th>
+                    <th>카테고리</th>
+                    <th>제목</th>
+                    <th>작성일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="faq : ${faqList}">
+                    <td>
+                        <a th:text="${faq.id}">No</a>
+                    </td>
+                    <td>
+                        <a th:text="${faq.faqCategory.label}">카테고리</a>
+                    </td>
+                    <td>
+                        <a th:text="${faq.faqTitle}">제목</a>
+                    </td>
+                    <td th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd')}">작성일</td>
+
+                </tbody>
+            </table>
+        </div>
+    </form>
+
+
+
+    <div class="pagination">
+        <button>&lt;</button>
+        <span class="page-number">1</span>
+        <button>&gt;</button>
+
+
+    </div>
+
+    <form th:action="@{/faq/register}" method="get">
+        <button type="submit" class="btnsubmit">등록하기</button>
+    </form>
+
+
+
+</div>
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

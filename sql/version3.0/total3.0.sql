@@ -473,3 +473,12 @@ CREATE TABLE message_read_log(
 
 -- ↑FK 3개인 것
 -- ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+ALTER TABLE faq modify COLUMN faq_category enum('HOWTOUSE','ACCOUNT','TEAM_GUEST','SHOP','REPORT','MANNER_TEMPERATURE');
+
+UPDATE faq SET faq_category = 'HOWTOUSE' WHERE faq_category = '0';
+UPDATE faq SET faq_category = 'ACCOUNT' WHERE faq_category = '1';
+UPDATE faq SET faq_category = 'TEAM_GUEST' WHERE faq_category = '2';
+UPDATE faq SET faq_category = 'SHOP' WHERE faq_category = '3';
+UPDATE faq SET faq_category = 'REPORT' WHERE faq_category = '4';
+UPDATE faq SET faq_category = 'MANNER_TEMPERATURE' WHERE faq_category = '5';

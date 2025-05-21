@@ -25,6 +25,7 @@ public class Faq extends BaseEntity {
     @JoinColumn(name="admin_id", nullable = false)
     private Member member;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="faq_category", nullable = false)
     private CustomerServiceType faqCategory;
 
