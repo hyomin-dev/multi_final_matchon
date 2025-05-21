@@ -11,18 +11,28 @@ import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.util.UriUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,11 +67,24 @@ public class BoardController {
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         Board board = boardService.findById(id);
+
+        List<String> savedPaths = board.getAttachmentPath() != null
+                ? List.of(board.getAttachmentPath().split(";"))
+                : List.of();
+
+        List<String> originalNames = board.getAttachmentOriginalName() != null
+                ? List.of(board.getAttachmentOriginalName().split(";"))
+                : List.of();
+
         model.addAttribute("board", board);
+        model.addAttribute("savedPaths", savedPaths);
+        model.addAttribute("originalNames", originalNames);
         model.addAttribute("commentRequest", new CommentRequest());
         model.addAttribute("comments", commentService.getCommentsByBoard(board));
+
         return "community/detail";
     }
+
 
     //게시글 작성 폼
     @GetMapping("/new")
@@ -75,7 +98,7 @@ public class BoardController {
     @PostMapping
     public String create(@Valid @ModelAttribute("boardRequest") BoardRequest boardRequest,
                          BindingResult bindingResult,
-                         @RequestParam("file") MultipartFile file,
+                         @RequestParam("files") MultipartFile[] files,
                          Model model) throws IOException {
 
         if (bindingResult.hasErrors()) {
@@ -83,23 +106,26 @@ public class BoardController {
             return "community/form";
         }
 
-        // 테스트용 더미 사용자 (ID=1)
         Member dummyMember = memberService.findById(1L);
 
-        // 파일 업로드 처리
         String uploadDir = System.getProperty("user.dir") + File.separator + "uploads" + File.separator;
         File dir = new File(uploadDir);
         if (!dir.exists()) dir.mkdirs();
 
-        String originalFilename = null;
-        String savedFileName = null;
         boolean hasAttachment = false;
+        StringBuilder savedFileNames = new StringBuilder();
+        StringBuilder originalFileNames = new StringBuilder();
 
-        if (!file.isEmpty()) {
-            originalFilename = file.getOriginalFilename();
-            savedFileName = UUID.randomUUID() + "_" + originalFilename;
-            file.transferTo(new File(uploadDir + savedFileName));
-            hasAttachment = true;
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                String originalFilename = file.getOriginalFilename();
+                String savedFileName = UUID.randomUUID() + "_" + originalFilename;
+                file.transferTo(new File(uploadDir + savedFileName));
+
+                savedFileNames.append(savedFileName).append(";");
+                originalFileNames.append(originalFilename).append(";");
+                hasAttachment = true;
+            }
         }
 
         Board newBoard = Board.builder()
@@ -108,13 +134,14 @@ public class BoardController {
                 .category(boardRequest.getCategory())
                 .member(dummyMember)
                 .boardAttachmentEnabled(hasAttachment)
-                .attachmentPath(savedFileName)
-                .attachmentOriginalName(originalFilename)
+                .attachmentPath(savedFileNames.toString())
+                .attachmentOriginalName(originalFileNames.toString())
                 .build();
 
         boardService.save(newBoard);
         return "redirect:/community";
     }
+
 
     //댓글 작성 처리
     @PostMapping("/{id}/comments")
@@ -138,5 +165,23 @@ public class BoardController {
         commentService.save(comment);
         return "redirect:/community/" + id;
     }
+
+    @GetMapping("/download/{filename}")
+    @ResponseBody
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
+        Path filePath = Paths.get(System.getProperty("user.dir"), "uploads", filename);
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (!resource.exists()) {
+            throw new FileNotFoundException("파일을 찾을 수 없습니다: " + filename);
+        }
+
+        String encodedFilename = UriUtils.encodePath(filename, StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFilename + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(filePath))
+                .body(resource);
+    }
+
 }
 

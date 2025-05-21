@@ -23,10 +23,15 @@
         <p th:text="${board.content}" class="post-content"></p>
 
         <div th:if="${board.boardAttachmentEnabled}" class="attachment-box">
-            <strong>첨부파일:</strong>
-            <a th:href="@{'/uploads/' + ${board.attachmentPath}}"
-               th:text="${board.attachmentOriginalName}" download></a>
+            <strong>첨부파일</strong>
+            <ul>
+                <li th:each="path, iterStat : ${savedPaths}">
+                    <a th:href="@{'/community/download/' + ${path}}"
+                       th:text="${originalNames[iterStat.index]}"></a>
+                </li>
+            </ul>
         </div>
+
     </div>
 
     <div class="post-actions">

@@ -40,8 +40,10 @@
 
     <div>
         <label>파일 첨부</label>
-        <input type="file" name="file" />
+        <input type="file" name="files" id="fileInput" multiple />
+        <div id="filePreview" class="file-preview" style="margin-top: 5px;"></div>
     </div>
+
 
     <div style="text-align: center;">
         <button type="submit">등록</button>
@@ -51,4 +53,65 @@
 </div>
 <div th:replace="~{common/footer::footer}"></div>
 </body>
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    let fileList = [];
+
+    fileInput.addEventListener('change', function () {
+        const selectedFiles = Array.from(fileInput.files);
+
+        // 기존 목록 + 새 파일 합치기
+        fileList = fileList.concat(selectedFiles);
+
+        // 중복 제거 (이름 기준)
+        const seen = new Set();
+        fileList = fileList.filter(file => {
+            if (seen.has(file.name)) return false;
+            seen.add(file.name);
+            return true;
+        });
+
+        updatePreview();
+    });
+
+    function updatePreview() {
+        filePreview.innerHTML = '';
+        fileList.forEach((file, index) => {
+            const previewBox = document.createElement('div');
+            previewBox.style.display = 'flex';
+            previewBox.style.alignItems = 'center';
+            previewBox.style.justifyContent = 'space-between';
+            previewBox.style.marginBottom = '5px';
+            previewBox.style.gap = '10px';
+
+            const fileNameSpan = document.createElement('span');
+            fileNameSpan.textContent = file.name;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'x';
+            deleteBtn.type = 'button';
+            deleteBtn.style.color = 'red';
+            deleteBtn.style.border = 'none';
+            deleteBtn.style.background = 'transparent';
+            deleteBtn.style.cursor = 'pointer';
+
+            deleteBtn.onclick = function () {
+                fileList.splice(index, 1); // 목록에서 제거
+                updatePreview(); // 다시 그리기
+            };
+
+            previewBox.appendChild(fileNameSpan);
+            previewBox.appendChild(deleteBtn);
+            filePreview.appendChild(previewBox);
+        });
+
+        // 새 FileList 생성
+        const dataTransfer = new DataTransfer();
+        fileList.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+    }
+</script>
+
+
 </html>
