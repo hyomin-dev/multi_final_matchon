@@ -1,6 +1,8 @@
 package com.multi.matchon.team.dto.res;
 
+
 import com.multi.matchon.team.domain.Team;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Data
 @NoArgsConstructor
@@ -24,6 +27,7 @@ public class ResTeamDto {
 
     private Boolean RecruitmentStatus;
 
+
     private String teamIntroduction;
 
     private MultipartFile teamImageFile;
@@ -31,6 +35,7 @@ public class ResTeamDto {
     private List<String> recruitingPositions;
 
     private Double teamRatingAverage;
+
 
     public static ResTeamDto from(Team team) {
         return ResTeamDto.builder()
@@ -47,4 +52,5 @@ public class ResTeamDto {
     }
 
 }
+
 

@@ -21,6 +21,9 @@ spring:
       stack:
         auto: false
 
+matchon:
+  kakao-api: ${KAKAO_API_KEY}
+
 ---
 
 spring:
@@ -78,4 +81,7 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET}
+
+file:
+  upload-dir: C:/upload-dir
 

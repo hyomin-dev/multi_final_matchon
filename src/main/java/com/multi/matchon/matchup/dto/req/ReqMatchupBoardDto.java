@@ -16,7 +16,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class ReqMatchupBoardDto {
 
-    private String sportsType;
+    private String sportsTypeName;
 
     private String teamName;
 
@@ -28,17 +28,17 @@ public class ReqMatchupBoardDto {
 
     private String sportsFacilityAddress;
 
-    private LocalDateTime matchDate;
+    private LocalDateTime matchDateTime;
 
     private Integer matchDuration;
 
-    private Integer currentParticipants;
+    private Integer currentParticipantsCount;
 
     private Integer maxParticipants;
 
     private Double minMannerTemperature;
 
-    private String matchIntro;
+    private String matchDescription;
 
 
 

@@ -54,7 +54,7 @@
             </label>
             <button type="button" onclick="submitHostName()">등록</button>
 
-            <a th:href="@{/event/register}">대회 등록하러 가기</a>
+            <a th:href="@{/schedule}">대회 등록하러 가기</a>
         </div>
     </div>
 </div>
@@ -183,6 +183,7 @@
 
     function submitMypage() {
         const accessToken = getCookie("Authorization");
+        console.log("accessToken:", accessToken); // 확인용 로그
 
         if (!accessToken) {
             alert("로그인 토큰이 없습니다. 다시 로그인해주세요.");
@@ -198,7 +199,7 @@
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": accesstoken.startsWith("Bearer ") ? accesstoken : `Bearer ${accesstoken}`
+                "Authorization": accessToken.startsWith("Bearer ") ? accessToken : `Bearer ${accessToken.trim()}`
             },
             body: JSON.stringify({
                 positionName: position,
@@ -212,6 +213,9 @@
             } else {
                 res.text().then(msg => alert("오류: " + msg));
             }
+        }).catch(err => {
+            console.error("요청 실패:", err);
+            alert("요청 실패: " + err.message);
         });
     }
 </script>

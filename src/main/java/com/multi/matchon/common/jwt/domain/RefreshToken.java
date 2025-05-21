@@ -16,7 +16,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name = "refresh_token")
+@Table(
+        name = "refresh_token",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_refresh_token_2_member", columnNames = {"member_id"})
+        }
+)
+
 public class RefreshToken {
 
     @Id

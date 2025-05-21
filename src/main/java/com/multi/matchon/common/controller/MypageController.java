@@ -62,5 +62,21 @@ public class MypageController {
         result.put("timeTypes", Arrays.stream(TimeType.values()).map(Enum::name).toList());
         return result;
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<String> updateMypage(@AuthenticationPrincipal CustomUser user,
+                                               @RequestBody Map<String, Object> payload) {
+
+        Member member = memberService.findForMypage(user.getUsername());
+
+        PositionName positionName = PositionName.valueOf((String) payload.get("positionName"));
+        TimeType timeType = TimeType.valueOf((String) payload.get("timeType"));
+        Double temperature = Double.valueOf(payload.get("temperature").toString());
+
+        mypageService.updateMypage(member, positionName, timeType, temperature);
+
+        return ResponseEntity.ok("수정 완료");
+    }
+
 }
 

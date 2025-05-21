@@ -1,0 +1,62 @@
+
+/* 제목 정렬 */
+h1 {
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 24px;
+}
+
+/* 테이블 전체 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+/* 테이블 행 간격 */
+table tr {
+    border-bottom: 1px solid #ccc;
+}
+
+/* 헤더 셀 */
+table th {
+    text-align: left;
+    width: 35%;
+    padding: 10px;
+    background-color: #f5f5f5;
+    font-weight: bold;
+    vertical-align: top;
+}
+
+/* 데이터 셀 */
+table td {
+    padding: 10px;
+    background-color: #fff;
+}
+
+/* 버튼 영역 */
+a#modify,
+a[href*="문의하기"],
+a[href*="참가요청"] {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a#modify:hover,
+a[href*="문의하기"]:hover,
+a[href*="참가요청"]:hover {
+    background-color: #0056b3;
+}
+
+/* 지도 영역 */
+#map {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
