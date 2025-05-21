@@ -12,12 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
 
+    // 마이페이지용
     @Transactional(readOnly = true)
     public Member findForMypage(String email) {
         return memberRepository.findForMypage(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     }
 
+    // 팀 이름 조회용
     @Transactional(readOnly = true)
     public String getTeamNameByMemberEmail(String email) {
         Member member = memberRepository.findByMemberEmailWithTeam(email).orElseThrow(() -> new IllegalArgumentException("이 email을 가진 회원은 소속팀이 없습니다."));
@@ -25,10 +27,16 @@ public class MemberService {
         return member.getTeam().getTeamName();
     }
 
+    // 마이온도 조회용
     @Transactional(readOnly = true)
     public Double getTemperatureByMemberEmail(String email) {
         Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new IllegalArgumentException("잘못된 email 입니다."));
 
         return member.getMyTemperature();
+    }
+
+    //임의 작성 전준혁
+    public Member findById(long l) {
+        return memberRepository.findById(l).orElse(null);
     }
 }

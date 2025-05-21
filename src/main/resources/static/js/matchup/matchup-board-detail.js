@@ -51,7 +51,6 @@ async function setContent(){
     // console.log(data2);
 
 
-
 }
 
 function setWriter(writer, loginMember){

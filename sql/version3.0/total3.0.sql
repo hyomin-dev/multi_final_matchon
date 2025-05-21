@@ -1,5 +1,5 @@
-  DROP DATABASE IF EXISTS matchon;
- CREATE DATABASE IF NOT EXISTS matchon;
+-- DROP DATABASE IF EXISTS matchon;
+-- CREATE DATABASE IF NOT EXISTS matchon;
 USE matchon;
 
 
@@ -111,7 +111,8 @@ CREATE TABLE refresh_token (
     refresh_token_data VARCHAR(512),
     refresh_token_expired_date DATETIME NOT NULL,
     created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT FK_refresh_token_2_member FOREIGN KEY (member_id) REFERENCES member(member_id)
+    CONSTRAINT FK_refresh_token_2_member FOREIGN KEY (member_id) REFERENCES member(member_id),
+    CONSTRAINT UK_refresh_token_2_member UNIQUE (member_id)
 );
 
 -- inquiry
@@ -472,24 +473,3 @@ CREATE TABLE message_read_log(
 
 -- ↑FK 3개인 것
 -- ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

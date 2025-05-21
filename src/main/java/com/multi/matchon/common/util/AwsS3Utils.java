@@ -19,10 +19,12 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import java.time.Duration;
 
 @Slf4j
@@ -69,6 +71,7 @@ public class AwsS3Utils {
         }
     }
 
+
     public S3Resource downloadFile(String dirName, String savedName) throws IOException {
         String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
         S3Resource resource =  s3Operations.download(bucket,dirName+savedNameOnly);
@@ -97,7 +100,9 @@ public class AwsS3Utils {
 
     /* Create a pre-signed URL to download an object in a subsequent GET request. */
     public String createPresignedGetUrl(String dirName, String savedName) {
+
         String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+
 
         try (S3Presigner presigner = S3Presigner.create()) {
 
@@ -136,6 +141,7 @@ public class AwsS3Utils {
             return false;
         }
     }
+
 
 
 }

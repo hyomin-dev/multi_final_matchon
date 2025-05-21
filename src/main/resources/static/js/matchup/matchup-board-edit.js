@@ -66,13 +66,13 @@ document.addEventListener("DOMContentLoaded",()=>{
     })
 
 
-
 })
 
 function submitCheck(e){
 
     alert("submit")
     //document.querySelector("#teamName").disabled=false;
+
 
 
     //e.preventDefault();
@@ -101,6 +101,7 @@ async function getSportsType(sportsTypeName){
         selectBtn.appendChild(option);
     }
 }
+
 
 async function setReservationFile(originalName, savedName){
     const response2 = await fetch(`/matchup/attachment/file?saved-name=${savedName}`,{

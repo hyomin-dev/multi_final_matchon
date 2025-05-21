@@ -202,6 +202,7 @@ public class MatchupController {
         String resourceUrl = matchupService.getAttachmentURL(savedName);
 
         return ResponseEntity.ok().body(ApiResponse.ok(resourceUrl));
+
     }
 
 }
