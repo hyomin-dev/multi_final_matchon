@@ -21,6 +21,9 @@ spring:
       stack:
         auto: false
 
+matchon:
+  kakao-api: ${KAKAO_API_KEY}
+
 ---
 
 spring:

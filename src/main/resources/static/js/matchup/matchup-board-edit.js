@@ -1,20 +1,38 @@
 document.addEventListener("DOMContentLoaded",()=>{
-    getSportsType(); // 종목 가져옴
-    getTeam(); // 현재 사용자의 팀 정보를 가져옴
-    setCurrentParticipants();
-    setMannerTemperature();
 
-    const cancelBtn = document.querySelector(".cancel-btn");
-    const form = document.querySelector("form");
-    form.addEventListener("submit", (event)=>{
-        submitCheck(event)
-    }
-    )
+    const editDto = document.querySelector("#matchup-board-edit-dto");
 
+    const boardId = Number(editDto.dataset.boardId);
+    const writer = editDto.dataset.writer;
+    const sportsTypeName = editDto.dataset.sportsTypeName;
+    const sportsFacilityName = editDto.dataset.sportsFacilityName;
+    const sportsFacilityAddress = editDto.dataset.sportsFacilityAddress;
+    const matchDatetime = editDto.dataset.matchDatetime;
+    const matchDuration = editDto.dataset.matchDuration;
+    const currentParticipantCount = Number(editDto.dataset.currentParticipantCount);
+    const maxParticipants = Number(editDto.dataset.maxParticipants);
+    const minMannerTemperature = Number(editDto.dataset.minMannerTemperature);
+    const originalName = editDto.dataset.originalName;
+    const savedName = editDto.dataset.savedName;
+    const savedPath = editDto.dataset.savedPath;
+    const myTemperature = Number(editDto.dataset.myTemperature);
+    const loginMember = editDto.dataset.loginMember;
 
-    cancelBtn.addEventListener("click",()=>{
-        window.history.back();
-    })
+    getSportsType(sportsTypeName); // 종목 가져옴
+
+    setMaxParticipants(maxParticipants);
+    setMannerTemperature(minMannerTemperature);
+
+    // const cancelBtn = document.querySelector(".cancel-btn");
+    // const form = document.querySelector("form");
+    // form.addEventListener("submit", (event)=>{
+    //     submitCheck(event)
+    // }
+    // )
+    //
+    // cancelBtn.addEventListener("click",()=>{
+    //     window.history.back();
+    // })
 })
 
 function submitCheck(e){
@@ -26,7 +44,7 @@ function submitCheck(e){
     //e.preventDefault();
 }
 
-async function getSportsType(){
+async function getSportsType(sportsTypeName){
     const response = await fetch("/sports-types",{
         method: "GET",
         credentials: "include"
@@ -43,32 +61,13 @@ async function getSportsType(){
         const option = document.createElement("option")
         option.value = data[i].sportsTypeName;
         option.textContent = data[i].sportsTypeName;
+
+        if(data[i].sportsTypeName===sportsTypeName)
+            option.selected = true;
         selectBtn.appendChild(option);
     }
 }
 
-
-async function getTeam(){
-    const email = document.querySelector("#user-info").dataset.email;
-    const team = document.querySelector("#teamName");
-    const response = await fetch(`/member/search-with-team-teamname?email=${email}`,{
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok){
-        //throw new Error(`HTTP error! Status:${response.status}`)
-        alert("MATCHUP 글 작성은 소속팀이 있어야 합니다.")
-        window.history.back();
-    }
-
-    const data = await response.json();
-    // if(data.data.trim()==='' || data.data===null){
-    //
-    // }
-    team.value=data.data;
-    team.textContent = data.data;
-
-}
 
 function getAddress() {
     new daum.Postcode({
@@ -94,24 +93,22 @@ function getAddress() {
     }).open();
 }
 
-function setCurrentParticipants(){
 
-    const selectCur = document.querySelector("#currentParticipantsCount");
+function setMaxParticipants(maxParticipants){
+
     const selectMax = document.querySelector("#maxParticipants");
 
     for(let i=1; i<=30;i++){
-        const option1 = document.createElement("option");
-        const option2 = document.createElement("option");
-        option1.value = i;
-        option1.textContent = i;
-        selectCur.appendChild(option1);
-        option2.value = i;
-        option2.textContent = i;
-        selectMax.appendChild(option2);
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        selectMax.appendChild(option);
+        if(i===maxParticipants)
+            option.selected = true;
     }
 }
 
-function setMannerTemperature(){
+function setMannerTemperature(minMannerTemperature){
     const selectManner = document.querySelector("#minMannerTemperature");
 
     for(let i=30;i<=40;i+=0.5){
@@ -119,5 +116,7 @@ function setMannerTemperature(){
         option.value = i;
         option.textContent = i;
         selectManner.appendChild(option);
+        if(i===minMannerTemperature)
+            option.selected = true;
     }
 }

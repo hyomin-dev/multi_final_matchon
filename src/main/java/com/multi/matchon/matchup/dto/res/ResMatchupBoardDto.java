@@ -26,6 +26,8 @@ public class ResMatchupBoardDto {
 
     private SportsTypeName sportsTypeName;
 
+    private String teamIntro;
+
     private String sportsFacilityName;
 
     private String sportsFacilityAddress;
@@ -40,9 +42,15 @@ public class ResMatchupBoardDto {
 
     private Double minMannerTemperature;
 
+
+    private String matchDescription;
+
     private String originalName;
 
     private String savedName;
 
     private String savedPath;
+
+    private Double myTemperature;
+
 }

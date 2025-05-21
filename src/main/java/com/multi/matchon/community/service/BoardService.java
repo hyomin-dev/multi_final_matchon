@@ -1,19 +1,12 @@
 package com.multi.matchon.community.service;
 
 import com.multi.matchon.community.domain.Board;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 
-@Service
-public class BoardService {
-
-    public List<Board> getBoardsByCategory(String category, int page) {
-
-        return List.of();
-    }
-
-    public int getTotalPagesByCategory(String category) {
-        return 1;
-    }
+public interface BoardService {
+    Board createBoard(Board board);
+    Board getBoardById(Long id);
+    List<Board> getAllBoards();
+    Board updateBoard(Long id, Board updatedBoard);
+    void deleteBoard(Long id);
 }

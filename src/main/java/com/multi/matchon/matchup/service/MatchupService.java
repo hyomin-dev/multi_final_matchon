@@ -15,6 +15,7 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
+import io.awspring.cloud.s3.S3Resource;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
+
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -69,17 +71,17 @@ public class MatchupService{
 
         MatchupBoard newMatchupBoard = MatchupBoard.builder()
                 .member(user.getMember())
-                .sportsType(sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardDto.getSportsType())).orElseThrow(()-> new IllegalArgumentException(reqMatchupBoardDto.getSportsType()+"는 지원하지 않는 종목입니다.")))
+                .sportsType(sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardDto.getSportsTypeName())).orElseThrow(()-> new IllegalArgumentException(reqMatchupBoardDto.getSportsTypeName()+"는 지원하지 않는 종목입니다.")))
                 .reservationAttachmentEnabled(true)
                 .teamIntro(reqMatchupBoardDto.getTeamIntro())
                 .sportsFacilityName(reqMatchupBoardDto.getSportsFacilityName())
                 .sportsFacilityAddress(reqMatchupBoardDto.getSportsFacilityAddress())
-                .matchDatetime(reqMatchupBoardDto.getMatchDate())
+                .matchDatetime(reqMatchupBoardDto.getMatchDateTime())
                 .matchDuration(LocalTime.of(reqMatchupBoardDto.getMatchDuration()/60,reqMatchupBoardDto.getMatchDuration()%60))
-                .currentParticipantCount(reqMatchupBoardDto.getCurrentParticipants())
+                .currentParticipantCount(reqMatchupBoardDto.getCurrentParticipantsCount())
                 .maxParticipants(reqMatchupBoardDto.getMaxParticipants())
                 .minMannerTemperature(reqMatchupBoardDto.getMinMannerTemperature())
-                .matchDescription(reqMatchupBoardDto.getMatchIntro())
+                .matchDescription(reqMatchupBoardDto.getMatchDescription())
                 .build();
         MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
         insertFile(reqMatchupBoardDto, matchupBoard);
@@ -192,13 +194,14 @@ public class MatchupService{
 
         List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
 
-        if(attachments.isEmpty())
-            throw new IllegalArgumentException(boardId +"번 게시글이 존재하지 않습니다.");
+        if(attachments.isEmpty()&&matchupBoard.getReservationAttachmentEnabled())
+            throw new IllegalArgumentException(boardId +"번 게시글의 첨부파일이 존재해야하는데 없습니다.");
 
        return ResMatchupBoardDto.builder()
                 .boardId(matchupBoard.getId())
                 .writer(matchupBoard.getMember().getMemberEmail())
                 .teamName(matchupBoard.getMember().getTeam().getTeamName())
+                .teamIntro(matchupBoard.getTeamIntro())
                 .sportsTypeName(matchupBoard.getSportsType().getSportsTypeName())
                 .sportsFacilityName(matchupBoard.getSportsFacilityName())
                 .sportsFacilityAddress(matchupBoard.getSportsFacilityAddress())
@@ -207,11 +210,19 @@ public class MatchupService{
                 .currentParticipantCount(matchupBoard.getCurrentParticipantCount())
                 .maxParticipants(matchupBoard.getMaxParticipants())
                 .minMannerTemperature(matchupBoard.getMinMannerTemperature())
+                .myTemperature(matchupBoard.getMember().getMyTemperature())
+                .matchDescription(matchupBoard.getMatchDescription())
                 .originalName(attachments.get(0).getOriginalName())
                 .savedName(attachments.get(0).getSavedName())
                 .savedPath(attachments.get(0).getSavePath())
                 .build();
 
+    }
+
+    public S3Resource getAttachment(String savedName) {
+        String presignedUrl = awsS3Utils.createPresignedGetUrl(FILE_DIR, savedName);
+        S3Resource resource = awsS3Utils.downloadFile(FILE_DIR, savedName);
+        return resource;
     }
 }
 

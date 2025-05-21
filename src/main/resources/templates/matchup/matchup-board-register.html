@@ -18,10 +18,10 @@
     <div class="content">
         <h1>MATCHUP 글 작성</h1>
         <div id="user-info" th:data-email="${#authentication.name}"></div>
-        <form th:object="${ReqMatchupBoardDto}" th:action="@{/matchup/board/register}" method="post" enctype="multipart/form-data">
+        <form th:object="${reqMatchupBoardDto}" th:action="@{/matchup/board/register}" method="post" enctype="multipart/form-data">
             <label>
                 종목:
-                <select th:field="*{sportsType}" required></select>
+                <select th:field="*{sportsTypeName}" required></select>
             </label>
             <label>
                 소속팀:
@@ -47,7 +47,7 @@
             </label>
             <label>
                 경기 날짜:
-                <input type="datetime-local" th:field="*{matchDate}" required>
+                <input type="datetime-local" th:field="*{matchDateTime}" required>
             </label>
             <label>
                 경기 진행 시간:
@@ -62,7 +62,7 @@
             </label>
             <label>
                 현재 참가 인원:
-                <select size="5" th:field="*{currentParticipants}" required></select>
+                <select size="5" th:field="*{currentParticipantsCount}" required></select>
             </label>
             <label>
                 총 모집 인원:
@@ -74,7 +74,7 @@
             </label>
             <label>
                 경기 방식 소개:
-                <textarea cols="30" rows="5" placeholder="경기 방식 소개" th:field="*{matchIntro}" required>
+                <textarea cols="30" rows="5" placeholder="경기 방식 소개" th:field="*{matchDescription}" required>
                 </textarea>
             </label>
 

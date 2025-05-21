@@ -1,29 +1,48 @@
 package com.multi.matchon.community.controller;
 
+import com.multi.matchon.community.domain.Board;
+import com.multi.matchon.community.service.BoardService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/boards")
 @RequiredArgsConstructor
 public class BoardController {
 
-    @GetMapping("/community")
-    public String index() {
-        return "main/main";
+    private final BoardService boardService;
+
+    @PostMapping
+    public ResponseEntity<Board> createBoard(@RequestBody Board board) {
+        Board createdBoard = boardService.createBoard(board);
+        return ResponseEntity.ok(createdBoard);
     }
 
-    @GetMapping("/list")
-    public String list() {
-        return "board/list";
+    @GetMapping("/{id}")
+    public ResponseEntity<Board> getBoardById(@PathVariable Long id) {
+        return ResponseEntity.ok(boardService.getBoardById(id));
     }
 
-    @GetMapping("/write")
-    public String writeForm() {
-        return "board/write";
+    @GetMapping
+    public ResponseEntity<List<Board>> getAllBoards() {
+        return ResponseEntity.ok(boardService.getAllBoards());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Board> updateBoard(@PathVariable Long id, @RequestBody Board board) {
+        return ResponseEntity.ok(boardService.updateBoard(id, board));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBoard(@PathVariable Long id) {
+        boardService.deleteBoard(id);
+        return ResponseEntity.noContent().build();
+    }
 }
+
 
 
 
