@@ -6,6 +6,10 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/community.css}">
 </head>
+
+<body class="flex-layout">
+<div class="page-wrapper">
+
 <body>
 <div th:replace="~{common/header::header}"></div>
 
@@ -46,6 +50,8 @@
         <button type="submit">등록</button>
     </div>
 </form>
+</div>
+
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>

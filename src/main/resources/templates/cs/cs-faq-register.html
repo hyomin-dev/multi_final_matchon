@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CS</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+
+    <style>
+        .write-box {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 600px;
+            padding: 0;
+            margin: 40px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .write-box input[type="text"] {
+            width: 100%;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            border-bottom: 1px solid #aaa;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .write-box textarea {
+            width: 100%;
+            height: 200px;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .write-box input::placeholder,
+        .write-box textarea::placeholder {
+            color: #aaa;
+        }
+
+        .pagination button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .pagination button:hover {
+            color: #007bff;
+        }
+
+        .titlefaq {
+            text-align: center;
+        }
+
+        .compleate {
+            float: right;
+        }
+    </style>
+
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+    <h1 class="titlefaq">FAQ 등록</h1>
+    <div class="filter-cs">
+        <select class="all-list">
+            <option value="" selected>카테고리</option>
+            <option value="HOWTOUSE">이용방법</option>
+            <option value="ACCOUNT">계정</option>
+            <option value="TEAM_GUEST">Team / Guest</option>
+            <option value="SHOP">쇼핑몰</option>
+            <option value="REPORT">신고</option>
+            <option value="MANNER_TEMPERATURE">매너온도</option>
+        </select>
+        <div class="write-box">
+            <input type="text" placeholder="제목을 입력 해 주세요..">
+            <textarea placeholder="내용을 입력 해 주세요...."></textarea>
+        </div>
+    </div>
+
+    <button class="compleate">작성 완료</button>
+
+</div>
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

@@ -246,3 +246,31 @@ form button[type="submit"]:hover {
     text-align: center;
 }
 
+
+/* flex 레이아웃으로 푸터 고정 */
+body.flex-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.page-wrapper {
+    flex: 1;
+    padding-bottom: 20px;
+}
+
+/* 푸터 기본 스타일 */
+footer {
+    background-color: #f4f4f4;
+    padding: 15px 0;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    border-top: 1px solid #ddd;
+}
+
+
+
+
+
