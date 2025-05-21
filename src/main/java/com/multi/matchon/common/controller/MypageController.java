@@ -35,6 +35,9 @@ public class MypageController {
         Map<String, Object> data = mypageService.getMypageInfo(member);
         data.forEach(model::addAttribute);
 
+        // select 초기값 세팅
+        model.addAttribute("myPosition", member.getPositions() != null ? member.getPositions().getPositionName().name() : "");
+        model.addAttribute("myTimeType", member.getTimeType() != null ? member.getTimeType().name() : "");
         return "mypage/mypage";
     }
 
@@ -74,7 +77,6 @@ public class MypageController {
         Double temperature = Double.valueOf(payload.get("temperature").toString());
 
         mypageService.updateMypage(member, positionName, timeType, temperature);
-
         return ResponseEntity.ok("수정 완료");
     }
 

@@ -16,11 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 
 @Controller
@@ -115,14 +118,20 @@ public class MatchupController {
     }
 
     @PostMapping("/board/edit")
-    public String boardEdit(String tmp){
-        return "matchup/matchup-board-detail";
+    public ModelAndView boardEdit(@ModelAttribute ResMatchupBoardDto resMatchupBoardDto, ModelAndView mv){
+        matchupService.boardEdit(resMatchupBoardDto);
+        ResMatchupBoardDto updateResMatchupBoardDto = matchupService.findBoardByBoardId(resMatchupBoardDto.getBoardId());
+        mv.addObject("resMatchupBoardDto", updateResMatchupBoardDto);
+        mv.setViewName("matchup/matchup-board-detail");
+        return mv;
     }
 
     @GetMapping("/board/delete")
-    public String boardDelete(){
+    @ResponseBody
+    public ResponseEntity<ApiResponse<String>> boardDelete(@RequestParam("boardId") Long boardId){
+        matchupService.boardDelete(boardId);
         log.info("matchup 게시글 삭제 완료");
-        return "matchup/matchup-board-list";
+        return ResponseEntity.ok().body(ApiResponse.ok("게시글 삭제 완료"));
     }
 
     // 참가 요청
@@ -170,12 +179,30 @@ public class MatchupController {
 
 
     // 첨부 파일 가져오기
-    @GetMapping("/attachment")
-    public ResponseEntity<ApiResponse<S3Resource>> getAttachment(@RequestParam("saved-name") String savedName) {
+    @GetMapping("/attachment/file")
+    public ResponseEntity<S3Resource> getAttachmentFile(@RequestParam("saved-name") String savedName) throws IOException {
 
-        S3Resource resource = matchupService.getAttachment(savedName);
+        S3Resource resource = matchupService.getAttachmentFile(savedName);
 
-        return ResponseEntity.ok().body(ApiResponse.ok(resource));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+                ContentDisposition.attachment()
+                        .filename(savedName, StandardCharsets.UTF_8)
+                        .build()
+        );
+
+
+        return ResponseEntity.ok().headers(headers).body(resource);
+    }
+
+    @GetMapping("/attachment/presigned-url")
+    public ResponseEntity<ApiResponse<String>> getAttachmentUrl(@RequestParam("saved-name") String savedName) throws IOException {
+
+        String resourceUrl = matchupService.getAttachmentURL(savedName);
+
+        return ResponseEntity.ok().body(ApiResponse.ok(resourceUrl));
+
     }
 
 }

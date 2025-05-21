@@ -15,7 +15,8 @@ public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
     Optional<Attachment> findLatestAttachment(@Param("boardType") BoardType boardType, @Param("boardNumber") Long boardNumber);
 
 
-    @Query("select t1 from Attachment t1 where t1.boardType=:boardType and t1.boardNumber=:matchupBoardId")
+    @Query("select t1 from Attachment t1 where t1.boardType=:boardType and t1.boardNumber=:matchupBoardId and t1.isDeleted=false")
     List<Attachment> findAllByBoardTypeAndBoardNumber(@Param("boardType") BoardType boardType,@Param("matchupBoardId") Long matchupBoardId);
+
 
 }

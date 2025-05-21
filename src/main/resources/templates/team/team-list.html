@@ -1,33 +1,72 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>MATCHON</title>
+    <title>MATCHON - 팀 목록</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-    <script th:src="@{/js/matchup/matchup-board-list.js}" defer></script>
+    <script th:src="@{/js/team/team-list.js}" defer></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/team/team-list.css}">
 
     <style>
         a {
-          display:block;
+            display: block;
         }
     </style>
 </head>
 <body>
 
 <div th:replace="~{common/header::header}"></div>
+
 <div id="wrap">
-    <h1>팀 목록</h1>
+    <h1>TEAM 목록</h1>
+    <div id="user-info" th:data-email="${#authentication.name}"></div>
 
+    <div id="filter">
+        <select id="region">
+            <option value="" selected>전체 지역</option>
+            <option value="CAPITAL_REGION">수도권</option>
+            <option value="YEONGNAM_REGION">영남권</option>
+            <option value="HONAM_REGION">호남권</option>
+            <option value="CHUNGCHEONG_REGION">충청권</option>
+            <option value="GANGWON_REGION">강원권</option>
+            <option value="JEJU">제주</option>
+        </select>
 
-    <a th:href="@{/matchup/board/register}">글 작성하기</a>
+        <select id="recruiting-position">
+            <option value="" selected>필요 포지션</option>
+            <option value="GOALKEEPER">골키퍼</option>
+            <option value="CENTER_BACK">센터백</option>
+            <option value="LEFT_RIGHT_BACK">풀백</option>
+            <option value="LEFT_RIGHT_WING_BACK">윙백</option>
+            <option value="CENTRAL_DEFENSIVE_MIDFIELDER">수비형 미드필더</option>
+            <option value="CENTRAL_MIDFIELDER">중앙 미드필더</option>
+            <option value="CENTRAL_ATTACKING_MIDFIELDER">공격형 미드필더</option>
+            <option value="LEFT_RIGHT_WING">윙</option>
+            <option value="STRIKER_CENTER_FORWARD">스트라이커</option>
+            <option value="SECOND_STRIKER">세컨드 스트라이커</option>
+            <option value="LEFT_RIGHT_WINGER">와이드 윙어</option>
+        </select>
 
+        <select id="rating-filter">
+            <option value="">별점 전체</option>
+            <option value="1">1점 이상</option>
+            <option value="2">2점 이상</option>
+            <option value="3">3점 이상</option>
+            <option value="4">4점 이상</option>
+            <option value="5">5점</option>
+        </select>
 
-    <a >글 상세보기</a> <!-- /matchup/board/detail-->
-    <a th:href="@{#}" disabled="true">팀만들기</a> <!-- /team/team_register-->
+        <button id="filterBtn">검색</button>
+    </div>
 
+    <a th:href="@{/team/team/register}"><button>팀 등록하기</button></a>
+    <a th:href="@{#}"><button>내 팀 보기</button></a>
 
+    <div id="team-container"></div>
+    <div id="paging-container"></div>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
+
 </body>
 </html>

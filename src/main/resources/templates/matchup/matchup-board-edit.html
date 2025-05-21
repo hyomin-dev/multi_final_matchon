@@ -42,13 +42,20 @@
         >
         </div>
         <form th:object="${resMatchupBoardDto}" th:action="@{/matchup/board/edit}" method="post" enctype="multipart/form-data" >
+            <input type="hidden" th:field="*{boardId}"/>
+            <input type="hidden" th:field="*{writer}"/>
+            <input type="hidden" th:field="*{originalName}"/>
+            <input type="hidden" th:field="*{savedName}"/>
+            <input type="hidden" th:field="*{savedPath}"/>
+            <input type="hidden" th:field="*{myTemperature}"/>
+
             <label>
                 종목:
                 <select th:field="*{sportsTypeName}" required></select>
             </label>
             <label>
                 소속팀:
-                <input type="text" th:field="*{teamName}" disabled>
+                <input type="text" th:field="*{teamName}" readonly>
             </label>
             <label>
                 팀 소개:
@@ -56,8 +63,19 @@
                 </textarea>
             </label>
             <label>
-                경기장 예약 내역:
-                <input type="text" th:field="*{originalName}" required>
+                <div>
+                    <div id="reservationLoadBox">
+                        경기장 예약 내역:
+                    <span>
+                        <a style="display: inline" th:text="${resMatchupBoardDto.originalName}"></a>
+                    </span>
+                    </div>
+                    <div id="reservationFileBox" style="display:none">
+                        경기장 예약 내역:
+                        <input type="file" th:field="*{reservationFile}">
+                    </div>
+                    <button id="toggleBtn" type="button">파일 변경</button>
+                </div>
             </label>
             <label>
                 경기장명:
@@ -71,7 +89,7 @@
             <label>
                 경기 날짜:
 <!--                <input type="datetime-local" value="2025-05-21T15:30" required>-->
-                <input type="datetime-local" th:value="${resMatchupBoardDto.matchDatetime}" required>
+                <input type="datetime-local" th:value="${resMatchupBoardDto.matchDatetime}" name="matchDatetime" required>
             </label>
             <label>
                 경기 진행 시간:
@@ -103,8 +121,8 @@
             </label>
 
             <div class="btn">
-                <button type="submit" disabled>저장하기</button>
-                <button type="button" class="cancel-btn">삭제하기</button>
+                <button type="submit" >저장하기</button>
+                <button type="button" class="delete-btn">삭제하기</button>
             </div>
         </form>
     </div>

@@ -19,26 +19,60 @@ document.addEventListener("DOMContentLoaded",()=>{
     const loginMember = editDto.dataset.loginMember;
 
     getSportsType(sportsTypeName); // 종목 가져옴
-
+    setReservationFile(originalName, savedName);
     setMaxParticipants(maxParticipants);
     setMannerTemperature(minMannerTemperature);
 
-    // const cancelBtn = document.querySelector(".cancel-btn");
-    // const form = document.querySelector("form");
-    // form.addEventListener("submit", (event)=>{
-    //     submitCheck(event)
-    // }
-    // )
-    //
-    // cancelBtn.addEventListener("click",()=>{
-    //     window.history.back();
-    // })
+    const form = document.querySelector("form");
+    form.addEventListener("submit", (event)=>{
+        submitCheck(event)
+    })
+
+    const deleteBtn = document.querySelector(".delete-btn");
+    deleteBtn.addEventListener("click",async ()=>{
+        const response = await fetch(`/matchup/board/delete?boardId=${boardId}`,{
+            method: "GET",
+            credentials: "include"
+            })
+
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        alert("삭제 완료");
+        window.location.href="/matchup";
+
+    })
+
+    const toggleBtn = document.querySelector("#toggleBtn");
+    const reservationLoadBox = document.querySelector("#reservationLoadBox");
+    const reservationFileBox = document.querySelector("#reservationFileBox");
+
+    toggleBtn.addEventListener("click",()=>{
+        const isDelete = toggleBtn.textContent === "파일 변경";
+
+        if(isDelete){
+            toggleBtn.textContent = "변경 취소";
+            reservationLoadBox.style.display = "none";
+            reservationFileBox.style.display = "block";
+            document.querySelector("#reservationFileBox > input").required = true;
+        }
+        else{
+            toggleBtn.textContent = "파일 변경";
+            reservationLoadBox.style.display = "block";
+            reservationFileBox.style.display = "none";
+            document.querySelector("#reservationFileBox > input").required = false;
+            document.querySelector("#reservationFileBox > input").value = '';
+
+        }
+    })
+
+
 })
 
 function submitCheck(e){
 
     alert("submit")
-    document.querySelector("#teamName").disabled=false;
+    //document.querySelector("#teamName").disabled=false;
+
 
 
     //e.preventDefault();
@@ -66,6 +100,36 @@ async function getSportsType(sportsTypeName){
             option.selected = true;
         selectBtn.appendChild(option);
     }
+}
+
+
+async function setReservationFile(originalName, savedName){
+    const response2 = await fetch(`/matchup/attachment/file?saved-name=${savedName}`,{
+        method: "GET",
+        credentials: "include"
+    })
+    if(!response2.ok)
+        throw new Error(`HTTP error! Status:${response2.status}`)
+    const data2 = await response2.blob();
+    const url = window.URL.createObjectURL(data2);
+    const aEle = document.querySelector("#reservationLoadBox > span > a");
+
+
+    aEle.href = url;
+    aEle.download = originalName;
+
+    aEle.addEventListener("click",()=>{
+        setTimeout(()=>{
+            aEle.removeAttribute("href")
+            URL.revokeObjectURL(url);
+        },500)
+    })
+
+    // const aEle2 = document.createElement("a");
+    // aEle2.innerHTML = "삭제하기";
+    //
+    // reservationBoxEle.appendChild(aEle2);
+
 }
 
 
