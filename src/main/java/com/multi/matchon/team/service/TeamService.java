@@ -81,7 +81,7 @@ public class TeamService {
                 .teamName(reqTeamDto.getTeamName())
                 .teamRegion(RegionType.valueOf(reqTeamDto.getTeamRegion()))
                 .teamRatingAverage(reqTeamDto.getTeamRatingAverage())
-                .recruitmentStatus(reqTeamDto.getRecruitmentStatus())                .teamIntroduction(reqTeamDto.getTeamIntroduction())
+                .recruitmentStatus(reqTeamDto.getRecruitmentStatus()).teamIntroduction(reqTeamDto.getTeamIntroduction())
                 .teamAttachmentEnabled(true)
                 .build();
         Team savedTeam = teamBoardRepository.save(newTeam);
@@ -130,14 +130,14 @@ public class TeamService {
         attachmentRepository.save(attachment);
     }
 
-    public void updateFile(MultipartFile multipartFile, Team findTeamBoard){
-        String fileName = UUID.randomUUID().toString().replace("-","");
+    public void updateFile(MultipartFile multipartFile, Team findTeamBoard) {
+        String fileName = UUID.randomUUID().toString().replace("-", "");
 
         List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.TEAM, findTeamBoard.getId());
-        if(findAttachments.isEmpty())
-            throw new IllegalArgumentException(BoardType.TEAM+"타입, "+findTeamBoard.getId()+"번에는 첨부파일이 없습니다.");
+        if (findAttachments.isEmpty())
+            throw new IllegalArgumentException(BoardType.TEAM + "타입, " + findTeamBoard.getId() + "번에는 첨부파일이 없습니다.");
 
-        findAttachments.get(0).update(multipartFile.getOriginalFilename(), fileName+multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")), FILE_DIR);
+        findAttachments.get(0).update(multipartFile.getOriginalFilename(), fileName + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")), FILE_DIR);
 
         attachmentRepository.save(findAttachments.get(0));
 
@@ -191,41 +191,42 @@ public class TeamService {
                         .build())
                 .build();
     }
-
-    public PageResponseDto<ResTeamDto> findAllWithPaging(
-            PageRequest pageRequest,
-            String recruitingPosition,
-            String region,
-            Double teamRatingAverage) {
-
-        // Convert enums safely
-        PositionName positionName = null;
-        if (recruitingPosition != null && !recruitingPosition.isBlank()) {
-            positionName = PositionName.valueOf(recruitingPosition.trim());
-        }
-
-        RegionType regionType = null;
-        if (region != null && !region.isBlank()) {
-            regionType = RegionType.valueOf(region.trim());
-        }
-
-
-        Page<Team> teamPage = teamBoardRepository.findTeamListWithPaging(
-                positionName, regionType, teamRatingAverage, pageRequest);
-
-
-        Page<ResTeamDto> dtoPage = teamPage.map(ResTeamDto::from);
-
-        return PageResponseDto.<ResTeamDto>builder()
-                .items(dtoPage.getContent())
-                .pageInfo(PageResponseDto.PageInfoDto.builder()
-                        .page(dtoPage.getNumber())
-                        .size(dtoPage.getNumberOfElements())
-                        .totalElements(dtoPage.getTotalElements())
-                        .totalPages(dtoPage.getTotalPages())
-                        .isFirst(dtoPage.isFirst())
-                        .isLast(dtoPage.isLast())
-                        .build())
-                .build();
-    }
 }
+
+//    public PageResponseDto<ResTeamDto> findAllWithPaging(
+//            PageRequest pageRequest,
+//            String recruitingPosition,
+//            String region,
+//            Double teamRatingAverage) {
+//
+//        // Convert enums safely
+//        PositionName positionName = null;
+//        if (recruitingPosition != null && !recruitingPosition.isBlank()) {
+//            positionName = PositionName.valueOf(recruitingPosition.trim());
+//        }
+//
+//        RegionType regionType = null;
+//        if (region != null && !region.isBlank()) {
+//            regionType = RegionType.valueOf(region.trim());
+//        }
+//
+//
+//        Page<Team> teamPage = teamBoardRepository.findTeamListWithPaging(
+//                positionName, regionType, teamRatingAverage, pageRequest);
+//
+//
+//        Page<ResTeamDto> dtoPage = teamPage.map(ResTeamDto::from);
+//
+//        return PageResponseDto.<ResTeamDto>builder()
+//                .items(dtoPage.getContent())
+//                .pageInfo(PageResponseDto.PageInfoDto.builder()
+//                        .page(dtoPage.getNumber())
+//                        .size(dtoPage.getNumberOfElements())
+//                        .totalElements(dtoPage.getTotalElements())
+//                        .totalPages(dtoPage.getTotalPages())
+//                        .isFirst(dtoPage.isFirst())
+//                        .isLast(dtoPage.isLast())
+//                        .build())
+//                .build();
+//    }
+//}
