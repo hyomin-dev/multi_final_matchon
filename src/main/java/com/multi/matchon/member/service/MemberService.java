@@ -31,4 +31,9 @@ public class MemberService {
 
         return member.getMyTemperature();
     }
+
+    //임의 작성 전준혁
+    public Member findById(long l) {
+        return memberRepository.findById(l).orElse(null);
+    }
 }

@@ -24,7 +24,7 @@ public class Board extends BaseEntity {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "board_attachment_enabled", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "board_attachment_enabled", nullable = false)
     @Builder.Default
     private Boolean boardAttachmentEnabled = false;
 
@@ -47,5 +47,6 @@ public class Board extends BaseEntity {
     @Column(name = "attachment_original_name")
     private String attachmentOriginalName;
 }
+
 
 
