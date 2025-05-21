@@ -343,9 +343,9 @@ CREATE TABLE event_request (
     event_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     host_id BIGINT NOT NULL,
     event_date DATE NOT NULL,
-    event_region ENUM('CAPITAL_REGION', 'YEONGNAM_REGION', 'HONAM_REGION', 'CHUNGCHEONG_REGION', 'GANGWON_REGION', 'JEJU') NOT NULL,
+    event_region VARCHAR(30) NOT NULL,
     event_title VARCHAR(100) NOT NULL,
-    host_profile_id BIGINT NOT NULL,    
+    host_profile_id BIGINT NOT NULL,
     event_method VARCHAR(100) NOT NULL,
     event_contact VARCHAR(50) NOT NULL,
     event_status ENUM('PENDING', 'APPROVED', 'DENIED') DEFAULT 'PENDING',
@@ -355,7 +355,7 @@ CREATE TABLE event_request (
     modified_person VARCHAR(100),
     is_deleted BOOLEAN DEFAULT FALSE,
     CONSTRAINT FK_event_request_2_member FOREIGN KEY (host_id) REFERENCES member(member_id),
-    CONSTRAINT FK_event_request_2_host_profile FOREIGN KEY (host_profile_id) REFERENCES host_profile(host_profile_id)    
+    CONSTRAINT FK_event_request_2_host_profile FOREIGN KEY (host_profile_id) REFERENCES host_profile(host_profile_id)
 );
 
 
@@ -474,11 +474,3 @@ CREATE TABLE message_read_log(
 -- ↑FK 3개인 것
 -- ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
-ALTER TABLE faq modify COLUMN faq_category enum('HOWTOUSE','ACCOUNT','TEAM_GUEST','SHOP','REPORT','MANNER_TEMPERATURE');
-
-UPDATE faq SET faq_category = 'HOWTOUSE' WHERE faq_category = '0';
-UPDATE faq SET faq_category = 'ACCOUNT' WHERE faq_category = '1';
-UPDATE faq SET faq_category = 'TEAM_GUEST' WHERE faq_category = '2';
-UPDATE faq SET faq_category = 'SHOP' WHERE faq_category = '3';
-UPDATE faq SET faq_category = 'REPORT' WHERE faq_category = '4';
-UPDATE faq SET faq_category = 'MANNER_TEMPERATURE' WHERE faq_category = '5';
