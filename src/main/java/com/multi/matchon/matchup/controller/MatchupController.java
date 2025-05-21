@@ -10,15 +10,20 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.service.MatchupService;
+import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 
 @Controller
@@ -35,7 +40,7 @@ public class MatchupController {
     @GetMapping("/board/register")
     public ModelAndView boardRegister(ModelAndView mv){
         mv.setViewName("/matchup/matchup-board-register");
-        mv.addObject("ReqMatchupBoardDto",new ReqMatchupBoardDto());
+        mv.addObject("reqMatchupBoardDto",new ReqMatchupBoardDto());
         return mv;
     }
 
@@ -53,8 +58,8 @@ public class MatchupController {
     @GetMapping("/board/detail")
     public ModelAndView boardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv){
         log.info("matchup-board-id: {}",boardId);
-        ResMatchupBoardDto reqMatchupBoardDto = matchupService.findBoardByBoardId(boardId);
-
+        ResMatchupBoardDto resMatchupBoardDto = matchupService.findBoardByBoardId(boardId);
+        mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-detail");
         return mv;
     }
@@ -104,19 +109,29 @@ public class MatchupController {
     // 게시글 수정/삭제
 
     @GetMapping("/board/edit")
-    public String boardEdit(){
-        return "matchup/matchup-board-edit";
+    public ModelAndView boardEdit(@RequestParam("boardId") Long boardId, ModelAndView mv){
+
+        ResMatchupBoardDto resMatchupBoardDto = matchupService.findBoardByBoardId(boardId);
+        mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
+        mv.setViewName("matchup/matchup-board-edit");
+        return mv;
     }
 
     @PostMapping("/board/edit")
-    public String boardEdit(String tmp){
-        return "matchup/matchup-board-detail";
+    public ModelAndView boardEdit(@ModelAttribute ResMatchupBoardDto resMatchupBoardDto, ModelAndView mv){
+        matchupService.boardEdit(resMatchupBoardDto);
+        ResMatchupBoardDto updateResMatchupBoardDto = matchupService.findBoardByBoardId(resMatchupBoardDto.getBoardId());
+        mv.addObject("resMatchupBoardDto", updateResMatchupBoardDto);
+        mv.setViewName("matchup/matchup-board-detail");
+        return mv;
     }
 
     @GetMapping("/board/delete")
-    public String boardDelete(){
+    @ResponseBody
+    public ResponseEntity<ApiResponse<String>> boardDelete(@RequestParam("boardId") Long boardId){
+        matchupService.boardDelete(boardId);
         log.info("matchup 게시글 삭제 완료");
-        return "matchup/matchup-board-list";
+        return ResponseEntity.ok().body(ApiResponse.ok("게시글 삭제 완료"));
     }
 
     // 참가 요청
@@ -160,6 +175,34 @@ public class MatchupController {
     @GetMapping("/request/delete")
     public String requestDelete(){
         return "matchup/matchup-request-my";
+    }
+
+
+    // 첨부 파일 가져오기
+    @GetMapping("/attachment/file")
+    public ResponseEntity<S3Resource> getAttachmentFile(@RequestParam("saved-name") String savedName) throws IOException {
+
+        S3Resource resource = matchupService.getAttachmentFile(savedName);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+                ContentDisposition.attachment()
+                        .filename(savedName, StandardCharsets.UTF_8)
+                        .build()
+        );
+
+
+        return ResponseEntity.ok().headers(headers).body(resource);
+    }
+
+    @GetMapping("/attachment/presigned-url")
+    public ResponseEntity<ApiResponse<String>> getAttachmentUrl(@RequestParam("saved-name") String savedName) throws IOException {
+
+        String resourceUrl = matchupService.getAttachmentURL(savedName);
+
+        return ResponseEntity.ok().body(ApiResponse.ok(resourceUrl));
+
     }
 
 }

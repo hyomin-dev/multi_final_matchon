@@ -246,6 +246,7 @@ form button[type="submit"]:hover {
     text-align: center;
 }
 
+
 /* flex 레이아웃으로 푸터 고정 */
 body.flex-layout {
     display: flex;
@@ -256,7 +257,7 @@ body.flex-layout {
 
 .page-wrapper {
     flex: 1;
-    padding-bottom: 20px; /* 푸터와 겹치지 않도록 여유 */
+    padding-bottom: 20px;
 }
 
 /* 푸터 기본 스타일 */
@@ -268,6 +269,7 @@ footer {
     color: #555;
     border-top: 1px solid #ddd;
 }
+
 
 
 

@@ -37,7 +37,7 @@ async function getSportsType(){
     //console.log(data); // data 확인
     //console.log(data.length); // data 길이 확인
 
-    const selectBtn = document.querySelector("#sportsType");
+    const selectBtn = document.querySelector("#sportsTypeName");
 
     for(let i=0;i<data.length;i++){
         const option = document.createElement("option")
@@ -55,13 +55,16 @@ async function getTeam(){
         method: "GET",
         credentials: "include"
     });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    if(data.data.trim()==='' || data.data===null){
+    if(!response.ok){
+        //throw new Error(`HTTP error! Status:${response.status}`)
         alert("MATCHUP 글 작성은 소속팀이 있어야 합니다.")
         window.history.back();
     }
+
+    const data = await response.json();
+    // if(data.data.trim()==='' || data.data===null){
+    //
+    // }
     team.value=data.data;
     team.textContent = data.data;
 
@@ -93,7 +96,7 @@ function getAddress() {
 
 function setCurrentParticipants(){
 
-    const selectCur = document.querySelector("#currentParticipants");
+    const selectCur = document.querySelector("#currentParticipantsCount");
     const selectMax = document.querySelector("#maxParticipants");
 
     for(let i=1; i<=30;i++){
