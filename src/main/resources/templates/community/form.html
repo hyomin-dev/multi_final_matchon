@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>게시글 작성</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+<h2>게시글 작성</h2>
+<form th:action="@{/community}" th:object="${board}" method="post" enctype="multipart/form-data">
+    <div>
+        제목: <input type="text" th:field="*{title}" required/>
+    </div>
+    <div>
+        내용: <textarea th:field="*{content}" required></textarea>
+    </div>
+    <div>
+        <label>카테고리:
+            <select th:field="*{category}">
+                <option value="FREEBOARD">자유게시판</option>
+                <option value="INFORMATION">정보게시판</option>
+                <option value="ANNOUNCEMENT">공지사항</option>
+            </select>
+        </label>
+    </div>
+    <div>
+        파일 첨부: <input type="file" name="file"/>
+    </div>
+    <button type="submit">등록</button>
+</form>
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>
+
+
+
+
+
+
+

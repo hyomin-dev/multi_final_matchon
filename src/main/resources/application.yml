@@ -79,3 +79,6 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
 
+file:
+  upload-dir: C:/upload-dir
+

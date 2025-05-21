@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>게시판 목록</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+<h2>게시판 목록</h2>
+<a th:href="@{/community/new}">게시글 작성</a>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>제목</th>
+    <th>카테고리</th>
+    <th>작성일</th>
+  </tr>
+  <tr th:each="board : ${boards}">
+    <td th:text="${board.id}">1</td>
+    <td><a th:href="@{'/community/' + ${board.id}}" th:text="${board.title}">제목</a></td>
+    <td th:text="${board.category.displayName}">카테고리</td>
+    <td th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</td>
+  </tr>
+</table>
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>
+
+
+
