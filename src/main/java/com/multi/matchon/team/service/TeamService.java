@@ -102,6 +102,7 @@ public class TeamService {
         }
 
         insertFile(reqTeamDto.getTeamImageFile(), savedTeam);
+
     }
 
     private void insertFile(MultipartFile multipartFile, Team team) {
@@ -144,6 +145,7 @@ public class TeamService {
         awsS3Utils.deleteFile(FILE_DIR, fileName);
 
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
+
 
 
     }
