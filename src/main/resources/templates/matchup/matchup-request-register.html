@@ -61,7 +61,7 @@
   </table>
 
   <form th:object="${reqMatchupRequestDto}" th:action="@{/matchup/request}" method="post" >
-    <input type="hidden" th:field="*{matchupBoardId}"/>
+    <input type="hidden" th:field="*{boardId}"/>
 
     <label>
       소개:

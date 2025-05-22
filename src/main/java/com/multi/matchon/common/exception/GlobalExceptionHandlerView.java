@@ -1,5 +1,6 @@
 package com.multi.matchon.common.exception;
 
+import com.sun.jdi.request.DuplicateRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -11,11 +12,11 @@ import org.springframework.web.servlet.ModelAndView;
 @Slf4j
 public class GlobalExceptionHandlerView {
 
-    @ExceptionHandler({Exception.class})
-    public ModelAndView exceptionHandler(Exception ex){
+    @ExceptionHandler({DuplicateRequestException.class})
+    public ModelAndView exceptionHandler(DuplicateRequestException ex){
         ModelAndView mv = new ModelAndView();
-        mv.setViewName("main/main");
-        mv.addObject("error message",ex.getMessage());
+        mv.setViewName("common/error");
+        mv.addObject("errorMessage",ex.getMessage());
         log.info("error message:{} ",ex.getMessage());
         ex.printStackTrace(); //나중에 제거
         return mv;

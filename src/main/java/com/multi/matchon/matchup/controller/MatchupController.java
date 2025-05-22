@@ -149,8 +149,9 @@ public class MatchupController {
     @PostMapping("/request")
     public String requestRegister(@ModelAttribute ReqMatchupRequestDto reqMatchupRequestDto,@AuthenticationPrincipal CustomUser user){
 
+        matchupService.requestRegister(reqMatchupRequestDto, user.getMember());
         log.info("matchup request 참가 요청 완료");
-        return "matchup/matchup-request-detail";
+        return "matchup/matchup-request-my";
     }
 
     // 참가 요청 상세보기

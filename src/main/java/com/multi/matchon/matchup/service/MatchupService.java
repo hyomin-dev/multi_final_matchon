@@ -11,11 +11,15 @@ import com.multi.matchon.common.repository.SportsTypeRepository;
 
 import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.matchup.domain.MatchupBoard;
+import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
+import com.multi.matchon.matchup.repository.MatchupRequestRepository;
+import com.multi.matchon.member.domain.Member;
+import com.sun.jdi.request.DuplicateRequestException;
 import io.awspring.cloud.s3.S3Resource;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +60,7 @@ public class MatchupService{
 
 
     private final MatchupBoardRepository matchupBoardRepository;
+    private final MatchupRequestRepository matchupRequestRepository;
 
     private final SportsTypeRepository sportsTypeRepository;
     private final AttachmentRepository attachmentRepository;
@@ -308,6 +313,28 @@ public class MatchupService{
 
         return reqMatchupRequestDto;
     }
+
+    public void requestRegister(ReqMatchupRequestDto reqMatchupRequestDto, Member member) {
+
+        Boolean isDuplicate = matchupBoardRepository.isAlreadyRequestedByBoardIdAndMemberId(reqMatchupRequestDto.getBoardId(), member.getId());
+        if(isDuplicate)
+            throw new DuplicateRequestException("matchup 중복된 참가 요청입니다.");
+        else{
+            MatchupRequest matchupRequest = MatchupRequest.builder()
+                    .matchupBoard(matchupBoardRepository.findById(reqMatchupRequestDto.getBoardId()).orElseThrow(()-> new IllegalArgumentException(reqMatchupRequestDto.getBoardId()+"번 게시글은 없습니다.")))
+                    .member(member)
+                    .selfIntro(reqMatchupRequestDto.getSelfIntro())
+                    .participantCount(reqMatchupRequestDto.getParticipantCount())
+                    .build();
+            matchupRequestRepository.save(matchupRequest);
+        }
+
+        //log.info("result = {}",isDuplicate);
+    }
+    // isDeleted=true ---> result = false, 재요청 가능, 중복 검사 성공
+    // status=pending, isDeleted=false  ----> result = true, 재요청 불가능, 중복 검사 성공,
+    // status=approved, isDeleted=false ----> result = true, 재요청 불가능, 중복 검사 성공
+    // status=denied, isDeleted=false ---> result = false, 재요청 가능, 중복 검사 성공
 }
 
 
