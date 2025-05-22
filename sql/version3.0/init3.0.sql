@@ -343,3 +343,7 @@ INSERT INTO message_read_log (message_read_log_id, chat_room_id, receiver_id, ch
     (8, 8, 8, 8, TRUE, '2025-05-17 20:52:28', 'Member8', '2025-05-17 20:52:28', 'Member8'),
     (9, 9, 9, 9, TRUE, '2025-05-17 20:52:28', 'Member9', '2025-05-17 20:52:28', 'Member9'),
     (10, 10, 10, 10, TRUE, '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28', 'Member10');
+
+
+
+

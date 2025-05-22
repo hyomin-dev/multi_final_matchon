@@ -1,14 +1,15 @@
 package com.multi.matchon.team.service;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
-import com.multi.matchon.common.domain.PositionName;
-import com.multi.matchon.common.domain.Positions;
-import com.multi.matchon.common.domain.SportsTypeName;
+
+import com.multi.matchon.common.domain.*;
+
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.PositionsRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
 
+import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.team.domain.RecruitingPosition;
@@ -21,6 +22,7 @@ import com.multi.matchon.team.repository.TeamNameRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
 import org.springframework.data.domain.Page;
@@ -28,10 +30,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.connection.RedisListCommands;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +48,9 @@ public class TeamService {
     private String S3_URL;
     private String FILE_DIR = "attachments/";
     private String FILE_URL;
+
+    @Value("${spring.cloud.aws.s3.base-url}")
+    private String S3BaseUrl;
 
     @PostConstruct
     public void init() {
@@ -57,7 +65,7 @@ public class TeamService {
     private final PositionsRepository positionsRepository;
     private final AttachmentRepository attachmentRepository;
 
-//    private final AwsS3Utils awsS3Utils;
+    private final AwsS3Utils awsS3Utils;
 
 
     public List<Team> findAll() {
@@ -73,7 +81,7 @@ public class TeamService {
                 .teamName(reqTeamDto.getTeamName())
                 .teamRegion(RegionType.valueOf(reqTeamDto.getTeamRegion()))
                 .teamRatingAverage(reqTeamDto.getTeamRatingAverage())
-                .recruitmentStatus(reqTeamDto.getRecruitmentStatus())                .teamIntroduction(reqTeamDto.getTeamIntroduction())
+                .recruitmentStatus(reqTeamDto.getRecruitmentStatus()).teamIntroduction(reqTeamDto.getTeamIntroduction())
                 .teamAttachmentEnabled(true)
                 .build();
         Team savedTeam = teamBoardRepository.save(newTeam);
@@ -93,10 +101,53 @@ public class TeamService {
             recruitingPositionRepository.save(rp);
         }
 
-        insertFile(reqTeamDto, savedTeam);
+        insertFile(reqTeamDto.getTeamImageFile(), savedTeam);
+
     }
 
-    private void insertFile(ReqTeamDto reqTeamDto, Team team) {
+    private void insertFile(MultipartFile multipartFile, Team team) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            log.warn("⚠️ No image file uploaded for team '{}'", team.getTeamName());
+            return;
+        }
+
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        String ext = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
+        String savedName = uuid + "." + ext;
+
+        String teamDir = "attachments/team/";
+
+        awsS3Utils.saveFile(teamDir, savedName, multipartFile); // uploads to correct key
+
+        Attachment attachment = Attachment.builder()
+                .boardType(BoardType.TEAM)
+                .boardNumber(team.getId())
+                .fileOrder(0)
+                .originalName(multipartFile.getOriginalFilename())
+                .savedName(savedName)
+                .savePath(teamDir)
+                .build();
+
+        attachmentRepository.save(attachment);
+    }
+
+    public void updateFile(MultipartFile multipartFile, Team findTeamBoard) {
+        String fileName = UUID.randomUUID().toString().replace("-", "");
+
+        List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.TEAM, findTeamBoard.getId());
+        if (findAttachments.isEmpty())
+            throw new IllegalArgumentException(BoardType.TEAM + "타입, " + findTeamBoard.getId() + "번에는 첨부파일이 없습니다.");
+
+        findAttachments.get(0).update(multipartFile.getOriginalFilename(), fileName + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")), FILE_DIR);
+
+        attachmentRepository.save(findAttachments.get(0));
+
+        awsS3Utils.deleteFile(FILE_DIR, fileName);
+
+        awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
+
+
+
     }
 
     public PageResponseDto<ResTeamDto> findAllWithPaging(
@@ -121,7 +172,14 @@ public class TeamService {
                 positionName, regionType, teamRatingAverage, pageRequest);
 
 
-        Page<ResTeamDto> dtoPage = teamPage.map(ResTeamDto::from);
+        Page<ResTeamDto> dtoPage = teamPage.map(team -> {
+            Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
+            String imageUrl = attachment
+                    .map(att -> S3BaseUrl + "team/" + att.getSavedName())
+                    .orElse("/img/default-team.png"); // fallback if no image
+
+            return ResTeamDto.from(team, imageUrl);
+        });
 
         return PageResponseDto.<ResTeamDto>builder()
                 .items(dtoPage.getContent())
@@ -136,3 +194,41 @@ public class TeamService {
                 .build();
     }
 }
+
+//    public PageResponseDto<ResTeamDto> findAllWithPaging(
+//            PageRequest pageRequest,
+//            String recruitingPosition,
+//            String region,
+//            Double teamRatingAverage) {
+//
+//        // Convert enums safely
+//        PositionName positionName = null;
+//        if (recruitingPosition != null && !recruitingPosition.isBlank()) {
+//            positionName = PositionName.valueOf(recruitingPosition.trim());
+//        }
+//
+//        RegionType regionType = null;
+//        if (region != null && !region.isBlank()) {
+//            regionType = RegionType.valueOf(region.trim());
+//        }
+//
+//
+//        Page<Team> teamPage = teamBoardRepository.findTeamListWithPaging(
+//                positionName, regionType, teamRatingAverage, pageRequest);
+//
+//
+//        Page<ResTeamDto> dtoPage = teamPage.map(ResTeamDto::from);
+//
+//        return PageResponseDto.<ResTeamDto>builder()
+//                .items(dtoPage.getContent())
+//                .pageInfo(PageResponseDto.PageInfoDto.builder()
+//                        .page(dtoPage.getNumber())
+//                        .size(dtoPage.getNumberOfElements())
+//                        .totalElements(dtoPage.getTotalElements())
+//                        .totalPages(dtoPage.getTotalPages())
+//                        .isFirst(dtoPage.isFirst())
+//                        .isLast(dtoPage.isLast())
+//                        .build())
+//                .build();
+//    }
+//}

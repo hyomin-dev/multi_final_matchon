@@ -343,9 +343,9 @@ CREATE TABLE event_request (
     event_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     host_id BIGINT NOT NULL,
     event_date DATE NOT NULL,
-    event_region ENUM('CAPITAL_REGION', 'YEONGNAM_REGION', 'HONAM_REGION', 'CHUNGCHEONG_REGION', 'GANGWON_REGION', 'JEJU') NOT NULL,
+    event_region VARCHAR(30) NOT NULL,
     event_title VARCHAR(100) NOT NULL,
-    host_profile_id BIGINT NOT NULL,    
+    host_profile_id BIGINT NOT NULL,
     event_method VARCHAR(100) NOT NULL,
     event_contact VARCHAR(50) NOT NULL,
     event_status ENUM('PENDING', 'APPROVED', 'DENIED') DEFAULT 'PENDING',
@@ -355,7 +355,7 @@ CREATE TABLE event_request (
     modified_person VARCHAR(100),
     is_deleted BOOLEAN DEFAULT FALSE,
     CONSTRAINT FK_event_request_2_member FOREIGN KEY (host_id) REFERENCES member(member_id),
-    CONSTRAINT FK_event_request_2_host_profile FOREIGN KEY (host_profile_id) REFERENCES host_profile(host_profile_id)    
+    CONSTRAINT FK_event_request_2_host_profile FOREIGN KEY (host_profile_id) REFERENCES host_profile(host_profile_id)
 );
 
 
@@ -473,3 +473,4 @@ CREATE TABLE message_read_log(
 
 -- ↑FK 3개인 것
 -- ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
