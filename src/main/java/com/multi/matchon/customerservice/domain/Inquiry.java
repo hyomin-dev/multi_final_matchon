@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 @Table(name="inquiry")
-//@Setter: JPA entity에서 setter사용은 자제, test용
+
 public class Inquiry extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

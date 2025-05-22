@@ -32,23 +32,23 @@
     <p class="title2faq">자주 묻는 질문</p>
 
     <form method="get" th:action="@{/cs}">
-        <div class="filter-cs">
-            <select name="category" onchange="this.form.submit()">
+        <select name="category">
             <option value="" th:selected="${category == null}">전체 보기</option>
-            <option value="HOWTOUSE" th:selected="${category != null and category.name() == 'HOWTOUSE'}">이용방법</option>
-            <option value="ACCOUNT" th:selected="${category != null and category.name() == 'ACCOUNT'}">계정</option>
-            <option value="TEAM_GUEST" th:selected="${category != null and category.name() == 'TEAM_GUEST'}">Team / Guest</option>
-            <option value="SHOP" th:selected="${category != null and category.name() == 'SHOP'}">쇼핑몰</option>
-            <option value="REPORT" th:selected="${category != null and category.name() == 'REPORT'}">신고</option>
-            <option value="MANNER_TEMPERATURE" th:selected="${category != null and category.name() == 'MANNER_TEMPERATURE'}">매너온도</option>
-            </select>
+            <option value="HOWTOUSE" th:selected="${category?.name() == 'HOWTOUSE'}">이용방법</option>
+            <option value="ACCOUNT" th:selected="${category?.name() == 'ACCOUNT'}">계정</option>
+            <option value="TEAM_GUEST" th:selected="${category?.name() == 'TEAM_GUEST'}">Team / Guest</option>
+            <option value="SHOP" th:selected="${category?.name() == 'SHOP'}">쇼핑몰</option>
+            <option value="REPORT" th:selected="${category?.name() == 'REPORT'}">신고</option>
+            <option value="MANNER_TEMPERATURE" th:selected="${category?.name() == 'MANNER_TEMPERATURE'}">매너온도</option>
+        </select>
+
+        <input type="text" name="keyword" placeholder="제목으로 검색" th:value="${keyword}" />
+        <button type="submit">검색</button>
+    </form>
 
 
 
-            <input type="text" name="search" placeholder="검색">
-            <button type="submit">검색</button>
-
-            <button class="btn1">1:1 문의 작성</button>
+    <button class="btn1">1:1 문의 작성</button>
             <br><br>
 
             <table border="1">
@@ -72,7 +72,7 @@
                         <a th:text="${faq.faqTitle}">제목</a>
                     </td>
                     <td th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd')}">작성일</td>
-
+                </tr>
                 </tbody>
             </table>
         </div>
