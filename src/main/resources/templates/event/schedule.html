@@ -13,27 +13,18 @@
             background: white;
             overflow-x: hidden;
         }
-
-        #wrap {
-            padding: 30px 0;
-        }
-
+        #wrap { padding: 30px 0; }
         .container {
             max-width: 1000px;
             margin: 0 auto;
             position: relative;
             padding: 10px;
         }
-
-        .header {
-            text-align: center;
-        }
-
+        .header { text-align: center; }
         .region-labels {
             text-align: center;
             margin: 10px 0 20px;
         }
-
         .region-dot {
             display: inline-block;
             width: 10px;
@@ -41,17 +32,14 @@
             border-radius: 50%;
             margin: 0 6px;
         }
-
         .month-title {
             text-align: center;
             font-size: 22px;
             font-weight: bold;
             margin-top: 20px;
         }
-
         .register-btn {
-            display: block;
-            margin: 10px auto;
+            display: inline-block;
             padding: 6px 16px;
             background-color: #4285f4;
             color: white;
@@ -60,7 +48,6 @@
             cursor: pointer;
             font-size: 14px;
         }
-
         .calendar-wrapper {
             position: relative;
             display: flex;
@@ -68,7 +55,6 @@
             align-items: center;
             margin-top: 10px;
         }
-
         .calendar-nav-img {
             position: absolute;
             top: 50%;
@@ -78,28 +64,22 @@
             cursor: pointer;
             z-index: 2;
         }
-
         .left-arrow { left: -40px; }
         .right-arrow { right: -40px; }
-
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             width: 100%;
             max-width: 800px;
         }
-
         .day-header {
             font-weight: bold;
             text-align: center;
             border-top: 2px solid #888;
             border-bottom: 2px solid #888;
-            background: transparent;
         }
-
         .day-header.sunday { color: red; }
         .day-header.saturday { color: blue; }
-
         .day-cell {
             min-height: 120px;
             display: flex;
@@ -108,26 +88,16 @@
             align-items: center;
             padding-top: 6px;
             cursor: pointer;
-            border-top: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            border-left: none;
-            border-right: none;
+            border: 1px solid #ddd;
+            border-top: none;
             transition: background-color 0.3s;
         }
-
-        .day-cell.today {
-            color: steelblue;
-        }
-
-        .day-cell.selected {
-            background-color: #cce5ff;
-        }
-
+        .day-cell.today { color: steelblue; }
+        .day-cell.selected { background-color: #cce5ff; }
         .day-number {
             font-weight: bold;
             margin-bottom: 4px;
         }
-
         .event-label {
             font-size: 12px;
             padding: 2px 4px;
@@ -136,15 +106,11 @@
             background-color: #ffc3c3;
             color: #000;
         }
-
-        .day-number.sunday {
-            color: red;
-        }
+        .day-number.sunday { color: red; }
     </style>
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
-
 <div id="wrap">
     <div class="container">
         <div class="header">
@@ -158,15 +124,13 @@
                 <span class="region-dot" style="background-color:#E7D0FF;"></span> 강원권
             </div>
         </div>
-
         <div class="month-title" id="monthYear"></div>
-
-        <button class="register-btn"
-                onclick="submitSelectedDate()"
-                th:if="${#authorization.expression('hasRole(''HOST'')')}">
-            등록하기
-        </button>
-
+        <div style="text-align: center; margin-bottom: 10px;" th:if="${#authorization.expression('hasRole(''HOST'')')}">
+            <a href="/event/my" style="margin-right: 10px; text-decoration: none;">
+                <button class="register-btn" style="background-color: #777;">My</button>
+            </a>
+            <button class="register-btn" onclick="submitSelectedDate()">등록하기</button>
+        </div>
         <div class="calendar-wrapper">
             <img src="/img/back.png" class="calendar-nav-img left-arrow" onclick="changeMonth(-1)">
             <img src="/img/go.png" class="calendar-nav-img right-arrow" onclick="changeMonth(1)">
@@ -174,30 +138,22 @@
         </div>
     </div>
 </div>
-
 <div th:replace="~{common/footer::footer}"></div>
-
 <script th:inline="javascript">
-    const userRole = /*[[${#authentication.principal.member.memberRole}]]*/ "USER";  // 권한 전달
+    const userRole = /*[[${#authentication.principal.member.memberRole}]]*/ "USER";
 </script>
-
 <script>
     const calendar = document.getElementById("calendar");
     const monthYear = document.getElementById("monthYear");
     let selectedCell = null;
     let selectedDate = null;
-
     let today = new Date();
     let currentYear = today.getFullYear();
     let currentMonth = today.getMonth();
-
-    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-        'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN','JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
     const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-
     function renderCalendar(year, month) {
         calendar.innerHTML = "";
-
         weekDays.forEach((day, i) => {
             const header = document.createElement("div");
             header.classList.add("day-header");
@@ -206,81 +162,51 @@
             header.textContent = day;
             calendar.appendChild(header);
         });
-
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const startDay = new Date(year, month, 1).getDay();
-
         for (let i = 0; i < startDay; i++) {
             const empty = document.createElement("div");
             empty.classList.add("day-cell");
             calendar.appendChild(empty);
         }
-
         for (let day = 1; day <= daysInMonth; day++) {
             const cell = document.createElement("div");
             cell.classList.add("day-cell");
-
             const dateObj = new Date(year, month, day);
             const isToday = dateObj.toDateString() === new Date().toDateString();
-            if (isToday) {
-                cell.classList.add("today");
-            }
-
+            if (isToday) cell.classList.add("today");
             const dayNum = document.createElement("div");
             dayNum.classList.add("day-number");
-
-            if (new Date(year, month, day).getDay() === 0) {
-                dayNum.classList.add("sunday");
-            }
-
+            if (new Date(year, month, day).getDay() === 0) dayNum.classList.add("sunday");
             dayNum.textContent = day;
             cell.appendChild(dayNum);
-
             if (day === 3 || day === 14) {
                 const label = document.createElement("div");
                 label.classList.add("event-label");
                 label.textContent = "지역 리그 경기";
                 cell.appendChild(label);
             }
-
             cell.onclick = () => {
-                if (userRole !== "HOST") return;  // 일반 사용자 클릭 막기
-
-                if (selectedCell) {
-                    selectedCell.classList.remove("selected");
-                }
+                if (userRole !== "HOST") return;
+                if (selectedCell) selectedCell.classList.remove("selected");
                 cell.classList.add("selected");
                 selectedCell = cell;
-
                 selectedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             };
-
             calendar.appendChild(cell);
         }
-
         monthYear.textContent = `${monthNames[month]} ${year}`;
     }
-
     function changeMonth(offset) {
         currentMonth += offset;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        } else if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
         renderCalendar(currentYear, currentMonth);
     }
-
     function submitSelectedDate() {
-        if (!selectedDate) {
-            alert("날짜를 선택해주세요.");
-            return;
-        }
+        if (!selectedDate) return alert("날짜를 선택해주세요.");
         window.location.href = `/event/new?selectedDate=${selectedDate}`;
     }
-
     renderCalendar(currentYear, currentMonth);
 </script>
 </body>

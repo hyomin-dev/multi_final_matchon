@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>내 대회 내역</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <style>
+        #wrap {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 20px;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        h2 {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .underline {
+            border-bottom: 2px solid #000;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f3f3f3;
+        }
+        .status-pending {
+            background-color: #ddd;
+            color: #555;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .status-approved {
+            background-color: #4CAF50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .status-denied {
+            background-color: #f44336;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .detail-link {
+            color: #0077cc;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            font-size: 16px;
+            color: #888;
+        }
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .pagination a {
+            margin: 0 5px;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            color: #000;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .pagination a.disabled {
+            color: #ccc;
+            pointer-events: none;
+            border-color: #eee;
+        }
+        .pagination a.active {
+            background-color: #5478b2;
+            color: white;
+        }
+        .btn-wrap {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .btn-wrap a {
+            display: inline-block;
+            background-color: #eee;
+            padding: 8px 14px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 6px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+    <h2><span class="underline">MY 등록 내역</span></h2>
+
+    <div id="eventTableContainer">
+        <div th:if="${myEvents.totalElements == 0}" class="no-data">등록된 대회가 없습니다.</div>
+
+        <table th:if="${myEvents.totalElements > 0}">
+            <thead>
+            <tr>
+                <th>No</th>
+                <th>대회명</th>
+                <th>등록자</th>
+                <th>등록일</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="event, iterStat : ${myEvents.content}">
+                <td th:text="${iterStat.index + 1 + (myEvents.number * myEvents.size)}"></td>
+                <td>
+                    <a th:href="@{'/event/' + ${event.id}}" th:text="${event.eventTitle}" class="detail-link"></a>
+                </td>
+                <td th:text="${event.memberName}"></td>
+                <td th:text="${#temporals.format(event.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <span th:text="${event.statusLabel}"
+                          th:class="${event.eventStatus.name()} == 'APPROVED' ? 'status-approved' : (${event.eventStatus.name()} == 'DENIED' ? 'status-denied' : 'status-pending')">
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination" th:if="${myEvents.totalPages > 0}">
+            <a th:classappend="${myEvents.first} ? 'disabled'" href="#" th:data-page="${myEvents.number - 1}">&laquo;</a>
+            <span th:each="pageNum : ${#numbers.sequence(0, myEvents.totalPages - 1)}">
+                <a href="#" th:data-page="${pageNum}" th:classappend="${pageNum == myEvents.number} ? 'active'" th:text="${pageNum + 1}"></a>
+            </span>
+            <a th:classappend="${myEvents.last} ? 'disabled'" href="#" th:data-page="${myEvents.number + 1}">&raquo;</a>
+        </div>
+    </div>
+
+    <div class="btn-wrap">
+        <a href="/schedule">돌아가기</a>
+    </div>
+</div>
+<div th:replace="~{common/footer::footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('eventTableContainer');
+
+        container.addEventListener('click', function (e) {
+            const target = e.target;
+            if (target.tagName === 'A' && target.hasAttribute('data-page')) {
+                e.preventDefault();
+                const page = target.getAttribute('data-page');
+                fetch(`/event/my?page=${page}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newTable = doc.querySelector('#eventTableContainer');
+                        container.innerHTML = newTable.innerHTML;
+                    });
+            }
+        });
+    });
+</script>
+</body>
+</html>
