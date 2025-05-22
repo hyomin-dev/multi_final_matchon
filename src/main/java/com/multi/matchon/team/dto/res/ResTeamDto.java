@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Builder
 public class ResTeamDto {
 
-    private Long team_id;
+    private Long teamId;
 
     private String teamName;
 
@@ -39,14 +39,14 @@ public class ResTeamDto {
 
 
     public static ResTeamDto from(Team team, String imageUrl) {
-
         return ResTeamDto.builder()
+                .teamId(team.getId())
                 .teamName(team.getTeamName())
                 .teamRegion(team.getTeamRegion().name())
                 .teamRatingAverage(team.getTeamRatingAverage())
                 .RecruitmentStatus(team.getRecruitmentStatus())
                 .imageUrl(imageUrl)
-
+                .teamIntroduction(team.getTeamIntroduction())
                 .recruitingPositions(
                         team.getRecruitingPositions().stream()
                                 .map(rp -> rp.getPositions().getPositionName().name())
