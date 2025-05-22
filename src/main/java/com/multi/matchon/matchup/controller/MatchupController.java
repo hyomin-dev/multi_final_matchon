@@ -10,6 +10,7 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
@@ -166,6 +167,15 @@ public class MatchupController {
     public String requestMy(){
         return "matchup/matchup-request-my";
     }
+
+    @GetMapping("/request/my/list")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupRequestListDto>>> findMyRequestAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user, @RequestParam("sportsType") String sportsType, @RequestParam("date") String date){
+        PageRequest pageRequest = PageRequest.of(page,size);
+        PageResponseDto<ResMatchupRequestListDto> pageResponseDto = matchupService.findMyRequestAllWithPaging(pageRequest, user, sportsType, date);
+        return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
+    }
+
 
     // 참가 요청 수정/삭제
 
