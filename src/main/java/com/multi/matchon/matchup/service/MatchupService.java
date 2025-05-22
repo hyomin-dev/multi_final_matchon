@@ -11,10 +11,17 @@ import com.multi.matchon.common.repository.SportsTypeRepository;
 
 import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.matchup.domain.MatchupBoard;
+import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
+import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
+import com.multi.matchon.matchup.repository.MatchupRequestRepository;
+import com.multi.matchon.member.domain.Member;
+import com.sun.jdi.request.DuplicateRequestException;
 import io.awspring.cloud.s3.S3Resource;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +62,7 @@ public class MatchupService{
 
 
     private final MatchupBoardRepository matchupBoardRepository;
+    private final MatchupRequestRepository matchupRequestRepository;
 
     private final SportsTypeRepository sportsTypeRepository;
     private final AttachmentRepository attachmentRepository;
@@ -63,13 +71,13 @@ public class MatchupService{
 
 
 
-    public List<MatchupBoard> findAll() {
-        List<MatchupBoard> matchupBoards = matchupBoardRepository.findAll();
-        List<MatchupBoard> matchupBoards1 = matchupBoardRepository.findAllWithMember();
-        List<MatchupBoard> matchupBoards2 = matchupBoardRepository.findAllWithMemberAndWithSportsType();
-
-        return matchupBoards;
-    }
+//    public List<MatchupBoard> findAll() {
+//        List<MatchupBoard> matchupBoards = matchupBoardRepository.findAll();
+//        List<MatchupBoard> matchupBoards1 = matchupBoardRepository.findAllWithMember();
+//        List<MatchupBoard> matchupBoards2 = matchupBoardRepository.findAllWithMemberAndWithSportsType();
+//
+//        return matchupBoards;
+//    }
 
     public void boardRegister(ReqMatchupBoardDto reqMatchupBoardDto, CustomUser user) {
 
@@ -117,17 +125,11 @@ public class MatchupService{
 
         awsS3Utils.deleteFile(FILE_DIR, savedName.substring(0,savedName.indexOf(".")));
 
-
         findAttachments.get(0).update(multipartFile.getOriginalFilename(), fileName+multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")), FILE_DIR);
-
-        attachmentRepository.save(findAttachments.get(0));
-
 
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
 
-
     }
-
 
 
 //    public void findBoardListTest() {
@@ -301,6 +303,73 @@ public class MatchupService{
 
     }
 
+    public ReqMatchupRequestDto findReqMatchupRequestDtoByBoardId(Long boardId) {
+
+        ReqMatchupRequestDto reqMatchupRequestDto = matchupBoardRepository.findReqMatchupRequestDtoByBoardId(boardId).orElseThrow(()->new IllegalArgumentException(boardId+"번 게시글이 업습니다."));
+
+        return reqMatchupRequestDto;
+    }
+
+    public void requestRegister(ReqMatchupRequestDto reqMatchupRequestDto, Member member) {
+
+        Boolean isDuplicate = matchupBoardRepository.isAlreadyRequestedByBoardIdAndMemberId(reqMatchupRequestDto.getBoardId(), member.getId());
+
+        // isDeleted=true ---> result = false, 재요청 가능, 중복 검사 성공
+        // status=pending, isDeleted=false  ----> result = true, 재요청 불가능, 중복 검사 성공,
+        // status=approved, isDeleted=false ----> result = true, 재요청 불가능, 중복 검사 성공
+        // status=denied, isDeleted=false ---> result = false, 재요청 가능, 중복 검사 성공
+
+        if(isDuplicate)
+            throw new DuplicateRequestException("matchup 중복된 참가 요청입니다.");
+        else{
+            MatchupRequest matchupRequest = MatchupRequest.builder()
+                    .matchupBoard(matchupBoardRepository.findById(reqMatchupRequestDto.getBoardId()).orElseThrow(()-> new IllegalArgumentException(reqMatchupRequestDto.getBoardId()+"번 게시글은 없습니다.")))
+                    .member(member)
+                    .selfIntro(reqMatchupRequestDto.getSelfIntro())
+                    .participantCount(reqMatchupRequestDto.getParticipantCount())
+                    .build();
+            matchupRequestRepository.save(matchupRequest);
+        }
+
+        //log.info("result = {}",isDuplicate);
+    }
+
+    public PageResponseDto<ResMatchupRequestListDto> findMyRequestAllWithPaging(PageRequest pageRequest, CustomUser user, String sportsType, String date) {
+
+        SportsTypeName sportsTypeName;
+        if(sportsType.isBlank())
+            sportsTypeName = null;
+        else
+            sportsTypeName = SportsTypeName.valueOf(sportsType);
+
+        LocalDate matchDate = null;
+        if(!date.isBlank())
+            matchDate = LocalDate.parse(date);
+
+
+        Page<ResMatchupRequestListDto> page = matchupRequestRepository.findMyRequestAllWithPaging(pageRequest,user.getMember().getId(), sportsTypeName, matchDate);
+
+        return PageResponseDto.<ResMatchupRequestListDto>builder()
+                .items(page.getContent())
+                .pageInfo(PageResponseDto.PageInfoDto.builder()
+                        .page(page.getNumber())
+                        .size(page.getNumberOfElements())
+                        .totalElements(page.getTotalElements())
+                        .totalPages(page.getTotalPages())
+                        .isFirst(page.isFirst())
+                        .isLast(page.isLast())
+                        .build())
+                .build();
+
+
+    }
+
+    public ResMatchupRequestDto findResMatchRequestDtoByRequestId(Long requestId) {
+
+
+        return matchupRequestRepository.findResMatchRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException(requestId+"번 요청은 없습니다."));
+
+    }
 }
 
 

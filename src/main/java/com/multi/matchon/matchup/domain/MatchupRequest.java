@@ -38,6 +38,7 @@ public class MatchupRequest extends BaseEntity {
 
     @Column(name="status",nullable = false)
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private Status matchupStatus = Status.PENDING;
 
     @Column(name="is_deleted")

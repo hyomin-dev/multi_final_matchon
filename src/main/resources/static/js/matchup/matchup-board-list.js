@@ -82,10 +82,7 @@ function renderList(items){
             </table>            
                 `;
         boardArea.appendChild(card);
-        // /board/detail
-        document.querySelector(".detail").addEventListener("click",()=>{
 
-        })
 
     })
 }

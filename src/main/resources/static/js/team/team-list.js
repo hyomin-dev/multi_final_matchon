@@ -3,10 +3,24 @@ let currentPage = 0;
 function loadTeamPage(page) {
     const region = document.getElementById('region').value;
     const position = document.getElementById('recruiting-position').value;
-    const rating = document.getElementById('rating-filter').value || 0;
+    const ratingValue = document.getElementById('rating-filter').value;
+    const rating = ratingValue === "" ? null : parseFloat(ratingValue);
 
-    fetch(`/team/team/list?page=${page}&region=${region}&recruitingPosition=${position}&teamRatingAverage=${rating}`)
-        .then(res => res.json())
+    // study!! - Using URL object for proper query parameter handling
+    const url = new URL(`/team/team/list`, window.location.origin);
+    url.searchParams.set("page", page);
+    if (region) url.searchParams.set("region", region);
+    if (position) url.searchParams.set("recruitingPosition", position);
+    if (rating !== null) url.searchParams.set("teamRatingAverage", rating);
+
+    // study!! - Single fetch call with proper error handling
+    fetch(url)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
         .then(data => {
             const teams = data.data.items;
             const pageInfo = data.data.pageInfo;
@@ -22,19 +36,23 @@ function loadTeamPage(page) {
             }
 
             teams.forEach(team => {
+                console.log("🔍 Team:", team);
                 container.innerHTML += `
-      <div class="team-card" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; display: flex; align-items: center;">
-        <img src="${team.imageUrl}" alt="${team.teamName} 이미지" style="width: 80px; height: 80px; margin-right: 15px; object-fit: contain;">
-        <div>
-          <h3>${team.teamName}</h3>
-          <p>지역: ${team.teamRegion}</p>
-          <p>소개: ${team.teamIntroduction || '소개 없음'}</p>
-          <p>별점: ${team.teamRatingAverage} ★</p>
-          <p>포지션: ${team.recruitingPositions.join(', ')}</p>
-          <p>${team.recruitmentStatus ? '모집 중' : '모집 완료'}</p>
-        </div>
+
+     <a href="/team/team/${team.teamId}" style="text-decoration: none; color: inherit;">
+    <div class="team-card" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; display: flex; align-items: center;">
+      <img src="${team.imageUrl || '/img/default-team.png'}" alt="${team.teamName} 이미지" style="width: 80px; height: 80px; margin-right: 15px; object-fit: contain;">
+      <div>
+        <h3>${team.teamName}</h3>
+        <p>지역: ${team.teamRegion}</p>
+        <p>별점: ${team.teamRatingAverage ? team.teamRatingAverage.toFixed(1) : 'N/A'} ★</p>
+        <p>포지션: ${team.recruitingPositions ? team.recruitingPositions.join(', ') : 'N/A'}</p>
+        <p>${team.recruitmentStatus ? '모집 중' : '모집 완료'}</p>
       </div>
-    `;
+    </div>
+  </a>
+`;
+
             });
 
             // Previous button
@@ -42,7 +60,7 @@ function loadTeamPage(page) {
                 paging.innerHTML += `<button onclick="loadTeamPage(${page - 1})">이전</button>`;
             }
 
-// Page number buttons
+            // Page number buttons
             for (let i = 0; i < pageInfo.totalPages; i++) {
                 paging.innerHTML += `
         <button onclick="loadTeamPage(${i})" ${i === page ? 'style="font-weight:bold;"' : ''}>
@@ -51,12 +69,18 @@ function loadTeamPage(page) {
     `;
             }
 
-// Next button
+            // Next button
             if (!pageInfo.isLast) {
                 paging.innerHTML += `<button onclick="loadTeamPage(${page + 1})">다음</button>`;
             }
 
             currentPage = page;
+        })
+        // study!! - Added error handling with user feedback
+        .catch(error => {
+            console.error('Error loading teams:', error);
+            const container = document.getElementById('team-container');
+            container.innerHTML = '<p>팀 목록을 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>';
         });
 }
 

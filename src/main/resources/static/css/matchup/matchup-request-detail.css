@@ -1,0 +1,103 @@
+
+/* 제목 */
+h1 {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2em;
+    color: #333;
+}
+
+/* 테이블 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+th, td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: top;
+}
+
+th {
+    width: 180px;
+    background-color: #f1f3f5;
+    color: #343a40;
+    font-weight: 600;
+}
+
+/* 버튼 링크 공통 스타일 */
+a#approved, a#denied,
+a#chat1-1Btn, a#requestBtn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px 8px 0 0;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+/* 승인 / 반려 */
+#approved {
+    background-color: #28a745;
+    color: white;
+}
+
+#approved:hover {
+    background-color: #218838;
+}
+
+#denied {
+    background-color: #dc3545;
+    color: white;
+}
+
+#denied:hover {
+    background-color: #c82333;
+}
+
+/* 수정 / 취소 */
+#chat1-1Btn {
+    background-color: #007bff;
+    color: white;
+}
+
+#chat1-1Btn:hover {
+    background-color: #0069d9;
+}
+
+#requestBtn {
+    background-color: #6c757d;
+    color: white;
+}
+
+#requestBtn:hover {
+    background-color: #5a6268;
+}
+
+/* 지도 위치 */
+#map {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* 반응형 대응 */
+@media (max-width: 768px) {
+    #wrap {
+        width: 95%;
+        padding: 10px;
+    }
+
+    th {
+        width: 100px;
+    }
+
+    a {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

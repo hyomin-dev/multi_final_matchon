@@ -43,6 +43,9 @@ public class EventRequest extends BaseEntity {
     @JoinColumn(name="host_profile_id",nullable = false)
     private HostProfile hostProfile;
 
+    @Column(name="event_address", nullable = false, columnDefinition = "VARCHAR(100)")
+    private String eventAddress;
+
     @Column(name="event_method", nullable = false,columnDefinition = "VARCHAR(100)")
     private String eventMethod;
 

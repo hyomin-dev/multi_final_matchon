@@ -345,17 +345,5 @@ INSERT INTO message_read_log (message_read_log_id, chat_room_id, receiver_id, ch
     (10, 10, 10, 10, TRUE, '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28', 'Member10');
 
 
-INSERT INTO faq (
-    faq_id, created_date, created_person, modified_date, modified_person,
-    faq_category, faq_content, faq_title, is_deleted, admin_id
-) VALUES
-      (null, now(), 'admin', now(), 'admin', 'TEAM_GUEST', '팀 채팅 안내입니다.', '팀 채팅 안내', 0, 1),
-      (null, now(), 'admin', now(), 'admin', 'ACCOUNT', '개인정보는 이렇게 수정하시면 됩니다.', '개인정보 수정하는 법', 0, 1),
-      (null, now(), 'admin', now(), 'admin', 'SHOP', '쇼핑몰은 이렇게 이용하시면 됩니다.', '쇼핑몰 이용 방법', 0, 1),
-      (null, now(), 'admin', now(), 'admin', 'TEAM_GUEST', 'Guest는 이렇게 이용하시면 됩니다.', 'Guest 이용 방법', 0, 1),
-      (null, now(), 'admin', now(), 'admin', 'HOWTOUSE', 'MatchON은 이렇게 이용하시면 됩니다.', 'MatchON 이용 방법', 0, 1),
-      (null, now(), 'admin', now(), 'admin', 'MANNER_TEMPERATURE', '매너온도의 계산 기준은 이렇습니다.', '매너온도 계산 기준 안내', 0, 1),
-      (null, now(), 'admin', now(), 'admin', 'HOWTOUSE', '챗봇은 이렇게 이용하시면 됩니다.', '챗봇 이용 방법', 0, 1),
-      (null, now(), 'admin', now(), 'admin', 'REPORT', '멤버 신고는 이렇게 하시면 됩니다.', '멤버 신고 안내', 0, 1);
 
 
