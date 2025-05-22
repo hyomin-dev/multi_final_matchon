@@ -23,14 +23,18 @@ function loadTeamPage(page) {
 
             teams.forEach(team => {
                 container.innerHTML += `
-          <div class="team-card" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-            <h3>${team.teamName}</h3>
-            <p>지역: ${team.teamRegion}</p>
-            <p>별점: ${team.teamRatingAverage} ★</p>
-            <p>포지션: ${team.recruitingPositions.join(', ')}</p>
-            <p>${team.recruitmentStatus ? '모집 중' : '모집 완료'}</p>
-          </div>
-        `;
+      <div class="team-card" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; display: flex; align-items: center;">
+        <img src="${team.imageUrl}" alt="${team.teamName} 이미지" style="width: 80px; height: 80px; margin-right: 15px; object-fit: contain;">
+        <div>
+          <h3>${team.teamName}</h3>
+          <p>지역: ${team.teamRegion}</p>
+          <p>소개: ${team.teamIntroduction || '소개 없음'}</p>
+          <p>별점: ${team.teamRatingAverage} ★</p>
+          <p>포지션: ${team.recruitingPositions.join(', ')}</p>
+          <p>${team.recruitmentStatus ? '모집 중' : '모집 완료'}</p>
+        </div>
+      </div>
+    `;
             });
 
             // Previous button
