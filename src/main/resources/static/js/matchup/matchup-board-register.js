@@ -1,4 +1,6 @@
-document.addEventListener("DOMContentLoaded",()=>{
+let myMannerTemperature;
+
+document.addEventListener("DOMContentLoaded",async ()=>{
     getSportsType(); // 종목 가져옴
     getTeam(); // 현재 사용자의 팀 정보를 가져옴
     setCurrentParticipants();
@@ -15,15 +17,43 @@ document.addEventListener("DOMContentLoaded",()=>{
     cancelBtn.addEventListener("click",()=>{
         window.history.back();
     })
+
+    myMannerTemperature = await getMyMannerTemperature();
 })
 
 function submitCheck(e){
 
-    alert("submit")
-    document.querySelector("#teamName").disabled=false;
+
+    //document.querySelector("#teamName").disabled=false;
+
+    const matchDateTimeEle = document.querySelector("#matchDateTime");
+    //console.log(matchDateTimeEle.value);
+
+    const currentParticipantsCountEle = document.querySelector("#currentParticipantsCount");
+    //console.log(currentParticipantsCountEle.value);
+
+    const maxParticipantsEle = document.querySelector("#maxParticipants");
+    //console.log(maxParticipantsEle.value);
+
+    const minMannerTemperatureEle = document.querySelector("#minMannerTemperature");
+    //console.log(minMannerTemperatureEle.value);
+
+    //console.log(myMannerTemperature);
 
 
-    //e.preventDefault();
+    const matchDate = new Date(matchDateTimeEle.value);
+    const now = new Date();
+    if(matchDate<now){
+        alert(`경기 시작 시간은 현재 시간(${now})이후만 가능합니다. 다시 작성해주세요.`)
+        e.preventDefault();
+    }else if(Number(currentParticipantsCountEle.value) >Number(maxParticipantsEle.value)){
+        alert(`현재 참가 인원은 총 모집 인원보다 적어야 합니다.`)
+        e.preventDefault();
+    }else if(Number(minMannerTemperatureEle.value) > Number(myMannerTemperature)){
+        alert(`하한 매너 온도는 작성자의 매너온도(${myMannerTemperature})이하로 지정해주세요.`)
+        e.preventDefault();
+    }else
+        alert("submit")
 }
 
 async function getSportsType(){
@@ -120,4 +150,21 @@ function setMannerTemperature(){
         option.textContent = i;
         selectManner.appendChild(option);
     }
+}
+
+async function getMyMannerTemperature(){
+
+    const email = document.querySelector("#user-info").dataset.email;
+    const response  = await fetch(`/member/search-temperature?email=${email}`,{
+        method: "GET",
+        credentials: "include"
+    })
+    if(!response.ok)
+        throw new Error(`HTTP error! Status:${response.status}`)
+    const data = await response.json();
+
+    return data.data;
+
+
+
 }

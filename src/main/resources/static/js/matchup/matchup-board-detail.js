@@ -29,7 +29,7 @@ async function setContent(){
     drawMap(sportsFacilityAddress, sportsFacilityName);
     calTime(matchDatetime, matchDuration);
     checkStatus(matchDatetime, currentParticipantCount, maxParticipants, writer, loginMember, minMannerTemperature, myTemperature);
-    setButton(matchDatetime, writer, loginMember);
+    setButton(matchDatetime, writer, loginMember, currentParticipantCount, maxParticipants, minMannerTemperature, myTemperature);
 
 
     const response = await fetch(`/matchup/attachment/presigned-url?saved-name=${savedName}`,{
@@ -50,8 +50,10 @@ async function setContent(){
     // const data2 = await response2.json();
     // console.log(data2);
 
-
 }
+
+
+
 
 function setWriter(writer, loginMember){
     const writerEle = document.querySelector("#writer");
@@ -170,15 +172,46 @@ function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, wr
     }
 }
 
-function setButton(matchDatetime, writer, loginMember){
+function setButton(matchDatetime, writer, loginMember,currentParticipantCount, maxParticipants, minMannerTemperature, myTemperature ){
     const matchDate = new Date(matchDatetime);
     const now = new Date();
-    if(writer === loginMember && matchDate<now){
+    if(writer === loginMember && matchDate<now){ //수정하기 버튼
        const modifyBtn = document.querySelector("#modify");
        modifyBtn.addEventListener("click",(e)=>{
            alert("경기 시작 시간이 지나 수정할 수 없습니다.");
            e.preventDefault();
        })
+    }else if(writer !==loginMember){ // 문의하기, 참가요청 버튼
+        const chatBtn = document.querySelector("#chat1-1Btn");
+        const requestBtn = document.querySelector("#requestBtn");
+
+        if(matchDate < now){ // 날짜 지난 경우
+            chatBtn.href = "#";
+            requestBtn.href = "#";
+
+            chatBtn.addEventListener("click",()=>{
+                alert("경기 시작 시간이 지나 1대1 문의를 할 수 없습니다.")
+            })
+
+            requestBtn.addEventListener("click",()=>{
+                alert("경기 시작 시간이 지나 1대1 문의를 할 수 없습니다.")
+            })
+
+        }else if(currentParticipantCount >=maxParticipants){ // 참가 인원 다 찬 경우
+            requestBtn.href = "#";
+            requestBtn.addEventListener("click",(e)=>{
+                alert("현재 참가 요청 인원이 마감되어 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+                e.preventDefault();
+            })
+
+        }else if(minMannerTemperature>myTemperature){ // 매너 온도 충족 안된 경우
+            requestBtn.href = "#";
+            requestBtn.addEventListener("click",(e)=>{
+                alert("입장 가능 매너 온도를 충족하지 못해 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+                e.preventDefault();
+            })
+        }
+
     }
 }
 

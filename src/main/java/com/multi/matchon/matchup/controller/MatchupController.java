@@ -7,8 +7,10 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
+import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
@@ -137,14 +139,20 @@ public class MatchupController {
     // 참가 요청
 
     @GetMapping("/request")
-    public String requestRegister(){
-        return "matchup/matchup-request-register";
+    public ModelAndView requestRegister(@RequestParam("boardId") Long boardId, ModelAndView mv) throws RuntimeException {
+        ReqMatchupRequestDto reqMatchupRequestDto = matchupService.findReqMatchupRequestDtoByBoardId(boardId);
+        mv.addObject("reqMatchupRequestDto",reqMatchupRequestDto);
+        mv.setViewName("matchup/matchup-request-register");
+
+        return mv;
     }
 
     @PostMapping("/request")
-    public String requestRegister(String tmp){
+    public String requestRegister(@ModelAttribute ReqMatchupRequestDto reqMatchupRequestDto,@AuthenticationPrincipal CustomUser user){
+
+        matchupService.requestRegister(reqMatchupRequestDto, user.getMember());
         log.info("matchup request 참가 요청 완료");
-        return "matchup/matchup-request-detail";
+        return "matchup/matchup-request-my";
     }
 
     // 참가 요청 상세보기
@@ -160,6 +168,15 @@ public class MatchupController {
         return "matchup/matchup-request-my";
     }
 
+    @GetMapping("/request/my/list")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupRequestListDto>>> findMyRequestAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user, @RequestParam("sportsType") String sportsType, @RequestParam("date") String date){
+        PageRequest pageRequest = PageRequest.of(page,size);
+        PageResponseDto<ResMatchupRequestListDto> pageResponseDto = matchupService.findMyRequestAllWithPaging(pageRequest, user, sportsType, date);
+        return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
+    }
+
+
     // 참가 요청 수정/삭제
 
     @GetMapping("/request/edit")
@@ -168,7 +185,7 @@ public class MatchupController {
     }
 
     @PostMapping("/request/edit")
-    public String requestEdit(String tmp){
+    public String requestEdit(@ModelAttribute ReqMatchupRequestDto reqMatchupRequestDto){
         return "matchup/matchup-request-my";
     }
 
@@ -192,10 +209,10 @@ public class MatchupController {
                         .build()
         );
 
-
         return ResponseEntity.ok().headers(headers).body(resource);
     }
 
+    // presignedUrl 반환
     @GetMapping("/attachment/presigned-url")
     public ResponseEntity<ApiResponse<String>> getAttachmentUrl(@RequestParam("saved-name") String savedName) throws IOException {
 

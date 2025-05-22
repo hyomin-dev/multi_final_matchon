@@ -3,7 +3,6 @@ package com.multi.matchon.common.service;
 import com.multi.matchon.common.domain.SportsType;
 import com.multi.matchon.common.dto.res.SportsTypeDto;
 import com.multi.matchon.common.repository.SportsTypeRepository;
-import com.multi.matchon.common.util.AwsS3Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

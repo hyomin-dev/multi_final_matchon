@@ -4,6 +4,9 @@
     <title>MATCHON</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <script th:src="@{/js/matchup/matchup-request-my.js}" defer></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-request-my.css}">
+
 </head>
 <body>
 
@@ -11,7 +14,22 @@
 <div id="wrap">
     <h1>MATCHUP request my 목록</h1>
 
-    <a th:href="@{/matchup/request/detail}">요청 상세보기</a>
+    <div id="filter">
+        <select id="sports-type">
+            <option value="" selected>전체 종목</option>
+            <option value="SOCCER">축구</option>
+            <option value="FUTSAL">풋살</option>
+        </select>
+        <label>날짜<input type="date" id="date-filter"></label>
+        <button id="filterBtn">검색</button>
+    </div>
+    <div id="request-container">
+
+    </div>
+
+    <div id="paging-container">
+
+    </div>
 
 </div>
 
