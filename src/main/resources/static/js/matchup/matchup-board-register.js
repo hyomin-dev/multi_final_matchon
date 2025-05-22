@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     const form = document.querySelector("form");
     form.addEventListener("submit", (event)=>{
         submitCheck(event)
-    }
+        }
     )
 
 
@@ -25,6 +25,7 @@ function submitCheck(e){
 
 
     //document.querySelector("#teamName").disabled=false;
+    const sportsFacilityAddress = document.querySelector("#sportsFacilityAddress");
 
     const matchDateTimeEle = document.querySelector("#matchDateTime");
     //console.log(matchDateTimeEle.value);
@@ -43,7 +44,11 @@ function submitCheck(e){
 
     const matchDate = new Date(matchDateTimeEle.value);
     const now = new Date();
-    if(matchDate<now){
+    if(sportsFacilityAddress.value ===""){
+        alert("경기장 주소를 입력해주세요.");
+        e.preventDefault();
+    }
+    else if(matchDate<now){
         alert(`경기 시작 시간은 현재 시간(${now})이후만 가능합니다. 다시 작성해주세요.`)
         e.preventDefault();
     }else if(Number(currentParticipantsCountEle.value) >Number(maxParticipantsEle.value)){
@@ -52,8 +57,11 @@ function submitCheck(e){
     }else if(Number(minMannerTemperatureEle.value) > Number(myMannerTemperature)){
         alert(`하한 매너 온도는 작성자의 매너온도(${myMannerTemperature})이하로 지정해주세요.`)
         e.preventDefault();
-    }else
-        alert("submit")
+    }else{
+        alert("submit");
+
+    }
+
 }
 
 async function getSportsType(){

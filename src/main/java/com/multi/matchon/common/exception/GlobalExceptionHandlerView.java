@@ -21,4 +21,14 @@ public class GlobalExceptionHandlerView {
         ex.printStackTrace(); //나중에 제거
         return mv;
     }
+
+    @ExceptionHandler({Exception.class})
+    public ModelAndView exceptionHandler(Exception ex){
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("common/error");
+        mv.addObject("errorMessage",ex.getMessage());
+        log.info("error message:{} ",ex.getMessage());
+        ex.printStackTrace(); //나중에 제거
+        return mv;
+    }
 }

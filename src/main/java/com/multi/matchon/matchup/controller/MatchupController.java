@@ -10,6 +10,7 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import io.awspring.cloud.s3.S3Resource;
@@ -50,9 +51,8 @@ public class MatchupController {
     public String boardRegister(@ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
         //log.info("{}", reqMatchupBoardDto);
         matchupService.boardRegister(reqMatchupBoardDto, user);
-
         log.info("matchup 게시글 등록 완료");
-        return "matchup/matchup-board-list";
+        return "redirect:/matchup";
     }
 
     // 게시글 상세 조회
@@ -79,7 +79,7 @@ public class MatchupController {
 
     @GetMapping("/board/list")
     @ResponseBody
-    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size, @RequestParam("sportsType") String sportsType, @RequestParam("region") String region, @RequestParam("date") String date ){
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "3") int size, @RequestParam("sportsType") String sportsType, @RequestParam("region") String region, @RequestParam("date") String date ){
         PageRequest pageRequest = PageRequest.of(page,size);
         PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest, sportsType, region, date);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
@@ -101,7 +101,7 @@ public class MatchupController {
 
     @GetMapping("/board/my/list")
     @ResponseBody
-    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findMyAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user){
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findMyAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "3") int size , @AuthenticationPrincipal CustomUser user){
         PageRequest pageRequest = PageRequest.of(page,size);
         PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findMyAllWithPaging(pageRequest, user);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
@@ -152,14 +152,18 @@ public class MatchupController {
 
         matchupService.requestRegister(reqMatchupRequestDto, user.getMember());
         log.info("matchup request 참가 요청 완료");
-        return "matchup/matchup-request-my";
+        return "redirect:/matchup/request/my";
     }
 
     // 참가 요청 상세보기
 
     @GetMapping("/request/detail")
-    public String requestDetail(){
-        return "matchup/matchup-request-detail";
+    public ModelAndView requestDetail(@RequestParam("request-id") Long requestId, ModelAndView mv){
+
+        ResMatchupRequestDto resMatchupRequestDto = matchupService.findResMatchRequestDtoByRequestId(requestId);
+        mv.addObject("resMatchupRequestDto",resMatchupRequestDto);
+        mv.setViewName("matchup/matchup-request-detail");
+        return mv;
     }
 
     // 참가 요청 목록
@@ -170,7 +174,7 @@ public class MatchupController {
 
     @GetMapping("/request/my/list")
     @ResponseBody
-    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupRequestListDto>>> findMyRequestAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user, @RequestParam("sportsType") String sportsType, @RequestParam("date") String date){
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupRequestListDto>>> findMyRequestAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "3") int size , @AuthenticationPrincipal CustomUser user, @RequestParam("sportsType") String sportsType, @RequestParam("date") String date){
         PageRequest pageRequest = PageRequest.of(page,size);
         PageResponseDto<ResMatchupRequestListDto> pageResponseDto = matchupService.findMyRequestAllWithPaging(pageRequest, user, sportsType, date);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
