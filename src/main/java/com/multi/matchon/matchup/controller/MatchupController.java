@@ -10,6 +10,7 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import io.awspring.cloud.s3.S3Resource;

@@ -4,6 +4,7 @@ package com.multi.matchon.matchup.repository;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.domain.MatchupRequest;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Repository
 public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, Long> {
@@ -40,4 +42,29 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             order by t2.matchDatetime DESC
             """)
     Page<ResMatchupRequestListDto> findMyRequestAllWithPaging(PageRequest pageRequest, @Param("id") Long id, @Param("sportsType") SportsTypeName sportsTypeName, @Param("matchDate") LocalDate matchDate);
+
+
+    @Query("""
+            select new com.multi.matchon.matchup.dto.res.ResMatchupRequestDto(
+            t5.memberEmail,
+            t2.memberEmail,
+            t3.id,
+            t1.id,
+            t4.sportsTypeName,
+            t3.sportsFacilityName,
+            t3.sportsFacilityAddress,
+            t3.matchDatetime,
+            t3.matchDuration,
+            t1.participantCount,
+            t1.matchupStatus,
+            t1.selfIntro
+            )
+            from MatchupRequest t1
+            join t1.member t2
+            join t1.matchupBoard t3
+            join t3.sportsType t4
+            join t3.member t5
+            where t1.id=:requestId and t1.isDeleted=false
+            """)
+    Optional<ResMatchupRequestDto> findResMatchRequestDtoByRequestId(Long requestId);
 }
