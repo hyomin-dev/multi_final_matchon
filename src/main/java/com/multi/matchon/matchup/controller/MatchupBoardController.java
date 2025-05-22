@@ -6,6 +6,7 @@ import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.service.MatchupBoardService;
 import com.multi.matchon.matchup.service.MatchupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class MatchupBoardController {
 
     private final MatchupService matchupService;
+    private final MatchupBoardService matchupBoardService;
 
     // 게시글 작성하기
 
@@ -36,7 +38,7 @@ public class MatchupBoardController {
     @PostMapping("/register")
     public String registerMatchupBoard(@ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
         //log.info("{}", reqMatchupBoardDto);
-        matchupService.boardRegister(reqMatchupBoardDto, user);
+        matchupBoardService.registerMatchupBoard(reqMatchupBoardDto, user);
 
         log.info("matchup 게시글 등록 완료");
         return "matchup/matchup-board-list";
@@ -45,9 +47,9 @@ public class MatchupBoardController {
     // 게시글 상세 조회
 
     @GetMapping("/detail")
-    public ModelAndView getMatchupBoardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv){
+    public ModelAndView getMatchupBoardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
         log.info("matchup-board-id: {}",boardId);
-        ResMatchupBoardDto resMatchupBoardDto = matchupService.findBoardByBoardId(boardId);
+        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId);
         mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-detail");
         return mv;
@@ -64,11 +66,11 @@ public class MatchupBoardController {
         return mv;
     }
 
-    @GetMapping("/board/list")
+    @GetMapping("/list")
     @ResponseBody
     public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> listMatchupBoardByFilter(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size, @RequestParam("sportsType") String sportsType, @RequestParam("region") String region, @RequestParam("date") String date ){
         PageRequest pageRequest = PageRequest.of(page,size);
-        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest, sportsType, region, date);
+        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupBoardService.findAllMatchupBoardsWithPaging(pageRequest, sportsType, region, date);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
     }
 
@@ -86,38 +88,38 @@ public class MatchupBoardController {
         return "matchup/matchup-board-my";
     }
 
-    @GetMapping("/board/my/list")
+    @GetMapping("/my/list")
     @ResponseBody
-    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> listMyMatchupBoardByFilter(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user){
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> listMyMatchupBoardByFilter(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user, @RequestParam("sportsType") String sportsType, @RequestParam("date") String date  ){
         PageRequest pageRequest = PageRequest.of(page,size);
-        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findMyAllWithPaging(pageRequest, user);
+        PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupBoardService.findAllMyMatchupBoardsWithPaging(pageRequest, user,sportsType, date);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
     }
 
     // 게시글 수정/삭제
 
-    @GetMapping("/board/edit")
-    public ModelAndView showMatchupBoardEditPage(@RequestParam("boardId") Long boardId, ModelAndView mv){
+    @GetMapping("/edit")
+    public ModelAndView showMatchupBoardEditPage(@RequestParam("boardId") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
 
-        ResMatchupBoardDto resMatchupBoardDto = matchupService.findBoardByBoardId(boardId);
+        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId);
         mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-edit");
         return mv;
     }
 
-    @PostMapping("/board/edit")
+    @PostMapping("/edit")
     public ModelAndView editMatchupBoard(@ModelAttribute ResMatchupBoardDto resMatchupBoardDto, ModelAndView mv){
-        matchupService.boardEdit(resMatchupBoardDto);
-        ResMatchupBoardDto updateResMatchupBoardDto = matchupService.findBoardByBoardId(resMatchupBoardDto.getBoardId());
+        matchupBoardService.updateBoard(resMatchupBoardDto);
+        ResMatchupBoardDto updateResMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(resMatchupBoardDto.getBoardId());
         mv.addObject("resMatchupBoardDto", updateResMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-detail");
         return mv;
     }
 
-    @GetMapping("/board/delete")
+    @GetMapping("/delete")
     @ResponseBody
-    public ResponseEntity<ApiResponse<String>> deleteBoard(@RequestParam("boardId") Long boardId){
-        matchupService.boardDelete(boardId);
+    public ResponseEntity<ApiResponse<String>> softDeleteBoard(@RequestParam("boardId") Long boardId){
+        matchupBoardService.softDeleteMatchupBoard(boardId);
         log.info("matchup 게시글 삭제 완료");
         return ResponseEntity.ok().body(ApiResponse.ok("게시글 삭제 완료"));
     }

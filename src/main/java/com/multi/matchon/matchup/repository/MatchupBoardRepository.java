@@ -27,7 +27,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     List<MatchupBoard> findAllWithMemberAndWithSportsType();
 
     @Query("select t1 from MatchupBoard t1 join fetch t1.sportsType where t1.id=:boardId and t1.isDeleted=false ")
-    Optional<MatchupBoard> findByIdAndIsDeleted(@Param("boardId") Long boardId);
+    Optional<MatchupBoard> findMatchupBoardByBoardIdAndIsDeleted(@Param("boardId") Long boardId);
 
 
     @Query("""
@@ -35,6 +35,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             .ResMatchupBoardListDto( 
             t1.id,
             t2.memberEmail,
+            t2.memberName,
             t3.teamName,
             t4.sportsTypeName,
             t1.sportsFacilityName,
@@ -54,13 +55,14 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
                     (t1.isDeleted=false)
             order by t1.createdDate DESC
             """)
-    Page<ResMatchupBoardListDto> findBoardListWithPaging(Pageable pageable, @Param("sportsType") SportsTypeName sportsType, @Param("region") String region, @Param("matchDate") LocalDate matchDate);
+    Page<ResMatchupBoardListDto> findAllMatchupBoardsWithPaging(Pageable pageable, @Param("sportsType") SportsTypeName sportsType, @Param("region") String region, @Param("matchDate") LocalDate matchDate);
 
     @Query("""
             select new com.multi.matchon.matchup.dto.res
             .ResMatchupBoardListDto( 
             t1.id,
             t2.memberEmail,
+            t2.memberName,
             t3.teamName,
             t4.sportsTypeName,
             t1.sportsFacilityName,
@@ -74,30 +76,19 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             join t1.member t2
             join t2.team t3
             join t1.sportsType t4
-            where t2.memberEmail =:email and t1.isDeleted=false
+            where (:sportsType is null or t4.sportsTypeName =:sportsType) and                    
+                    (:matchDate is null or DATE(t1.matchDatetime) >=:matchDate) and
+                    t1.isDeleted=false and t2.memberEmail =:email and t1.isDeleted=false
             order by t1.matchDatetime DESC
             """)
-    Page<ResMatchupBoardListDto> findByMemberEmailBoardListWithPaging(Pageable pageable, @Param("email") String email);
+    Page<ResMatchupBoardListDto> findAllResMatchupBoardListDtosByMemberEmailWithPaging(Pageable pageable, @Param("email") String email, @Param("sportsType") SportsTypeName sportsType, @Param("matchDate") LocalDate matchDate);
 
 
     @Query("select t1 from MatchupBoard t1 join fetch t1.member t2 join fetch t1.member.team t3 join fetch t1.sportsType t4 where t1.id=:boardId and t1.isDeleted=false")
-    Optional<MatchupBoard> findByIdWithMemberWithTeamWithSportsType(@Param("boardId") Long boardId);
+    Optional<MatchupBoard> findMatchupBoardByBoardId(@Param("boardId") Long boardId);
 
 
-    @Query("""
-            select new com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto(
-            t1.id,
-            t2.sportsTypeName,
-            t1.sportsFacilityName,
-            t1.sportsFacilityAddress,
-            t1.matchDatetime,
-            t1.matchDuration,
-            t1.currentParticipantCount,
-            t1.maxParticipants)
-            from MatchupBoard t1 join t1.sportsType t2
-            where t1.id =:boardId and t1.isDeleted=false
-            """)
-    Optional<ReqMatchupRequestDto> findReqMatchupRequestDtoByBoardId(@Param("boardId") Long boardId);
+
 
 
 //    @Query("""
@@ -113,19 +104,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
 //
 //        """)
 
-    @Query("""
-        select case
-           when count(t1) > 0 then true 
-           else false 
-           end
-        from MatchupRequest t1             
-        where (t1.matchupBoard.id =:boardId and t1.member.id=:memberId and t1.isDeleted=false) and                
-                  t1.matchupStatus in (
-                    com.multi.matchon.common.domain.Status.PENDING,
-                    com.multi.matchon.common.domain.Status.APPROVED
-                )
-        """)
-    Boolean isAlreadyRequestedByBoardIdAndMemberId(@Param("boardId") Long boardId,@Param("memberId") Long memberId); // true: 중복된 요청이 존재, false: 중복된 요청이 없음
+
 
 
 //    @Query("""

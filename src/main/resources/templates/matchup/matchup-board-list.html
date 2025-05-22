@@ -18,7 +18,6 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
     <h1>MATCHUP 글 목록</h1>
-    <div id="user-info" th:data-email="${#authentication.name}"></div>
     <div id="filter">
         <select id="sports-type">
             <option value="" selected>전체 종목</option>
@@ -54,8 +53,6 @@
     <a th:href="@{/matchup/board/my}">내가 작성한 글 목록</a> <!-- /matchup/board/my-->
     <a th:href="@{/matchup/request/my}">내가 요청한 목록</a> <!-- /matchup/request/my -->
 <!--    <a th:href="@{/matchup/board/listtest}">글 목록 조회테스트</a>-->
-
-
 
     <div id="board-container">
 

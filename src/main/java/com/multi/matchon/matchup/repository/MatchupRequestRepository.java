@@ -4,6 +4,7 @@ package com.multi.matchon.matchup.repository;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.domain.MatchupRequest;
+import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import org.springframework.data.domain.Page;
@@ -35,19 +36,21 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             from MatchupRequest t1
             join t1.matchupBoard t2
             join t2.sportsType t3
-            where t1.member.id=:id and
+            where t1.member.id=:memberId and
                     (:sportsType is null or t3.sportsTypeName =:sportsType) and
                     (:matchDate is null or DATE(t2.matchDatetime) >=:matchDate) and
                     (t1.isDeleted=false)
             order by t2.matchDatetime DESC
             """)
-    Page<ResMatchupRequestListDto> findMyRequestAllWithPaging(PageRequest pageRequest, @Param("id") Long id, @Param("sportsType") SportsTypeName sportsTypeName, @Param("matchDate") LocalDate matchDate);
+    Page<ResMatchupRequestListDto> findAllResMatchupRequestListDtosByMemberIdAndSportsTypeAndMatchDateWithPaging(PageRequest pageRequest, @Param("memberId") Long memberId, @Param("sportsType") SportsTypeName sportsTypeName, @Param("matchDate") LocalDate matchDate);
 
 
     @Query("""
             select new com.multi.matchon.matchup.dto.res.ResMatchupRequestDto(
             t5.memberEmail,
+            t5.memberName,
             t2.memberEmail,
+            t2.memberName,
             t3.id,
             t1.id,
             t4.sportsTypeName,
@@ -66,5 +69,35 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             join t3.member t5
             where t1.id=:requestId and t1.isDeleted=false
             """)
-    Optional<ResMatchupRequestDto> findResMatchRequestDtoByRequestId(Long requestId);
+    Optional<ResMatchupRequestDto> findResMatchupRequestDtoByRequestId(Long requestId);
+
+    @Query("""
+            select new com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto(
+            t1.id,
+            t2.sportsTypeName,
+            t1.sportsFacilityName,
+            t1.sportsFacilityAddress,
+            t1.matchDatetime,
+            t1.matchDuration,
+            t1.currentParticipantCount,
+            t1.maxParticipants)
+            from MatchupBoard t1 join t1.sportsType t2
+            where t1.id =:boardId and t1.isDeleted=false
+            """)
+    Optional<ReqMatchupRequestDto> findReqMatchupRequestDtoByBoardId(@Param("boardId") Long boardId);
+
+    @Query("""
+        select case
+           when count(t1) > 0 then true 
+           else false 
+           end
+        from MatchupRequest t1             
+        where (t1.matchupBoard.id =:boardId and t1.member.id=:memberId and t1.isDeleted=false) and                
+                  t1.matchupStatus in (
+                    com.multi.matchon.common.domain.Status.PENDING,
+                    com.multi.matchon.common.domain.Status.APPROVED
+                )
+        """)
+    Boolean isAlreadyRequestedByBoardIdAndMemberId(@Param("boardId") Long boardId,@Param("memberId") Long memberId); // true: 중복된 요청이 존재, false: 중복된 요청이 없음
+
 }

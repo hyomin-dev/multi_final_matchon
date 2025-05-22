@@ -18,10 +18,11 @@ import java.time.LocalTime;
 @Builder
 public class ResMatchupBoardDto {
 
-
     private Long boardId;
 
-    private String writer;
+    private String memberEmail;
+
+    private String memberName;
 
     private String teamName;
 
@@ -53,6 +54,6 @@ public class ResMatchupBoardDto {
 
     private String savedPath;
 
-    private Double myTemperature;
+    private Double myMannerTemperature;
 
 }

@@ -41,7 +41,7 @@ public class MatchupController {
     @GetMapping("/attachment/file")
     public ResponseEntity<S3Resource> getAttachmentFile(@RequestParam("saved-name") String savedName) throws IOException {
 
-        S3Resource resource = matchupService.getAttachmentFile(savedName);
+        S3Resource resource = matchupService.findAttachmentFile(savedName);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
@@ -58,7 +58,7 @@ public class MatchupController {
     @GetMapping("/attachment/presigned-url")
     public ResponseEntity<ApiResponse<String>> getAttachmentUrl(@RequestParam("saved-name") String savedName) throws IOException {
 
-        String resourceUrl = matchupService.getAttachmentURL(savedName);
+        String resourceUrl = matchupService.findAttachmentURL(savedName);
 
         return ResponseEntity.ok().body(ApiResponse.ok(resourceUrl));
 
