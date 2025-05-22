@@ -34,12 +34,10 @@ document.addEventListener("DOMContentLoaded",()=>{
             method: "GET",
             credentials: "include"
             })
-
         if(!response.ok)
             throw new Error(`HTTP error! Status:${response.status}`)
         alert("삭제 완료");
         window.location.href="/matchup";
-
     })
 
     const toggleBtn = document.querySelector("#toggleBtn");

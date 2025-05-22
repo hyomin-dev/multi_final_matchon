@@ -38,6 +38,7 @@ function loadTeamPage(page) {
             teams.forEach(team => {
                 console.log("🔍 Team:", team);
                 container.innerHTML += `
+
      <a href="/team/team/${team.teamId}" style="text-decoration: none; color: inherit;">
     <div class="team-card" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; display: flex; align-items: center;">
       <img src="${team.imageUrl || '/img/default-team.png'}" alt="${team.teamName} 이미지" style="width: 80px; height: 80px; margin-right: 15px; object-fit: contain;">
@@ -51,6 +52,7 @@ function loadTeamPage(page) {
     </div>
   </a>
 `;
+
             });
 
             // Previous button

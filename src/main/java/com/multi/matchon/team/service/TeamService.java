@@ -181,6 +181,7 @@ public class TeamService {
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
 
 
+
     }
 
     public PageResponseDto<ResTeamDto> findAllWithPaging(
@@ -234,6 +235,7 @@ public class TeamService {
                         .build())
                 .build();
     }
+
 
     public ResTeamDto findTeamById(Long teamId) {
         Team team = teamRepository.findById(teamId)
@@ -344,6 +346,7 @@ public class TeamService {
         // Soft delete the review
         review.softDelete();
     }
+
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(
@@ -364,7 +367,9 @@ public class TeamService {
 //        }
 //
 //
+
 //        Page<Team> teamPage = teamRepository.findTeamListWithPaging(
+
 //                positionName, regionType, teamRatingAverage, pageRequest);
 //
 //
@@ -382,4 +387,6 @@ public class TeamService {
 //                        .build())
 //                .build();
 //    }
+
 //}
+

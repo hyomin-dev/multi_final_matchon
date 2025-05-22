@@ -7,8 +7,11 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
+import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.service.MatchupService;
 import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
@@ -48,9 +51,8 @@ public class MatchupController {
     public String boardRegister(@ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
         //log.info("{}", reqMatchupBoardDto);
         matchupService.boardRegister(reqMatchupBoardDto, user);
-
         log.info("matchup 게시글 등록 완료");
-        return "matchup/matchup-board-list";
+        return "redirect:/matchup";
     }
 
     // 게시글 상세 조회
@@ -77,7 +79,7 @@ public class MatchupController {
 
     @GetMapping("/board/list")
     @ResponseBody
-    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size, @RequestParam("sportsType") String sportsType, @RequestParam("region") String region, @RequestParam("date") String date ){
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "3") int size, @RequestParam("sportsType") String sportsType, @RequestParam("region") String region, @RequestParam("date") String date ){
         PageRequest pageRequest = PageRequest.of(page,size);
         PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest, sportsType, region, date);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
@@ -99,7 +101,7 @@ public class MatchupController {
 
     @GetMapping("/board/my/list")
     @ResponseBody
-    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findMyAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user){
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> findMyAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "3") int size , @AuthenticationPrincipal CustomUser user){
         PageRequest pageRequest = PageRequest.of(page,size);
         PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findMyAllWithPaging(pageRequest, user);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
@@ -137,21 +139,31 @@ public class MatchupController {
     // 참가 요청
 
     @GetMapping("/request")
-    public String requestRegister(){
-        return "matchup/matchup-request-register";
+    public ModelAndView requestRegister(@RequestParam("boardId") Long boardId, ModelAndView mv) throws RuntimeException {
+        ReqMatchupRequestDto reqMatchupRequestDto = matchupService.findReqMatchupRequestDtoByBoardId(boardId);
+        mv.addObject("reqMatchupRequestDto",reqMatchupRequestDto);
+        mv.setViewName("matchup/matchup-request-register");
+
+        return mv;
     }
 
     @PostMapping("/request")
-    public String requestRegister(String tmp){
+    public String requestRegister(@ModelAttribute ReqMatchupRequestDto reqMatchupRequestDto,@AuthenticationPrincipal CustomUser user){
+
+        matchupService.requestRegister(reqMatchupRequestDto, user.getMember());
         log.info("matchup request 참가 요청 완료");
-        return "matchup/matchup-request-detail";
+        return "redirect:/matchup/request/my";
     }
 
     // 참가 요청 상세보기
 
     @GetMapping("/request/detail")
-    public String requestDetail(){
-        return "matchup/matchup-request-detail";
+    public ModelAndView requestDetail(@RequestParam("request-id") Long requestId, ModelAndView mv){
+
+        ResMatchupRequestDto resMatchupRequestDto = matchupService.findResMatchRequestDtoByRequestId(requestId);
+        mv.addObject("resMatchupRequestDto",resMatchupRequestDto);
+        mv.setViewName("matchup/matchup-request-detail");
+        return mv;
     }
 
     // 참가 요청 목록
@@ -159,6 +171,15 @@ public class MatchupController {
     public String requestMy(){
         return "matchup/matchup-request-my";
     }
+
+    @GetMapping("/request/my/list")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupRequestListDto>>> findMyRequestAllWithPaging(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "3") int size , @AuthenticationPrincipal CustomUser user, @RequestParam("sportsType") String sportsType, @RequestParam("date") String date){
+        PageRequest pageRequest = PageRequest.of(page,size);
+        PageResponseDto<ResMatchupRequestListDto> pageResponseDto = matchupService.findMyRequestAllWithPaging(pageRequest, user, sportsType, date);
+        return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
+    }
+
 
     // 참가 요청 수정/삭제
 
@@ -168,7 +189,7 @@ public class MatchupController {
     }
 
     @PostMapping("/request/edit")
-    public String requestEdit(String tmp){
+    public String requestEdit(@ModelAttribute ReqMatchupRequestDto reqMatchupRequestDto){
         return "matchup/matchup-request-my";
     }
 
@@ -192,10 +213,10 @@ public class MatchupController {
                         .build()
         );
 
-
         return ResponseEntity.ok().headers(headers).body(resource);
     }
 
+    // presignedUrl 반환
     @GetMapping("/attachment/presigned-url")
     public ResponseEntity<ApiResponse<String>> getAttachmentUrl(@RequestParam("saved-name") String savedName) throws IOException {
 

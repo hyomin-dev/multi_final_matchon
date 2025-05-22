@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>CS</title>
+    <title>FAQ 등록</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
 
@@ -41,52 +41,73 @@
             color: #aaa;
         }
 
-        .pagination button {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #333;
-        }
-
-        .pagination button:hover {
-            color: #007bff;
-        }
-
         .titlefaq {
             text-align: center;
         }
 
         .compleate {
             float: right;
+            margin-top: 10px;
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .compleate:hover {
+            background-color: #0056b3;
+        }
+
+        .filter-cs {
+            width: 600px;
+            margin: 0 auto;
+        }
+
+        .all-list {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
     </style>
-
 </head>
 <body>
 
 <div th:replace="~{common/header::header}"></div>
+
 <div id="wrap">
     <h1 class="titlefaq">FAQ 등록</h1>
-    <div class="filter-cs">
-        <select class="all-list">
-            <option value="" selected>카테고리</option>
-            <option value="HOWTOUSE">이용방법</option>
-            <option value="ACCOUNT">계정</option>
-            <option value="TEAM_GUEST">Team / Guest</option>
-            <option value="SHOP">쇼핑몰</option>
-            <option value="REPORT">신고</option>
-            <option value="MANNER_TEMPERATURE">매너온도</option>
-        </select>
-        <div class="write-box">
-            <input type="text" placeholder="제목을 입력 해 주세요..">
-            <textarea placeholder="내용을 입력 해 주세요...."></textarea>
+
+    <form th:action="@{/faq/register}" method="post">
+        <div class="filter-cs">
+
+
+            <select class="all-list" name="faqCategory" required>
+                <option value="" disabled selected>카테고리 선택</option>
+                <option value="HOWTOUSE">이용방법</option>
+                <option value="ACCOUNT">계정</option>
+                <option value="TEAM_GUEST">Team / Guest</option>
+                <option value="SHOP">쇼핑몰</option>
+                <option value="REPORT">신고</option>
+                <option value="MANNER_TEMPERATURE">매너온도</option>
+            </select>
+
+
+            <div class="write-box">
+                <input type="text" name="faqTitle" placeholder="제목을 입력 해 주세요.." required />
+                <textarea name="faqContent" placeholder="내용을 입력 해 주세요...." required></textarea>
+            </div>
+
+
+            <button type="submit" class="compleate">작성 완료</button>
         </div>
-    </div>
-
-    <button class="compleate">작성 완료</button>
-
+    </form>
 </div>
+
 <div th:replace="~{common/footer::footer}"></div>
+
 </body>
 </html>

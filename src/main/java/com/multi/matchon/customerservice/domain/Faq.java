@@ -1,12 +1,14 @@
 package com.multi.matchon.customerservice.domain;
 
-import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -15,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name="faq")
 //@Setter: JPA entity에서 setter사용은 자제, test용
-public class Faq extends BaseEntity {
+public class Faq extends TimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="faq_id")
@@ -38,5 +40,10 @@ public class Faq extends BaseEntity {
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+
 
 }
