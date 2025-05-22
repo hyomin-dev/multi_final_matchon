@@ -8,60 +8,71 @@
 </head>
 <body class="flex-layout">
 <div class="page-wrapper">
-<div th:replace="~{common/header::header}"></div>
+    <div th:replace="~{common/header::header}"></div>
 
-<h2 class="page-title" th:text="${selectedCategory != null} ? ${selectedCategory.displayName} : '자유게시판'">자유게시판</h2>
-<div style="text-align: right; width: 90%; margin: auto;">
-    <a th:href="@{/community/new}" class="button">게시글 작성</a>
-</div>
+    <h2 class="page-title" th:text="${selectedCategory != null} ? ${selectedCategory.displayName} : '자유게시판'">자유게시판</h2>
+    <div style="text-align: right; width: 90%; margin: auto;">
+        <a th:href="@{/community/new}" class="button">게시글 작성</a>
+    </div>
 
-<!-- 카테고리 선택 드롭다운 or 탭 -->
-<div class="category-select-box">
-    <form th:action="@{/community}" method="get">
-        <select name="category" onchange="this.form.submit()" class="category-select">
+    <div class="category-select-box">
+        <select class="category-select">
             <option th:each="cat : ${categories}"
                     th:value="${cat}"
                     th:text="${cat.displayName}"
                     th:selected="${cat} == ${selectedCategory}">
             </option>
         </select>
-    </form>
-</div>
+    </div>
 
+    <div id="board-list">
+        <table>
+            <tr>
+                <th>작성자</th>
+                <th>제목</th>
+                <th>카테고리</th>
+                <th>작성일</th>
+            </tr>
+            <tr th:each="board : ${boardsPage.content}">
+                <td th:text="${board.member.memberName}"></td>
+                <td><a th:href="@{'/community/' + ${board.id}}" th:text="${board.title}"></a></td>
+                <td th:text="${board.category.displayName}"></td>
+                <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
+            </tr>
+        </table>
 
-<!-- 기존 게시글 목록 테이블 아래 그대로 유지 -->
+        <div class="pagination">
+            <a th:if="${boardsPage.hasPrevious()}" th:href="@{/community(page=${boardsPage.number - 1}, category=${selectedCategory})}">이전</a>
 
+            <a th:each="i : ${#numbers.sequence(0, boardsPage.totalPages - 1)}"
+               th:href="@{/community(page=${i}, category=${selectedCategory})}"
+               th:text="${i + 1}"
+               th:classappend="${i == boardsPage.number} ? 'active' : ''"></a>
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>제목</th>
-        <th>카테고리</th>
-        <th>작성일</th>
-    </tr>
-    <tr th:each="board : ${boardsPage.content}">
-        <td th:text="${board.id}"></td>
-        <td><a th:href="@{'/community/' + ${board.id}}" th:text="${board.title}"></a></td>
-        <td th:text="${board.category.displayName}"></td>
-        <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
-    </tr>
-</table>
+            <a th:if="${boardsPage.hasNext()}" th:href="@{/community(page=${boardsPage.number + 1}, category=${selectedCategory})}">다음</a>
+        </div>
+    </div>
 
-<div class="pagination">
-    <a th:if="${boardsPage.hasPrevious()}" th:href="@{/community(page=${boardsPage.number - 1})}">이전</a>
-
-    <a th:each="i : ${#numbers.sequence(0, boardsPage.totalPages - 1)}"
-       th:href="@{/community(page=${i})}"
-       th:text="${i + 1}"
-       th:classappend="${i == boardsPage.number} ? 'active' : ''"></a>
-
-    <a th:if="${boardsPage.hasNext()}" th:href="@{/community(page=${boardsPage.number + 1})}">다음</a>
-</div>
 </div>
 <div th:replace="~{common/footer::footer}"></div>
+
+<script>
+    document.querySelector('.category-select').addEventListener('change', function () {
+        const selectedCategory = this.value;
+
+        fetch(`/community?category=${selectedCategory}`)
+            .then(response => response.text())
+            .then(html => {
+                const tempDom = document.createElement('div');
+                tempDom.innerHTML = html;
+
+                const newBoardList = tempDom.querySelector('#board-list');
+                document.querySelector('#board-list').replaceWith(newBoardList);
+
+                const newTitle = tempDom.querySelector('.page-title');
+                document.querySelector('.page-title').textContent = newTitle.textContent;
+            });
+    });
+</script>
 </body>
 </html>
-
-
-
-

@@ -22,6 +22,11 @@
     </div>
 
     <div>
+        <label>작성자</label>
+        <input type="text" th:value="${memberName}" readonly />
+    </div>
+
+    <div>
         <label>내용</label>
         <textarea th:field="*{content}" required></textarea>
         <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
@@ -61,10 +66,8 @@
     fileInput.addEventListener('change', function () {
         const selectedFiles = Array.from(fileInput.files);
 
-        // 기존 목록 + 새 파일 합치기
         fileList = fileList.concat(selectedFiles);
 
-        // 중복 제거 (이름 기준)
         const seen = new Set();
         fileList = fileList.filter(file => {
             if (seen.has(file.name)) return false;

@@ -14,9 +14,11 @@
     <div class="post-header">
         <h2 th:text="${board.title}" class="post-title">제목</h2>
         <div class="post-meta">
+            <span><strong>작성자:</strong> <span th:text="${board.member.memberName}"></span></span>
             <span><strong>카테고리:</strong> <span th:text="${board.category.displayName}"></span></span>
             <span><strong>작성일:</strong> <span th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></span></span>
         </div>
+
     </div>
 
     <div class="post-body">

@@ -1,5 +1,6 @@
 package com.multi.matchon.community.controller;
 
+import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
 import com.multi.matchon.community.domain.Comment;
@@ -7,6 +8,7 @@ import com.multi.matchon.community.dto.req.BoardRequest;
 import com.multi.matchon.community.dto.req.CommentRequest;
 import com.multi.matchon.community.service.BoardService;
 import com.multi.matchon.community.service.CommentService;
+import com.multi.matchon.community.service.MemberDetails;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.service.MemberService;
 import jakarta.validation.Valid;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.util.UriUtils;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,10 +48,6 @@ public class BoardController {
     private final MemberService memberService;
     private final CommentService commentService;
 
-    /**
-     * 게시글 목록 조회
-     * 선택된 카테고리를 기준으로 게시글을 조회하고, view에서 동적으로 제목 변경
-     */
     @GetMapping
     public String listBy(@RequestParam(defaultValue = "FREEBOARD") Category category,
                          @RequestParam(defaultValue = "0") int page,
@@ -57,13 +56,12 @@ public class BoardController {
         Page<Board> boardsPage = boardService.findByCategory(category, pageable);
 
         model.addAttribute("boardsPage", boardsPage);
-        model.addAttribute("selectedCategory", category); // 동적 제목 변경용
+        model.addAttribute("selectedCategory", category);
         model.addAttribute("categories", Category.values());
 
-        return "community/view"; // 목록 페이지
+        return "community/view";
     }
 
-    //게시글 상세 보기
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         Board board = boardService.findById(id);
@@ -85,28 +83,32 @@ public class BoardController {
         return "community/detail";
     }
 
-
-    //게시글 작성 폼
     @GetMapping("/new")
-    public String form(Model model) {
+    public String form(Model model, @AuthenticationPrincipal CustomUser userDetails) {
+        if (userDetails == null) {
+            return "redirect:/login"; // 또는 401 에러 페이지
+        }
+
         model.addAttribute("boardRequest", new BoardRequest());
         model.addAttribute("categories", Category.values());
+        model.addAttribute("memberName", userDetails.getMember().getMemberName()); // ← 여기 주의!
+
         return "community/form";
     }
 
-    //게시글 저장 처리
     @PostMapping
     public String create(@Valid @ModelAttribute("boardRequest") BoardRequest boardRequest,
                          BindingResult bindingResult,
                          @RequestParam("files") MultipartFile[] files,
-                         Model model) throws IOException {
+                         Model model,
+                         @AuthenticationPrincipal CustomUser userDetails) throws IOException {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", Category.values());
             return "community/form";
         }
 
-        Member dummyMember = memberService.findById(1L);
+        Member loginMember = userDetails.getMember(); // 직접 사용자 꺼내기
 
         String uploadDir = System.getProperty("user.dir") + File.separator + "uploads" + File.separator;
         File dir = new File(uploadDir);
@@ -132,7 +134,7 @@ public class BoardController {
                 .title(boardRequest.getTitle())
                 .content(boardRequest.getContent())
                 .category(boardRequest.getCategory())
-                .member(dummyMember)
+                .member(loginMember)
                 .boardAttachmentEnabled(hasAttachment)
                 .attachmentPath(savedFileNames.toString())
                 .attachmentOriginalName(originalFileNames.toString())
@@ -143,7 +145,6 @@ public class BoardController {
     }
 
 
-    //댓글 작성 처리
     @PostMapping("/{id}/comments")
     public String addComment(@PathVariable Long id,
                              @Valid @ModelAttribute("commentRequest") CommentRequest commentRequest,
@@ -183,5 +184,5 @@ public class BoardController {
                 .body(resource);
     }
 
-}
 
+}
