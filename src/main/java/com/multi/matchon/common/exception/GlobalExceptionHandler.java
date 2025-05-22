@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
     }
 
     // 모든 예외 상세 메시지 반환 (개발용)
-    @ExceptionHandler(Exception.class)
+    //@ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getClass().getSimpleName() + ": " + ex.getMessage());

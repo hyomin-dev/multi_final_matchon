@@ -16,6 +16,8 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class ReqMatchupBoardDto {
 
+
+
     private String sportsTypeName;
 
     private String teamName;

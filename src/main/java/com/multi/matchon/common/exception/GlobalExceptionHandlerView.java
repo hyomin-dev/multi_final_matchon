@@ -1,0 +1,23 @@
+package com.multi.matchon.common.exception;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
+
+@ControllerAdvice(basePackages = {"com.multi.matchon"})
+@Slf4j
+public class GlobalExceptionHandlerView {
+
+    @ExceptionHandler({Exception.class})
+    public ModelAndView exceptionHandler(Exception ex){
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("main/main");
+        mv.addObject("error message",ex.getMessage());
+        log.info("error message:{} ",ex.getMessage());
+        ex.printStackTrace(); //나중에 제거
+        return mv;
+    }
+}

@@ -13,6 +13,8 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class ReqMatchupRequestDto {
 
+    private Long matchupBoardId;
+
     private SportsTypeName sportsTypeName;
 
     private String sportsFacilityName;
@@ -31,7 +33,8 @@ public class ReqMatchupRequestDto {
 
     private Integer participantCount;
 
-    public ReqMatchupRequestDto(SportsTypeName sportsTypeName, String sportsFacilityName,  String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount,  Integer maxParticipants){
+    public ReqMatchupRequestDto(Long matchupBoardId, SportsTypeName sportsTypeName, String sportsFacilityName,  String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount,  Integer maxParticipants){
+        this.matchupBoardId = matchupBoardId;
         this.currentParticipantCount = currentParticipantCount;
         this.matchDatetime = matchDatetime;
         this.matchDuration = matchDuration;

@@ -138,15 +138,17 @@ public class MatchupController {
     // 참가 요청
 
     @GetMapping("/request")
-    public ModelAndView requestRegister(@RequestParam("boardId") Long boardId, ModelAndView mv){
+    public ModelAndView requestRegister(@RequestParam("boardId") Long boardId, ModelAndView mv) throws RuntimeException {
         ReqMatchupRequestDto reqMatchupRequestDto = matchupService.findReqMatchupRequestDtoByBoardId(boardId);
         mv.addObject("reqMatchupRequestDto",reqMatchupRequestDto);
         mv.setViewName("matchup/matchup-request-register");
+
         return mv;
     }
 
     @PostMapping("/request")
-    public String requestRegister(String tmp){
+    public String requestRegister(@ModelAttribute ReqMatchupRequestDto reqMatchupRequestDto,@AuthenticationPrincipal CustomUser user){
+
         log.info("matchup request 참가 요청 완료");
         return "matchup/matchup-request-detail";
     }
@@ -195,7 +197,6 @@ public class MatchupController {
                         .filename(savedName, StandardCharsets.UTF_8)
                         .build()
         );
-
 
         return ResponseEntity.ok().headers(headers).body(resource);
     }

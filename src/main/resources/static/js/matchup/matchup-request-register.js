@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const registerDto = document.querySelector("#matchup-request-register-dto");
 
     const sportsTypeName = registerDto.dataset.sportsTypeName;
+    const sportsFacilityName = registerDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = registerDto.dataset.sportsFacilityAddress;
     const matchDatetime = registerDto.dataset.matchDatetime;
     const matchDuration = registerDto.dataset.matchDuration;
@@ -9,7 +10,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const maxParticipants = Number(registerDto.dataset.maxParticipants);
 
 
-    drawMap(sportsFacilityAddress, sportsTypeName);
+    drawMap(sportsFacilityAddress, sportsFacilityName);
     calTime(matchDatetime, matchDuration);
     setParticipantCount(currentParticipantCount, maxParticipants);
 

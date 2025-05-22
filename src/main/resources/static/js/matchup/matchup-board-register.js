@@ -46,14 +46,14 @@ function submitCheck(e){
     if(matchDate<now){
         alert(`경기 시작 시간은 현재 시간(${now})이후만 가능합니다. 다시 작성해주세요.`)
         e.preventDefault();
-    }else if(currentParticipantsCountEle.value >maxParticipantsEle.value){
+    }else if(Number(currentParticipantsCountEle.value) >Number(maxParticipantsEle.value)){
         alert(`현재 참가 인원은 총 모집 인원보다 적어야 합니다.`)
         e.preventDefault();
-    }else if(minMannerTemperatureEle.value > myMannerTemperature){
+    }else if(Number(minMannerTemperatureEle.value) > Number(myMannerTemperature)){
         alert(`하한 매너 온도는 작성자의 매너온도(${myMannerTemperature})이하로 지정해주세요.`)
         e.preventDefault();
-    }
-    alert("submit")
+    }else
+        alert("submit")
 }
 
 async function getSportsType(){
