@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/event/event-detail.css}">
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7bb155da95fb31682683d7bb286174d2&libraries=services"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services"></script>
 
 </head>
 <body>
