@@ -6,6 +6,7 @@ import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
@@ -92,7 +93,6 @@ public class MatchupRequestService {
     @Transactional(readOnly = true)
     public ResMatchupRequestDto findResMatchRequestDtoByRequestId(Long requestId) {
 
-
         return matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException(requestId+"번 요청은 없습니다."));
 
     }
@@ -100,8 +100,18 @@ public class MatchupRequestService {
     @Transactional(readOnly = true)
     public ReqMatchupRequestDto findReqMatchupRequestDtoByBoardId(Long boardId) {
 
-       return matchupRequestRepository.findReqMatchupRequestDtoByBoardId(boardId).orElseThrow(()->new IllegalArgumentException(boardId+"번 게시글이 업습니다."));
+       return matchupBoardRepository.findReqMatchupRequestDtoByBoardId(boardId).orElseThrow(()->new IllegalArgumentException(boardId+"번 게시글이 업습니다."));
     }
+
+
+    @Transactional
+    public void updateMatchupRequest(ResMatchupRequestDto resMatchupRequestDto, Long requestId) {
+        MatchupRequest findMatchupRequest = matchupRequestRepository.findById(requestId).orElseThrow(()->new IllegalArgumentException(requestId+"번 요청글이 없습니다."));
+
+        findMatchupRequest.update(resMatchupRequestDto.getSelfIntro(), resMatchupRequestDto.getParticipantCount());
+
+    }
+
 
     // 수정
 

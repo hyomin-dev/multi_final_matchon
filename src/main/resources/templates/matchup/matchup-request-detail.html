@@ -69,11 +69,15 @@
             <td id="match-date"></td>
         </tr>
         <tr>
+            <th>현재 정원:</th>
+            <td th:text="'(' + ${resMatchupRequestDto.currentParticipantCount} + '/' + ${resMatchupRequestDto.maxParticipants} +')'"></td>
+        </tr>
+        <tr>
             <th>신청 인원:</th>
             <td th:text="${resMatchupRequestDto.participantCount}"></td>
         </tr>
         <tr>
-            <th>신청 가능 여부</th>
+            <th>요청 상태:</th>
             <td th:text="${resMatchupRequestDto.matchupStatus}"></td>
         </tr>
     </table>

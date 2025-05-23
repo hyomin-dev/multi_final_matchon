@@ -87,6 +87,20 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     @Query("select t1 from MatchupBoard t1 join fetch t1.member t2 join fetch t1.member.team t3 join fetch t1.sportsType t4 where t1.id=:boardId and t1.isDeleted=false")
     Optional<MatchupBoard> findMatchupBoardByBoardId(@Param("boardId") Long boardId);
 
+    @Query("""
+            select new com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto(
+            t1.id,
+            t2.sportsTypeName,
+            t1.sportsFacilityName,
+            t1.sportsFacilityAddress,
+            t1.matchDatetime,
+            t1.matchDuration,
+            t1.currentParticipantCount,
+            t1.maxParticipants)
+            from MatchupBoard t1 join t1.sportsType t2
+            where t1.id =:boardId and t1.isDeleted=false
+            """)
+    Optional<ReqMatchupRequestDto> findReqMatchupRequestDtoByBoardId(@Param("boardId") Long boardId);
 
 
 

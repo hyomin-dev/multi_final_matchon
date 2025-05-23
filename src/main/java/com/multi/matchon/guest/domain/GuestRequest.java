@@ -54,8 +54,18 @@ public class GuestRequest extends BaseEntity {
     @Column(name="match_description",nullable = false,columnDefinition = "TEXT")
     private String matchDescription;
 
-    @Column(name="status",nullable = false, columnDefinition = "ENUM('PENDING', 'APPROVED', 'DENIED') NOT NULL DEFAULT 'PENDING'")
-    private Status guestStatus;
+    @Column(name="status",nullable = false, columnDefinition = "ENUM('PENDING', 'APPROVED', 'DENIED', 'CANCELREQUESTED') NOT NULL DEFAULT 'PENDING'")
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Status guestStatus = Status.PENDING;
+
+    @Column(name="request_resubmitted_count")
+    @Builder.Default
+    private Integer guestRequestResubmittedCount = 0;
+
+    @Column(name="cancel_resubmitted_count")
+    @Builder.Default
+    private Integer guestCancelResubmittedCount = 0;
 
     @Column(name="is_deleted")
     @Builder.Default

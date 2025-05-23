@@ -4,6 +4,7 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.service.MatchupRequestService;
@@ -70,16 +71,19 @@ public class MatchupRequestController {
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
     }
 
-
     // 참가 요청 수정/삭제
 
     @GetMapping("/edit")
-    public String showMatchupRequestEditPage(@RequestParam("request-id") Long requestId, @AuthenticationPrincipal CustomUser user){
-        return "matchup/matchup-request-edit";
+    public ModelAndView showMatchupRequestEditPage(@RequestParam("request-id") Long requestId, @AuthenticationPrincipal CustomUser user, ModelAndView mv){
+        ResMatchupRequestDto resMatchupRequestDto = matchupRequestService.findResMatchRequestDtoByRequestId(requestId);
+        mv.addObject("resMatchupRequestDto",resMatchupRequestDto);
+        mv.setViewName("matchup/matchup-request-edit");
+        return mv;
     }
 
     @PostMapping("/edit")
-    public String editMatchupRequest(@ModelAttribute ReqMatchupRequestDto reqMatchupRequestDto){
+    public String editMatchupRequest(@ModelAttribute ResMatchupRequestDto resMatchupRequestDto, @RequestParam("request-id") Long requestId){
+        matchupRequestService.updateMatchupRequest(resMatchupRequestDto, requestId);
         return "matchup/matchup-request-my";
     }
 

@@ -30,6 +30,8 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             t2.sportsFacilityAddress,
             t2.matchDatetime,
             t2.matchDuration,
+            t2.currentParticipantCount,
+            t2.maxParticipants,
             t1.participantCount,
             t1.matchupStatus
             )
@@ -58,6 +60,8 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             t3.sportsFacilityAddress,
             t3.matchDatetime,
             t3.matchDuration,
+            t3.currentParticipantCount,
+            t3.maxParticipants,
             t1.participantCount,
             t1.matchupStatus,
             t1.selfIntro
@@ -71,20 +75,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             """)
     Optional<ResMatchupRequestDto> findResMatchupRequestDtoByRequestId(Long requestId);
 
-    @Query("""
-            select new com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto(
-            t1.id,
-            t2.sportsTypeName,
-            t1.sportsFacilityName,
-            t1.sportsFacilityAddress,
-            t1.matchDatetime,
-            t1.matchDuration,
-            t1.currentParticipantCount,
-            t1.maxParticipants)
-            from MatchupBoard t1 join t1.sportsType t2
-            where t1.id =:boardId and t1.isDeleted=false
-            """)
-    Optional<ReqMatchupRequestDto> findReqMatchupRequestDtoByBoardId(@Param("boardId") Long boardId);
+
 
     @Query("""
         select case
