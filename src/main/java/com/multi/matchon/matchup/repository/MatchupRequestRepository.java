@@ -75,20 +75,43 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             """)
     Optional<ResMatchupRequestDto> findResMatchupRequestDtoByRequestId(Long requestId);
 
-
+    @Query("""
+            select case
+                    when count(t1)>0 then true
+                    else false
+                end
+                from MatchupRequest t1
+                where t1.matchupBoard.id =:boardId and t1.member.id =:memberId and t1.isDeleted=true
+            """)
+    Boolean isCanceledMatchupRequestByBoardIdAndMemberId(@Param("boardId") Long boardId, @Param("memberId") Long memberId);
 
     @Query("""
         select case
-           when count(t1) > 0 then true 
-           else false 
+                when count(t1) > 0 then true
+                else false
            end
-        from MatchupRequest t1             
-        where (t1.matchupBoard.id =:boardId and t1.member.id=:memberId and t1.isDeleted=false) and                
+        from MatchupRequest t1
+        where (t1.matchupBoard.id =:boardId and t1.member.id=:memberId and t1.isDeleted=false) and
                   t1.matchupStatus in (
                     com.multi.matchon.common.domain.Status.PENDING,
-                    com.multi.matchon.common.domain.Status.APPROVED
+                    com.multi.matchon.common.domain.Status.APPROVED,
+                    com.multi.matchon.common.domain.Status.CANCELREQUESTED
                 )
         """)
-    Boolean isAlreadyRequestedByBoardIdAndMemberId(@Param("boardId") Long boardId,@Param("memberId") Long memberId); // true: 중복된 요청이 존재, false: 중복된 요청이 없음
+    Boolean isAlreadyMatchupRequestedByBoardIdAndMemberId(@Param("boardId") Long boardId,@Param("memberId") Long memberId); // true: 중복된 요청이 존재, false: 중복된 요청이 없음
+
+    @Query("""
+            select case
+                    when count(t1) >0 then true
+                    else false
+                end
+            from MatchupRequest t1
+            where t1.matchupBoard.id =:boardId and t1.member.id =:memberId and t1.isDeleted=false and
+                t1.matchupStatus =com.multi.matchon.common.domain.Status.DENIED and
+                t1.matchupRequestResubmittedCount>=2
+            """)
+    Boolean hasExceededThreeMatchupRequestsByBoardIdAndMemberId(@Param("boardId") Long boardId, @Param("memberId") Long memberId);
+
+
 
 }

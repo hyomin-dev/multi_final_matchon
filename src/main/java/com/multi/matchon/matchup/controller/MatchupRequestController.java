@@ -41,7 +41,7 @@ public class MatchupRequestController {
     @PostMapping()
     public String registerMatchupRequest(@ModelAttribute ReqMatchupRequestDto reqMatchupRequestDto, @AuthenticationPrincipal CustomUser user){
 
-        matchupRequestService.registerMatchupRequest(reqMatchupRequestDto, user.getMember());
+        matchupRequestService.registerMatchupRequest(reqMatchupRequestDto, user);
         log.info("matchup request 참가 요청 완료");
         return "matchup/matchup-request-my";
     }
@@ -81,11 +81,11 @@ public class MatchupRequestController {
         return mv;
     }
 
-    @PostMapping("/edit")
-    public String editMatchupRequest(@ModelAttribute ResMatchupRequestDto resMatchupRequestDto, @RequestParam("request-id") Long requestId){
-        matchupRequestService.updateMatchupRequest(resMatchupRequestDto, requestId);
-        return "matchup/matchup-request-my";
-    }
+//    @PostMapping("/edit")
+//    public String editMatchupRequest(@ModelAttribute ResMatchupRequestDto resMatchupRequestDto, @RequestParam("request-id") Long requestId){
+//        matchupRequestService.updateMatchupRequest(resMatchupRequestDto, requestId);
+//        return "matchup/matchup-request-my";
+//    }
 
     @GetMapping("/delete")
     public String deleteMatchupRequest(){

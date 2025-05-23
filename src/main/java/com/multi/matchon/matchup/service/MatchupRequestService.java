@@ -4,6 +4,8 @@ package com.multi.matchon.matchup.service;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.dto.res.PageResponseDto;
+import com.multi.matchon.common.exception.custom.CancelMatchupRequestException;
+import com.multi.matchon.common.exception.custom.MatchupRequestLimitExceededException;
 import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
@@ -34,29 +36,36 @@ public class MatchupRequestService {
     // 등록
 
     @Transactional
-    public void registerMatchupRequest(ReqMatchupRequestDto reqMatchupRequestDto, Member member) {
+    public void registerMatchupRequest(ReqMatchupRequestDto reqMatchupRequestDto, CustomUser user) {
 
-        Boolean isDuplicate = matchupRequestRepository.isAlreadyRequestedByBoardIdAndMemberId(reqMatchupRequestDto.getBoardId(), member.getId());
+        // 1. 취소이력 검사
+        Boolean isCanceled = matchupRequestRepository.isCanceledMatchupRequestByBoardIdAndMemberId(reqMatchupRequestDto.getBoardId(), user.getMember().getId());
+        if(isCanceled)
+            throw new CancelMatchupRequestException("취소 이력이 있어 Matchup 참가 요청이 불가능합니다.");
 
-        // isDeleted=true ---> result = false, 재요청 가능, 중복 검사 성공
-        // status=pending, isDeleted=false  ----> result = true, 재요청 불가능, 중복 검사 성공,
-        // status=approved, isDeleted=false ----> result = true, 재요청 불가능, 중복 검사 성공
-        // status=denied, isDeleted=false ---> result = false, 재요청 가능, 중복 검사 성공
-
+        // 2. 중복 검사
+        Boolean isDuplicate = matchupRequestRepository.isAlreadyMatchupRequestedByBoardIdAndMemberId(reqMatchupRequestDto.getBoardId(), user.getMember().getId());
         if(isDuplicate)
-            throw new DuplicateRequestException("matchup 중복된 참가 요청입니다.");
-        else{
-            MatchupRequest matchupRequest = MatchupRequest.builder()
+            throw new DuplicateRequestException("중복된 Matchup 참가 요청입니다.");
+
+
+        // 3. 재요청이 4번 이상인지 체크(3번까지는 요청 가능)
+        Boolean isExceed = matchupRequestRepository.hasExceededThreeMatchupRequestsByBoardIdAndMemberId(reqMatchupRequestDto.getBoardId(), user.getMember().getId());
+        if(isExceed)
+            throw new MatchupRequestLimitExceededException("Matchup 참가 요청을 3번 하셔서 더 이상 요청은 불가능 합니다.");
+
+         MatchupRequest matchupRequest = MatchupRequest.builder()
                     .matchupBoard(matchupBoardRepository.findById(reqMatchupRequestDto.getBoardId()).orElseThrow(()-> new IllegalArgumentException(reqMatchupRequestDto.getBoardId()+"번 게시글은 없습니다.")))
-                    .member(member)
+                    .member(user.getMember())
                     .selfIntro(reqMatchupRequestDto.getSelfIntro())
+                    .matchupRequestResubmittedCount(0)
                     .participantCount(reqMatchupRequestDto.getParticipantCount())
                     .build();
             matchupRequestRepository.save(matchupRequest);
         }
 
         //log.info("result = {}",isDuplicate);
-    }
+    
 
 
     // 조회
@@ -92,7 +101,8 @@ public class MatchupRequestService {
 
     @Transactional(readOnly = true)
     public ResMatchupRequestDto findResMatchRequestDtoByRequestId(Long requestId) {
-
+        
+    
         return matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException(requestId+"번 요청은 없습니다."));
 
     }
@@ -104,13 +114,13 @@ public class MatchupRequestService {
     }
 
 
-    @Transactional
-    public void updateMatchupRequest(ResMatchupRequestDto resMatchupRequestDto, Long requestId) {
-        MatchupRequest findMatchupRequest = matchupRequestRepository.findById(requestId).orElseThrow(()->new IllegalArgumentException(requestId+"번 요청글이 없습니다."));
-
-        findMatchupRequest.update(resMatchupRequestDto.getSelfIntro(), resMatchupRequestDto.getParticipantCount());
-
-    }
+//    @Transactional
+//    public void updateMatchupRequest(ResMatchupRequestDto resMatchupRequestDto, Long requestId) {
+//        MatchupRequest findMatchupRequest = matchupRequestRepository.findById(requestId).orElseThrow(()->new IllegalArgumentException(requestId+"번 요청글이 없습니다."));
+//
+//        findMatchupRequest.update(resMatchupRequestDto.getSelfIntro(), resMatchupRequestDto.getParticipantCount());
+//
+//    }
 
 
     // 수정
