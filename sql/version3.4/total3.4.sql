@@ -531,58 +531,6 @@ ALTER TABLE faq ADD CONSTRAINT uq_unique_faq UNIQUE (faq_category, faq_title, fa
 INSERT INTO sports_type (sports_type_name)
 VALUES ('SOCCER');
 
-INSERT INTO member (
-    member_email,
-    member_password,
-    member_role,
-    is_deleted
-)
-VALUES (
-    'admin@matchon.com',
-    '$2a$10$/7307rNefJWazcNC7.AYPegSYUZ7a0X61ouK6SnuMOg9u2cGvhEYa', -- "admin1234" 암호화된 값
-    'ADMIN',
-    false
-);
-
-INSERT INTO positions (sports_type_id, position_name)
-VALUES (1, 'FW');
-
-SELECT * FROM sports_type;
-
-INSERT INTO positions (position_name) VALUES
-('GOALKEEPER'),
-('CENTER_BACK'),
-('LEFT_RIGHT_BACK'),
-('LEFT_RIGHT_WING_BACK'),
-('CENTRAL_DEFENSIVE_MIDFIELDER'),
-('CENTRAL_MIDFIELDER'),
-('CENTRAL_ATTACKING_MIDFIELDER'),
-('LEFT_RIGHT_WING'),
-('STRIKER_CENTER_FORWARD'),
-('SECOND_STRIKER'),
-('LEFT_RIGHT_WINGER');
-
-
-SELECT * FROM member WHERE member_email = 'user01@test.com';
-
-
-
-
-SELECT m.member_id, m.member_email, p.position_name
-FROM member m
-LEFT JOIN positions p ON m.position_id = p.position_id
-WHERE m.member_email = 'user01@test.com';
-
-
-DELETE FROM refresh_token
-WHERE member_id = 1
-AND refresh_token_id NOT IN (
-    SELECT * FROM (
-        SELECT MIN(refresh_token_id)
-        FROM refresh_token
-        WHERE member_id = 1
-    ) AS temp
-);
 
 
 
