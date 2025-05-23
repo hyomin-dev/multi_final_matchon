@@ -1,62 +1,108 @@
 
-/* 제목 정렬 */
+
+
+/* 제목 */
 h1 {
     text-align: center;
-    margin-bottom: 24px;
-    font-size: 24px;
+    margin-bottom: 2rem;
 }
 
-/* 테이블 전체 스타일 */
+/* 테이블 구조 */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 24px;
-    font-size: 14px;
+    margin-bottom: 2rem;
 }
 
-/* 테이블 행 간격 */
-table tr {
-    border-bottom: 1px solid #ccc;
-}
-
-/* 헤더 셀 */
-table th {
+th, td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #ddd;
     text-align: left;
-    width: 35%;
-    padding: 10px;
-    background-color: #f5f5f5;
-    font-weight: bold;
-    vertical-align: top;
 }
 
-/* 데이터 셀 */
-table td {
-    padding: 10px;
+th {
+    background-color: #f8f8f8;
+    width: 20%;
+    font-weight: bold;
+}
+
+td {
     background-color: #fff;
 }
 
-/* 버튼 영역 */
+/* 지도 */
+#map {
+    width: 100%;
+    height: 350px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+/* 링크 버튼 */
 a#modify,
-a[href*="문의하기"],
-a[href*="참가요청"] {
+a#chat1-1Btn,
+a#requestBtn {
     display: inline-block;
-    margin-right: 10px;
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 4px;
+    margin: 0.5rem 0.5rem 0 0;
+    padding: 8px 14px;
+    border-radius: 6px;
     text-decoration: none;
     font-weight: bold;
+    color: white;
+}
+
+#modify {
+    background-color: #007a00;
+}
+
+#chat1-1Btn {
+    background-color: #004080;
+}
+
+#requestBtn {
+    background-color: #c0392b;
 }
 
 a#modify:hover,
-a[href*="문의하기"]:hover,
-a[href*="참가요청"]:hover {
-    background-color: #0056b3;
+a#chat1-1Btn:hover,
+a#requestBtn:hover {
+    opacity: 0.9;
 }
 
-/* 지도 영역 */
-#map {
-    border: 1px solid #ccc;
-    border-radius: 4px;
+/* 버튼 컨테이너: 가운데 정렬 */
+.button-group {
+    display: flex;
+    justify-content: center; /* 가로 가운데 정렬 */
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* 공통 버튼 스타일 */
+.button-group a {
+    display: inline-block;
+    margin: 0.5rem;
+    padding: 10px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    color: white;
+}
+
+/* 각 버튼 색상 */
+a#modify {
+    background-color: #007a00;
+}
+
+a#chat1-1Btn {
+    background-color: #004080;
+}
+
+a#requestBtn {
+    background-color: #c0392b;
+}
+
+.button-group a:hover {
+    opacity: 0.9;
 }

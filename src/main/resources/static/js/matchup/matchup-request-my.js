@@ -48,14 +48,15 @@ function renderList(items){
         card.innerHTML = `
             <div class="card-content">
                 <div class="left-info">
-                    <div><strong>참여 인원: ${item.participantCount}</strong></div>
+                    <div><strong>현재 정원: (${item.currentParticipantCount} / ${item.maxParticipants})</strong></div>
+                    <div><strong>신청 인원: ${item.participantCount}</strong></div>
                     <div><strong>요청 상태: ${item.matchupStatus}</strong></div>
                     <div><strong>경기 상태: ${checkMatchStatus(item)}</strong></div>
                     <div class="button-group">
                         <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
                             <button class="detail">게시글 상세보기</button>
                         </a>
-                        <a href="#">
+                        <a href="/matchup/request/detail?request-id=${item.requestId}">
                             <button class="detail">요청 상세보기</button>
                         </a>
                     </div>

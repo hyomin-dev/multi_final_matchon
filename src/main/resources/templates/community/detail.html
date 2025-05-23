@@ -28,9 +28,6 @@
                 <span><strong>작성일:</strong> <span th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></span></span>
             </div>
 
-
-        </div>
-
         <div class="post-body">
             <p th:text="${board.content}" class="post-content"></p>
 
@@ -49,6 +46,7 @@
             <a th:href="@{/community}" class="back-link"> 목록으로 </a>
         </div>
     </div>
+
 
     <div class="comment-section">
         <h3>댓글</h3>
@@ -75,7 +73,7 @@
 
     </div>
 </div>
-
+  
 <div th:replace="~{common/footer::footer}"></div>
 </body>
 </html>

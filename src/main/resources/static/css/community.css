@@ -281,6 +281,23 @@ form .error {
     cursor: default;
 }
 
+.attachment-box ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-top: 5px;
+}
+
+.attachment-box li {
+    margin-bottom: 4px;
+}
+
+.attachment-box a {
+    color: #007bff;
+    text-decoration: underline;
+    word-break: break-word;
+}
+
+
 
 
 

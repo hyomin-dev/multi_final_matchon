@@ -8,6 +8,7 @@ import com.multi.matchon.community.dto.req.BoardRequest;
 import com.multi.matchon.community.dto.req.CommentRequest;
 import com.multi.matchon.community.service.BoardService;
 import com.multi.matchon.community.service.CommentService;
+import com.multi.matchon.community.service.MemberDetails;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.service.MemberService;
 import jakarta.validation.Valid;
@@ -108,6 +109,7 @@ public class BoardController {
             return "community/form";
         }
 
+
         Member loginMember = userDetails.getMember();
 
         String uploadDir = System.getProperty("user.dir") + File.separator + "uploads" + File.separator;
@@ -169,7 +171,6 @@ public class BoardController {
         return "redirect:/community/" + id;
     }
 
-
     @GetMapping("/download/{filename}")
     @ResponseBody
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
@@ -186,6 +187,7 @@ public class BoardController {
                 .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(filePath))
                 .body(resource);
     }
+
 
     @PostMapping("/{boardId}/comments/{commentId}/delete")
     public String deleteComment(@PathVariable Long boardId,

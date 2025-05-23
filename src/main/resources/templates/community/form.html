@@ -9,6 +9,7 @@
 </head>
 <body class="flex-layout">
 <div class="page-wrapper">
+3
     <div th:replace="~{common/header::header}"></div>
 
     <h2 style="text-align: center;">게시글 작성</h2>
@@ -26,7 +27,6 @@
                 <input type="text" th:value="${memberName}" readonly class="readonly-coral" />
             </div>
 
-
             <div>
                 <label>카테고리</label>
                 <select th:field="*{category}" required>
@@ -37,6 +37,7 @@
                 </select>
                 <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
             </div>
+
 
             <div>
                 <label>내용</label>
@@ -56,7 +57,7 @@
         </form>
     </div>
 </div>
-
+  
 <div th:replace="~{common/footer::footer}"></div>
 
 <script>
@@ -115,4 +116,63 @@
     }
 </script>
 </body>
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    let fileList = [];
+
+    fileInput.addEventListener('change', function () {
+        const selectedFiles = Array.from(fileInput.files);
+
+        fileList = fileList.concat(selectedFiles);
+
+        const seen = new Set();
+        fileList = fileList.filter(file => {
+            if (seen.has(file.name)) return false;
+            seen.add(file.name);
+            return true;
+        });
+
+        updatePreview();
+    });
+
+    function updatePreview() {
+        filePreview.innerHTML = '';
+        fileList.forEach((file, index) => {
+            const previewBox = document.createElement('div');
+            previewBox.style.display = 'flex';
+            previewBox.style.alignItems = 'center';
+            previewBox.style.justifyContent = 'space-between';
+            previewBox.style.marginBottom = '5px';
+            previewBox.style.gap = '10px';
+
+            const fileNameSpan = document.createElement('span');
+            fileNameSpan.textContent = file.name;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'x';
+            deleteBtn.type = 'button';
+            deleteBtn.style.color = 'red';
+            deleteBtn.style.border = 'none';
+            deleteBtn.style.background = 'transparent';
+            deleteBtn.style.cursor = 'pointer';
+
+            deleteBtn.onclick = function () {
+                fileList.splice(index, 1); // 목록에서 제거
+                updatePreview(); // 다시 그리기
+            };
+
+            previewBox.appendChild(fileNameSpan);
+            previewBox.appendChild(deleteBtn);
+            filePreview.appendChild(previewBox);
+        });
+
+        // 새 FileList 생성
+        const dataTransfer = new DataTransfer();
+        fileList.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+    }
+</script>
+
+
 </html>

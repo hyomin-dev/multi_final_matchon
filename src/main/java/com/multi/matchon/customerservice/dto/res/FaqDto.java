@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class FaqDto {
 
-    private Long id;
+    private Long faqId; // ← id → faqId로 변경
     private Member member;
     private CustomerServiceType faqCategory;
     private String faqTitle;
@@ -24,14 +24,14 @@ public class FaqDto {
     private LocalDateTime createdDate;
 
     @Builder
-    public FaqDto(Long id,
+    public FaqDto(Long faqId,
                   Member member,
                   CustomerServiceType faqCategory,
                   String faqTitle,
                   String faqContent,
                   Boolean isDeleted,
                   LocalDateTime createdDate) {
-        this.id = id;
+        this.faqId = faqId;
         this.member = member;
         this.faqCategory = faqCategory;
         this.faqTitle = faqTitle;
@@ -40,10 +40,9 @@ public class FaqDto {
         this.createdDate = createdDate;
     }
 
-
     public FaqDto withMember(Member member) {
         return FaqDto.builder()
-                .id(this.id)
+                .faqId(this.faqId)
                 .member(member)
                 .faqCategory(this.faqCategory)
                 .faqTitle(this.faqTitle)
@@ -53,10 +52,9 @@ public class FaqDto {
                 .build();
     }
 
-
     public Faq toEntity() {
         return Faq.builder()
-                .id(id)
+                .id(faqId)
                 .member(member)
                 .faqCategory(faqCategory)
                 .faqTitle(faqTitle)
@@ -64,4 +62,25 @@ public class FaqDto {
                 .isDeleted(isDeleted != null ? isDeleted : false)
                 .build();
     }
+
+    // 중복된 데이터 제거(FaqService.java)할려면 이거 필요함...
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FaqDto)) return false;
+        FaqDto that = (FaqDto) o;
+        return faqCategory == that.faqCategory &&
+                ((faqTitle == null && that.faqTitle == null) || (faqTitle != null && faqTitle.equals(that.faqTitle))) &&
+                ((faqContent == null && that.faqContent == null) || (faqContent != null && faqContent.equals(that.faqContent)));
+    }
+
+    @Override
+    public int hashCode() {
+        int result = faqCategory != null ? faqCategory.hashCode() : 0;
+        result = 31 * result + (faqTitle != null ? faqTitle.hashCode() : 0);
+        result = 31 * result + (faqContent != null ? faqContent.hashCode() : 0);
+        return result;
+    }
+
+
 }

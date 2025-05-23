@@ -1,12 +1,29 @@
 let myMannerTemperature;
+let sportsType = '';
+let dateFilter = '';
 document.addEventListener("DOMContentLoaded",async ()=>{
+
+
+    document.querySelector("#sports-type").addEventListener("change",(e)=>{
+        sportsType = e.target.value;
+    })
+
+    document.querySelector("#date-filter").addEventListener("change",(e)=>{
+        dateFilter = e.target.value;
+        //console.log(dateFilter);
+    })
+
+    document.querySelector("#filterBtn").addEventListener("click",()=>{
+        loadItems(1, sportsType, dateFilter);
+    })
+
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
 
 
 })
 
-async function loadItems(page){
-    const response = await fetch(`/matchup/board/my/list?page=${page-1}`,{
+async function loadItems(page, sportsType='', dateFilter=''){
+    const response = await fetch(`/matchup/board/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}`,{
         method: "GET",
         credentials: "include"
 
@@ -20,7 +37,7 @@ async function loadItems(page){
     //console.log(pageInfo);
 
     renderList(items);
-    renderPagination(pageInfo)
+    renderPagination(pageInfo , sportsType, dateFilter);
 
 }
 function renderList(items){
@@ -33,37 +50,38 @@ function renderList(items){
         const card = document.createElement("div");
         card.className = "matchup-card";
         card.innerHTML = `
-            <table>
-                <tr>
-                    <td class="center">
-                        <div><strong>작성자: ${item.writer}</strong></div>
-                        <div><strong>팀 이름: ${item.teamName}</strong></div>
-                        <div>
-                            <a href="/matchup/board/detail?matchup-board-id=${item.boardId}"><button class="detail">상세보기</button></a>
-                            <button class="request">요청 확인</button>
-                        </div>
-                        
-                    </td>
-                    <td class="center">
-                        <div><strong>종목: ${item.sportsTypeName}</strong></div>
-                        <div><strong>경기장: ${item.sportsFacilityName}</strong></div>
-                         <div>경기장 주소: ${item.sportsFacilityAddress}</div>  
-                        <div>📅 날짜: ${date.getMonth()+1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - ${calTime(item,date.getHours(), date.getMinutes())}</div>
-                                     
-                    </td>
-                    <td class="center">
-                        <div>${checkStatus(item)}</div>
-                        <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>                    
-                    </td>
-                </tr>
-            </table>            
+             <div class="card-section center">
+                <div><strong>작성자:</strong> ${item.memberName}</div>
+                <div><strong>팀 이름:</strong> ${item.teamName}</div>
+                <div>
+                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
+                        <button class="detail">상세보기</button>
+                    </a>
+                    <button class="request">요청 확인</button>
+                </div>
+            </div>
+
+            <div class="card-section center">
+                <div><strong>종목:</strong> ${item.sportsTypeName}</div>
+                <div><strong>경기장:</strong> ${item.sportsFacilityName}</div>
+                <div><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
+                <div>
+                    📅 날짜: ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 -
+                    ${calTime(item, date.getHours(), date.getMinutes())}
+                </div>
+            </div>
+
+            <div class="card-section center">
+                <div>${checkStatus(item)}</div>
+                <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>
+            </div>    
                 `;
         boardArea.appendChild(card);
 
     })
 }
 
-function renderPagination(pageInfo){
+function renderPagination(pageInfo, sportsType, dateFilter){
     // 프론트는 페이지 시작번호 1부터로 헷갈림
     const pageBlockSize = 5;
     // 프론트 측 page 시작 번호 1부터 변경
@@ -83,7 +101,7 @@ function renderPagination(pageInfo){
         const firstBtn = document.createElement("button");
         firstBtn.textContent = "<<";
         firstBtn.addEventListener("click",()=>{
-            loadItems(1);
+            loadItems(1, sportsType, dateFilter);
         });
         pagingArea.appendChild(firstBtn);
     }
@@ -93,7 +111,7 @@ function renderPagination(pageInfo){
         const prevBtn = document.createElement("button");
         prevBtn.textContent = "<";
         prevBtn.addEventListener("click",()=>{
-            loadItems(startPage-1);
+            loadItems(startPage-1, sportsType, dateFilter);
         });
         pagingArea.appendChild(prevBtn);
     }
@@ -106,7 +124,7 @@ function renderPagination(pageInfo){
             btn.disabled = true;
 
         btn.addEventListener("click",()=>{
-            loadItems(i);
+            loadItems(i, sportsType, dateFilter);
         })
         pagingArea.appendChild(btn);
     }
@@ -116,7 +134,7 @@ function renderPagination(pageInfo){
         const nextBtn = document.createElement("button");
         nextBtn.textContent = ">";
         nextBtn.addEventListener("click",()=>{
-            loadItems(endPage+1);
+            loadItems(endPage+1, sportsType, dateFilter);
         })
         pagingArea.appendChild(nextBtn);
     }
@@ -127,7 +145,7 @@ function renderPagination(pageInfo){
         const lastBtn = document.createElement("button");
         lastBtn.textContent  = ">>";
         lastBtn.addEventListener("click",()=>{
-            loadItems(pageInfo.totalPages);
+            loadItems(pageInfo.totalPages, sportsType, dateFilter);
         })
         pagingArea.appendChild(lastBtn);
 
