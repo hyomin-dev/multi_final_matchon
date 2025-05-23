@@ -6,14 +6,18 @@ import com.multi.matchon.customerservice.service.FaqService;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,28 +30,26 @@ public class FaqController {
     @GetMapping("/cs")
     public String faqShow(@RequestParam(required = false) CustomerServiceType category,
                           @RequestParam(required = false) String keyword,
+                          // DESC : 내림차순(최신 데이터가 먼저 추가됨..), ASC : 오름차순(최신 데이터를 뒤로 보냄..)
+                          @PageableDefault(size = 8, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
                           Model model) {
 
-        List<FaqDto> faqList;
+        Page<FaqDto> faqPage;
 
         if (keyword != null && !keyword.isBlank()) {
             if (category != null) {
-                faqList = faqService.searchByCategoryAndTitle(category, keyword);
+                faqPage = faqService.searchByCategoryAndTitlePaged(category, keyword, pageable);
             } else {
-                faqList = faqService.searchByTitle(keyword);
+                faqPage = faqService.searchByTitlePaged(keyword, pageable);
             }
         } else {
-            faqList = faqService.getFaqList(category);
+            faqPage = faqService.getFaqListPaged(category, pageable);
         }
 
-        // 로그 출력
-        System.out.println("선택된 카테고리: " + category);
-        System.out.println("입력된 키워드: " + keyword);
-        faqList.forEach(f -> System.out.println("조회된 제목: " + f.getFaqTitle()));
-
-        model.addAttribute("faqList", faqList);
+        model.addAttribute("faqList", faqPage.getContent());
+        model.addAttribute("page", faqPage);
         model.addAttribute("category", category);
-        model.addAttribute("keyword", keyword); // 검색창 입력값 유지용
+        model.addAttribute("keyword", keyword);
         return "cs/cs";
     }
 
@@ -80,9 +82,16 @@ public class FaqController {
                 .faqCategory(faqCategory)
                 .build();
 
-        faqService.savePost(faqDto.withMember(member));
+        Long savedId = faqService.savePost(faqDto.withMember(member));
 
         return "redirect:/cs";
     }
 
+    // faq 상세보기
+    @GetMapping("/faq/detail/{id}")
+    public String detail(@PathVariable Long id, Model model) {
+        FaqDto faqDto = faqService.getFaqById(id);
+        model.addAttribute("faqDto", faqDto);
+        return "cs/cs-faq-detail";
+    }
 }

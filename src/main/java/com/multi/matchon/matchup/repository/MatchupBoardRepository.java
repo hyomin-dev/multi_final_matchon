@@ -3,6 +3,7 @@ package com.multi.matchon.matchup.repository;
 
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.matchup.domain.MatchupBoard;
+import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,7 @@ import java.util.Optional;
 
 @Repository
 public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Long> {
-    List<MatchupBoard> findAll();
+    //List<MatchupBoard> findAll();
 
     @Query("select t1 from MatchupBoard t1 join fetch t1.member where t1.isDeleted=false")
     List<MatchupBoard> findAllWithMember();
@@ -26,7 +27,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     List<MatchupBoard> findAllWithMemberAndWithSportsType();
 
     @Query("select t1 from MatchupBoard t1 join fetch t1.sportsType where t1.id=:boardId and t1.isDeleted=false ")
-    Optional<MatchupBoard> findByIdAndIsDeleted(@Param("boardId") Long boardId);
+    Optional<MatchupBoard> findMatchupBoardByBoardIdAndIsDeleted(@Param("boardId") Long boardId);
 
 
     @Query("""
@@ -34,6 +35,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             .ResMatchupBoardListDto( 
             t1.id,
             t2.memberEmail,
+            t2.memberName,
             t3.teamName,
             t4.sportsTypeName,
             t1.sportsFacilityName,
@@ -53,13 +55,14 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
                     (t1.isDeleted=false)
             order by t1.createdDate DESC
             """)
-    Page<ResMatchupBoardListDto> findBoardListWithPaging(Pageable pageable, @Param("sportsType") SportsTypeName sportsType, @Param("region") String region, @Param("matchDate") LocalDate matchDate);
+    Page<ResMatchupBoardListDto> findAllMatchupBoardsWithPaging(Pageable pageable, @Param("sportsType") SportsTypeName sportsType, @Param("region") String region, @Param("matchDate") LocalDate matchDate);
 
     @Query("""
             select new com.multi.matchon.matchup.dto.res
             .ResMatchupBoardListDto( 
             t1.id,
             t2.memberEmail,
+            t2.memberName,
             t3.teamName,
             t4.sportsTypeName,
             t1.sportsFacilityName,
@@ -73,14 +76,33 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             join t1.member t2
             join t2.team t3
             join t1.sportsType t4
-            where t2.memberEmail =:email and t1.isDeleted=false
+            where (:sportsType is null or t4.sportsTypeName =:sportsType) and                    
+                    (:matchDate is null or DATE(t1.matchDatetime) >=:matchDate) and
+                    t1.isDeleted=false and t2.memberEmail =:email and t1.isDeleted=false
             order by t1.matchDatetime DESC
             """)
-    Page<ResMatchupBoardListDto> findByMemberEmailBoardListWithPaging(Pageable pageable, @Param("email") String email);
+    Page<ResMatchupBoardListDto> findAllResMatchupBoardListDtosByMemberEmailWithPaging(Pageable pageable, @Param("email") String email, @Param("sportsType") SportsTypeName sportsType, @Param("matchDate") LocalDate matchDate);
 
 
     @Query("select t1 from MatchupBoard t1 join fetch t1.member t2 join fetch t1.member.team t3 join fetch t1.sportsType t4 where t1.id=:boardId and t1.isDeleted=false")
-    Optional<MatchupBoard> findByIdWithMemberWithTeamWithSportsType(@Param("boardId") Long boardId);
+    Optional<MatchupBoard> findMatchupBoardByBoardId(@Param("boardId") Long boardId);
+
+
+
+
+
+//    @Query("""
+//        select case
+//            when t1.isDeleted=true then false
+//            when t1.matchupStatus =com.multi.matchon.common.domain.Status.PENDING then true
+//            when t1.matchupStatus =com.multi.matchon.common.domain.Status.APPROVED then true
+//            when t1.matchupStatus =com.multi.matchon.common.domain.Status.DENIED then false
+//            else false
+//            end
+//        from MatchupRequest t1
+//        where t1.matchupBoard.id =:boardId and t1.member.id=:memberId
+//
+//        """)
 
 
 

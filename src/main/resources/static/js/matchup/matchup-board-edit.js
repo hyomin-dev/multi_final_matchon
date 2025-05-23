@@ -3,105 +3,97 @@ document.addEventListener("DOMContentLoaded",()=>{
     const editDto = document.querySelector("#matchup-board-edit-dto");
 
     const boardId = Number(editDto.dataset.boardId);
-    const writer = editDto.dataset.writer;
     const sportsTypeName = editDto.dataset.sportsTypeName;
-    const sportsFacilityName = editDto.dataset.sportsFacilityName;
-    const sportsFacilityAddress = editDto.dataset.sportsFacilityAddress;
-    const matchDatetime = editDto.dataset.matchDatetime;
-    const matchDuration = editDto.dataset.matchDuration;
     const currentParticipantCount = Number(editDto.dataset.currentParticipantCount);
     const maxParticipants = Number(editDto.dataset.maxParticipants);
     const minMannerTemperature = Number(editDto.dataset.minMannerTemperature);
     const originalName = editDto.dataset.originalName;
     const savedName = editDto.dataset.savedName;
-    const savedPath = editDto.dataset.savedPath;
-    const myTemperature = Number(editDto.dataset.myTemperature);
+    const myMannerTemperature = Number(editDto.dataset.myMannerTemperature);
     const loginMember = editDto.dataset.loginMember;
 
-    getSportsType(sportsTypeName); // 종목 가져옴
+    setSportsType(sportsTypeName); // 종목 가져옴
     setReservationFile(originalName, savedName);
-    setMaxParticipants(maxParticipants);
+    setMaxParticipants(currentParticipantCount, maxParticipants);
     setMannerTemperature(minMannerTemperature);
+    setButton(boardId);
 
     const form = document.querySelector("form");
-    form.addEventListener("submit", (event)=>{
-        submitCheck(event)
+    form.addEventListener("submit", (e)=>{
+        submitCheck(e);
     })
-
-    const deleteBtn = document.querySelector(".delete-btn");
-    deleteBtn.addEventListener("click",async ()=>{
-        const response = await fetch(`/matchup/board/delete?boardId=${boardId}`,{
-            method: "GET",
-            credentials: "include"
-            })
-
-        if(!response.ok)
-            throw new Error(`HTTP error! Status:${response.status}`)
-        alert("삭제 완료");
-        window.location.href="/matchup";
-
-    })
-
-    const toggleBtn = document.querySelector("#toggleBtn");
-    const reservationLoadBox = document.querySelector("#reservationLoadBox");
-    const reservationFileBox = document.querySelector("#reservationFileBox");
-
-    toggleBtn.addEventListener("click",()=>{
-        const isDelete = toggleBtn.textContent === "파일 변경";
-
-        if(isDelete){
-            toggleBtn.textContent = "변경 취소";
-            reservationLoadBox.style.display = "none";
-            reservationFileBox.style.display = "block";
-            document.querySelector("#reservationFileBox > input").required = true;
-        }
-        else{
-            toggleBtn.textContent = "파일 변경";
-            reservationLoadBox.style.display = "block";
-            reservationFileBox.style.display = "none";
-            document.querySelector("#reservationFileBox > input").required = false;
-            document.querySelector("#reservationFileBox > input").value = '';
-
-        }
-    })
-
 
 })
 
 function submitCheck(e){
 
-    alert("submit")
+    const teamIntroEle = document.querySelector("#teamIntro");
+
+    const sportsFacilityNameEle = document.querySelector("#sportsFacilityName");
+
     //document.querySelector("#teamName").disabled=false;
+    const sportsFacilityAddressEle = document.querySelector("#sportsFacilityAddress");
+
+    const matchDateTimeEle = document.querySelector("#matchDateTime");
+    //console.log(matchDateTimeEle.value);
+
+    const matchDurationEle = document.querySelector("#matchDuration");
+
+    const currentParticipantsCountEle = document.querySelector("#currentParticipantsCount");
+    //console.log(currentParticipantsCountEle.value);
+
+    const maxParticipantsEle = document.querySelector("#maxParticipants");
+    //console.log(maxParticipantsEle.value);
+
+    const minMannerTemperatureEle = document.querySelector("#minMannerTemperature");
+    //console.log(minMannerTemperatureEle.value);
+    //console.log(myMannerTemperature);
+
+    const matchDescriptionEle = document.querySelector("#matchDescription");
 
 
-
-    //e.preventDefault();
-}
-
-async function getSportsType(sportsTypeName){
-    const response = await fetch("/sports-types",{
-        method: "GET",
-        credentials: "include"
-    })
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data); // data 확인
-    //console.log(data.length); // data 길이 확인
-
-    const selectBtn = document.querySelector("#sportsTypeName");
-
-    for(let i=0;i<data.length;i++){
-        const option = document.createElement("option")
-        option.value = data[i].sportsTypeName;
-        option.textContent = data[i].sportsTypeName;
-
-        if(data[i].sportsTypeName===sportsTypeName)
-            option.selected = true;
-        selectBtn.appendChild(option);
+    if(teamIntroEle.value ===""){
+        alert("팀 소개를 입력해주세요.");
+        e.preventDefault();
+    } else if(sportsFacilityNameEle.value ===""){
+        alert("경기장 명을 입력하세요.");
+        e.preventDefault();
+    } else if(sportsFacilityAddressEle.value ===""){
+        alert("경기장 주소를 입력하세요.");
+        e.preventDefault();
+    } else if(matchDateTimeEle.value ===""){
+        alert("경기 날짜를 입력하세요");
+        e.preventDefault();
+    } else if(matchDurationEle.value ===""){
+        alert("경기 진행 시간을 입력하세요.");
+        e.preventDefault();
+    } else if(currentParticipantsCountEle.value ===""){
+        alert("현재 참가 인원을 입력하세요.")
+        e.preventDefault();
+    } else if(maxParticipantsEle.value ===""){
+        alert("총 모집 인원을 입력하세요.");
+        e.preventDefault();
+    } else if(minMannerTemperatureEle.value ===""){
+        alert("하한 매너 온도를 입력하세요.");
+        e.preventDefault();
+    } else if(matchDescriptionEle.value ===""){
+        alert("경기 방식 소개를 입력하세요");
+        e.preventDefault();
+    } else{
+        alert("submit");
     }
+
 }
 
+async function setSportsType(sportsTypeName){
+    const optionSoccerEle = document.querySelector("#option-soccer");
+    const optionFutsal = document.querySelector("#option-futsal");
+
+    if(optionSoccerEle.value === sportsTypeName)
+        optionSoccerEle.selected = true;
+    else
+        optionFutsal.selected = true;
+}
 
 async function setReservationFile(originalName, savedName){
     const response2 = await fetch(`/matchup/attachment/file?saved-name=${savedName}`,{
@@ -158,11 +150,11 @@ function getAddress() {
 }
 
 
-function setMaxParticipants(maxParticipants){
+function setMaxParticipants(currentParticipantCount, maxParticipants){
 
     const selectMax = document.querySelector("#maxParticipants");
 
-    for(let i=1; i<=30;i++){
+    for(let i=currentParticipantCount; i<=30;i++){
         const option = document.createElement("option");
         option.value = i;
         option.textContent = i;
@@ -183,4 +175,41 @@ function setMannerTemperature(minMannerTemperature){
         if(i===minMannerTemperature)
             option.selected = true;
     }
+}
+
+async function setButton(boardId){
+    const deleteBtn = document.querySelector(".delete-btn");
+    deleteBtn.addEventListener("click",async ()=>{
+        const response = await fetch(`/matchup/board/delete?boardId=${boardId}`,{
+            method: "GET",
+            credentials: "include"
+        })
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        alert("삭제 완료");
+        window.location.href="/matchup";
+    })
+
+    const toggleBtn = document.querySelector("#toggleBtn");
+    const reservationLoadBox = document.querySelector("#reservationLoadBox");
+    const reservationFileBox = document.querySelector("#reservationFileBox");
+
+    toggleBtn.addEventListener("click",()=>{
+        const isDelete = toggleBtn.textContent === "파일 변경";
+
+        if(isDelete){
+            toggleBtn.textContent = "변경 취소";
+            reservationLoadBox.style.display = "none";
+            reservationFileBox.style.display = "block";
+            document.querySelector("#reservationFileBox > input").required = true;
+        }
+        else{
+            toggleBtn.textContent = "파일 변경";
+            reservationLoadBox.style.display = "block";
+            reservationFileBox.style.display = "none";
+            document.querySelector("#reservationFileBox > input").required = false;
+            document.querySelector("#reservationFileBox > input").value = '';
+
+        }
+    })
 }

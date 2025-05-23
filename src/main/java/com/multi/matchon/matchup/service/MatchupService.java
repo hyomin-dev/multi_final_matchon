@@ -11,10 +11,17 @@ import com.multi.matchon.common.repository.SportsTypeRepository;
 
 import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.matchup.domain.MatchupBoard;
+import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
+import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
+import com.multi.matchon.matchup.repository.MatchupRequestRepository;
+import com.multi.matchon.member.domain.Member;
+import com.sun.jdi.request.DuplicateRequestException;
 import io.awspring.cloud.s3.S3Resource;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -53,44 +60,10 @@ public class MatchupService{
         this.FILE_URL = S3_URL;
     }
 
-
-    private final MatchupBoardRepository matchupBoardRepository;
-
-    private final SportsTypeRepository sportsTypeRepository;
     private final AttachmentRepository attachmentRepository;
 
     private final AwsS3Utils awsS3Utils;
 
-
-
-    public List<MatchupBoard> findAll() {
-        List<MatchupBoard> matchupBoards = matchupBoardRepository.findAll();
-        List<MatchupBoard> matchupBoards1 = matchupBoardRepository.findAllWithMember();
-        List<MatchupBoard> matchupBoards2 = matchupBoardRepository.findAllWithMemberAndWithSportsType();
-
-        return matchupBoards;
-    }
-
-    public void boardRegister(ReqMatchupBoardDto reqMatchupBoardDto, CustomUser user) {
-
-        MatchupBoard newMatchupBoard = MatchupBoard.builder()
-                .member(user.getMember())
-                .sportsType(sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardDto.getSportsTypeName())).orElseThrow(()-> new IllegalArgumentException(reqMatchupBoardDto.getSportsTypeName()+"는 지원하지 않는 종목입니다.")))
-                .reservationAttachmentEnabled(true)
-                .teamIntro(reqMatchupBoardDto.getTeamIntro())
-                .sportsFacilityName(reqMatchupBoardDto.getSportsFacilityName())
-                .sportsFacilityAddress(reqMatchupBoardDto.getSportsFacilityAddress())
-                .matchDatetime(reqMatchupBoardDto.getMatchDateTime())
-                .matchDuration(LocalTime.of(reqMatchupBoardDto.getMatchDuration()/60,reqMatchupBoardDto.getMatchDuration()%60))
-                .currentParticipantCount(reqMatchupBoardDto.getCurrentParticipantsCount())
-                .maxParticipants(reqMatchupBoardDto.getMaxParticipants())
-                .minMannerTemperature(reqMatchupBoardDto.getMinMannerTemperature())
-                .matchDescription(reqMatchupBoardDto.getMatchDescription())
-                .build();
-        MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
-        insertFile(reqMatchupBoardDto.getReservationFile(), matchupBoard);
-
-    }
     public void insertFile(MultipartFile multipartFile, MatchupBoard matchupBoard){
         String fileName = UUID.randomUUID().toString().replace("-","");
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
@@ -117,17 +90,10 @@ public class MatchupService{
 
         awsS3Utils.deleteFile(FILE_DIR, savedName.substring(0,savedName.indexOf(".")));
 
-
         findAttachments.get(0).update(multipartFile.getOriginalFilename(), fileName+multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")), FILE_DIR);
 
-        attachmentRepository.save(findAttachments.get(0));
-
-
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
-
-
     }
-
 
 
 //    public void findBoardListTest() {
@@ -169,137 +135,21 @@ public class MatchupService{
 //        System.out.println();
 //    }
 
-    public PageResponseDto<ResMatchupBoardListDto> findAllWithPaging(PageRequest pageRequest, String sportsType, String region, String date  ) {
-        SportsTypeName sportsTypeName;
-        if(sportsType.isBlank())
-            sportsTypeName = null;
-        else
-            sportsTypeName = SportsTypeName.valueOf(sportsType);
 
-        if(region.isBlank())
-            region = null;
-
-        LocalDate matchDate = null;
-        if(!date.isBlank())
-            matchDate = LocalDate.parse(date);
-
-        Page<ResMatchupBoardListDto> page = matchupBoardRepository.findBoardListWithPaging(pageRequest, sportsTypeName, region, matchDate);
-       return PageResponseDto.<ResMatchupBoardListDto>builder()
-                .items(page.getContent())
-                .pageInfo(PageResponseDto.PageInfoDto.builder()
-                        .page(page.getNumber())
-                        .size(page.getNumberOfElements())
-                        .totalElements(page.getTotalElements())
-                        .totalPages(page.getTotalPages())
-                        .isFirst(page.isFirst())
-                        .isLast(page.isLast())
-                        .build())
-                .build();
-
-    }
-
-    public PageResponseDto<ResMatchupBoardListDto> findMyAllWithPaging(PageRequest pageRequest, CustomUser user) {
-
-        Page<ResMatchupBoardListDto> page = matchupBoardRepository.findByMemberEmailBoardListWithPaging(pageRequest, user.getMember().getMemberEmail());
-        return PageResponseDto.<ResMatchupBoardListDto>builder()
-                .items(page.getContent())
-                .pageInfo(PageResponseDto.PageInfoDto.builder()
-                        .page(page.getNumber())
-                        .size(page.getNumberOfElements())
-                        .totalElements(page.getTotalElements())
-                        .totalPages(page.getTotalPages())
-                        .isFirst(page.isFirst())
-                        .isLast(page.isLast())
-                        .build())
-                .build();
-
-    }
-
-    public ResMatchupBoardDto findBoardByBoardId(Long boardId) {
-
-        MatchupBoard matchupBoard = matchupBoardRepository.findByIdWithMemberWithTeamWithSportsType(boardId).orElseThrow(()->new IllegalArgumentException(boardId +"번 게시글이 존재하지 않습니다."));
-
-        List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
-
-        if(attachments.isEmpty()&&matchupBoard.getReservationAttachmentEnabled())
-            throw new IllegalArgumentException(boardId +"번 게시글의 첨부파일이 존재해야하는데 없습니다.");
-
-       return ResMatchupBoardDto.builder()
-                .boardId(matchupBoard.getId())
-                .writer(matchupBoard.getMember().getMemberEmail())
-                .teamName(matchupBoard.getMember().getTeam().getTeamName())
-                .teamIntro(matchupBoard.getTeamIntro())
-                .sportsTypeName(matchupBoard.getSportsType().getSportsTypeName())
-                .sportsFacilityName(matchupBoard.getSportsFacilityName())
-                .sportsFacilityAddress(matchupBoard.getSportsFacilityAddress())
-                .matchDatetime(matchupBoard.getMatchDatetime())
-                .matchDuration(matchupBoard.getMatchDuration())
-                .currentParticipantCount(matchupBoard.getCurrentParticipantCount())
-                .maxParticipants(matchupBoard.getMaxParticipants())
-                .minMannerTemperature(matchupBoard.getMinMannerTemperature())
-                .myTemperature(matchupBoard.getMember().getMyTemperature())
-                .matchDescription(matchupBoard.getMatchDescription())
-                .originalName(attachments.get(0).getOriginalName())
-                .savedName(attachments.get(0).getSavedName())
-                .savedPath(attachments.get(0).getSavePath())
-                .build();
-
-    }
-
-    public void boardEdit(ResMatchupBoardDto resMatchupBoardDto) {
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findByIdAndIsDeleted(resMatchupBoardDto.getBoardId()).orElseThrow(()->new IllegalArgumentException(resMatchupBoardDto.getBoardId()+"번 게시글이 없습니다."));
-
-        findMatchupBoard.update(
-                sportsTypeRepository.findBySportsTypeName(resMatchupBoardDto.getSportsTypeName()).orElseThrow(()-> new IllegalArgumentException(resMatchupBoardDto.getSportsTypeName()+"는 지원하지 않는 종목입니다.")),
-                resMatchupBoardDto.getTeamIntro(),
-                resMatchupBoardDto.getSportsFacilityName(),
-                resMatchupBoardDto.getSportsFacilityAddress(),
-                resMatchupBoardDto.getMatchDatetime(),
-                resMatchupBoardDto.getMatchDuration(),
-                resMatchupBoardDto.getCurrentParticipantCount(),
-                resMatchupBoardDto.getMaxParticipants(),
-                resMatchupBoardDto.getMinMannerTemperature(),
-                resMatchupBoardDto.getMatchDescription()
-        );
-        matchupBoardRepository.save(findMatchupBoard);
-
-        //if(resMatchupBoardDto.getReservationFile())
-        System.out.println("Tt");
-
-        if(!Objects.requireNonNull(resMatchupBoardDto.getReservationFile().getOriginalFilename()).isBlank()){
-
-            updateFile(resMatchupBoardDto.getReservationFile(), findMatchupBoard);
-
-        }
-    }
-
-    public S3Resource getAttachmentFile(String savedName) throws IOException {
+    public S3Resource findAttachmentFile(String savedName) throws IOException {
         S3Resource resource = awsS3Utils.downloadFile(FILE_DIR, savedName);
         return resource;
     }
 
-    public String getAttachmentURL(String savedName) throws IOException {
+    public String findAttachmentURL(String savedName) throws IOException {
         String presignedUrl = awsS3Utils.createPresignedGetUrl(FILE_DIR, savedName);
 
         return presignedUrl;
     }
 
 
-    public void boardDelete(Long boardId) {
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findByIdAndIsDeleted(boardId).orElseThrow(()->new IllegalArgumentException(boardId+"번 게시글이 없습니다."));
 
-        findMatchupBoard.delete(true);
 
-        matchupBoardRepository.save(findMatchupBoard);
-
-        List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
-        if(findAttachments.isEmpty())
-            throw new IllegalArgumentException(BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
-        findAttachments.get(0).delete(true);
-
-        attachmentRepository.save(findAttachments.get(0));
-
-    }
 
 }
 

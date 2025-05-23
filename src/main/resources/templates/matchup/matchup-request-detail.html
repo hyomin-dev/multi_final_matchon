@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <title>MATCHON</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-request-detail.css}">
+    <script th:src="@{/js/matchup/matchup-request-detail.js}" defer></script>
+    <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
     <style>
         a {
             display:block;
@@ -15,10 +18,75 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
     <h1>MATCHUP 참가 요청 상세보기</h1>
-    <a th:href="@{/matchup/request/edit}">수정하기</a>
-    <a th:href="@{/matchup/request/delete}">취소하기</a>
-    <a th:href="@{#}">승인</a>
-    <a th:href="@{#}">반려</a>
+    <div id="matchup-request-detail-dto"
+
+         th:data-sports-facility-name="${resMatchupRequestDto.sportsFacilityName}"
+         th:data-sports-facility-address="${resMatchupRequestDto.sportsFacilityAddress}"
+         th:data-match-datetime="${resMatchupRequestDto.matchDatetime}"
+         th:data-match-duration="${resMatchupRequestDto.matchDuration}"
+    >
+    </div>
+
+    <table>
+        <th:block th:if="${resMatchupRequestDto.boardWriter == #authentication.name}">
+            <tr>
+                <th>지원자: </th>
+                <td th:text="${resMatchupRequestDto.applicant}"></td>
+            </tr>
+        </th:block>
+
+        <th:block th:if="${resMatchupRequestDto.applicant == #authentication.name}">
+            <tr>
+                <th>게시글 작성자: </th>
+                <td th:text="${resMatchupRequestDto.boardWriter}"></td>
+            </tr>
+        </th:block>
+
+        <tr>
+            <th>종목: </th>
+            <td th:text="${resMatchupRequestDto.sportsTypeName}"></td>
+        </tr>
+        <tr>
+            <th>자기소개: </th>
+            <td th:text="${resMatchupRequestDto.selfIntro}"></td>
+        </tr>
+        <tr>
+            <th>경기장명:</th>
+            <td th:text="${resMatchupRequestDto.sportsFacilityName}"></td>
+        </tr>
+        <tr>
+            <th>경기장 주소:</th>
+            <td th:text="${resMatchupRequestDto.sportsFacilityAddress}"></td>
+        </tr>
+        <tr>
+            <th>경기장 위치:</th>
+            <td>
+                <div id="map" style="width:100%;height:350px;"></div>
+            </td>
+        </tr>
+        <tr>
+            <th>경기 날짜:</th>
+            <td id="match-date"></td>
+        </tr>
+        <tr>
+            <th>신청 인원:</th>
+            <td th:text="${resMatchupRequestDto.participantCount}"></td>
+        </tr>
+        <tr>
+            <th>신청 가능 여부</th>
+            <td th:text="${resMatchupRequestDto.matchupStatus}"></td>
+        </tr>
+    </table>
+    <th:block th:if="${resMatchupRequestDto.boardWriterEmail == #authentication.name}">
+        <a th:href="@{#}" id="approved">승인</a>
+        <a th:href="@{#}" id="denied">반려</a>
+    </th:block>
+    <th:block th:if="${resMatchupRequestDto.applicantEmail == #authentication.name}">
+        <a id="chat1-1Btn" th:href="@{/}">수정하기</a>
+        <a id="requestBtn" th:href="@{#}">요청취소하기</a>
+    </th:block>
+
+
 
 
 </div>

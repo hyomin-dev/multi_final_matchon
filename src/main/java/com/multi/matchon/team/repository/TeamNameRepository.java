@@ -16,17 +16,35 @@ public interface TeamNameRepository extends JpaRepository <Team, Long> {
     List<Team> findAll();
 
     @Query("""
-
-            SELECT DISTINCT t FROM Team t
-LEFT JOIN t.recruitingPositions rp
-LEFT JOIN rp.positions p
-WHERE (:positionName IS NULL OR p.positionName = :positionName)
-AND (:region IS NULL OR t.teamRegion = :region)
-AND (t.teamRatingAverage IS NULL OR t.teamRatingAverage >= :rating)
+    SELECT DISTINCT t FROM Team t
+    LEFT JOIN t.recruitingPositions rp
+    LEFT JOIN rp.positions p
+    WHERE (:positionName IS NULL OR p.positionName = :positionName)
+    AND (:region IS NULL OR t.teamRegion = :region)
+    AND (t.teamRatingAverage IS NOT NULL AND t.teamRatingAverage >= :rating)
 """)
-    Page<Team> findTeamListWithPaging(
+    Page<Team> findWithRatingFilter(
             @Param("positionName") PositionName positionName,
             @Param("region") RegionType region,
             @Param("rating") Double rating,
             Pageable pageable);
-    }
+
+
+    @Query("""
+    SELECT DISTINCT t FROM Team t
+    LEFT JOIN t.recruitingPositions rp
+    LEFT JOIN rp.positions p
+    WHERE (
+        (:positionName IS NULL OR p.positionName = :positionName)
+        AND (:region IS NULL OR t.teamRegion = :region)
+    )
+    OR (:positionName IS NULL AND :region IS NULL)
+""")
+    Page<Team> findWithoutRatingFilter(
+            @Param("positionName") PositionName positionName,
+            @Param("region") RegionType region,
+            Pageable pageable
+    );
+}
+
+//    research needed!!
