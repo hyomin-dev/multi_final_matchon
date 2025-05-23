@@ -1,4 +1,3 @@
-const userRole = "USER";
 const calendar = document.getElementById("calendar");
 const monthYear = document.getElementById("monthYear");
 const tooltip = document.getElementById("tooltip");

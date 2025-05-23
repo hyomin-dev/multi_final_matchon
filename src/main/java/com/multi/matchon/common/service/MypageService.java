@@ -9,7 +9,10 @@ import com.multi.matchon.event.repository.HostProfileRepository;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.domain.MemberRole;
 import com.multi.matchon.common.domain.Positions;
+import com.multi.matchon.member.repository.MemberRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -33,6 +36,10 @@ public class MypageService {
     private final HostProfileRepository hostProfileRepository;
     private final AwsS3Utils awsS3Utils;
     private final AttachmentRepository attachmentRepository;
+    private final MemberRepository memberRepository;
+
+    @PersistenceContext
+    private EntityManager em;
 
     @Value("${spring.cloud.aws.s3.base-url}")
     private String S3BaseUrl;
@@ -44,8 +51,6 @@ public class MypageService {
 
         data.put("memberRole", member.getMemberRole() != null ? member.getMemberRole().name() : "UNKNOWN");
         data.put("memberName", member.getMemberName());
-
-
         data.put("myTemperature", member.getMyTemperature());
         data.put("teamName", member.getTeam() != null ? member.getTeam().getTeamName() : "팀이 없습니다");
 
@@ -56,9 +61,10 @@ public class MypageService {
         }
 
 
+
         Optional<Attachment> profileAttachment = attachmentRepository.findLatestAttachment(BoardType.MEMBER, member.getId());
         String imageUrl = profileAttachment
-                .map(att -> S3BaseUrl + "profile/" + att.getSavedName())
+                .map(att -> awsS3Utils.createPresignedGetUrl(PROFILE_DIR, att.getSavedName()))
                 .orElse("/img/default-profile.jpg");
 
         data.put("profileImageUrl", imageUrl);
@@ -81,11 +87,22 @@ public class MypageService {
     }
 
     public void uploadProfileImage(Member member, MultipartFile file) {
+
+        // 1. 기존 첨부 파일이 있으면 삭제
+        Optional<Attachment> existingAttachmentOpt =
+                attachmentRepository.findLatestAttachment(BoardType.MEMBER, member.getId());
+
+        existingAttachmentOpt.ifPresent(att -> {
+            awsS3Utils.deleteFile(att.getSavePath(), att.getSavedName());
+            attachmentRepository.delete(att); // DB에서도 삭제
+        });
+
+        // 2. 새 파일 저장
         String uuid = UUID.randomUUID().toString().replace("-", "");
         String ext = FilenameUtils.getExtension(file.getOriginalFilename());
         String savedName = uuid + "." + ext;
 
-        awsS3Utils.saveFile(PROFILE_DIR, savedName, file);
+        awsS3Utils.saveFile(PROFILE_DIR, uuid, file); // 확장자 내부에서 붙임
 
         Attachment attachment = Attachment.builder()
                 .boardType(BoardType.MEMBER)
@@ -100,13 +117,19 @@ public class MypageService {
     }
 
     @Transactional
-    public void updateMypage(Member member, PositionName positionName, TimeType timeType, Double temperature) {
+    public void updateMypage(String email, PositionName positionName, TimeType timeType, Double temperature) {
+        Member member = memberRepository.findByMemberEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+
         Positions position = positionsRepository.findByPositionName(positionName)
-                .orElseThrow(() -> new IllegalArgumentException("해당 포지션이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("포지션 없음"));
 
         member.setPositions(position);
         member.setTimeType(timeType);
         member.setMyTemperature(temperature);
-    }
-}
 
+        memberRepository.saveAndFlush(member);
+        em.clear();
+    }
+
+}

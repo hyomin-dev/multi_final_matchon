@@ -53,9 +53,9 @@ public class FaqController {
         return "cs/cs";
     }
 
-    // 상세보기(챗봇 이용방법)
-    @GetMapping("/faq/howtochatbot")
-    public String faqChatbotPage() {
+    // 상세보기
+    @GetMapping("/faq/detail")
+    public String faq_detail_Show() {
         return "cs/cs-faq-detail";
     }
 
@@ -87,7 +87,7 @@ public class FaqController {
         return "redirect:/cs";
     }
 
-    // faq 상세보기
+    // faq 상세보기 설정
     @GetMapping("/faq/detail/{id}")
     public String detail(@PathVariable Long id, Model model) {
         FaqDto faqDto = faqService.getFaqById(id);

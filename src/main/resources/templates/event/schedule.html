@@ -6,6 +6,9 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/event/schedule.css}">
+    <script th:inline="javascript">
+        const userRole = /*[[${#authentication.principal.member.memberRole}]]*/ "USER";
+    </script>
     <script th:src="@{/js/event/schedule.js}" defer></script>
 
 </head>
