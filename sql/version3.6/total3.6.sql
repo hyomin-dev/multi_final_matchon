@@ -225,7 +225,8 @@ CREATE TABLE comment
     modified_person VARCHAR(100),
     modified_date   DATETIME DEFAULT current_timestamp on update current_timestamp,
     is_deleted      BOOLEAN  DEFAULT FALSE,
-    CONSTRAINT FK_comment_2_board FOREIGN KEY (board_id) REFERENCES board (board_id)
+    CONSTRAINT FK_comment_2_board FOREIGN KEY (board_id) REFERENCES board (board_id),
+    CONSTRAINT FK_comment_2_member FOREIGN KEY (member_id) REFERENCES member (member_id)
 );
 
 -- host_profile
