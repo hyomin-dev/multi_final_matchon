@@ -101,8 +101,7 @@ public class MatchupRequestService {
 
     @Transactional(readOnly = true)
     public ResMatchupRequestDto findResMatchRequestDtoByRequestId(Long requestId) {
-        
-    
+
         return matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException(requestId+"번 요청은 없습니다."));
 
     }
@@ -121,6 +120,7 @@ public class MatchupRequestService {
 //        findMatchupRequest.update(resMatchupRequestDto.getSelfIntro(), resMatchupRequestDto.getParticipantCount());
 //
 //    }
+
 
 
     // 수정

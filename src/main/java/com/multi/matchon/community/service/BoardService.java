@@ -41,5 +41,11 @@ public class BoardService {
         return boardRepository.findByCategory(category, pageable);
     }
 
+    public void softDelete(Long boardId) {
+        Board board = findById(boardId);
+        board.setIsDeleted(true);
+        save(board);
+    }
+
 }
 

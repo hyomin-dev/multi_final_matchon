@@ -41,6 +41,10 @@ public class Board extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted = false;
 
+    public void setIsDeleted(boolean deleted) {
+        this.isDeleted = deleted;
+    }
+
     @Column(name = "attachment_path")
     private String attachmentPath;
 

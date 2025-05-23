@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>게시판 목록</title>
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
@@ -11,6 +12,7 @@
     <div th:replace="~{common/header::header}"></div>
 
     <h2 class="page-title" th:text="${selectedCategory != null} ? ${selectedCategory.displayName} : '자유게시판'">자유게시판</h2>
+
     <div style="text-align: right; width: 90%; margin: auto;">
         <a th:href="@{/community/new}" class="button">게시글 작성</a>
     </div>
@@ -54,6 +56,7 @@
     </div>
 
 </div>
+
 <div th:replace="~{common/footer::footer}"></div>
 
 <script>

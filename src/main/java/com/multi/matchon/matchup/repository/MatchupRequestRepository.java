@@ -75,6 +75,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             """)
     Optional<ResMatchupRequestDto> findResMatchupRequestDtoByRequestId(Long requestId);
 
+<<<<<<< HEAD
     @Query("""
             select case
                     when count(t1)>0 then true
@@ -84,6 +85,9 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
                 where t1.matchupBoard.id =:boardId and t1.member.id =:memberId and t1.isDeleted=true
             """)
     Boolean isCanceledMatchupRequestByBoardIdAndMemberId(@Param("boardId") Long boardId, @Param("memberId") Long memberId);
+=======
+
+>>>>>>> develop
 
     @Query("""
         select case

@@ -69,7 +69,13 @@ public class EventController {
             LocalDate finalDate = date;
             List<EventSummaryDto> dailyEvents = approvedEvents.stream()
                     .filter(e -> e.getEventDate().equals(finalDate))
-                    .map(e -> new EventSummaryDto(e.getEventTitle()))
+                    .map(e -> new EventSummaryDto( e.getId(),
+                            e.getEventTitle(),
+                            e.getEventRegionType().name(),
+                            e.getHostProfile().getHostName(),
+                            e.getEventAddress(),
+                            e.getEventMethod(),
+                            e.getEventContact()))
                     .toList();
 
             days.add(new CalendarDayDto(date, ym.getMonthValue() == date.getMonthValue(), dailyEvents));
@@ -156,14 +162,16 @@ public class EventController {
     }
 
     @GetMapping("/event/{id}")
-    @PreAuthorize("hasRole('HOST')")
     public String getEventDetail(@PathVariable Long id,
                                  @AuthenticationPrincipal CustomUser customUser,
                                  Model model) {
         EventRequest event = eventRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 대회를 찾을 수 없습니다."));
 
-        if (!event.getMember().getId().equals(customUser.getMember().getId())) {
+        boolean isOwner = customUser != null && customUser.getMember().getId().equals(event.getMember().getId());
+        boolean isApproved = event.getEventStatus() == Status.APPROVED;
+
+        if (!isOwner && !isApproved) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
@@ -186,6 +194,7 @@ public class EventController {
 
         model.addAttribute("event", event);
         model.addAttribute("regionLabel", regionLabel);
+        model.addAttribute("isOwner", isOwner);
         model.addAttribute("statusLabel", statusLabel);
         return "event/event-detail";
     }
@@ -208,6 +217,38 @@ public class EventController {
 
         eventRepository.delete(event);
         return "redirect:/event/my";
+    }
+
+    // 대회 등록
+    @GetMapping("/api/events")
+    @ResponseBody
+    public List<CalendarDayDto> getApprovedEvents(@RequestParam int year, @RequestParam int month) {
+        YearMonth ym = YearMonth.of(year, month);
+        LocalDate start = ym.atDay(1).with(DayOfWeek.SUNDAY);
+        LocalDate end = ym.atEndOfMonth().with(DayOfWeek.SATURDAY);
+
+        List<EventRequest> events = eventRepository.findByEventDateBetween(start, end);
+        List<EventRequest> approved = events.stream()
+                .filter(e -> e.getEventStatus() == Status.APPROVED)
+                .toList();
+
+        List<CalendarDayDto> days = new ArrayList<>();
+        for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+            LocalDate finalDate = date;
+            List<EventSummaryDto> summaries = approved.stream()
+                    .filter(e -> e.getEventDate().equals(finalDate))
+                    .map(e -> new EventSummaryDto( e.getId(),
+                            e.getEventTitle(),
+                            e.getEventRegionType().name(),
+                            e.getHostProfile().getHostName(),
+                            e.getEventAddress(),
+                            e.getEventMethod(),
+                            e.getEventContact()))
+                    .toList();
+            days.add(new CalendarDayDto(date, ym.getMonthValue() == date.getMonthValue(), summaries));
+        }
+
+        return days;
     }
 
 }

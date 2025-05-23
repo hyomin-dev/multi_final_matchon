@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -86,7 +87,7 @@ public class BoardController {
     @GetMapping("/new")
     public String form(Model model, @AuthenticationPrincipal CustomUser userDetails) {
         if (userDetails == null) {
-            return "redirect:/login"; // 또는 401 에러 페이지
+            return "redirect:/login";
         }
 
         model.addAttribute("boardRequest", new BoardRequest());
@@ -108,7 +109,8 @@ public class BoardController {
             return "community/form";
         }
 
-        Member loginMember = userDetails.getMember(); // 직접 사용자 꺼내기
+
+        Member loginMember = userDetails.getMember();
 
         String uploadDir = System.getProperty("user.dir") + File.separator + "uploads" + File.separator;
         File dir = new File(uploadDir);
@@ -149,7 +151,8 @@ public class BoardController {
     public String addComment(@PathVariable Long id,
                              @Valid @ModelAttribute("commentRequest") CommentRequest commentRequest,
                              BindingResult bindingResult,
-                             Model model) {
+                             Model model,
+                             @AuthenticationPrincipal CustomUser userDetails) {
         Board board = boardService.findById(id);
 
         if (bindingResult.hasErrors()) {
@@ -160,6 +163,7 @@ public class BoardController {
 
         Comment comment = Comment.builder()
                 .board(board)
+                .member(userDetails.getMember()) // 작성자 정보 설정
                 .content(commentRequest.getContent())
                 .build();
 
@@ -183,6 +187,23 @@ public class BoardController {
                 .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(filePath))
                 .body(resource);
     }
+
+
+    @PostMapping("/{boardId}/comments/{commentId}/delete")
+    public String deleteComment(@PathVariable Long boardId,
+                                @PathVariable Long commentId,
+                                @AuthenticationPrincipal CustomUser userDetails) {
+        Comment comment = commentService.findById(commentId);
+
+        // 본인 확인
+        if (!comment.getMember().getId().equals(userDetails.getMember().getId())) {
+            throw new AccessDeniedException("삭제 권한이 없습니다.");
+        }
+
+        commentService.softDelete(commentId); // 논리 삭제
+        return "redirect:/community/" + boardId;
+    }
+
 
 
 }

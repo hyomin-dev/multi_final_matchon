@@ -1,0 +1,128 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: white;
+    overflow-x: hidden;
+}
+#wrap { padding: 30px 0; }
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 10px;
+}
+.header { text-align: center; }
+.region-labels {
+    text-align: center;
+    margin: 10px 0 20px;
+}
+.region-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0 6px;
+}
+.month-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+.register-btn {
+    display: inline-block;
+    padding: 6px 16px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.calendar-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+.calendar-nav-img {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    z-index: 2;
+}
+.left-arrow { left: -40px; }
+.right-arrow { right: -40px; }
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    width: 100%;
+    max-width: 800px;
+    min-height: 720px;
+}
+.day-header {
+    font-weight: bold;
+    text-align: center;
+    border-top: 2px solid #888;
+    border-bottom: 2px solid #888;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+}
+.day-header.sunday { color: red; }
+.day-header.saturday { color: blue; }
+.day-cell {
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 6px;
+    border: 1px solid #ddd;
+    border-top: none;
+}
+.day-cell.today { color: steelblue; }
+.day-cell.selected { background-color: #cce5ff; }
+.day-number {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.day-number.sunday { color: red; }
+
+.event-label {
+    font-size: 12px;
+    padding: 6px 4px;
+    margin-top: 6px;
+    border-radius: 4px;
+    width: 90%; /* ✅ 셀 너비에 맞춤 */
+    text-align: center;
+    box-sizing: border-box;
+    word-break: keep-all;
+    color: #000;
+    cursor: pointer;
+}
+
+.event-label:hover {
+    opacity: 0.85;
+}
+
+#tooltip {
+    position: absolute;
+    display: none;
+    background: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 1000;
+    white-space: nowrap;
+    pointer-events: none;
+    max-width: none;
+}
