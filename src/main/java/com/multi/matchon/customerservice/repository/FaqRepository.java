@@ -2,13 +2,13 @@ package com.multi.matchon.customerservice.repository;
 
 import com.multi.matchon.customerservice.domain.CustomerServiceType;
 import com.multi.matchon.customerservice.domain.Faq;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface FaqRepository extends JpaRepository<Faq, Long> {
-    List<Faq> findByIsDeletedFalse();
-    List<Faq> findByFaqCategoryAndIsDeletedFalse(CustomerServiceType category);
-    List<Faq> findByFaqTitleContainingIgnoreCaseAndIsDeletedFalse(String keyword);
-    List<Faq> findByFaqCategoryAndFaqTitleContainingIgnoreCaseAndIsDeletedFalse(CustomerServiceType category, String keyword);
+    Page<Faq> findByIsDeletedFalse(Pageable pageable);
+    Page<Faq> findByFaqCategoryAndIsDeletedFalse(CustomerServiceType category, Pageable pageable);
+    Page<Faq> findByFaqTitleContainingIgnoreCaseAndIsDeletedFalse(String keyword, Pageable pageable);
+    Page<Faq> findByFaqCategoryAndFaqTitleContainingIgnoreCaseAndIsDeletedFalse(CustomerServiceType category, String keyword, Pageable pageable);
 }

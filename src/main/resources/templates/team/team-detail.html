@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${team.teamName} + ' 상세 정보'">팀 상세 정보</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/team/team-detail.css}">
+</head>
+<body>
+    <div th:replace="~{common/header::header}"></div>
+
+    <div class="content-wrapper">
+        <div class="team-tabs">
+            <a href="#" id="tab-info" class="active">홈/소개</a>
+            <a href="#" id="tab-reviews">후기보기/쓰기</a>
+            <a href="#" id="tab-join">팀/가입 신청</a>
+            <a href="#" id="tab-chat">채팅</a>
+        </div>
+
+        <div class="team-content">
+            <div class="team-profile">
+                <div class="team-image">
+                    <img th:src="${team.imageUrl}" th:alt="${team.teamName}">
+                </div>
+                <h1 th:text="${team.teamName}" class="team-name">팀 이름</h1>
+            </div>
+
+            <!-- Team Info Section -->
+            <div class="team-info">
+                <div class="info-box">
+                    <h2>팀 소개</h2>
+                    <p th:text="${team.teamIntroduction}">팀 소개 내용</p>
+                </div>
+
+                <div class="info-box">
+                    <h2>팀 활동 지역</h2>
+                    <div class="area-box">
+                        <p th:text="${team.teamRegion}">활동 지역</p>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h2>팀에서 필요한 포지션</h2>
+                    <div class="position-box">
+                        <p th:if="${team.recruitingPositions != null and not #lists.isEmpty(team.recruitingPositions)}"
+                           th:text="${#strings.listJoin(team.recruitingPositions, ', ')}">
+                            필요한 포지션들
+                        </p>
+                        <p th:unless="${team.recruitingPositions != null and not #lists.isEmpty(team.recruitingPositions)}">
+                            현재 모집중인 포지션이 없습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review Section -->
+            <div id="reviewSection" class="review-section" style="display:none;">
+                <!-- Review List View -->
+                <div id="reviewListView" class="info-box">
+                    <h2>팀 후기</h2>
+                    <div id="reviewList" class="review-list">
+                        <p class="loading-text">후기를 불러오는 중입니다...</p>
+                    </div>
+                    <div class="review-actions">
+                        <button id="writeReviewBtn" class="btn-primary">후기 쓰기</button>
+                    </div>
+                </div>
+
+                <!-- Review Write View -->
+                <div id="reviewWriteView" class="info-box" style="display:none;">
+                    <h2>후기 쓰기</h2>
+                    <form id="reviewForm" class="review-form">
+                        <div class="form-group">
+                            <label>별점</label>
+                            <div class="rating-group">
+                                <label><input type="radio" name="rating" value="1" required> ⭐</label>
+                                <label><input type="radio" name="rating" value="2"> ⭐⭐</label>
+                                <label><input type="radio" name="rating" value="3"> ⭐⭐⭐</label>
+                                <label><input type="radio" name="rating" value="4"> ⭐⭐⭐⭐</label>
+                                <label><input type="radio" name="rating" value="5"> ⭐⭐⭐⭐⭐</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <textarea id="reviewContent" rows="4" required placeholder="후기를 작성해주세요"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-submit">작성 완료</button>
+                            <button type="button" class="btn-cancel" id="cancelWriteBtn">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{common/footer::footer}"></div>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const infoSection = document.querySelector('.team-info');
+            const reviewSection = document.getElementById('reviewSection');
+            const reviewListView = document.getElementById('reviewListView');
+            const reviewWriteView = document.getElementById('reviewWriteView');
+            const tabInfo = document.getElementById('tab-info');
+            const tabReviews = document.getElementById('tab-reviews');
+            const writeReviewBtn = document.getElementById('writeReviewBtn');
+            const cancelWriteBtn = document.getElementById('cancelWriteBtn');
+            const teamId = /*[[${team.teamId}]]*/ '';
+
+            // Tab switching logic
+            tabInfo.addEventListener('click', (e) => {
+                e.preventDefault();
+                infoSection.style.display = 'block';
+                reviewSection.style.display = 'none';
+                tabInfo.classList.add('active');
+                tabReviews.classList.remove('active');
+            });
+
+            tabReviews.addEventListener('click', (e) => {
+                e.preventDefault();
+                infoSection.style.display = 'none';
+                reviewSection.style.display = 'block';
+                reviewListView.style.display = 'block';
+                reviewWriteView.style.display = 'none';
+                tabReviews.classList.add('active');
+                tabInfo.classList.remove('active');
+                if (teamId) {
+                    loadReviews();
+                }
+            });
+
+            // Switch to write review view
+            writeReviewBtn.addEventListener('click', () => {
+                reviewListView.style.display = 'none';
+                reviewWriteView.style.display = 'block';
+            });
+
+            // Cancel writing and return to list view
+            cancelWriteBtn.addEventListener('click', () => {
+                reviewWriteView.style.display = 'none';
+                reviewListView.style.display = 'block';
+                document.getElementById('reviewForm').reset();
+            });
+
+            function loadReviews() {
+                const reviewList = document.getElementById('reviewList');
+                fetch(`/team/team/${teamId}/reviews`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to load reviews');
+                        return response.json();
+                    })
+                    .then(response => {
+                        const reviews = response.data;
+                        if (!reviews || reviews.length === 0) {
+                            reviewList.innerHTML = '<p class="no-reviews">아직 작성된 후기가 없습니다.</p>';
+                            return;
+                        }
+
+                        reviewList.innerHTML = reviews.map(review => `
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="review-author-info">
+                                        <img src="/img/default-avatar.png" alt="User" class="author-avatar">
+                                        <span class="review-author">${review.reviewerName || '익명'}</span>
+                                    </div>
+                                    <div class="review-meta">
+                                        <span class="review-rating">${'⭐'.repeat(review.rating)}</span>
+                                        <span class="review-date">${review.createdDate.split('T')[0]}</span>
+                                    </div>
+                                </div>
+                                <p class="review-content">${review.content}</p>
+                            </div>
+                        `).join('');
+                    })
+                    .catch(error => {
+                        console.error('Error loading reviews:', error);
+                        reviewList.innerHTML = '<p class="error-message">후기를 불러오는데 실패했습니다.</p>';
+                    });
+            }
+
+            const reviewForm = document.getElementById('reviewForm');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const content = document.getElementById('reviewContent').value;
+                    const ratingInput = document.querySelector('input[name="rating"]:checked');
+
+                    if (!content || !ratingInput) {
+                        alert('내용과 별점을 모두 입력해주세요.');
+                        return;
+                    }
+
+                    fetch(`/team/team/${teamId}/review`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            content,
+                            rating: parseInt(ratingInput.value)
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Review submission failed');
+                        reviewForm.reset();
+                        reviewWriteView.style.display = 'none';
+                        reviewListView.style.display = 'block';
+                        loadReviews();
+                    })
+                    .catch(error => {
+                        console.error('Error submitting review:', error);
+                        alert('후기 작성에 실패했습니다. 다시 시도해주세요.');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

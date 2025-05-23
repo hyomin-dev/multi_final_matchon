@@ -1,43 +1,148 @@
-
-h1{
+/* 제목 */
+h1 {
     text-align: center;
+    margin-bottom: 2rem;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+/* 카드 전체 레이아웃 */
+.matchup-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: white;
 }
 
-td {
-    border: 1px solid #ccc;
-    padding: 12px;
-    vertical-align: top;
+/* 카드 내부 섹션 */
+.card-section {
+    flex: 1 1 30%;
+    min-width: 220px;
+    padding: 0.5rem;
 }
 
-.center {
-    text-align: center;
+/* 가운데 정렬용 */
+.card-section.center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.btn {
+/* 버튼 스타일 */
+.detail, .request {
+    padding: 6px 12px;
+    margin: 3px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+}
+
+.detail {
+    background-color: #004080;
+}
+
+.request {
+    background-color: #007a00;
+}
+
+.detail:hover {
+    background-color: #003060;
+}
+
+.request:hover {
+    background-color: #005a00;
+}
+
+/* 페이징 버튼 */
+#paging-container button {
+    margin: 4px;
+    padding: 6px 10px;
+    border: 1px solid #aaa;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#paging-container button:disabled {
+    background-color: #d0d0d0;
+    cursor: not-allowed;
+}
+
+
+
+#board-create-link:hover {
+    background-color: #003060;
+}
+
+/* 페이징 영역 가운데 정렬 */
+#paging-container {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+/* 가운데 정렬용 wrapper */
+.center-wrapper {
+    display: flex;
+    justify-content: right;
+    margin: 2rem 0;
+}
+
+/* 버튼처럼 보이는 a 태그 */
+.create-btn {
     display: inline-block;
-    padding: 4px 8px;
-    border: 1px solid #e67e92;
-    color: #e67e92;
-    border-radius: 5px;
-    font-size: 13px;
-    text-decoration: none;
-}
-
-.temp {
-    font-size: 14px;
-    margin-top: 5px;
-}
-
-.status {
+    padding: 10px 20px;
+    background-color: #004080;
+    color: white;
+    font-size: 1rem;
     font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
-#paging-container{
-    text-align: center;
+
+.create-btn:hover {
+    background-color: #003060;
+    transform: translateY(-2px);
 }
+
+/* 필터 영역 */
+#filter {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+#filter select,
+#filter input[type="date"] {
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#filterBtn {
+    padding: 6px 14px;
+    background-color: #007a00;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#filterBtn:hover {
+    background-color: #005a00;
+}
+
+
+
+

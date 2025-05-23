@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>대회 등록 현황</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <style>
+        #wrap {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 20px;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        h2 {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .underline-title {
+            border-bottom: 2px solid #000;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        th { background-color: #f3f3f3; }
+
+        .status-pending { background-color: #ddd; color: #555; padding: 4px 8px; border-radius: 4px; }
+        .status-approved { background-color: #4CAF50; color: white; padding: 4px 8px; border-radius: 4px; }
+        .status-denied { background-color: #f44336; color: white; padding: 4px 8px; border-radius: 4px; }
+
+        .pagination { margin-top: 20px; text-align: center; }
+        .pagination a {
+            margin: 0 5px; padding: 6px 12px;
+            border: 1px solid #ccc; color: #000;
+            text-decoration: none; border-radius: 4px;
+            cursor: pointer;
+        }
+        .pagination a.disabled { color: #ccc; pointer-events: none; border-color: #eee; }
+        .pagination a.active { background-color: #5478b2; color: white; }
+        .detail-link { color: #0077cc; text-decoration: underline; cursor: pointer; }
+        .no-data { text-align: center; padding: 30px; font-size: 16px; color: #888; }
+    </style>
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+
+<div id="wrap">
+    <h2><span class="underline-title">대회 등록 현황</span></h2>
+    <div id="eventTable"></div>
+    <div id="pagination"></div>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadEventPage(0);
+    });
+
+    function loadEventPage(page) {
+        fetch(`/admin/event/page?page=${page}`)
+            .then(res => res.json())
+            .then(data => {
+                const tableContainer = document.getElementById("eventTable");
+                const paginationContainer = document.getElementById("pagination");
+
+                if (data.content.length === 0) {
+                    tableContainer.innerHTML = '<div class="no-data">등록된 대회가 없습니다.</div>';
+                    paginationContainer.innerHTML = '';
+                    return;
+                }
+
+                let tableHtml = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>대회명</th>
+                            <th>등록자</th>
+                            <th>등록일</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+                data.content.forEach((event, index) => {
+                    const statusClass = event.eventStatus === 'APPROVED'
+                        ? 'status-approved'
+                        : (event.eventStatus === 'DENIED' ? 'status-denied' : 'status-pending');
+
+                    tableHtml += `
+                        <tr>
+                            <td>${index + 1 + (data.number * data.size)}</td>
+                            <td><a href="/admin/event/${event.id}" class="detail-link">${event.eventTitle}</a></td>
+                            <td>${event.memberName}</td>
+                            <td>${event.createdDate.replace("T", " ")}</td>
+                            <td><span class="${statusClass}">${event.statusLabel}</span></td>
+                        </tr>`;
+                });
+
+                tableHtml += '</tbody></table>';
+                tableContainer.innerHTML = tableHtml;
+
+                // pagination
+                let paginationHtml = '';
+                paginationHtml += `<a onclick="loadEventPage(${data.number - 1})" class="${data.first ? 'disabled' : ''}">&laquo;</a>`;
+
+                for (let i = 0; i < data.totalPages; i++) {
+                    const active = i === data.number ? 'active' : '';
+                    paginationHtml += `<a onclick="loadEventPage(${i})" class="${active}">${i + 1}</a>`;
+                }
+
+                paginationHtml += `<a onclick="loadEventPage(${data.number + 1})" class="${data.last ? 'disabled' : ''}">&raquo;</a>`;
+
+                paginationContainer.innerHTML = `<div class="pagination">${paginationHtml}</div>`;
+            });
+    }
+</script>
+</body>
+</html>
