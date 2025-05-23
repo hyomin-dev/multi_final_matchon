@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>게시글 작성</title>
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
@@ -8,56 +9,56 @@
 </head>
 <body class="flex-layout">
 <div class="page-wrapper">
-<div th:replace="~{common/header::header}"></div>
+    <div th:replace="~{common/header::header}"></div>
 
-<h2 style="text-align: center;">게시글 작성</h2>
+    <h2 style="text-align: center;">게시글 작성</h2>
+
+    <div class="form-container">
+        <form th:action="@{/community}" th:object="${boardRequest}" method="post" enctype="multipart/form-data">
+            <div>
+                <label>제목</label>
+                <input type="text" th:field="*{title}" required />
+                <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+            </div>
+
+            <div>
+                <label>작성자</label>
+                <input type="text" th:value="${memberName}" readonly class="readonly-coral" />
+            </div>
 
 
-<div class="form-container">
-<form th:action="@{/community}" th:object="${boardRequest}" method="post" enctype="multipart/form-data">
-    <div>
-        <label>제목</label>
-        <input type="text" th:field="*{title}" required />
-        <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+            <div>
+                <label>카테고리</label>
+                <select th:field="*{category}" required>
+                    <option value="">-- 선택하세요 --</option>
+                    <option th:each="category : ${categories}"
+                            th:value="${category}"
+                            th:text="${category.displayName}"></option>
+                </select>
+                <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+            </div>
+
+            <div>
+                <label>내용</label>
+                <textarea th:field="*{content}" required></textarea>
+                <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+            </div>
+
+            <div>
+                <label>파일 첨부</label>
+                <input type="file" name="files" id="fileInput" multiple />
+                <div id="filePreview" class="file-preview" style="margin-top: 5px;"></div>
+            </div>
+
+            <div style="text-align: center;">
+                <button type="submit">등록</button>
+            </div>
+        </form>
     </div>
-
-    <div>
-        <label>작성자</label>
-        <input type="text" th:value="${memberName}" readonly />
-    </div>
-
-    <div>
-        <label>내용</label>
-        <textarea th:field="*{content}" required></textarea>
-        <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
-    </div>
-
-    <div>
-        <label>카테고리</label>
-        <select th:field="*{category}" required>
-            <option value="">-- 선택하세요 --</option>
-            <option th:each="category : ${categories}"
-                    th:value="${category}"
-                    th:text="${category.displayName}"></option>
-        </select>
-        <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
-    </div>
-
-    <div>
-        <label>파일 첨부</label>
-        <input type="file" name="files" id="fileInput" multiple />
-        <div id="filePreview" class="file-preview" style="margin-top: 5px;"></div>
-    </div>
-
-
-    <div style="text-align: center;">
-        <button type="submit">등록</button>
-    </div>
-</form>
 </div>
-</div>
+
 <div th:replace="~{common/footer::footer}"></div>
-</body>
+
 <script>
     const fileInput = document.getElementById('fileInput');
     const filePreview = document.getElementById('filePreview');
@@ -65,7 +66,6 @@
 
     fileInput.addEventListener('change', function () {
         const selectedFiles = Array.from(fileInput.files);
-
         fileList = fileList.concat(selectedFiles);
 
         const seen = new Set();
@@ -100,8 +100,8 @@
             deleteBtn.style.cursor = 'pointer';
 
             deleteBtn.onclick = function () {
-                fileList.splice(index, 1); // 목록에서 제거
-                updatePreview(); // 다시 그리기
+                fileList.splice(index, 1);
+                updatePreview();
             };
 
             previewBox.appendChild(fileNameSpan);
@@ -109,12 +109,10 @@
             filePreview.appendChild(previewBox);
         });
 
-        // 새 FileList 생성
         const dataTransfer = new DataTransfer();
         fileList.forEach(file => dataTransfer.items.add(file));
         fileInput.files = dataTransfer.files;
     }
 </script>
-
-
+</body>
 </html>

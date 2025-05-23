@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>게시글 상세</title>
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
@@ -8,60 +9,73 @@
 </head>
 <body class="flex-layout">
 <div class="page-wrapper">
-<div th:replace="~{common/header::header}"></div>
+    <div th:replace="~{common/header::header}"></div>
 
-<div class="content-box">
-    <div class="post-header">
-        <h2 th:text="${board.title}" class="post-title">제목</h2>
-        <div class="post-meta">
-            <span><strong>작성자:</strong> <span th:text="${board.member.memberName}"></span></span>
-            <span><strong>카테고리:</strong> <span th:text="${board.category.displayName}"></span></span>
-            <span><strong>작성일:</strong> <span th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></span></span>
+    <div class="content-box">
+        <div class="post-header" style="position: relative;">
+            <h2 th:text="${board.title}" class="post-title">제목</h2>
+
+            <div th:if="${board.member.id == #authentication.principal.member.id}"
+                 class="board-delete-button-container">
+                <form th:action="@{'/community/' + ${board.id} + '/delete'}" method="post">
+                    <button type="submit" class="board-delete-button">✖ 삭제</button>
+                </form>
+            </div>
+
+            <div class="post-meta meta-horizontal">
+                <span><strong>작성자:</strong> <span th:text="${board.member.memberName}"></span></span>
+                <span><strong>카테고리:</strong> <span th:text="${board.category.displayName}"></span></span>
+                <span><strong>작성일:</strong> <span th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></span></span>
+            </div>
+
+
         </div>
 
-    </div>
+        <div class="post-body">
+            <p th:text="${board.content}" class="post-content"></p>
 
-    <div class="post-body">
-        <p th:text="${board.content}" class="post-content"></p>
-
-        <div th:if="${board.boardAttachmentEnabled}" class="attachment-box">
-            <strong>첨부파일</strong>
-            <ul>
-                <li th:each="path, iterStat : ${savedPaths}">
-                    <a th:href="@{'/community/download/' + ${path}}"
-                       th:text="${originalNames[iterStat.index]}"></a>
-                </li>
-            </ul>
+            <div th:if="${board.boardAttachmentEnabled}" class="attachment-box">
+                <strong>첨부파일</strong>
+                <ul>
+                    <li th:each="path, iterStat : ${savedPaths}">
+                        <a th:href="@{'/community/download/' + ${path}}"
+                           th:text="${originalNames[iterStat.index]}"></a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
+        <div class="post-actions">
+            <a th:href="@{/community}" class="back-link"> 목록으로 </a>
+        </div>
     </div>
 
-    <div class="post-actions">
-        <a th:href="@{/community}" class="back-link"> 목록으로 </a>
+    <div class="comment-section">
+        <h3>댓글</h3>
+        <form th:action="@{'/community/' + ${board.id} + '/comments'}"
+              th:object="${commentRequest}" method="post">
+            <textarea th:field="*{content}" placeholder="댓글을 입력하세요."></textarea>
+            <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" style="color:red;"></div>
+            <button type="submit">댓글 작성</button>
+        </form>
+
+        <ul>
+            <li th:each="comment : ${comments}">
+                <small>
+                    <span th:text="${comment.member.memberName}">작성자</span> |
+                    <span th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</span>
+                    <form th:action="@{'/community/' + ${board.id} + '/comments/' + ${comment.id} + '/delete'}"
+                          method="post" th:if="${comment.member.id == #authentication.principal.member.id}" style="display:inline">
+                        <button type="submit" style="color:red; background:none; border:none; cursor:pointer;">삭제</button>
+                    </form>
+                </small>
+                <p th:text="${comment.content}"></p>
+            </li>
+        </ul>
+
     </div>
 </div>
 
-<div class="comment-section">
-    <h3>댓글</h3>
-    <form th:action="@{'/community/' + ${board.id} + '/comments'}"
-          th:object="${commentRequest}" method="post">
-        <textarea th:field="*{content}" placeholder="댓글을 입력하세요."></textarea>
-        <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" style="color:red;"></div>
-        <button type="submit">댓글 작성</button>
-    </form>
-
-    <ul>
-        <li th:each="comment : ${comments}">
-            <p th:text="${comment.content}"></p>
-            <small th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}"></small>
-        </li>
-    </ul>
-</div>
-</div>
 <div th:replace="~{common/footer::footer}"></div>
 </body>
 </html>
-
-
-
-
