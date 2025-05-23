@@ -7,8 +7,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 async function setContent(){
     const detailDto = document.querySelector("#matchup-board-detail-dto");
 
-    const boardId = Number(detailDto.dataset.boardId);
-    const writer = detailDto.dataset.writer;
+    const memberEmail = detailDto.dataset.memberEmail;
     const sportsFacilityName = detailDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = detailDto.dataset.sportsFacilityAddress;
     const matchDatetime = detailDto.dataset.matchDatetime;
@@ -16,20 +15,19 @@ async function setContent(){
     const currentParticipantCount = Number(detailDto.dataset.currentParticipantCount);
     const maxParticipants = Number(detailDto.dataset.maxParticipants);
     const minMannerTemperature = Number(detailDto.dataset.minMannerTemperature);
-    const originalName = detailDto.dataset.originalName;
     const savedName = detailDto.dataset.savedName;
-    const savedPath = detailDto.dataset.savedPath;
-    const myTemperature = Number(detailDto.dataset.myTemperature);
-    const loginMember = detailDto.dataset.loginMember;
+    const myMannerTemperature = Number(detailDto.dataset.myMannerTemperature);
+    const loginEmail = detailDto.dataset.loginEmail;
     //const baseUrl = detailDto.dataset.baseUrl;
     //console.log(sportsFacilityAddress);
     //console.log(matchDatetime);
+    //console.log(loginMemberName);
 
-    setWriter(writer, loginMember);
+    setWriter(memberEmail, loginEmail);
     drawMap(sportsFacilityAddress, sportsFacilityName);
     calTime(matchDatetime, matchDuration);
-    checkStatus(matchDatetime, currentParticipantCount, maxParticipants, writer, loginMember, minMannerTemperature, myTemperature);
-    setButton(matchDatetime, writer, loginMember, currentParticipantCount, maxParticipants, minMannerTemperature, myTemperature);
+    checkStatus(matchDatetime, currentParticipantCount, maxParticipants, memberEmail, loginEmail, minMannerTemperature, myMannerTemperature);
+    setButton(matchDatetime, memberEmail, loginEmail, currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature);
 
 
     const response = await fetch(`/matchup/attachment/presigned-url?saved-name=${savedName}`,{
@@ -53,14 +51,12 @@ async function setContent(){
 }
 
 
-
-
-function setWriter(writer, loginMember){
+function setWriter(memberEmail, loginEmail){
     const writerEle = document.querySelector("#writer");
-    if(writer===loginMember)
+    if(memberEmail===loginEmail)
         writerEle.innerHTML = "나";
     else
-        writerEle.innerHTML = writer;
+        writerEle.innerHTML = memberEmail;
 }
 
 
@@ -141,7 +137,7 @@ function calTime(matchDatetime, matchDuration){
 
 }
 
-function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, writer, loginMember, minMannerTemperature, myTemperature){
+function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, memberEmail, loginEmail, minMannerTemperature, myMannerTemperature){
     const statusEle = document.querySelector("#status");
 
     // console.log(currentParticipantCount)
@@ -152,7 +148,7 @@ function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, wr
     const now = new Date();
     if(matchDate<now)
         statusEle.innerHTML = "경기 종료"
-    else if(writer === loginMember){
+    else if(memberEmail === loginEmail){
         // 경우1: 사용자가 쓴 글
         // 신청 가능 여부: 모집 중, 모집 완료, 경기 종료
 
@@ -163,7 +159,7 @@ function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, wr
     }else{
         // 경우2: 다른 사람의 글
         // 신청 가능 여부: 신청 가능, 신청 마감, 입장 불가, 경기 종료
-        if(minMannerTemperature>myTemperature)
+        if(minMannerTemperature>myMannerTemperature)
             statusEle.innerHTML = "입장 불가";
         else if(currentParticipantCount < maxParticipants)
             statusEle.innerHTML = "신청 가능";
@@ -172,16 +168,16 @@ function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, wr
     }
 }
 
-function setButton(matchDatetime, writer, loginMember,currentParticipantCount, maxParticipants, minMannerTemperature, myTemperature ){
+function setButton(matchDatetime, memberEmail, loginEmail,currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature ){
     const matchDate = new Date(matchDatetime);
     const now = new Date();
-    if(writer === loginMember && matchDate<now){ //수정하기 버튼
+    if(memberEmail === loginEmail && matchDate<now){ //수정하기 버튼
        const modifyBtn = document.querySelector("#modify");
        modifyBtn.addEventListener("click",(e)=>{
            alert("경기 시작 시간이 지나 수정할 수 없습니다.");
            e.preventDefault();
        })
-    }else if(writer !==loginMember){ // 문의하기, 참가요청 버튼
+    }else if(memberEmail !==loginEmail){ // 문의하기, 참가요청 버튼
         const chatBtn = document.querySelector("#chat1-1Btn");
         const requestBtn = document.querySelector("#requestBtn");
 
@@ -204,7 +200,7 @@ function setButton(matchDatetime, writer, loginMember,currentParticipantCount, m
                 e.preventDefault();
             })
 
-        }else if(minMannerTemperature>myTemperature){ // 매너 온도 충족 안된 경우
+        }else if(minMannerTemperature>myMannerTemperature){ // 매너 온도 충족 안된 경우
             requestBtn.href = "#";
             requestBtn.addEventListener("click",(e)=>{
                 alert("입장 가능 매너 온도를 충족하지 못해 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")

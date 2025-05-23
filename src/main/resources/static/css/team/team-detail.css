@@ -6,7 +6,9 @@
 
 .team-tabs {
     display: flex;
+
     justify-content: center; /* 🔥 This centers the tabs */
+
     gap: 20px;
     border-bottom: 2px solid #ddd;
     margin-bottom: 30px;
@@ -417,6 +419,7 @@
 
 .error-message {
     color: #dc3545;
+
 }
 html, body {
     height: 100%;
@@ -432,3 +435,4 @@ html, body {
 .content-wrapper {
     flex: 1;
 }
+

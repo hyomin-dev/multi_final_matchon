@@ -5,7 +5,8 @@
     <title>대회 등록</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/event/register.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/event/event-register.css}">
+    <script th:src="@{/js/event/event-register.js}" defer></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
@@ -71,21 +72,6 @@
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
-<script>
-    function getAddress() {
-        new daum.Postcode({
-            oncomplete: function(data) {
-                var addr = '';
-                if (data.userSelectedType === 'R') {
-                    addr = data.roadAddress;
-                } else {
-                    addr = data.jibunAddress;
-                }
-                document.querySelector("#eventAddress").value = addr;
-                document.querySelector("#eventAddress").focus();
-            }
-        }).open();
-    }
-</script>
+
 </body>
 </html>
