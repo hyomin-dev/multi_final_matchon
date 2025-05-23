@@ -57,4 +57,11 @@ public class MatchupRequest extends BaseEntity {
         this.selfIntro = selfIntro;
         this.participantCount = participantCount;
     }
+
+    public void updateRequestMangementInfo(Status matchupStatus, Integer matchupRequestSubmittedCount, Integer matchupCancelSubmittedCount, Boolean isDeleted) {
+        this.matchupStatus = matchupStatus;
+        this.matchupRequestSubmittedCount = matchupRequestSubmittedCount;
+        this.matchupCancelSubmittedCount = matchupCancelSubmittedCount;
+        this.isDeleted = isDeleted;
+    }
 }

@@ -534,8 +534,6 @@ WHERE faq_category = '5';
 
 DELETE FROM faq WHERE faq_id NOT IN (SELECT min_id FROM (SELECT MIN(faq_id) AS min_id FROM faq GROUP BY faq_category, faq_title, LEFT(faq_content, 100)) AS sub);
 ALTER TABLE faq ADD CONSTRAINT uq_unique_faq UNIQUE (faq_category, faq_title, faq_content(100));
-INSERT INTO sports_type (sports_type_name)
-VALUES ('SOCCER');
 
 
 

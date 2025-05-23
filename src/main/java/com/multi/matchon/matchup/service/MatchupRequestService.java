@@ -5,6 +5,7 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.common.dto.res.PageResponseDto;
+import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.common.exception.custom.hasCanceledMatchRequestMoreThanOnceException;
 import com.multi.matchon.common.exception.custom.MatchupRequestLimitExceededException;
 import com.multi.matchon.matchup.domain.MatchupRequest;
@@ -71,28 +72,28 @@ public class MatchupRequestService {
 
         if(!findMatchupRequestOptional.isPresent()){
             MatchupRequest newMatchupRequest = MatchupRequest.builder()
-                    .matchupBoard(matchupBoardRepository.findByIdAndIsDeletedFalse(reqMatchupRequestDto.getBoardId()).orElseThrow(()->new IllegalArgumentException(reqMatchupRequestDto.getBoardId()+"번 Matchup 게시글이 존재하지 않습니다.")))
-                    .member(memberRepository.findByIdAndIsDeletedFalse(user.getMember().getId()).orElseThrow(()->new IllegalArgumentException(user.getMember().getId()+"번 회원은 없습니다.(Matchup)")))
+                    .matchupBoard(matchupBoardRepository.findByIdAndIsDeletedFalse(reqMatchupRequestDto.getBoardId()).orElseThrow(()->new IllegalArgumentException("Matchup"+reqMatchupRequestDto.getBoardId()+"번 게시글이 존재하지 않습니다.")))
+                    .member(memberRepository.findByIdAndIsDeletedFalse(user.getMember().getId()).orElseThrow(()->new IllegalArgumentException("Matchup"+user.getMember().getId()+"번 회원은 없습니다.")))
                     .selfIntro(reqMatchupRequestDto.getSelfIntro())
                     .participantCount(reqMatchupRequestDto.getParticipantCount())
                     .matchupStatus(Status.PENDING)
                     .build();
             matchupRequestRepository.save(newMatchupRequest);
         }
-//        else{
-//            MatchupRequest findMatchupRequest = findMatchupRequestOptional.get();
-//
-//            if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestResubmittedCount()==1){
-//
-//            }else if{
-//
-//            }else if{
-//
-//            }else{
-//
-//            }
-//
-//        }
+        else{
+            MatchupRequest findMatchupRequest = findMatchupRequestOptional.get();
+
+            if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && findMatchupRequest.getIsDeleted()) {
+                findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false); // 재요청 1번 상황
+            }else if(findMatchupRequest.getMatchupStatus()==Status.DENIED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && findMatchupRequest.getIsDeleted()){
+                findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false); // 재요청 2번 상황
+            }else if(findMatchupRequest.getMatchupStatus()==Status.DENIED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
+                findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false); // 재요청 3번 상황
+            }else{
+                throw new CustomException("Matchup"+"요청할 수 없는 상태입니다. 이전 이력을 확인해주세요.");
+            }
+
+        }
 
 
 
@@ -133,14 +134,14 @@ public class MatchupRequestService {
     @Transactional(readOnly = true)
     public ResMatchupRequestDto findResMatchRequestDtoByRequestId(Long requestId) {
 
-        return matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException(requestId+"번 요청은 없습니다."));
+        return matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException("Matchup"+requestId+"번 요청은 없습니다."));
 
     }
 
     @Transactional(readOnly = true)
     public ReqMatchupRequestDto findReqMatchupRequestDtoByBoardId(Long boardId) {
 
-       return matchupBoardRepository.findReqMatchupRequestDtoByBoardId(boardId).orElseThrow(()->new IllegalArgumentException(boardId+"번 게시글이 없습니다."));
+       return matchupBoardRepository.findReqMatchupRequestDtoByBoardId(boardId).orElseThrow(()->new IllegalArgumentException("Matchup"+boardId+"번 게시글이 없습니다."));
     }
 
 

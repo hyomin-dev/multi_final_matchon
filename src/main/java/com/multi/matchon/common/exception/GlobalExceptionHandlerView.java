@@ -1,5 +1,6 @@
 package com.multi.matchon.common.exception;
 
+import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.common.exception.custom.hasCanceledMatchRequestMoreThanOnceException;
 import com.multi.matchon.common.exception.custom.MatchupRequestLimitExceededException;
 import com.sun.jdi.request.DuplicateRequestException;
@@ -14,16 +15,6 @@ public class GlobalExceptionHandlerView {
 
     @ExceptionHandler({DuplicateRequestException.class})
     public ModelAndView exceptionHandler(DuplicateRequestException ex){
-        ModelAndView mv = new ModelAndView();
-        mv.setViewName("common/error");
-        mv.addObject("errorMessage",ex.getMessage());
-        log.info("error message:{} ",ex.getMessage());
-        ex.printStackTrace(); //나중에 제거
-        return mv;
-    }
-
-    @ExceptionHandler({Exception.class})
-    public ModelAndView exceptionHandler(Exception ex){
         ModelAndView mv = new ModelAndView();
         mv.setViewName("common/error");
         mv.addObject("errorMessage",ex.getMessage());
@@ -51,4 +42,25 @@ public class GlobalExceptionHandlerView {
         ex.printStackTrace();
         return mv;
     }
+
+    @ExceptionHandler({CustomException.class})
+    public ModelAndView exceptionHandler(CustomException ex){
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("common/error");
+        mv.addObject("errorMessage",ex.getMessage());
+        log.info("error message: {}",ex.getMessage());
+        ex.printStackTrace();
+        return mv;
+    }
+
+    @ExceptionHandler({Exception.class})
+    public ModelAndView exceptionHandler(Exception ex){
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("common/error");
+        mv.addObject("errorMessage",ex.getMessage());
+        log.info("error message:{} ",ex.getMessage());
+        ex.printStackTrace(); //나중에 제거
+        return mv;
+    }
+
 }
