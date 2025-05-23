@@ -75,19 +75,18 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             """)
     Optional<ResMatchupRequestDto> findResMatchupRequestDtoByRequestId(Long requestId);
 
-<<<<<<< HEAD
+
     @Query("""
             select case
                     when count(t1)>0 then true
                     else false
                 end
                 from MatchupRequest t1
-                where t1.matchupBoard.id =:boardId and t1.member.id =:memberId and t1.isDeleted=true
+                where t1.matchupBoard.id =:boardId and t1.member.id =:memberId and t1.isDeleted=true and 
+                t1.matchupRequestSubmittedCount >=2
             """)
-    Boolean isCanceledMatchupRequestByBoardIdAndMemberId(@Param("boardId") Long boardId, @Param("memberId") Long memberId);
-=======
+    Boolean hasCanceledMatchRequestMoreThanOnce(@Param("boardId") Long boardId, @Param("memberId") Long memberId);
 
->>>>>>> develop
 
     @Query("""
         select case
@@ -112,10 +111,10 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             from MatchupRequest t1
             where t1.matchupBoard.id =:boardId and t1.member.id =:memberId and t1.isDeleted=false and
                 t1.matchupStatus =com.multi.matchon.common.domain.Status.DENIED and
-                t1.matchupRequestResubmittedCount>=2
+                t1.matchupRequestSubmittedCount>=1
             """)
-    Boolean hasExceededThreeMatchupRequestsByBoardIdAndMemberId(@Param("boardId") Long boardId, @Param("memberId") Long memberId);
+    Boolean hasExceededTwoMatchupRequestsByBoardIdAndMemberId(@Param("boardId") Long boardId, @Param("memberId") Long memberId);
 
 
-
+    Optional<MatchupRequest> findByMatchupBoardIdAndMemberId(Long boardId, Long id);
 }

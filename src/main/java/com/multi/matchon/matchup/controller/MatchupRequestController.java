@@ -81,19 +81,13 @@ public class MatchupRequestController {
         return mv;
     }
 
-<<<<<<< HEAD
+
 //    @PostMapping("/edit")
 //    public String editMatchupRequest(@ModelAttribute ResMatchupRequestDto resMatchupRequestDto, @RequestParam("request-id") Long requestId){
 //        matchupRequestService.updateMatchupRequest(resMatchupRequestDto, requestId);
 //        return "matchup/matchup-request-my";
 //    }
-=======
-    @PostMapping("/edit")
-    public String editMatchupRequest(@ModelAttribute ResMatchupRequestDto resMatchupRequestDto, @RequestParam("request-id") Long requestId){
-        matchupRequestService.updateMatchupRequest(resMatchupRequestDto, requestId);
-        return "matchup/matchup-request-my";
-    }
->>>>>>> develop
+
 
     @GetMapping("/delete")
     public String deleteMatchupRequest(){

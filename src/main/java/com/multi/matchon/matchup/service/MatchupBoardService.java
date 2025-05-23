@@ -46,7 +46,7 @@ public class MatchupBoardService {
 
         MatchupBoard newMatchupBoard = MatchupBoard.builder()
                 .member(user.getMember())
-                .sportsType(sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardDto.getSportsTypeName())).orElseThrow(()-> new IllegalArgumentException(reqMatchupBoardDto.getSportsTypeName()+"는 지원하지 않는 종목입니다.")))
+                .sportsType(sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardDto.getSportsTypeName())).orElseThrow(()-> new IllegalArgumentException(reqMatchupBoardDto.getSportsTypeName()+"는 Matchup에서 지원하지 않는 종목입니다.")))
                 .reservationAttachmentEnabled(true)
                 .teamIntro(reqMatchupBoardDto.getTeamIntro())
                 .sportsFacilityName(reqMatchupBoardDto.getSportsFacilityName())
@@ -67,12 +67,12 @@ public class MatchupBoardService {
     @Transactional(readOnly = true)
     public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId) {
 
-        MatchupBoard matchupBoard = matchupBoardRepository.findMatchupBoardByBoardId(boardId).orElseThrow(()->new IllegalArgumentException(boardId +"번 게시글이 존재하지 않습니다."));
+        MatchupBoard matchupBoard = matchupBoardRepository.findMatchupBoardByBoardId(boardId).orElseThrow(()->new IllegalArgumentException(boardId +"번 Matchup 게시글이 존재하지 않습니다."));
 
         List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
 
         if(attachments.isEmpty()&&matchupBoard.getReservationAttachmentEnabled())
-            throw new IllegalArgumentException(boardId +"번 게시글의 첨부파일이 존재해야하는데 없습니다.");
+            throw new IllegalArgumentException(boardId +"번 Matchup 게시글의 첨부파일이 존재해야하는데 없습니다.");
 
         return ResMatchupBoardDto.builder()
                 .boardId(matchupBoard.getId())
@@ -161,7 +161,7 @@ public class MatchupBoardService {
         MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(resMatchupBoardDto.getBoardId()).orElseThrow(()->new IllegalArgumentException(resMatchupBoardDto.getBoardId()+"번 게시글이 없습니다."));
 
         findMatchupBoard.update(
-                sportsTypeRepository.findBySportsTypeName(resMatchupBoardDto.getSportsTypeName()).orElseThrow(()-> new IllegalArgumentException(resMatchupBoardDto.getSportsTypeName()+"는 지원하지 않는 종목입니다.")),
+                sportsTypeRepository.findBySportsTypeName(resMatchupBoardDto.getSportsTypeName()).orElseThrow(()-> new IllegalArgumentException(resMatchupBoardDto.getSportsTypeName()+"는 Matchup에서 지원하지 않는 종목입니다.")),
                 resMatchupBoardDto.getTeamIntro(),
                 resMatchupBoardDto.getSportsFacilityName(),
                 resMatchupBoardDto.getSportsFacilityAddress(),
@@ -186,7 +186,7 @@ public class MatchupBoardService {
 
     @Transactional
     public void softDeleteMatchupBoard(Long boardId) {
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(boardId).orElseThrow(()->new IllegalArgumentException(boardId+"번 게시글이 없습니다."));
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(boardId).orElseThrow(()->new IllegalArgumentException(boardId+"번 Matchup 게시글이 없습니다."));
 
         findMatchupBoard.delete(true);
 
@@ -194,7 +194,7 @@ public class MatchupBoardService {
 
         List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
         if(findAttachments.isEmpty())
-            throw new IllegalArgumentException(BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
+            throw new IllegalArgumentException(BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다. Matchup ");
         findAttachments.get(0).delete(true);
 
         attachmentRepository.save(findAttachments.get(0));
