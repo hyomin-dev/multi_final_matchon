@@ -74,7 +74,7 @@ public class MatchupRequestController {
     // 참가 요청 수정/삭제
 
     @GetMapping("/edit")
-    public String showMatchupRequestEditPage(){
+    public String showMatchupRequestEditPage(@RequestParam("request-id") Long requestId, @AuthenticationPrincipal CustomUser user){
         return "matchup/matchup-request-edit";
     }
 

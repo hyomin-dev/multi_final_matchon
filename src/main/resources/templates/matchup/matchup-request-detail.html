@@ -82,7 +82,7 @@
         <a th:href="@{#}" id="denied">반려</a>
     </th:block>
     <th:block th:if="${resMatchupRequestDto.applicantEmail == #authentication.name}">
-        <a id="chat1-1Btn" th:href="@{/}">수정하기</a>
+        <a id="chat1-1Btn" th:href="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}">수정하기</a>
         <a id="requestBtn" th:href="@{#}">요청취소하기</a>
     </th:block>
 
