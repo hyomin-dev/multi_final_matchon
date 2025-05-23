@@ -69,20 +69,24 @@
             <td id="match-date"></td>
         </tr>
         <tr>
+            <th>현재 정원:</th>
+            <td th:text="'(' + ${resMatchupRequestDto.currentParticipantCount} + '/' + ${resMatchupRequestDto.maxParticipants} +')'"></td>
+        </tr>
+        <tr>
             <th>신청 인원:</th>
             <td th:text="${resMatchupRequestDto.participantCount}"></td>
         </tr>
         <tr>
-            <th>신청 가능 여부</th>
+            <th>요청 상태:</th>
             <td th:text="${resMatchupRequestDto.matchupStatus}"></td>
         </tr>
     </table>
-    <th:block th:if="${resMatchupRequestDto.boardWriter == #authentication.name}">
+    <th:block th:if="${resMatchupRequestDto.boardWriterEmail == #authentication.name}">
         <a th:href="@{#}" id="approved">승인</a>
         <a th:href="@{#}" id="denied">반려</a>
     </th:block>
-    <th:block th:if="${resMatchupRequestDto.applicant == #authentication.name}">
-        <a id="chat1-1Btn" th:href="@{/}">수정하기</a>
+    <th:block th:if="${resMatchupRequestDto.applicantEmail == #authentication.name}">
+        <a id="chat1-1Btn" th:href="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}">수정하기</a>
         <a id="requestBtn" th:href="@{#}">요청취소하기</a>
     </th:block>
 
