@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -17,10 +18,11 @@ import java.time.LocalTime;
 @Builder
 public class ResMatchupBoardDto {
 
-
     private Long boardId;
 
-    private String writer;
+    private String memberEmail;
+
+    private String memberName;
 
     private String teamName;
 
@@ -42,6 +44,7 @@ public class ResMatchupBoardDto {
 
     private Double minMannerTemperature;
 
+    private MultipartFile reservationFile;
 
     private String matchDescription;
 
@@ -51,6 +54,6 @@ public class ResMatchupBoardDto {
 
     private String savedPath;
 
-    private Double myTemperature;
+    private Double myMannerTemperature;
 
 }

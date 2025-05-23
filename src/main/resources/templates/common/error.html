@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <script th:inline="javascript">
+    (function(){
+
+      const errorCode = [[${errorMessage}]]
+      //console.log(errorCode);
+
+        if(errorCode.includes("matchup 중복된 참가 요청입니다.")){
+            alert("이미 참가 요청을 하셨습니다. 중복 요청은 불가능합니다.")
+            window.location.href="/matchup/board";
+        }else{
+            alert("알 수 없는 오류로 인해 메인 페이지로 이동합니다.")
+            window.location.href="/";
+        }
+
+    })()
+  </script>
+
+</body>
+</html>

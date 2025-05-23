@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- faq 상세보기 -->
+    <!-- faq의 제목을 누르면 맞는 상세보기 이동됨 -->
+    <title>Faq-detail</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+
+    <style>
+        .pagination button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .pagination button:hover {
+            color: #007bff;
+        }
+
+        .pagination .page-number {
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .titlefaq {
+            text-align: center;
+        }
+
+        .title2faq {
+            text-align: center;
+        }
+
+        .faq-box {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            width: 600px;
+            margin: 40px auto;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .faq-box strong {
+            color: #007bff;
+            font-size: 18px;
+        }
+
+        .faq-box a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .faq-box a:hover {
+            text-decoration: underline;
+        }
+
+        .faq-box .question {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .btnturnmenu {
+            float: right;
+        }
+
+
+    </style>
+
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+
+    <h1 class="titlefaq">FAQ</h1>
+    <p class="title2faq">자주 묻는 질문</p>
+
+    <!-- faq 상세보기 -->
+    <h1 th:text="${faqDto.faqTitle}"></h1>
+    <p th:text="${faqDto.faqContent}"></p>
+
+    <form th:action="@{/cs}" method="get">
+        <button type="submit" class="btnturnmenu">메뉴로 돌아가기</button>
+    </form>
+
+</div>
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

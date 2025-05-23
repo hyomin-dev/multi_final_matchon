@@ -1,5 +1,5 @@
---   DROP DATABASE IF EXISTS matchon;
---  CREATE DATABASE IF NOT EXISTS matchon;
+  DROP DATABASE IF EXISTS matchon;
+ CREATE DATABASE IF NOT EXISTS matchon;
 USE matchon;
 
 

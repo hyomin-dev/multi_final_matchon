@@ -19,8 +19,12 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.time.Duration;
 
 @Slf4j
@@ -67,19 +71,44 @@ public class AwsS3Utils {
         }
     }
 
-    public S3Resource downloadFile(String dirName, String savedName) {
 
-        S3Resource resource =  s3Operations.download(bucket,dirName+savedName);
+    public S3Resource downloadFile(String dirName, String savedName) throws IOException {
+        String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+        S3Resource resource =  s3Operations.download(bucket,dirName+savedNameOnly);
+
+//       ByteArrayOutputStream outputStream = (ByteArrayOutputStream) resource.getOutputStream();
+//       byte[] data = outputStream.toByteArray();
+//       Path filePath = Paths.get("C:/temp/test.pdf");
+//       Files.write(filePath, data);
+//       log.info("로컬에 복사 완료");
+
+        /////////////////////////////
+//        File targetFile = new File("C:/temp/reservation.pdf"); // 원하는 로컬 경로
+//
+//        try (InputStream inputStream = resource.getInputStream();
+//             OutputStream outputStream = new FileOutputStream(targetFile)) {
+//            byte[] buffer = new byte[8192];
+//            int bytesRead;
+//            while ((bytesRead = inputStream.read(buffer)) != -1) {
+//                outputStream.write(buffer, 0, bytesRead);
+//            }
+//            System.out.println("저장 완료!");
+//        }
+
         return resource;
     }
 
     /* Create a pre-signed URL to download an object in a subsequent GET request. */
     public String createPresignedGetUrl(String dirName, String savedName) {
+
+        String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+
+
         try (S3Presigner presigner = S3Presigner.create()) {
 
             GetObjectRequest objectRequest = GetObjectRequest.builder()
                     .bucket(bucket)
-                    .key(dirName+savedName)
+                    .key(dirName+savedNameOnly)
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -88,10 +117,28 @@ public class AwsS3Utils {
                     .build();
 
             PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
-            log.info("Presigned URL: [{}]", presignedRequest.url().toString());
-            log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
+            //log.info("Presigned URL: [{}]", presignedRequest.url().toString());
+            //log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
 
             return presignedRequest.url().toExternalForm();
+        }
+    }
+
+    /**
+     * S3에서 파일 삭제
+     */
+    public boolean deleteFile(String dirName, String fileName) {
+        log.info("[AwsS3Utils] deleteFile Start =====================");
+        String s3Key = dirName + fileName; // yml 에서  products 까지 경로 줘도되고, 이미지 업로드 구분하려면 폴더명을 서비스에서 받아서 이용
+        System.out.println("======>    "+s3Key);
+
+        try {
+            s3Operations.deleteObject(bucket, s3Key);
+            log.info("[AwsS3Utils] File Deleted Successfully: " + s3Key);
+            return true;
+        } catch (Exception e) {
+            log.error("[AwsS3Utils] File Deletion Failed: " + s3Key, e);
+            return false;
         }
     }
 

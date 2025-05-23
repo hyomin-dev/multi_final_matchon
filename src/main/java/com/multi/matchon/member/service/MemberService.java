@@ -3,6 +3,7 @@ package com.multi.matchon.member.service;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,4 +35,11 @@ public class MemberService {
 
         return member.getMyTemperature();
     }
+
+    //이메일로 회원조회
+    public Member findByEmail(String email) {
+        return memberRepository.findByMemberEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    }
+
 }

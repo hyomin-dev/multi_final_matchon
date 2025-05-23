@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>대회 상세</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/admin/admin-event-detail.css}">
+    <script th:src="@{/js/admin/admin-event-detail.js}" defer></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7bb155da95fb31682683d7bb286174d2&libraries=services"></script>
+
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+    <h2 th:text="${event.eventTitle}">대회 제목</h2>
+
+    <div class="info-box"><label>주최기관:</label> <span th:text="${event.hostProfile.hostName}"></span></div>
+    <div class="info-box"><label>일자:</label> <span th:text="${event.eventDate}"></span></div>
+    <div class="info-box"><label>지역:</label> <span th:text="${regionLabel}"></span></div>
+    <div class="info-box"><label>장소:</label> <span th:text="${event.eventAddress}"></span></div>
+    <div id="map"></div>
+    <div class="info-box"><label>참가 방법:</label> <span th:text="${event.eventMethod}"></span></div>
+    <div class="info-box"><label>문의:</label> <span th:text="${event.eventContact}"></span></div>
+    <div class="info-box"><label>상태:</label> <span th:text="${statusLabel}"></span></div>
+
+    <div class="btn-wrap">
+        <a th:href="@{/admin/event}" class="btn back-btn">목록으로</a>
+        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post">
+            <input type="hidden" name="status" value="APPROVED">
+            <button type="submit" class="btn approve-btn">승인</button>
+        </form>
+        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post">
+            <input type="hidden" name="status" value="DENIED">
+            <button type="submit" class="btn deny-btn">반려</button>
+        </form>
+    </div>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

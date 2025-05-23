@@ -20,11 +20,7 @@
 <div id="wrap">
   <h1>MATCHUP 글 상세보기</h1>
   <div id="matchup-board-detail-dto"
-       th:data-board-id="${resMatchupBoardDto.boardId}"
-       th:data-writer="${resMatchupBoardDto.writer}"
-       th:data-team-name="${resMatchupBoardDto.teamName}"
-       th:data-sports-type-name="${resMatchupBoardDto.sportsTypeName}"
-       th:data-team-intro="${resMatchupBoardDto.teamIntro}"
+       th:data-member-email="${resMatchupBoardDto.memberEmail}"
        th:data-sports-facility-name="${resMatchupBoardDto.sportsFacilityName}"
        th:data-sports-facility-address="${resMatchupBoardDto.sportsFacilityAddress}"
        th:data-match-datetime="${resMatchupBoardDto.matchDatetime}"
@@ -33,13 +29,11 @@
        th:data-max-participants="${resMatchupBoardDto.maxParticipants}"
        th:data-min-manner-temperature="${resMatchupBoardDto.minMannerTemperature}"
        th:data-match-description="${resMatchupBoardDto.matchDescription}"
-       th:data-original-name="${resMatchupBoardDto.originalName}"
        th:data-saved-name="${resMatchupBoardDto.savedName}"
-       th:data-my-temperature="${resMatchupBoardDto.myTemperature}"
-       th:data-login-member="${#authentication.name}"
+       th:data-my-manner-temperature="${resMatchupBoardDto.myMannerTemperature}"
+       th:data-login-email = "${#authentication.name}"
   >
   </div>
-
   <table>
     <tr>
       <th>종목: </th>
@@ -59,7 +53,8 @@
     </tr>
     <tr>
       <th>경기장 예약내역:</th>
-      <td th:text="${resMatchupBoardDto.originalName}"></td>
+
+      <td >미리보기: <a id="reservationUrl" th:text="${resMatchupBoardDto.originalName}" target="_blank" download></a></td>
     </tr>
     <tr>
       <th>경기장명:</th>
@@ -93,17 +88,20 @@
     </tr>
     <tr>
       <th>내 매너 온도</th>
-      <td th:text="${resMatchupBoardDto.myTemperature}"></td>
+      <td th:text="${resMatchupBoardDto.myMannerTemperature}"></td>
     </tr>
   </table>
-  <th:block th:if="${resMatchupBoardDto.writer == #authentication.name}">
-    <a th:href="@{/matchup/board/edit(boardId=${resMatchupBoardDto.boardId})}" id="modify">수정하기</a>
+  <div class="button-group">
+    <th:block th:if="${resMatchupBoardDto.memberEmail == #authentication.name}">
+      <a th:href="@{/matchup/board/edit(boardId=${resMatchupBoardDto.boardId})}" id="modify">수정하기</a>
 
-  </th:block>
-  <th:block th:unless="${resMatchupBoardDto.writer == #authentication.name}">
-    <a th:href="@{/matchup/}">문의하기</a>
-    <a th:href="@{#}">참가요청</a>
-  </th:block>
+    </th:block>
+    <th:block th:unless="${resMatchupBoardDto.memberEmail == #authentication.name}">
+      <a id="chat1-1Btn" th:href="@{#}">문의하기</a>
+      <a id="requestBtn" th:href="@{/matchup/request(boardId=${resMatchupBoardDto.boardId})}">참가요청</a>
+    </th:block>
+  </div>
+
 
 </div>
 

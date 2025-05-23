@@ -17,9 +17,19 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
     <h1>MATCHUP 내가 작성한 글 목록</h1>
+    <div class="center-wrapper">
+        <a th:href="@{/matchup/board/register}" class="create-btn">글 작성하기</a>
+    </div>
 
-    <a th:href="@{/matchup/detail}"><button>글 상세보기</button></a>
-    <a th:href="@{/matchup/board/register}"><button>글 작성하기</button></a>
+    <div id="filter">
+        <select id="sports-type">
+            <option value="" selected>전체 종목</option>
+            <option value="SOCCER">축구</option>
+            <option value="FUTSAL">풋살</option>
+        </select>
+        <label>날짜<input type="date" id="date-filter"></label>
+        <button id="filterBtn">검색</button>
+    </div>
 
     <div id="board-container">
 

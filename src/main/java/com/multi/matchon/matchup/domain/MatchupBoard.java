@@ -3,6 +3,7 @@ package com.multi.matchon.matchup.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.common.domain.SportsType;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -69,4 +70,23 @@ public class MatchupBoard extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
+    public void update(SportsType sportsType, String teamIntro, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants, Double minMannerTemperature, String matchDescription){
+
+        this.sportsType = sportsType;
+        this.teamIntro = teamIntro;
+        this.sportsFacilityName = sportsFacilityName;
+        this.sportsFacilityAddress = sportsFacilityAddress;
+        this.matchDatetime = matchDatetime;
+        this.matchDuration = matchDuration;
+        this.currentParticipantCount = currentParticipantCount;
+        this.maxParticipants = maxParticipants;
+        this.minMannerTemperature = minMannerTemperature;
+        this.matchDescription = matchDescription;
+
+    }
+
+
+    public void delete(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }

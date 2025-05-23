@@ -57,35 +57,35 @@ function renderList(items){
         const card = document.createElement("div");
         card.className = "matchup-card";
         card.innerHTML = `
-            <table>
-                <tr>
-                    <td class="center">
-                        <div><strong>작성자: ${item.writer}</strong></div>
-                        <div><strong>팀 이름: ${item.teamName}</strong></div>
-                        <div>
-                            <a href="/matchup/board/detail?matchup-board-id=${item.boardId}"><button class="detail">상세보기</button></a>                           
-                        </div>                       
-                    </td>
-                    <td class="center">
-                        <div><strong>종목: ${item.sportsTypeName}</strong></div>
-                        <div><strong>경기장: ${item.sportsFacilityName}</strong></div>
-                        <div>경기장 주소: ${item.sportsFacilityAddress}</div>  
-                        <div>📅 날짜: ${date.getMonth()+1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - ${calTime(item,date.getHours(), date.getMinutes())}</div>                                         
-                    </td>
-                    <td class="center">
-                        <div>${checkStatus(item)}</div>
-                        <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>
-                        <div>입장 가능 매너 온도: ${item.minMannerTemperature}</div>
-                        <div>내 매너 온도: ${myMannerTemperature}</div>
-                    </td>
-                </tr>
-            </table>            
+                                 
+           <div class="card-section">
+                <div><strong>작성자:</strong> ${item.memberName}</div>
+                <div><strong>팀 이름:</strong> ${item.teamName}</div>
+                <div>
+                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
+                        <button class="detail">상세보기</button>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card-section">
+                <div><strong>종목:</strong> ${item.sportsTypeName}</div>
+                <div><strong>경기장:</strong> ${item.sportsFacilityName}</div>
+                <div><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
+                <div>
+                    📅 날짜: ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
+                    ${calTime(item, date.getHours(), date.getMinutes())}
+                </div>
+            </div>
+            
+            <div class="card-section">
+                <div>${checkStatus(item)}</div>
+                <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>
+                <div>입장 가능 매너 온도: ${item.minMannerTemperature}</div>
+                <div>내 매너 온도: ${myMannerTemperature}</div>
+            </div>
                 `;
         boardArea.appendChild(card);
-        // /board/detail
-        document.querySelector(".detail").addEventListener("click",()=>{
-
-        })
 
     })
 }
@@ -207,8 +207,7 @@ function checkStatus(item){
 
 async function getMyMannerTemperature(){
 
-    const email = document.querySelector("#user-info").dataset.email;
-    const response  = await fetch(`/member/search-temperature?email=${email}`,{
+    const response  = await fetch(`/member/search/manner-temperature`,{
         method: "GET",
         credentials: "include"
     })
@@ -217,8 +216,6 @@ async function getMyMannerTemperature(){
     const data = await response.json();
 
     return data.data;
-
-
 
 }
 

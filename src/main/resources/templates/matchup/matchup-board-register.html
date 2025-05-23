@@ -17,15 +17,17 @@
 <div id="wrap">
     <div class="content">
         <h1>MATCHUP 글 작성</h1>
-        <div id="user-info" th:data-email="${#authentication.name}"></div>
         <form th:object="${reqMatchupBoardDto}" th:action="@{/matchup/board/register}" method="post" enctype="multipart/form-data">
             <label>
                 종목:
-                <select th:field="*{sportsTypeName}" required></select>
+                <select th:field="*{sportsTypeName}">
+                    <option value="SOCCER" selected>축구</option>
+                    <option value="FUTSAL">풋살</option>
+                </select>
             </label>
             <label>
                 소속팀:
-                <input type="text" th:field="*{teamName}" disabled>
+                <input type="text" th:field="*{teamName}" readonly required>
             </label>
             <label>
                 팀 소개:
