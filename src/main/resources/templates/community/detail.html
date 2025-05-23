@@ -6,31 +6,34 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/community.css}">
 </head>
-
 <body class="flex-layout">
 <div class="page-wrapper">
-
-<body>
-
 <div th:replace="~{common/header::header}"></div>
 
 <div class="content-box">
     <div class="post-header">
         <h2 th:text="${board.title}" class="post-title">제목</h2>
         <div class="post-meta">
+            <span><strong>작성자:</strong> <span th:text="${board.member.memberName}"></span></span>
             <span><strong>카테고리:</strong> <span th:text="${board.category.displayName}"></span></span>
             <span><strong>작성일:</strong> <span th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></span></span>
         </div>
+
     </div>
 
     <div class="post-body">
         <p th:text="${board.content}" class="post-content"></p>
 
         <div th:if="${board.boardAttachmentEnabled}" class="attachment-box">
-            <strong>첨부파일:</strong>
-            <a th:href="@{'/uploads/' + ${board.attachmentPath}}"
-               th:text="${board.attachmentOriginalName}" download></a>
+            <strong>첨부파일</strong>
+            <ul>
+                <li th:each="path, iterStat : ${savedPaths}">
+                    <a th:href="@{'/community/download/' + ${path}}"
+                       th:text="${originalNames[iterStat.index]}"></a>
+                </li>
+            </ul>
         </div>
+
     </div>
 
     <div class="post-actions">
@@ -54,10 +57,7 @@
         </li>
     </ul>
 </div>
-
 </div>
-
-
 <div th:replace="~{common/footer::footer}"></div>
 </body>
 </html>

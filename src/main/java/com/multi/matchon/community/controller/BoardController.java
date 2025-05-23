@@ -1,5 +1,6 @@
 package com.multi.matchon.community.controller;
 
+import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
 import com.multi.matchon.community.domain.Comment;
@@ -7,22 +8,34 @@ import com.multi.matchon.community.dto.req.BoardRequest;
 import com.multi.matchon.community.dto.req.CommentRequest;
 import com.multi.matchon.community.service.BoardService;
 import com.multi.matchon.community.service.CommentService;
+import com.multi.matchon.community.service.MemberDetails;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.util.UriUtils;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,10 +48,6 @@ public class BoardController {
     private final MemberService memberService;
     private final CommentService commentService;
 
-    /**
-     * 게시글 목록 조회
-     * 선택된 카테고리를 기준으로 게시글을 조회하고, view에서 동적으로 제목 변경
-     */
     @GetMapping
     public String listBy(@RequestParam(defaultValue = "FREEBOARD") Category category,
                          @RequestParam(defaultValue = "0") int page,
@@ -47,76 +56,95 @@ public class BoardController {
         Page<Board> boardsPage = boardService.findByCategory(category, pageable);
 
         model.addAttribute("boardsPage", boardsPage);
-        model.addAttribute("selectedCategory", category); // 동적 제목 변경용
+        model.addAttribute("selectedCategory", category);
         model.addAttribute("categories", Category.values());
 
-        return "community/view"; // 목록 페이지
+        return "community/view";
     }
 
-    //게시글 상세 보기
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         Board board = boardService.findById(id);
+
+        List<String> savedPaths = board.getAttachmentPath() != null
+                ? List.of(board.getAttachmentPath().split(";"))
+                : List.of();
+
+        List<String> originalNames = board.getAttachmentOriginalName() != null
+                ? List.of(board.getAttachmentOriginalName().split(";"))
+                : List.of();
+
         model.addAttribute("board", board);
+        model.addAttribute("savedPaths", savedPaths);
+        model.addAttribute("originalNames", originalNames);
         model.addAttribute("commentRequest", new CommentRequest());
         model.addAttribute("comments", commentService.getCommentsByBoard(board));
+
         return "community/detail";
     }
 
-    //게시글 작성 폼
     @GetMapping("/new")
-    public String form(Model model) {
+    public String form(Model model, @AuthenticationPrincipal CustomUser userDetails) {
+        if (userDetails == null) {
+            return "redirect:/login"; // 또는 401 에러 페이지
+        }
+
         model.addAttribute("boardRequest", new BoardRequest());
         model.addAttribute("categories", Category.values());
+        model.addAttribute("memberName", userDetails.getMember().getMemberName()); // ← 여기 주의!
+
         return "community/form";
     }
 
-    //게시글 저장 처리
     @PostMapping
     public String create(@Valid @ModelAttribute("boardRequest") BoardRequest boardRequest,
                          BindingResult bindingResult,
-                         @RequestParam("file") MultipartFile file,
-                         Model model) throws IOException {
+                         @RequestParam("files") MultipartFile[] files,
+                         Model model,
+                         @AuthenticationPrincipal CustomUser userDetails) throws IOException {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", Category.values());
             return "community/form";
         }
 
-        // 테스트용 더미 사용자 (ID=1)
-        Member dummyMember = memberService.findById(1L);
+        Member loginMember = userDetails.getMember(); // 직접 사용자 꺼내기
 
-        // 파일 업로드 처리
         String uploadDir = System.getProperty("user.dir") + File.separator + "uploads" + File.separator;
         File dir = new File(uploadDir);
         if (!dir.exists()) dir.mkdirs();
 
-        String originalFilename = null;
-        String savedFileName = null;
         boolean hasAttachment = false;
+        StringBuilder savedFileNames = new StringBuilder();
+        StringBuilder originalFileNames = new StringBuilder();
 
-        if (!file.isEmpty()) {
-            originalFilename = file.getOriginalFilename();
-            savedFileName = UUID.randomUUID() + "_" + originalFilename;
-            file.transferTo(new File(uploadDir + savedFileName));
-            hasAttachment = true;
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                String originalFilename = file.getOriginalFilename();
+                String savedFileName = UUID.randomUUID() + "_" + originalFilename;
+                file.transferTo(new File(uploadDir + savedFileName));
+
+                savedFileNames.append(savedFileName).append(";");
+                originalFileNames.append(originalFilename).append(";");
+                hasAttachment = true;
+            }
         }
 
         Board newBoard = Board.builder()
                 .title(boardRequest.getTitle())
                 .content(boardRequest.getContent())
                 .category(boardRequest.getCategory())
-                .member(dummyMember)
+                .member(loginMember)
                 .boardAttachmentEnabled(hasAttachment)
-                .attachmentPath(savedFileName)
-                .attachmentOriginalName(originalFilename)
+                .attachmentPath(savedFileNames.toString())
+                .attachmentOriginalName(originalFileNames.toString())
                 .build();
 
         boardService.save(newBoard);
         return "redirect:/community";
     }
 
-    //댓글 작성 처리
+
     @PostMapping("/{id}/comments")
     public String addComment(@PathVariable Long id,
                              @Valid @ModelAttribute("commentRequest") CommentRequest commentRequest,
@@ -138,5 +166,23 @@ public class BoardController {
         commentService.save(comment);
         return "redirect:/community/" + id;
     }
-}
 
+    @GetMapping("/download/{filename}")
+    @ResponseBody
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
+        Path filePath = Paths.get(System.getProperty("user.dir"), "uploads", filename);
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (!resource.exists()) {
+            throw new FileNotFoundException("파일을 찾을 수 없습니다: " + filename);
+        }
+
+        String encodedFilename = UriUtils.encodePath(filename, StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFilename + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(filePath))
+                .body(resource);
+    }
+
+
+}
