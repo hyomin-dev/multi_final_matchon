@@ -102,7 +102,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             """)
     Optional<ReqMatchupRequestDto> findReqMatchupRequestDtoByBoardId(@Param("boardId") Long boardId);
 
-
+    Optional<MatchupBoard> findByIdAndIsDeletedFalse(Long boardId);
 
 
 //    @Query("""
