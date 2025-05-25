@@ -1,6 +1,10 @@
 package com.multi.matchon.team.service;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
+import com.multi.matchon.team.domain.Review;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.multi.matchon.common.domain.*;
 
@@ -293,14 +297,13 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("회원 없음"));
         log.info("Found member with ID: {}", member.getId());
 
-        // Verify team membership
-        TeamMember teamMember = teamMemberRepository.findByMember_IdAndTeam_Id(member.getId(), teamId)
-                .orElseThrow(() -> new IllegalArgumentException("팀의 멤버만 리뷰를 작성할 수 있습니다."));
-        log.info("Found team member relationship for member {} in team {}", member.getId(), teamId);
-
+        // Find the team
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다: " + teamId));
         // Create and save the review
         Review review = Review.builder()
                 .member(member)
+                .team(team)
                 .reviewRating(dto.getRating())
                 .content(dto.getContent())
                 .isDeleted(false)
