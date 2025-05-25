@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResMyEventDto {
+public class EventResDto {
     private Long id;
     private String eventTitle;
     private String memberName;

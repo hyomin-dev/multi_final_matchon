@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 문의 내역</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #fff;
+        }
+        #wrap {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 span {
+            border-bottom: 2px solid #000;
+        }
+        form {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .search-area {
+            display: flex;
+            gap: 8px;
+        }
+        select, input[type="text"], button {
+            padding: 6px;
+            font-size: 14px;
+        }
+        select {
+            text-align-last: center;
+        }
+        option {
+            text-align: center;
+        }
+        .btn-write {
+            background-color: #007BFF;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px 6px;
+            text-align: center;
+            word-break: keep-all;
+        }
+        th {
+            background-color: #f3f3f3;
+        }
+        th:nth-child(1), td:nth-child(1) { width: 60px; }
+        th:nth-child(2), td:nth-child(2) { width: 130px; }
+        th:nth-child(3), td:nth-child(3) { width: 460px; }
+        th:nth-child(4), td:nth-child(4) { width: 200px; }
+        th:nth-child(5), td:nth-child(5) { width: 110px; }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .title-link {
+            text-decoration: none;
+            color: #000;
+        }
+        .title-link:hover {
+            text-decoration: underline;
+        }
+
+        .status-completed, .status-pending {
+            display: inline-block;
+            font-size: 13px;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        .status-completed {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+        .status-pending {
+            background-color: #ddd;
+            color: #444;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            margin: 0 4px;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            text-decoration: none;
+            color: #000;
+            border-radius: 4px;
+        }
+        .pagination a.active {
+            background-color: #5478b2;
+            color: white;
+        }
+        .pagination a.disabled {
+            pointer-events: none;
+            color: #aaa;
+            border-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+
+<div id="wrap">
+    <h2><span>내 문의 내역</span></h2>
+
+    <!-- 검색 영역 -->
+    <form id="searchForm" method="get" th:action="@{/inquiry}">
+        <div class="search-area">
+            <select name="category">
+                <option value="">전체</option>
+                <option th:each="type : ${T(com.multi.matchon.customerservice.domain.CustomerServiceType).values()}"
+                        th:value="${type}" th:text="${type.label}" th:selected="${type == category}"></option>
+            </select>
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력">
+            <button type="submit">검색</button>
+        </div>
+        <a href="/inquiry/form" class="btn-write">문의 작성</a>
+    </form>
+
+    <!-- Ajax 교체 대상 전체 영역 -->
+    <div id="inquiryContentArea">
+        <div id="inquiryTableArea">
+            <table th:if="${inquiries.totalElements > 0}">
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>카테고리</th>
+                    <th>제목</th>
+                    <th>작성일</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="inquiry, stat : ${inquiries.content}">
+                    <td th:text="${stat.index + 1 + inquiries.number * inquiries.size}">1</td>
+                    <td th:text="${inquiry.categoryLabel}">카테고리</td>
+                    <td><a class="title-link" th:href="@{'/inquiry/' + ${inquiry.id}}" th:text="${inquiry.inquiryTitle}">제목</a></td>
+                    <td th:text="${#temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</td>
+                    <td>
+                        <span th:text="${inquiry.statusLabel}"
+                              th:classappend="${inquiry.statusLabel == '답변완료'} ? 'status-completed' : 'status-pending'">상태</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+
+            <div th:if="${inquiries.totalElements == 0}" style="text-align: center; padding: 40px 0; font-size: 16px; color: #666;">
+                등록된 문의가 없습니다.
+            </div>
+        </div>
+
+        <div class="pagination" th:if="${inquiries.totalPages > 0}">
+            <a th:classappend="${inquiries.first} ? 'disabled'" href="#" th:data-page="${inquiries.number - 1}">&laquo;</a>
+            <span th:each="pageNum : ${#numbers.sequence(0, inquiries.totalPages - 1)}">
+                <a href="#"
+                   th:data-page="${pageNum}"
+                   th:classappend="${pageNum == inquiries.number} ? 'active'"
+                   th:text="${pageNum + 1}">1</a>
+            </span>
+            <a th:classappend="${inquiries.last} ? 'disabled'" href="#" th:data-page="${inquiries.number + 1}">&raquo;</a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const contentArea = document.getElementById('inquiryContentArea');
+        const searchForm = document.getElementById('searchForm');
+
+        searchForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            loadPage(0);
+        });
+
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest('.pagination a');
+            if (link && !link.classList.contains('disabled') && link.hasAttribute('data-page')) {
+                e.preventDefault();
+                const page = link.getAttribute('data-page');
+                loadPage(page);
+            }
+        });
+
+        function loadPage(page) {
+            const formData = new FormData(searchForm);
+            const params = new URLSearchParams(formData);
+            params.append('page', page);
+
+            fetch('/inquiry?' + params.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.getElementById('inquiryContentArea');
+                    if (newContent) {
+                        contentArea.innerHTML = newContent.innerHTML;
+                    }
+                });
+        }
+    });
+</script>
+
+</body>
+</html>

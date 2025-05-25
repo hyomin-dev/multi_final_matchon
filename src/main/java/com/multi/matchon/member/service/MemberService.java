@@ -14,9 +14,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     // 마이페이지용
-    @Transactional(readOnly = true)
     public Member findForMypage(String email) {
-        return memberRepository.findForMypage(email)
+        return memberRepository.findByMemberEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     }
 

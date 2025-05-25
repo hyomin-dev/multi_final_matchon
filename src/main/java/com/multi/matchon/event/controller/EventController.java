@@ -5,10 +5,10 @@ import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.event.domain.EventRegionType;
 import com.multi.matchon.event.domain.EventRequest;
 import com.multi.matchon.event.domain.HostProfile;
-import com.multi.matchon.event.dto.req.ReqEventCreateDto;
+import com.multi.matchon.event.dto.req.EventReqDto;
 import com.multi.matchon.event.dto.res.CalendarDayDto;
 import com.multi.matchon.event.dto.res.EventSummaryDto;
-import com.multi.matchon.event.dto.res.ResMyEventDto;
+import com.multi.matchon.event.dto.res.EventResDto;
 import com.multi.matchon.event.repository.EventRepository;
 import com.multi.matchon.event.repository.HostProfileRepository;
 import com.multi.matchon.member.domain.Member;
@@ -32,7 +32,6 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.multi.matchon.common.domain.Status.*;
 
@@ -110,7 +109,7 @@ public class EventController {
     @PostMapping("/event/new")
     @PreAuthorize("hasRole('HOST')")
     public String createEvent(@AuthenticationPrincipal CustomUser customUser,
-                              @ModelAttribute ReqEventCreateDto dto) {
+                              @ModelAttribute EventReqDto dto) {
 
         Member member = customUser.getMember();
 
@@ -144,7 +143,7 @@ public class EventController {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createdDate").descending());
         Page<EventRequest> eventPage = eventRepository.findByMember(member, pageable);
 
-        Page<ResMyEventDto> dtoPage = eventPage.map(e -> new ResMyEventDto(
+        Page<EventResDto> dtoPage = eventPage.map(e -> new EventResDto(
                 e.getId(),
                 e.getEventTitle(),
                 e.getMember().getMemberName(),
