@@ -17,9 +17,11 @@
 
             <div th:if="${board.member.id == #authentication.principal.member.id}"
                  class="board-delete-button-container">
-                <form th:action="@{'/community/' + ${board.id} + '/delete'}" method="post">
-                    <button type="submit" class="board-delete-button">✖ 삭제</button>
-                </form>
+                <button type="button"
+                        class="board-delete-button"
+                        th:onclick="'deletePost(' + ${board.id} + ')'">
+                    ✖ 삭제
+                </button>
             </div>
 
             <div class="post-meta meta-horizontal">
@@ -27,18 +29,16 @@
                 <span><strong>카테고리:</strong> <span th:text="${board.category.displayName}"></span></span>
                 <span><strong>작성일:</strong> <span th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></span></span>
             </div>
-
-
         </div>
 
         <div class="post-body">
-            <p th:text="${board.content}" class="post-content"></p>
+            <div th:utext="${board.content}" class="post-content"></div>
 
             <div th:if="${board.boardAttachmentEnabled}" class="attachment-box">
                 <strong>첨부파일</strong>
                 <ul>
                     <li th:each="path, iterStat : ${savedPaths}">
-                        <a th:href="@{'/community/download/' + ${path}}"
+                        <a th:href="@{/community/download-force/{filename}(filename=${path})}"
                            th:text="${originalNames[iterStat.index]}"></a>
                     </li>
                 </ul>
@@ -52,30 +52,122 @@
 
     <div class="comment-section">
         <h3>댓글</h3>
-        <form th:action="@{'/community/' + ${board.id} + '/comments'}"
-              th:object="${commentRequest}" method="post">
-            <textarea th:field="*{content}" placeholder="댓글을 입력하세요."></textarea>
-            <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" style="color:red;"></div>
+        <form id="commentForm">
+            <textarea id="commentContent" placeholder="댓글을 입력하세요."></textarea>
             <button type="submit">댓글 작성</button>
         </form>
 
-        <ul>
-            <li th:each="comment : ${comments}">
+        <ul id="commentList">
+            <li th:each="comment : ${comments}" th:attr="data-comment-id=${comment.id}">
                 <small>
                     <span th:text="${comment.member.memberName}">작성자</span> |
                     <span th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</span>
-                    <form th:action="@{'/community/' + ${board.id} + '/comments/' + ${comment.id} + '/delete'}"
-                          method="post" th:if="${comment.member.id == #authentication.principal.member.id}" style="display:inline">
-                        <button type="submit" style="color:red; background:none; border:none; cursor:pointer;">삭제</button>
-                    </form>
+                    <button type="button"
+                            class="btn-comment-delete"
+                            th:data-comment-id="${comment.id}"
+                            th:data-board-id="${board.id}"
+                            th:if="${comment.member.id == #authentication.principal.member.id}">
+                        삭제
+                    </button>
                 </small>
                 <p th:text="${comment.content}"></p>
             </li>
         </ul>
-
     </div>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
+
+<script>
+    function deletePost(boardId) {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+
+        const token = localStorage.getItem("accessToken");
+
+        fetch(`/community/${boardId}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    alert("로그인이 필요한 서비스입니다.");
+                    window.location.href = "/login";
+                } else if (response.ok) {
+                    alert("삭제되었습니다.");
+                    window.location.href = "/community";
+                } else {
+                    alert("삭제에 실패했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("삭제 요청 오류:", error);
+                alert("오류가 발생했습니다.");
+            });
+    }
+
+    document.getElementById("commentForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const content = document.getElementById("commentContent").value.trim();
+        const boardId = /* 서버에서 렌더링하거나 전역 변수로 사용 */ document.location.pathname.split("/")[2];
+        const token = localStorage.getItem("accessToken");
+
+        if (!content) {
+            alert("댓글을 입력해주세요.");
+            return;
+        }
+
+        fetch(`/community/${boardId}/comments`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ content: content })
+        })
+            .then(res => res.json())
+            .then(data => {
+                const commentList = document.getElementById("commentList");
+                const newComment = document.createElement("li");
+                newComment.innerHTML = `
+                <small><b>${data.memberName}</b> | ${data.createdDate}
+                    <button type="button" class="btn-comment-delete" data-comment-id="${data.commentId}" data-board-id="${boardId}">삭제</button>
+                </small>
+                <p>${data.content}</p>
+            `;
+                commentList.prepend(newComment);
+                document.getElementById("commentContent").value = "";
+            })
+            .catch(err => {
+                console.error("댓글 등록 오류:", err);
+                alert("댓글 등록 실패");
+            });
+    });
+
+    document.addEventListener("click", function (e) {
+        if (e.target.matches(".btn-comment-delete")) {
+            const commentId = e.target.dataset.commentId;
+            const boardId = e.target.dataset.boardId;
+            const token = localStorage.getItem("accessToken");
+
+            if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+            fetch(`/community/${boardId}/comments/${commentId}`, {
+                method: "DELETE",
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+                .then(res => {
+                    if (res.ok) {
+                        e.target.closest("li").remove();
+                    } else {
+                        alert("댓글 삭제 실패");
+                    }
+                });
+        }
+    });
+</script>
 </body>
 </html>

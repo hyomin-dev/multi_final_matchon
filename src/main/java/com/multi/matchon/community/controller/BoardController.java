@@ -1,42 +1,36 @@
 package com.multi.matchon.community.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
+import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
-import com.multi.matchon.community.domain.Comment;
 import com.multi.matchon.community.dto.req.BoardRequest;
 import com.multi.matchon.community.dto.req.CommentRequest;
 import com.multi.matchon.community.service.BoardService;
 import com.multi.matchon.community.service.CommentService;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.service.MemberService;
+import io.awspring.cloud.s3.S3Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.util.UriUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -47,6 +41,7 @@ public class BoardController {
     private final BoardService boardService;
     private final MemberService memberService;
     private final CommentService commentService;
+    private final AwsS3Utils awsS3Utils;
 
     @GetMapping
     public String listBy(@RequestParam(defaultValue = "FREEBOARD") Category category,
@@ -109,10 +104,7 @@ public class BoardController {
         }
 
         Member loginMember = userDetails.getMember();
-
-        String uploadDir = System.getProperty("user.dir") + File.separator + "uploads" + File.separator;
-        File dir = new File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
+        String dirName = "community/"; // S3 내에 폴더처럼 구분 가능
 
         boolean hasAttachment = false;
         StringBuilder savedFileNames = new StringBuilder();
@@ -121,10 +113,10 @@ public class BoardController {
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
                 String originalFilename = file.getOriginalFilename();
-                String savedFileName = UUID.randomUUID() + "_" + originalFilename;
-                file.transferTo(new File(uploadDir + savedFileName));
+                String uuidFileName = UUID.randomUUID() + "_" + originalFilename;
+                awsS3Utils.saveFile(dirName, uuidFileName, file);  // S3에 업로드
 
-                savedFileNames.append(savedFileName).append(";");
+                savedFileNames.append(uuidFileName).append(";");
                 originalFileNames.append(originalFilename).append(";");
                 hasAttachment = true;
             }
@@ -145,62 +137,66 @@ public class BoardController {
     }
 
 
-    @PostMapping("/{id}/comments")
-    public String addComment(@PathVariable Long id,
-                             @Valid @ModelAttribute("commentRequest") CommentRequest commentRequest,
-                             BindingResult bindingResult,
-                             Model model,
-                             @AuthenticationPrincipal CustomUser userDetails) {
-        Board board = boardService.findById(id);
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("board", board);
-            model.addAttribute("comments", commentService.getCommentsByBoard(board));
-            return "community/detail";
-        }
-
-        Comment comment = Comment.builder()
-                .board(board)
-                .member(userDetails.getMember()) // 작성자 정보 설정
-                .content(commentRequest.getContent())
-                .build();
-
-        commentService.save(comment);
-        return "redirect:/community/" + id;
+    @GetMapping("/download/{filename}")
+    public String redirectToS3Download(@PathVariable String filename) {
+        String presignedUrl = awsS3Utils.createPresignedGetUrl("community/", filename);
+        return "redirect:" + presignedUrl;
     }
 
-
-    @GetMapping("/download/{filename}")
-    @ResponseBody
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
-        Path filePath = Paths.get(System.getProperty("user.dir"), "uploads", filename);
-        Resource resource = new UrlResource(filePath.toUri());
-
-        if (!resource.exists()) {
-            throw new FileNotFoundException("파일을 찾을 수 없습니다: " + filename);
+    @GetMapping("/download-force/{filename}")
+    public ResponseEntity<Resource> forceDownload(@PathVariable String filename) throws IOException {
+        // Board를 통해 원본 파일명 조회
+        Board board = boardService.findByAttachmentFilename(filename);
+        if (board == null) {
+            return ResponseEntity.notFound().build();
         }
 
-        String encodedFilename = UriUtils.encodePath(filename, StandardCharsets.UTF_8);
+        // 원본 이름 리스트와 저장된 이름 리스트를 매핑
+        String[] savedPaths = board.getAttachmentPath().split(";");
+        String[] originalNames = board.getAttachmentOriginalName().split(";");
+
+        String originalName = filename;
+        for (int i = 0; i < savedPaths.length; i++) {
+            if (savedPaths[i].equals(filename)) {
+                originalName = originalNames[i];
+                break;
+            }
+        }
+
+        S3Resource resource = awsS3Utils.downloadFileWithFullName("community/", filename);
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFilename + "\"")
-                .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(filePath))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + URLEncoder.encode(originalName, StandardCharsets.UTF_8) + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
                 .body(resource);
     }
 
-    @PostMapping("/{boardId}/comments/{commentId}/delete")
-    public String deleteComment(@PathVariable Long boardId,
-                                @PathVariable Long commentId,
-                                @AuthenticationPrincipal CustomUser userDetails) {
-        Comment comment = commentService.findById(commentId);
-
-        // 본인 확인
-        if (!comment.getMember().getId().equals(userDetails.getMember().getId())) {
-            throw new AccessDeniedException("삭제 권한이 없습니다.");
+    @PostMapping("/image-upload")
+    @ResponseBody
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile image) {
+        if (image.isEmpty()) {
+            return ResponseEntity.badRequest().body("No file selected");
         }
 
-        commentService.softDelete(commentId); // 논리 삭제
-        return "redirect:/community/" + boardId;
+        String originalFilename = image.getOriginalFilename();
+        String uuidFileName = UUID.randomUUID() + "_" + originalFilename;
+        String dirName = "community/editor/";
+
+        awsS3Utils.saveFile(dirName, uuidFileName, image);
+
+        String imageUrl = awsS3Utils.getObjectUrl(dirName, uuidFileName);
+        return ResponseEntity.ok().body(Map.of("url", imageUrl));
     }
+
+    @PostMapping("/community/{id}/delete")
+    @ResponseBody
+    public ResponseEntity<?> deletePost(@PathVariable Long id,
+                                        @AuthenticationPrincipal CustomUser user) {
+        boardService.deleteByIdAndUser(id, user.getMember());
+        return ResponseEntity.ok().build();
+    }
+
 
 
 

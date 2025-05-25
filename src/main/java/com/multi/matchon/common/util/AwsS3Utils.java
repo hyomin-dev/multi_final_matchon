@@ -101,14 +101,15 @@ public class AwsS3Utils {
     /* Create a pre-signed URL to download an object in a subsequent GET request. */
     public String createPresignedGetUrl(String dirName, String savedName) {
 
-        String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+        //String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거 //주석처리 - 전준혁
 
 
         try (S3Presigner presigner = S3Presigner.create()) {
 
             GetObjectRequest objectRequest = GetObjectRequest.builder()
                     .bucket(bucket)
-                    .key(dirName+savedNameOnly)
+//                    .key(dirName+savedNameOnly) //주석처리 전준혁
+                    .key(dirName+savedName) //임의추가 전준혁
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -141,6 +142,20 @@ public class AwsS3Utils {
             return false;
         }
     }
+
+    /**
+     * 확장자 제거 없이 전체 파일명을 사용 - 전준혁
+     */
+    public S3Resource downloadFileWithFullName(String dirName, String fullFileName) throws IOException {
+        String s3Key = dirName + fullFileName;
+        return s3Operations.download(bucket, s3Key);
+    }
+
+    public String getObjectUrl(String dir, String filename) {
+        return "https://" + bucket + ".s3.amazonaws.com/" + dir + filename;
+    }
+
+
 
 
 

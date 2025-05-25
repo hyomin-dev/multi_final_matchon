@@ -19,8 +19,9 @@ public class CommentService {
         return commentRepository.findByBoardAndIsDeletedFalse(board);
     }
 
-    public void save(Comment comment) {
+    public Comment save(Comment comment) {
         commentRepository.save(comment);
+        return comment;
     }
 
     public Comment findById(Long id) {
