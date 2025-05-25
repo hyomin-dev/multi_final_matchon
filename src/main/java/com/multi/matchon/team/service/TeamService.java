@@ -96,6 +96,10 @@ public class TeamService {
 
 
     public void teamRegister(ReqTeamDto reqTeamDto, CustomUser user) {
+        // Check if the user already has an active team
+        if (teamRepository.existsByCreatedPersonAndIsDeletedFalse(user.getUsername())) {
+            throw new IllegalArgumentException("이미 팀이 있습니다.");
+        }
         Team newTeam = Team.builder()
                 .teamName(reqTeamDto.getTeamName())
                 .teamRegion(RegionType.valueOf(reqTeamDto.getTeamRegion()))
