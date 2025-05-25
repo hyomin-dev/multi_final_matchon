@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -124,6 +125,15 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             where t1.id=:boardId and t1.isDeleted=false
             """)
     Optional<ResMatchupBoardOverviewDto> findResMatchupOverviewDto(@Param("boardId") Long boardId);
+
+
+    @Query("""
+            select count(t1)
+            from MatchupBoard t1
+            where t1.member.id =:memberId and
+                    t1.createdDate >:before24
+            """)
+    Long countTodayMatchupBoards(@Param("memberId") Long memberId, @Param("before24") LocalDateTime before24);
 
 
 //    @Query("""

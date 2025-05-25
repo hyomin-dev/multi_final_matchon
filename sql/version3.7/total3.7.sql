@@ -270,7 +270,7 @@ CREATE TABLE inquiry_answer
     is_deleted      BOOLEAN  DEFAULT FALSE,
     CONSTRAINT FK_inquiry_answer_2_inquiry FOREIGN KEY (inquiry_id) REFERENCES inquiry (inquiry_id),
     CONSTRAINT FK_inquiry_answer_2_member FOREIGN KEY (admin_id) REFERENCES member (member_id)
-
+);
 
 CREATE TABLE matchup_board
 (

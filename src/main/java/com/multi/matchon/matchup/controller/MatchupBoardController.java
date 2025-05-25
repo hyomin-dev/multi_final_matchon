@@ -41,7 +41,7 @@ public class MatchupBoardController {
         matchupBoardService.registerMatchupBoard(reqMatchupBoardDto, user);
 
         log.info("matchup 게시글 등록 완료");
-        return "matchup/matchup-board-list";
+        return "redirect:/matchup/board";
     }
 
     // 게시글 상세 조회
@@ -111,8 +111,9 @@ public class MatchupBoardController {
     public ModelAndView editMatchupBoard(@ModelAttribute ResMatchupBoardDto resMatchupBoardDto, ModelAndView mv){
         matchupBoardService.updateBoard(resMatchupBoardDto);
         ResMatchupBoardDto updateResMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(resMatchupBoardDto.getBoardId());
-        mv.addObject("resMatchupBoardDto", updateResMatchupBoardDto);
-        mv.setViewName("matchup/matchup-board-detail");
+        //mv.addObject("resMatchupBoardDto", updateResMatchupBoardDto);
+//        mv.setViewName("matchup/matchup-board-detail");
+        mv.setViewName("redirect:/matchup/board/detail?matchup-board-id="+resMatchupBoardDto.getBoardId());
         return mv;
     }
 

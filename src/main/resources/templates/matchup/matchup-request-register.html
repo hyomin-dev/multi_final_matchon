@@ -65,17 +65,19 @@
 
     <label>
       소개:
-      <textarea cols="30" rows="5" placeholder="자기 소개를 입력하세요." th:field="*{selfIntro}" required>
+      <textarea placeholder="자기 소개를 입력하세요." th:field="*{selfIntro}" required>
                 </textarea>
     </label>
     <label>
       참가 인원:
-      <select size="5" th:field="*{participantCount}" required></select>
+      <select th:field="*{participantCount}" required></select>
     </label>
 
+  <div class="button-wrapper">
+      <button type="submit">요청하기</button>
+      <button type="button" class="cancel-btn">취소하기</button>
+  </div>
 
-    <button type="submit">요청하기</button>
-    <button type="button" class="cancel-btn">취소하기</button>
   </form>
 </div>
 
