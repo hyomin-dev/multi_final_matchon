@@ -59,41 +59,61 @@ table tr:hover {
 
 /* ===== 폼 ===== */
 .form-container {
-    width: 90%;
+    width: 100%;
     max-width: 700px;
-    margin: 0 auto;
-    background-color: #fff;
+    margin: 40px auto;
+    background-color: #ffffff;
     padding: 40px;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e2e2;
+}
+
+.form-group {
+    margin-bottom: 2px; /* 기본 폼 그룹 간격 */
+}
+
+.form-group.author-group {
+    margin-top: 2px;       /* 제목 아래를 더 가깝게 */
+    margin-bottom: 20px;   /* 카테고리와는 여유 있게 */
 }
 
 form label {
-    font-weight: bold;
+    font-weight: 600;
     display: block;
-    margin-bottom: 8px;
-    color: #34495e;
+    margin-bottom: 6px;
+    color: #2c3e50;
 }
 
+/* 입력 필드 스타일 */
 form input[type="text"],
 form textarea,
 form select,
 form input[type="file"] {
     width: 100%;
-    padding: 12px;
+    padding: 12px 14px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 14px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    background-color: #fafafa;
     box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
+/* 입력 필드 포커스 효과 */
 form input:focus,
 form textarea:focus,
 form select:focus {
     border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+    background-color: #fff;
     outline: none;
-    background-color: #f9fcff;
+}
+
+/* 버튼 정렬 및 마진 */
+form button {
+    margin: 0 8px;
 }
 
 form .error {
@@ -106,22 +126,34 @@ form .error {
     width: 90%;
     max-width: 900px;
     margin: 40px auto;
-    background: #fff;
+    background: #fafafa; /* 더 연한 회색 배경 */
     padding: 40px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
 }
 
 .post-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e2e2e2;
+    padding-bottom: 10px;
 }
 
 .post-meta {
     font-size: 13px;
     color: #888;
     margin-bottom: 30px;
+}
+
+.meta-horizontal {
+    background-color: #f0f3f5;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #555;
 }
 
 .post-content {
@@ -132,9 +164,9 @@ form .error {
 
 /* ===== 첨부파일 ===== */
 .attachment-box {
-    background-color: #f6f8fa;
-    padding: 12px 20px;
-    border-left: 4px solid #3498db;
+    background-color: #f8f9fb;
+    padding: 16px 20px;
+    border-left: 5px solid #3498db;
     border-radius: 6px;
     margin-top: 30px;
 }
@@ -144,17 +176,19 @@ form .error {
     width: 90%;
     max-width: 900px;
     margin: 50px auto;
-    background-color: #ffffff;
+    background-color: #fdfdfd;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
 }
 
 .comment-section h3 {
-    font-size: 18px;
+    font-size: 20px;
     margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
 }
-
 .comment-section textarea {
     width: 100%;
     height: 80px;
@@ -173,8 +207,7 @@ form .error {
 }
 
 .comment-section li {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    padding: 12px 0;
     border-bottom: 1px solid #eee;
 }
 
@@ -271,14 +304,17 @@ form .error {
     color: #444;
 }
 
-.readonly-coral {
-    background-color: cornflowerblue;
-    border: none;              /* 검은 테두리 제거 */
-    /*color: white;              !* 텍스트 색상 대비를 위해 흰색 *!*/
-    font-weight: bold;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: default;
+/* 읽기 전용 필드 개선 */
+.author-display {
+    padding: 10px 16px;
+    background-color: lightblue;
+    color: #2c3e50;
+    font-weight: 600;
+    border: 1px solid lightblue;
+    border-radius: 6px;
+    font-size: 15px;
+    line-height: 1.4;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
 }
 
 .attachment-box ul {
@@ -303,11 +339,25 @@ form .error {
     height: auto;
 }
 
-/* Toast UI Editor wrapper */
+
+/* 에디터 영역 구분 */
+.form-group-editor {
+    margin-bottom: 30px;
+}
+
 .toast-editor-container {
+    border: none; /* 이중 박스 느낌 제거 */
+    padding: 0;
+    margin-top: 8px;
+    box-shadow: none;
+    background: transparent;
+}
+
+/* Toast UI Editor 내부 스타일 보완 */
+.toastui-editor-defaultUI {
     border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 /* 본문 출력 시 이미지가 컨테이너를 넘지 않도록 */
@@ -349,7 +399,7 @@ form .error {
 
 /* 작성 취소 버튼 스타일 */
 .btn-outline-danger {
-    padding: 8px 20px;
+    padding: 8px 15px;
     background-color: white;
     color: #f44336;
     border: 2px solid #f44336;

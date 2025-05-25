@@ -88,8 +88,8 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
+            },
+            credentials: 'include'
         })
             .then(response => {
                 if (response.status === 401) {

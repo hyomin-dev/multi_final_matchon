@@ -189,14 +189,17 @@ public class BoardController {
         return ResponseEntity.ok().body(Map.of("url", imageUrl));
     }
 
-    @PostMapping("/community/{id}/delete")
+    @PostMapping("/{id}/delete")
     @ResponseBody
     public ResponseEntity<?> deletePost(@PathVariable Long id,
                                         @AuthenticationPrincipal CustomUser user) {
+        if (user == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
         boardService.deleteByIdAndUser(id, user.getMember());
         return ResponseEntity.ok().build();
     }
-
 
 
 

@@ -16,18 +16,18 @@
 
     <div class="form-container">
         <form th:action="@{/community}" th:object="${boardRequest}" method="post" enctype="multipart/form-data">
-            <div>
+            <div class="form-group">
                 <label>제목</label>
                 <input type="text" th:field="*{title}" required />
                 <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
             </div>
 
-            <div>
+            <div class="form-group author-group">
                 <label>작성자</label>
-                <input type="text" th:value="${memberName}" readonly class="readonly-coral" />
+                <div class="author-display" th:text="${memberName}">작성자 이름</div>
             </div>
 
-            <div>
+            <div class="form-group">
                 <label>카테고리</label>
                 <select th:field="*{category}" required>
                     <option value="">-- 선택하세요 --</option>
@@ -38,8 +38,8 @@
                 <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
             </div>
 
-            <div>
-                <label>내용</label>
+            <div class="form-group-editor">
+                <label for="editor">내용</label>
                 <div id="editor" class="toast-editor-container"></div>
                 <input type="hidden" th:field="*{content}" id="hiddenContent" />
                 <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
