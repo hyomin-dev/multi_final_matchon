@@ -73,6 +73,10 @@ public class MypageService {
     }
 
     public void updateHostName(Member member, String newHostName) {
+        if (hostProfileRepository.findByHostName(newHostName).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 기관명입니다.");
+        }
+
         HostProfile profile = hostProfileRepository.findByMember(member)
                 .orElseGet(() -> {
                     HostProfile newProfile = HostProfile.builder()

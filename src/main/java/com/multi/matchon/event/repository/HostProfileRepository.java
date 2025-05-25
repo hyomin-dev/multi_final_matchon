@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface HostProfileRepository extends JpaRepository<HostProfile, Long> {
     Optional<HostProfile> findByMember(Member member);
+
+    Optional<HostProfile> findByHostName(String hostName);
 }

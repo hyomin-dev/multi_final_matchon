@@ -37,7 +37,6 @@
             <option value="HOWTOUSE" th:selected="${category?.name() == 'HOWTOUSE'}">이용방법</option>
             <option value="ACCOUNT" th:selected="${category?.name() == 'ACCOUNT'}">계정</option>
             <option value="TEAM_GUEST" th:selected="${category?.name() == 'TEAM_GUEST'}">Team / Guest</option>
-            <option value="SHOP" th:selected="${category?.name() == 'SHOP'}">쇼핑몰</option>
             <option value="REPORT" th:selected="${category?.name() == 'REPORT'}">신고</option>
             <option value="MANNER_TEMPERATURE" th:selected="${category?.name() == 'MANNER_TEMPERATURE'}">매너온도</option>
         </select>
@@ -46,7 +45,7 @@
         <input type="text" id="keyword" name="keyword" placeholder="검색.." th:value="${keyword}" />
         <button type="submit">검색</button>
 
-        <button class="btn1">1:1 문의 작성</button>
+        <a href="/inquiry" class="btn1">1:1 문의 작성</a>
     </form>
 <br>
     <table>

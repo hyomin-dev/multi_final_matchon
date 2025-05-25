@@ -31,21 +31,36 @@ th {
 .status-pending {
     background-color: #ddd;
     color: #555;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 5px 10px;
+    border-radius: 20px; /* 동그란 형태 */
+    font-size: 13px;
+    display: inline-block;
 }
+
 .status-approved {
     background-color: #4CAF50;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: inline-block;
 }
+
 .status-denied {
     background-color: #f44336;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: inline-block;
 }
+
+
+table th:nth-child(5),
+table td:nth-child(5) {
+    width: 100px;
+}
+
 .detail-link {
     color: #0077cc;
     text-decoration: underline;
