@@ -73,8 +73,8 @@ public class AwsS3Utils {
 
 
     public S3Resource downloadFile(String dirName, String savedName) throws IOException {
-        String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
-        S3Resource resource =  s3Operations.download(bucket,dirName+savedNameOnly);
+        //String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+        S3Resource resource =  s3Operations.download(bucket,dirName+savedName);
 
 //       ByteArrayOutputStream outputStream = (ByteArrayOutputStream) resource.getOutputStream();
 //       byte[] data = outputStream.toByteArray();

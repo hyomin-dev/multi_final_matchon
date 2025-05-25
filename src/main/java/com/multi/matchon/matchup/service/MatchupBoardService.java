@@ -13,6 +13,7 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardOverviewDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
 import com.multi.matchon.member.domain.Member;
 import com.sun.jdi.request.DuplicateRequestException;
@@ -199,6 +200,12 @@ public class MatchupBoardService {
 
         attachmentRepository.save(findAttachments.get(0));
 
+    }
+
+    @Transactional(readOnly = true)
+    public ResMatchupBoardOverviewDto findResMatchupOverviewDto(Long boardId) {
+
+        return matchupBoardRepository.findResMatchupOverviewDto(boardId).orElseThrow(()->new IllegalArgumentException("Matchup"+boardId+"번 게시글이 없습니다."));
     }
     // ========================================================================================================
     //                                                    테스트 해본 코드

@@ -1,18 +1,50 @@
+const Status = {
+    PENDING: "PENDING",
+    APPROVED: "APPROVED",
+    DENIED: "DENIED",
+    CANCELREQUESTED: "CANCELREQUESTED"
+}
+
 document.addEventListener("DOMContentLoaded",()=>{
     setContent();
 })
 
+
+
+
 function setContent(){
     const detailDto = document.querySelector("#matchup-request-detail-dto");
 
-
+    const boardId = detailDto.dataset.boardId;
+    const requestId = detailDto.dataset.requestId;
     const sportsFacilityName = detailDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = detailDto.dataset.sportsFacilityAddress;
     const matchDatetime = detailDto.dataset.matchDatetime;
     const matchDuration = detailDto.dataset.matchDuration;
+    const matchupStatus = detailDto.dataset.matchupStatus;
+    const matchupRequestSubmittedCount = Number(detailDto.dataset.matchupRequestSubmittedCount);
+    const matchupCancelSubmittedCount = Number(detailDto.dataset.matchupCancelSubmittedCount);
+    const isDeleted = detailDto.dataset.isDeleted === "true";
+    const currentParticipantCount = Number(detailDto.dataset.currentParticipantCount);
+    const maxParticipants = Number(detailDto.dataset.maxParticipants);
+    const participantCount = Number(detailDto.dataset.participantCount);
+    const boardWriterEmail = detailDto.dataset.boardWriterEmail;
+    const applicantEmail = detailDto.dataset.applicantEmail;
+    const loginMemberEmail = detailDto.dataset.loginMemberEmail;
+
+
 
     drawMap(sportsFacilityAddress, sportsFacilityName);
     calTime(matchDatetime, matchDuration);
+    manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime);
+
+    if(boardWriterEmail === loginMemberEmail)
+        setDecision(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime, boardId, requestId, currentParticipantCount, maxParticipants, participantCount);
+    else if(applicantEmail === loginMemberEmail)
+        setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime)
+
+
+
 
 }
 function drawMap(address, sportsFacilityName){
@@ -91,3 +123,447 @@ function calTime(matchDatetime, matchDuration){
     matchDateEle.textContent = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
 
 }
+
+
+function manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime){
+    const matchDate = new Date(matchDatetime);
+    const now = new Date();
+
+    //console.log(matchDate<now);
+
+    const statusEle = document.querySelector("#status");
+
+    // console.log(matchupStatus);
+    // console.log(matchupRequestSubmittedCount);
+    // console.log(matchupCancelSubmittedCount);
+    // console.log(isDeleted);
+    // if(matchupStatus === Status.PENDING)
+    //     console.log("enum 사용");
+    // console.log(matchupStatus ===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===false);
+
+    // 1. 참가 요청 후 승인 대기
+    if(
+        (matchupStatus ===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===false) ||
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted ===false)
+    ){
+        statusEle.textContent =  "승인 대기";
+    }
+    // 2. 참가 요청 삭제
+    else if(
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
+        (matchupStatus===Status.DENIED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true)
+    ){
+        statusEle.textContent =  "요청 취소됨";
+    }
+    // 3. 참가 요청 승인
+    else if(
+        (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===false)||
+        (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===false)
+    ){
+        statusEle.textContent = "승인됨";
+    }
+    // 4. 참가 요청 반려
+    else if(
+        (matchupStatus === Status.DENIED && matchupRequestSubmittedCount ===1 && matchupCancelSubmittedCount ===0 && isDeleted ===false) ||
+        (matchupStatus === Status.DENIED && matchupRequestSubmittedCount ===2 && matchupCancelSubmittedCount ===0 && isDeleted ===false)
+    ){
+        statusEle.textContent = "반려됨";
+    }
+    // 8. 승인 취소 요청을 했으나 경기 시간이 지나 자동 참가 처리
+    else if(
+        (matchDate <now) &&
+        (
+            (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===2 && matchupCancelSubmittedCount ===1 && isDeleted===false) ||
+            (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===1 && matchupCancelSubmittedCount ===1 && isDeleted===false)
+        )
+    ){
+        statusEle.textContent = "자동 참가"
+    }
+    // 5. 승인 취소 요청 상태
+    else if(
+        (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===2 && matchupCancelSubmittedCount ===1 && isDeleted===false) ||
+        (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===1 && matchupCancelSubmittedCount ===1 && isDeleted===false)
+    ){
+        statusEle.textContent = "승인 취소 요청";
+    }
+    // 6. 승인 취소 요청이 승인
+    else if(
+        (matchupStatus===Status.CANCELREQUESTED && matchupRequestSubmittedCount === 2 && matchupCancelSubmittedCount===1 && isDeleted===true) ||
+        (matchupStatus===Status.CANCELREQUESTED && matchupRequestSubmittedCount === 1 && matchupCancelSubmittedCount===1 && isDeleted===true)
+    ){
+        statusEle.textContent = "취소 요청 승인";
+    }
+    // 7. 승인 취소 요청이 반려
+    else if(
+        (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===1 && isDeleted ===false) ||
+        (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===1 && isDeleted ===false)
+    ){
+        statusEle.textContent = "취소 요청 반려";
+    }else{
+        statusEle.textContent = "서버 오류";
+    }
+}
+
+
+//  작성자 승인 및 반려
+function setDecision(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime, boardId, requestId, currentParticipantCount, maxParticipants, participantCount) {
+    const approvedBtn = document.querySelector("#approvedBtn");
+    const deniedBtn = document.querySelector("#deniedBtn");
+    const approveWithdrawRequestBtn = document.querySelector("#approveWithdrawRequestBtn");
+    const denyWithdrawRequestBtn = document.querySelector("#denyWithdrawRequestBtn");
+
+    // 클릭 시 체크 날짜, 인원수 --> DB에서도 체크해야됨
+    const matchDate = new Date(matchDatetime);
+    let now = new Date();
+
+    approvedBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 승인을 할 수 없습니다.");
+        }
+    });
+
+    deniedBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 반려를 할 수 없습니다.");
+        }
+    })
+
+    approveWithdrawRequestBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 취소 요청 승인을 할 수 없습니다.");
+        }
+    })
+
+    denyWithdrawRequestBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 취소 요청 반려를 할 수 없습니다.");
+        }
+    })
+
+    // 참가 요청에 대한 승인/반려
+    if(
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount ===0 && isDeleted===false)||
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount ===0 && isDeleted===false)
+    ){
+        // approvedBtn.href = `/matchup/request/approve?request-id=${requestId}&board-id=${boardId}`;
+        // deniedBtn.href = `/matchup/request/deny?request-id=${requestId}&board-id=${boardId}`;
+
+        // 참가 승인 가능
+        // 참가 반려 가능
+
+        //취소 승인 불가능
+        approveWithdrawRequestBtn.classList.add("disabled");
+        approveWithdrawRequestBtn.href = "#";
+
+        //취소 반려 불가능
+
+        denyWithdrawRequestBtn.classList.add("disabled");
+        denyWithdrawRequestBtn.href = "#";
+
+    }
+    //승인 취소 요청에 대한 승인/반려
+    else if(
+        (matchupStatus===Status.CANCELREQUESTED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount ===1 && isDeleted===false) ||
+        (matchupStatus===Status.CANCELREQUESTED && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount ===1 && isDeleted===false)
+    ){
+        // approvedBtn.href = `/matchup/request/approve?request-id=${requestId}&board-id=${boardId}`;
+        // deniedBtn.href = `/matchup/request/deny?request-id=${requestId}&board-id=${boardId}`;
+
+        // 참가 승인 불가능
+        approvedBtn.classList.add("disabled");
+        approvedBtn.href = "#";
+
+        // 참가 반려 불가능
+        deniedBtn.classList.add("disabled");
+        deniedBtn.href = "#";
+
+        //취소 승인 가능
+
+        //취소 반려 가능
+
+
+
+    }else{
+        // 참가 승인 불가능
+        approvedBtn.classList.add("disabled");
+        approvedBtn.href = "#";
+
+        // 참가 반려 불가능
+        deniedBtn.classList.add("disabled");
+        deniedBtn.href = "#";
+
+        //취소 승인 불가능
+        approveWithdrawRequestBtn.classList.add("disabled");
+        approveWithdrawRequestBtn.href = "#";
+
+        //취소 반려 불가능
+        denyWithdrawRequestBtn.classList.add("disabled");
+        denyWithdrawRequestBtn.href = "#";
+    }
+
+    // 마지막에 인원수 체크, 승인 버튼 없애기
+    if(currentParticipantCount+participantCount>maxParticipants){
+
+        // 참가 승인 불가능
+        approvedBtn.classList.add("disabled");
+        approvedBtn.href = "#";
+
+        // 참가 반려 불가능
+
+        // 취소 승인 가능
+
+        // 취소 반려 가능
+
+
+    }
+
+}
+
+function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime) {
+
+    const modifyBtn = document.querySelector("#modifyBtn");
+    const cancelBtn = document.querySelector("#cancelBtn");
+    const retryBtn = document.querySelector("#retryBtn");
+    const withdrawBtn = document.querySelector("#withdrawBtn");
+
+    const matchDate = new Date(matchDatetime);
+    let now = new Date();
+
+    modifyBtn.addEventListener("click",(e)=>{
+
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+        }
+    });
+
+    cancelBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 취소할 수 없습니다.")
+        }
+    });
+
+    retryBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 재 요청할 수 없습니다.")
+        }
+    });
+
+    withdrawBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 승인 취소 요청할 수 없습니다.")
+        }
+    });
+
+    // 1. 참가 요청 후 승인 대기
+    if(
+        (matchupStatus ===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===false) ||
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted ===false)
+    ){
+        // 수정하기 가능
+        // 요청 취소 가능
+        //재 요청 불가능
+        retryBtn.classList.add("disabled");
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+    }
+    // 2.1 참가 요청 취소- 재요청 가능
+    else if(
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
+        (matchupStatus===Status.DENIED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true)
+
+    ){
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        //재 요청 가능
+
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+    }
+    // 2.2 참가 요청 취소- 재요청 불가능
+    else if( (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true)){
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        //재 요청 가능
+        retryBtn.classList.add("disabled");
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+    }
+    // 3. 참가 요청 승인
+    else if(
+        (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===false)||
+        (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===false)
+    ){
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        modifyBtn.href = "#";
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+        //재 요청 불가능
+        retryBtn.classList.add("disabled");
+        retryBtn.href = "#";
+        //승인 취소 요청 가능
+    }
+    // 4.1 참가 요청 반려- 재요청가능
+    else if(
+        (matchupStatus === Status.DENIED && matchupRequestSubmittedCount ===1 && matchupCancelSubmittedCount ===0 && isDeleted ===false)
+
+    ){
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        modifyBtn.href = "#";
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+        //재 요청 가능
+
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
+
+    }
+    // 4.2 참가 요청 반려- 재요청불가능
+    else if((matchupStatus === Status.DENIED && matchupRequestSubmittedCount ===2 && matchupCancelSubmittedCount ===0 && isDeleted ===false)){
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        modifyBtn.href = "#";
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+        //재 요청 가능
+        retryBtn.classList.add("disabled");
+        retryBtn.href = "#";
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
+    }
+    // 8. 승인 취소 요청을 했으나 경기 시간이 지나 자동 참가 처리
+    else if(
+        (matchDate < now) &&
+        (
+            (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===2 && matchupCancelSubmittedCount ===1 && isDeleted===false) ||
+            (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===1 && matchupCancelSubmittedCount ===1 && isDeleted===false)
+        )
+    ){
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        modifyBtn.href = "#";
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+        //재 요청 가능
+        retryBtn.classList.add("disabled");
+        retryBtn.href = "#";
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
+    }
+    // 5. 승인 취소 요청 상태
+    else if(
+        (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===2 && matchupCancelSubmittedCount ===1 && isDeleted===false) ||
+        (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===1 && matchupCancelSubmittedCount ===1 && isDeleted===false)
+    ){
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        modifyBtn.href = "#";
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+        //재 요청 가능
+        retryBtn.classList.add("disabled");
+        retryBtn.href = "#";
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
+    }
+    // 6. 승인 취소 요청이 승인
+    else if(
+        (matchupStatus===Status.CANCELREQUESTED && matchupRequestSubmittedCount === 2 && matchupCancelSubmittedCount===1 && isDeleted===true) ||
+        (matchupStatus===Status.CANCELREQUESTED && matchupRequestSubmittedCount === 1 && matchupCancelSubmittedCount===1 && isDeleted===true)
+    ){
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        modifyBtn.href = "#";
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+        //재 요청 가능
+        retryBtn.classList.add("disabled");
+        retryBtn.href = "#";
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
+    }
+    // 7. 승인 취소 요청이 반려
+    else if(
+        (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===1 && isDeleted ===false) ||
+        (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===1 && isDeleted ===false)
+    ){
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        modifyBtn.href = "#";
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+        //재 요청 가능
+        retryBtn.classList.add("disabled");
+        retryBtn.href = "#";
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
+    }else{
+        // 수정하기 불가능
+        modifyBtn.classList.add("disabled");
+        modifyBtn.href = "#";
+        // 요청 취소 불가능
+        cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+        //재 요청 가능
+        retryBtn.classList.add("disabled");
+        retryBtn.href = "#";
+        //승인 취소 요청 불가능
+        withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
+    }
+}
+
+
+
+

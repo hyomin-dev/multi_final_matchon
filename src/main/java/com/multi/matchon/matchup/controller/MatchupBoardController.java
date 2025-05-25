@@ -117,11 +117,10 @@ public class MatchupBoardController {
     }
 
     @GetMapping("/delete")
-    @ResponseBody
-    public ResponseEntity<ApiResponse<String>> softDeleteBoard(@RequestParam("boardId") Long boardId){
+    public String softDeleteBoard(@RequestParam("boardId") Long boardId){
         matchupBoardService.softDeleteMatchupBoard(boardId);
         log.info("matchup 게시글 삭제 완료");
-        return ResponseEntity.ok().body(ApiResponse.ok("게시글 삭제 완료"));
+        return "matchup/matchup-board-my";
     }
 
 }
