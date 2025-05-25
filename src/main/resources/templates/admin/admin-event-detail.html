@@ -6,8 +6,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/admin/admin-event-detail.css}">
-    <script th:src="@{/js/admin/admin-event-detail.js}" defer></script>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7bb155da95fb31682683d7bb286174d2&libraries=services"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services"></script>
 
 </head>
 <body>
@@ -38,5 +37,23 @@
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
+
+<script th:inline="javascript">
+    let mapContainer = document.getElementById('map');
+    let address = /*[[${event.eventAddress}]]*/ '';
+    let mapOption = {
+        center: new kakao.maps.LatLng(33.450701, 126.570667),
+        level: 3
+    };
+    let map = new kakao.maps.Map(mapContainer, mapOption);
+    let geocoder = new kakao.maps.services.Geocoder();
+    geocoder.addressSearch(address, function(result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+            let coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+            let marker = new kakao.maps.Marker({ map: map, position: coords });
+            map.setCenter(coords);
+        }
+    });
+</script>
 </body>
 </html>
