@@ -26,12 +26,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.validation.BindingResult;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @RequestMapping("/community")
@@ -86,7 +85,8 @@ public class BoardController {
 
         model.addAttribute("boardRequest", new BoardRequest());
         model.addAttribute("categories", Category.values());
-        model.addAttribute("memberName", userDetails.getMember().getMemberName()); // ← 여기 주의!
+        model.addAttribute("memberName", userDetails.getMember().getMemberName());
+        model.addAttribute("formAction", "/community");
 
         return "community/form";
     }
@@ -104,7 +104,7 @@ public class BoardController {
         }
 
         Member loginMember = userDetails.getMember();
-        String dirName = "community/"; // S3 내에 폴더처럼 구분 가능
+        String dirName = "community/";
 
         boolean hasAttachment = false;
         StringBuilder savedFileNames = new StringBuilder();
@@ -114,7 +114,7 @@ public class BoardController {
             if (!file.isEmpty()) {
                 String originalFilename = file.getOriginalFilename();
                 String uuidFileName = UUID.randomUUID() + "_" + originalFilename;
-                awsS3Utils.saveFile(dirName, uuidFileName, file);  // S3에 업로드
+                awsS3Utils.saveFile(dirName, uuidFileName, file);
 
                 savedFileNames.append(uuidFileName).append(";");
                 originalFileNames.append(originalFilename).append(";");
@@ -136,6 +136,76 @@ public class BoardController {
         return "redirect:/community";
     }
 
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model,
+                           @AuthenticationPrincipal CustomUser userDetails) {
+        Board board = boardService.findById(id);
+        if (!board.getMember().getId().equals(userDetails.getMember().getId())) {
+            return "redirect:/community";
+        }
+
+        BoardRequest boardRequest = new BoardRequest();
+        boardRequest.setTitle(board.getTitle());
+        boardRequest.setContent(board.getContent());
+        boardRequest.setCategory(board.getCategory());
+
+        model.addAttribute("boardRequest", boardRequest);
+        model.addAttribute("boardId", id);
+        model.addAttribute("categories", Category.values());
+        model.addAttribute("memberName", userDetails.getMember().getMemberName());
+        model.addAttribute("formAction", "/community/" + id + "/edit");
+
+        return "community/form";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String updatePost(@PathVariable Long id,
+                             @Valid @ModelAttribute("boardRequest") BoardRequest boardRequest,
+                             BindingResult bindingResult,
+                             @RequestParam("files") MultipartFile[] files,
+                             Model model,
+                             @AuthenticationPrincipal CustomUser userDetails) throws IOException {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", Category.values());
+            model.addAttribute("memberName", userDetails.getMember().getMemberName());
+            model.addAttribute("formAction", "/community/" + id + "/edit");
+            model.addAttribute("boardId", id);
+            return "community/form";
+        }
+
+        Board board = boardService.findById(id);
+        if (!board.getMember().getId().equals(userDetails.getMember().getId())) {
+            return "redirect:/community";
+        }
+
+        boolean hasAttachment = false;
+        StringBuilder savedFileNames = new StringBuilder();
+        StringBuilder originalFileNames = new StringBuilder();
+
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                String originalFilename = file.getOriginalFilename();
+                String uuidFileName = UUID.randomUUID() + "_" + originalFilename;
+                awsS3Utils.saveFile("community/", uuidFileName, file);
+
+                savedFileNames.append(uuidFileName).append(";");
+                originalFileNames.append(originalFilename).append(";");
+                hasAttachment = true;
+            }
+        }
+
+        board.update(
+                boardRequest.getTitle(),
+                boardRequest.getContent(),
+                boardRequest.getCategory(),
+                hasAttachment ? savedFileNames.toString() : board.getAttachmentPath(),
+                hasAttachment ? originalFileNames.toString() : board.getAttachmentOriginalName()
+        );
+
+        boardService.save(board);
+        return "redirect:/community/" + id;
+    }
 
     @GetMapping("/download/{filename}")
     public String redirectToS3Download(@PathVariable String filename) {
@@ -145,13 +215,11 @@ public class BoardController {
 
     @GetMapping("/download-force/{filename}")
     public ResponseEntity<Resource> forceDownload(@PathVariable String filename) throws IOException {
-        // Board를 통해 원본 파일명 조회
         Board board = boardService.findByAttachmentFilename(filename);
         if (board == null) {
             return ResponseEntity.notFound().build();
         }
 
-        // 원본 이름 리스트와 저장된 이름 리스트를 매핑
         String[] savedPaths = board.getAttachmentPath().split(";");
         String[] originalNames = board.getAttachmentOriginalName().split(";");
 
@@ -184,8 +252,8 @@ public class BoardController {
         String dirName = "community/editor/";
 
         awsS3Utils.saveFile(dirName, uuidFileName, image);
-
         String imageUrl = awsS3Utils.getObjectUrl(dirName, uuidFileName);
+
         return ResponseEntity.ok().body(Map.of("url", imageUrl));
     }
 
@@ -200,7 +268,4 @@ public class BoardController {
         boardService.deleteByIdAndUser(id, user.getMember());
         return ResponseEntity.ok().build();
     }
-
-
-
 }

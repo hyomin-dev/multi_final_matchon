@@ -3,12 +3,14 @@ package com.multi.matchon.community.service;
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
 import com.multi.matchon.community.repository.BoardRepository;
+import com.multi.matchon.community.repository.CommentRepository;
 import com.multi.matchon.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final CommentService commentService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -53,6 +56,7 @@ public class BoardService {
         return null;
     }
 
+    @Transactional
     public void deleteByIdAndUser(Long id, Member member) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
@@ -61,7 +65,12 @@ public class BoardService {
             throw new SecurityException("삭제 권한이 없습니다.");
         }
 
+        // 1. 댓글 먼저 삭제
+        commentService.deleteAllByBoard(board);
+
+        // 2. 게시글 삭제
         boardRepository.deleteById(id);
     }
+
 }
 

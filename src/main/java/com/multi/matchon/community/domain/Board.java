@@ -50,6 +50,16 @@ public class Board extends BaseEntity {
 
     @Column(name = "attachment_original_name")
     private String attachmentOriginalName;
+
+    public void update(String title, String content, Category category,
+                       String attachmentPath, String attachmentOriginalName) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+        this.attachmentPath = attachmentPath;
+        this.attachmentOriginalName = attachmentOriginalName;
+    }
+
 }
 
 

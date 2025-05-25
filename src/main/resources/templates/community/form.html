@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>게시글 작성</title>
+    <title th:text="${boardId != null} ? '게시글 수정' : '게시글 작성'">게시글 작성</title>
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/community.css}">
@@ -12,10 +12,12 @@
 <div class="page-wrapper">
     <div th:replace="~{common/header::header}"></div>
 
-    <h2 style="text-align: center;">게시글 작성</h2>
+    <h2 style="text-align: center;" th:text="${boardId != null} ? '게시글 수정' : '게시글 작성'">게시글 작성</h2>
 
     <div class="form-container">
-        <form th:action="@{/community}" th:object="${boardRequest}" method="post" enctype="multipart/form-data">
+        <form th:action="@{${formAction}}"
+              th:object="${boardRequest}" method="post" enctype="multipart/form-data">
+
             <div class="form-group">
                 <label>제목</label>
                 <input type="text" th:field="*{title}" required />
@@ -52,8 +54,8 @@
             </div>
 
             <div style="text-align: center;">
-                <button type="submit">등록</button>
-                <button type="button" onclick="confirmCancel()" class="btn-outline-danger">작성 취소</button>
+                <button type="submit" th:text="${boardId != null} ? '수정 완료' : '등록'">등록</button>
+                <button type="button" onclick="confirmCancel()" class="btn-outline-danger">취소</button>
             </div>
         </form>
     </div>
@@ -61,60 +63,70 @@
 
 <div th:replace="~{common/footer::footer}"></div>
 
-<!-- 에디터 + 이미지 압축 라이브러리 -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/compressorjs@1.2.1/dist/compressor.min.js"></script>
 
-<script>
+<!-- Thymeleaf-safe 자바스크립트 처리 -->
+<script th:inline="javascript">
     function confirmCancel() {
         if (confirm("작성 중인 내용이 삭제됩니다. 목록으로 돌아가시겠습니까?")) {
             window.location.href = "/community";
         }
     }
 
-    const editor = new toastui.Editor({
-        el: document.querySelector('#editor'),
-        height: '400px',
-        initialEditType: 'wysiwyg',
-        previewStyle: 'tab',
-        toolbarItems: [
-            ['heading', 'bold', 'italic', 'strike'],
-            ['ul', 'ol'],
-            ['table', 'link', 'image']
-        ],
-        hooks: {
-            addImageBlobHook: (blob, callback) => {
-                new Compressor(blob, {
-                    quality: 0.7,
-                    maxWidth: 1200,
-                    success(compressedBlob) {
-                        const formData = new FormData();
-                        formData.append('image', compressedBlob);
+    window.addEventListener('DOMContentLoaded', () => {
+        const editorContainer = document.querySelector('#editor');
+        const form = document.querySelector('form');
+        const hiddenContent = document.getElementById('hiddenContent');
 
-                        fetch('/community/image-upload', {
-                            method: 'POST',
-                            body: formData
-                        })
-                            .then(res => res.json())
-                            .then(data => {
-                                const imageHtml = `<img src="${data.url}" loading="lazy" style="max-width:100%; height:auto; display:block;" />`;
-                                callback(data.url, '이미지', imageHtml);
-                            });
-                    },
-                    error(err) {
-                        console.error('이미지 압축 오류:', err);
+        if (editorContainer && form && hiddenContent) {
+            const editor = new toastui.Editor({
+                el: editorContainer,
+                height: '400px',
+                initialEditType: 'wysiwyg',
+                previewStyle: 'tab',
+                toolbarItems: [
+                    ['heading', 'bold', 'italic', 'strike'],
+                    ['ul', 'ol'],
+                    ['table', 'link', 'image']
+                ],
+                hooks: {
+                    addImageBlobHook: (blob, callback) => {
+                        new Compressor(blob, {
+                            quality: 0.7,
+                            maxWidth: 1200,
+                            success(compressedBlob) {
+                                const formData = new FormData();
+                                formData.append('image', compressedBlob);
+                                fetch('/community/image-upload', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        const imageHtml = `<img src="${data.url}" loading="lazy" style="max-width:100%; height:auto; display:block;" />`;
+                                        callback(data.url, '이미지', imageHtml);
+                                    });
+                            },
+                            error(err) {
+                                console.error('이미지 압축 오류:', err);
+                            }
+                        });
                     }
-                });
+                }
+            });
+
+            if (hiddenContent.value) {
+                editor.setHTML(hiddenContent.value);
             }
+
+            form.addEventListener('submit', function () {
+                hiddenContent.value = editor.getHTML();
+            });
         }
     });
 
-    // 에디터 내용 → hidden 필드 저장
-    document.querySelector('form').addEventListener('submit', function () {
-        document.getElementById('hiddenContent').value = editor.getHTML();
-    });
-
-    // 파일 첨부 미리보기
+    // 파일 첨부
     const fileInput = document.getElementById('fileInput');
     const filePreview = document.getElementById('filePreview');
     let fileList = [];
@@ -137,7 +149,6 @@
         filePreview.innerHTML = '';
         fileList.forEach((file, index) => {
             const previewBox = document.createElement('div');
-
             const fileNameSpan = document.createElement('span');
             fileNameSpan.textContent = file.name;
 
