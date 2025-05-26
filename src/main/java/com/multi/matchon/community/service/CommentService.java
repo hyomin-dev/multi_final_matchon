@@ -4,9 +4,9 @@ import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Comment;
 import com.multi.matchon.community.repository.CommentRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,8 +21,7 @@ public class CommentService {
     }
 
     public Comment save(Comment comment) {
-        commentRepository.save(comment);
-        return comment;
+        return commentRepository.save(comment);
     }
 
     public Comment findById(Long id) {
@@ -30,8 +29,8 @@ public class CommentService {
                 .orElseThrow(() -> new EntityNotFoundException("댓글을 찾을 수 없습니다."));
     }
 
-    public void softDelete(Long commentId) {
-        Comment comment = findById(commentId);
+    public void softDelete(Long id) {
+        Comment comment = findById(id);
         comment.setIsDeleted(true);
         commentRepository.save(comment);
     }
@@ -40,7 +39,4 @@ public class CommentService {
     public void deleteAllByBoard(Board board) {
         commentRepository.deleteAllByBoard(board);
     }
-
-
 }
-
