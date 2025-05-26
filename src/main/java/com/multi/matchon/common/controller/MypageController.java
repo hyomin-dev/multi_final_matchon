@@ -7,6 +7,8 @@ import com.multi.matchon.common.service.MypageService;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/mypage")
@@ -30,12 +33,10 @@ public class MypageController {
     @GetMapping
     @Transactional(readOnly = true)
     public String getMypage(@AuthenticationPrincipal CustomUser user, Model model) {
-        Member member = memberService.findForMypage(user.getUsername()); // 이메일 기반 조회
-
+        Member member = memberService.findForMypage(user.getUsername());
         Map<String, Object> data = mypageService.getMypageInfo(member);
         data.forEach(model::addAttribute);
 
-        // select 초기값 세팅
         model.addAttribute("myPosition", member.getPositions() != null ? member.getPositions().getPositionName().name() : "");
         model.addAttribute("myTimeType", member.getTimeType() != null ? member.getTimeType().name() : "");
         return "mypage/mypage";
@@ -69,16 +70,16 @@ public class MypageController {
     @PutMapping("/update")
     public ResponseEntity<String> updateMypage(@AuthenticationPrincipal CustomUser user,
                                                @RequestBody Map<String, Object> payload) {
+        try {
+            PositionName positionName = PositionName.valueOf((String) payload.get("positionName"));
+            TimeType timeType = TimeType.valueOf((String) payload.get("timeType"));
+            Double temperature = Double.valueOf(payload.get("temperature").toString());
 
-        Member member = memberService.findForMypage(user.getUsername());
-
-        PositionName positionName = PositionName.valueOf((String) payload.get("positionName"));
-        TimeType timeType = TimeType.valueOf((String) payload.get("timeType"));
-        Double temperature = Double.valueOf(payload.get("temperature").toString());
-
-        mypageService.updateMypage(member, positionName, timeType, temperature);
-        return ResponseEntity.ok("수정 완료");
+            mypageService.updateMypage(user.getUsername(), positionName, timeType, temperature);
+            return ResponseEntity.ok("수정 완료");
+        } catch (Exception e) {
+            log.error("마이페이지 수정 실패", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("수정 실패: " + e.getMessage());
+        }
     }
-
 }
-

@@ -59,13 +59,13 @@ public class GuestRequest extends BaseEntity {
     @Builder.Default
     private Status guestStatus = Status.PENDING;
 
-    @Column(name="request_resubmitted_count")
+    @Column(name="request_submitted_count")
     @Builder.Default
-    private Integer guestRequestResubmittedCount = 0;
+    private Integer guestRequestSubmittedCount = 1;
 
-    @Column(name="cancel_resubmitted_count")
+    @Column(name="cancel_submitted_count")
     @Builder.Default
-    private Integer guestCancelResubmittedCount = 0;
+    private Integer guestCancelSubmittedCount = 0;
 
     @Column(name="is_deleted")
     @Builder.Default

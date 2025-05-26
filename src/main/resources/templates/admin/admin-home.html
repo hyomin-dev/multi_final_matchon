@@ -5,57 +5,8 @@
     <title>관리자 메인</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-    <style>
-        /* wrap 전체 스타일 */
-        #wrap {
-            max-width: 700px;
-            margin: 60px auto;
-            padding: 30px;
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
+    <link rel="stylesheet" type="text/css" th:href="@{/css/admin/admin-home.css}">
 
-        /* 제목 스타일 */
-        #wrap h1 {
-            font-size: 24px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #222;
-            padding-bottom: 10px;
-            display: inline-block;
-        }
-
-        /* 리스트 스타일 */
-        #wrap ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        #wrap li {
-            background-color: #f9f9f9;
-            margin: 12px 0;
-            padding: 16px 20px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            transition: background-color 0.2s ease;
-        }
-
-        #wrap li:hover {
-            background-color: #eef2fb;
-        }
-
-        #wrap li a {
-            text-decoration: none;
-            color: #1f3e7b;
-            font-weight: 600;
-            font-size: 16px;
-            display: block;
-        }
-    </style>
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
@@ -63,7 +14,7 @@
     <h1>ADMIN</h1>
 
     <ul>
-        <li><a th:href="@{/admin/cs}">1:1 문의 관리</a></li>
+        <li><a th:href="@{/admin/inquiry}">1:1 문의 관리</a></li>
         <li><a th:href="@{/admin/community}">커뮤니티 관리</a></li>
         <li><a th:href="@{/admin/reports}">신고 내역</a></li>
         <li><a th:href="@{/admin/event}">대회 등록 관리</a></li>

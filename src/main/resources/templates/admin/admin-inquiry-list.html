@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 문의 목록</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #fff;
+        }
+        #wrap {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px 6px;
+            text-align: center;
+            word-break: keep-all;
+        }
+        th {
+            background-color: #f3f3f3;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .status-completed, .status-pending {
+            display: inline-block;
+            font-size: 13px;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        .status-completed {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+        .status-pending {
+            background-color: #ddd;
+            color: #444;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            margin: 0 4px;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #000;
+        }
+        .pagination a.active {
+            background-color: #5478b2;
+            color: white;
+        }
+        .pagination a.disabled {
+            pointer-events: none;
+            color: #aaa;
+            border-color: #eee;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+    <div>
+        <h2>전체 문의 목록</h2>
+
+
+        <div id="adminInquiryTableArea" th:fragment="adminInquiryTableArea">
+            <table th:if="${!inquiries.empty}">
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>카테고리</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>작성일</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="inquiry, stat : ${inquiries.content}">
+                    <td th:text="${stat.index + 1 + inquiries.number * inquiries.size}">1</td>
+                    <td th:text="${inquiry.inquiryCategory.label}">카테고리</td>
+                    <td>
+                        <a th:href="@{'/admin/inquiry/' + ${inquiry.id}}" th:text="${inquiry.inquiryTitle}">제목</a>
+                    </td>
+                    <td th:text="${inquiry.member.memberName}">작성자</td>
+                    <td th:text="${#temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</td>
+                    <td>
+                        <span th:text="${inquiry.inquiryStatus.name() == 'COMPLETED' ? '답변완료' : '대기중'}"
+                              th:classappend="${inquiry.inquiryStatus.name() == 'COMPLETED'} ? 'status-completed' : 'status-pending'">
+                            상태
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${inquiries.empty}" style="text-align: center; padding: 40px 0;">
+                등록된 문의가 없습니다.
+            </div>
+
+            <div class="pagination" th:if="${inquiries.totalPages > 0}">
+                <a th:classappend="${inquiries.first} ? 'disabled'" href="#" th:data-page="${inquiries.number - 1}">&laquo;</a>
+                <span th:each="pageNum : ${#numbers.sequence(0, inquiries.totalPages - 1)}">
+                    <a href="#" th:data-page="${pageNum}"
+                       th:classappend="${pageNum == inquiries.number} ? 'active'" th:text="${pageNum + 1}">1</a>
+                </span>
+                <a th:classappend="${inquiries.last} ? 'disabled'" href="#" th:data-page="${inquiries.number + 1}">&raquo;</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{common/footer::footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableArea = document.getElementById('adminInquiryTableArea');
+
+        document.addEventListener('click', function (e) {
+            const target = e.target.closest('.pagination a');
+            if (target && target.hasAttribute('data-page')) {
+                e.preventDefault();
+                const page = target.getAttribute('data-page');
+
+                fetch(`/admin/inquiry?page=${page}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContent = doc.getElementById('adminInquiryTableArea');
+                        if (newContent) {
+                            tableArea.innerHTML = newContent.innerHTML;
+                        }
+                    });
+            }
+        });
+    });
+</script>
+</body>
+</html>

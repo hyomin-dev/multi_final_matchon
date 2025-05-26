@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>문의 상세 (관리자)</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <style>
+        body {
+            background-color: #ffffff;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        #wrap {
+            max-width: 700px;
+            margin: 60px auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .badge.category {
+            background-color: #007BFF;
+            color: white;
+        }
+        .badge.status {
+            background-color: #ccc;
+            color: #333;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0 24px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+        .content-box {
+            font-size: 16px;
+            padding: 16px;
+            background-color: #fdfdfd;
+            border-left: 4px solid #007BFF;
+            border-radius: 6px;
+            min-height: 100px;
+            margin-bottom: 30px;
+        }
+        .answer-box {
+            background: #eef9ee;
+            padding: 16px;
+            border-left: 4px solid #28a745;
+            border-radius: 6px;
+            font-size: 15px;
+            margin-top: 30px;
+        }
+        .answer-form textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        .btn-area {
+            display: flex;
+            justify-content: center; /* 수정됨 */
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .back-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+    <div class="meta">
+        <span class="badge category" th:text="${inquiry.categoryLabel}">카테고리</span>
+        <span class="badge status" th:text="${inquiry.statusLabel}">상태</span>
+    </div>
+
+    <h2 th:text="${inquiry.inquiryTitle}">문의 제목</h2>
+
+    <div class="content-box" th:text="${inquiry.inquiryContent}">문의 내용</div>
+
+    <!-- 답변 작성 폼 -->
+    <div th:if="${inquiry.inquiryStatus.name() == 'PENDING'}">
+        <form class="answer-form" th:action="@{'/admin/inquiry/' + ${inquiry.id} + '/answer'}" method="post">
+            <textarea name="answerContent" placeholder="답변 내용을 입력하세요"></textarea>
+            <div class="btn-area">
+                <button type="submit" class="btn submit-btn">답변 등록</button>
+                <a th:href="@{/admin/inquiry}"><button type="button" class="btn back-btn">돌아가기</button></a>
+            </div>
+        </form>
+    </div>
+
+    <!-- 답변 완료된 경우 -->
+    <div th:if="${inquiry.inquiryStatus.name() == 'COMPLETED'}">
+        <div class="answer-box">
+            <strong>답변 내용</strong>
+            <p th:text="${inquiry.answerContent}">답변 내용</p>
+        </div>
+        <div class="btn-area">
+            <a th:href="@{/admin/inquiry}">
+                <button type="button" class="btn back-btn">돌아가기</button>
+            </a>
+        </div>
+    </div>
+</div>
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

@@ -44,7 +44,7 @@ public class AwsS3Utils {
 
         // String replaceFileName = fileName + "." + FilenameUtils.getExtension(multipartFile.getResource().getFilename());
 
-        String s3Key = dirName + fileName;
+        String s3Key = dirName + fileName + "." + FilenameUtils.getExtension(multipartFile.getOriginalFilename());;
 
         System.out.println("======>    "+s3Key);
         try (InputStream inputStream = multipartFile.getInputStream()) {
@@ -73,8 +73,8 @@ public class AwsS3Utils {
 
 
     public S3Resource downloadFile(String dirName, String savedName) throws IOException {
-        String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
-        S3Resource resource =  s3Operations.download(bucket,dirName+savedNameOnly);
+        //String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+        S3Resource resource =  s3Operations.download(bucket,dirName+savedName);
 
 //       ByteArrayOutputStream outputStream = (ByteArrayOutputStream) resource.getOutputStream();
 //       byte[] data = outputStream.toByteArray();
@@ -101,15 +101,14 @@ public class AwsS3Utils {
     /* Create a pre-signed URL to download an object in a subsequent GET request. */
     public String createPresignedGetUrl(String dirName, String savedName) {
 
-        //String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거 //주석처리 - 전준혁
+        // String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
 
 
         try (S3Presigner presigner = S3Presigner.create()) {
 
             GetObjectRequest objectRequest = GetObjectRequest.builder()
                     .bucket(bucket)
-//                    .key(dirName+savedNameOnly) //주석처리 전준혁
-                    .key(dirName+savedName) //임의추가 전준혁
+                    .key(dirName+savedName)
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
