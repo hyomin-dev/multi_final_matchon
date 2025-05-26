@@ -174,6 +174,7 @@ public class BoardController {
             return "community/form";
         }
 
+
         Board board = boardService.findById(id);
         if (!board.getMember().getId().equals(userDetails.getMember().getId())) {
             return "redirect:/community";

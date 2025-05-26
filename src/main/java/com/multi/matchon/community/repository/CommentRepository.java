@@ -11,6 +11,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     void deleteAllByBoard(Board board);
 
-
 }
 
