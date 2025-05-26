@@ -34,7 +34,7 @@
         <label for="category"></label>
         <select name="category" id="category">
             <option value="" th:selected="${category == null}">전체 보기</option>
-            <option value="HOWTOUSE" th:selected="${category?.name() == 'HOWTOUSE'}">이용방법</option>
+            <option value="TUTORIAL" th:selected="${category?.name() == 'TUTORIAL'}">이용방법</option>
             <option value="ACCOUNT" th:selected="${category?.name() == 'ACCOUNT'}">계정</option>
             <option value="TEAM_GUEST" th:selected="${category?.name() == 'TEAM_GUEST'}">Team / Guest</option>
             <option value="REPORT" th:selected="${category?.name() == 'REPORT'}">신고</option>
@@ -47,29 +47,40 @@
 
         <a href="/inquiry" class="btn1">1:1 문의 작성</a>
     </form>
-<br>
+
+    <br>
     <table>
         <thead>
         <tr>
-            <th>No</th>
+            <th>No.</th>
             <th>카테고리</th>
             <th>제목</th>
             <th>작성일</th>
+            <th th:if="${isAdmin}">수정일</th>
+            <th th:if="${isAdmin}">삭제</th>
         </tr>
         </thead>
         <tbody>
-        <tbody>
         <tr th:each="faq, stat : ${faqList}">
-            <!-- 1부터 시작, 페이지마다 순차 증가..-->
             <td th:text="${page.number * page.size + stat.index + 1}">No</td>
             <td th:text="${faq.faqCategory.label}">카테고리</td>
             <td>
                 <a th:href="@{/faq/detail/{id}(id=${faq.faqId})}" th:text="${faq.faqTitle}">제목</a>
             </td>
             <td th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd')}">작성일</td>
+            <td th:if="${isAdmin}" th:text="${#temporals.format(faq.modifiedDate, 'yyyy-MM-dd HH:mm')}">수정일</td>
+            <td th:if="${isAdmin}">
+                <form th:action="@{/faq/delete/{id}(id=${faq.faqId})}" method="post">
+                    <button type="submit" style="background-color: red; color: white; border: none; padding: 4px 8px; border-radius: 4px;">
+                        삭제
+                    </button>
+                </form>
+
+
+
+            </td>
         </tr>
         </tbody>
-
     </table>
 
     <div class="pagination">
@@ -78,10 +89,21 @@
         <a th:if="${!page.last}" th:href="@{/cs(page=${page.number + 1}, category=${category}, keyword=${keyword})}">&gt;</a>
     </div>
 
-    <!-- faq 글 등록하기 cs-faq-register.html로 이동 -->
-    <form th:action="@{/faq/register}" method="get">
-        <button type="submit" class="btnsubmit">등록하기</button>
-    </form>
+    <!-- 관리자만 FAQ 등록 버튼 표시 -->
+    <th:block th:if="${isAdmin}">
+        <div style="text-align: right; margin: 10px 0;">
+            <a href="/faq/register" style="
+                display: inline-block;
+                padding: 8px 16px;
+                background-color: #007bff;
+                color: white;
+                border-radius: 4px;
+                text-decoration: none;
+                font-weight: bold;">
+                FAQ 등록
+            </a>
+        </div>
+    </th:block>
 
 </div>
 <div th:replace="~{common/footer::footer}"></div>

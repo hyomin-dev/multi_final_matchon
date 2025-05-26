@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -41,9 +38,13 @@ public class Faq extends TimeEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdDate;
+    public void update(String title, String content, CustomerServiceType category) {
+        this.faqTitle = title;
+        this.faqContent = content;
+        this.faqCategory = category;
+    }
 
-
+    public void softDelete() {
+        this.isDeleted = true;
+    }
 }

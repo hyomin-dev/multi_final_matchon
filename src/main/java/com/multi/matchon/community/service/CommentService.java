@@ -6,6 +6,7 @@ import com.multi.matchon.community.repository.CommentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,8 +20,9 @@ public class CommentService {
         return commentRepository.findByBoardAndIsDeletedFalse(board);
     }
 
-    public void save(Comment comment) {
+    public Comment save(Comment comment) {
         commentRepository.save(comment);
+        return comment;
     }
 
     public Comment findById(Long id) {
@@ -33,6 +35,12 @@ public class CommentService {
         comment.setIsDeleted(true);
         commentRepository.save(comment);
     }
+
+    @Transactional
+    public void deleteAllByBoard(Board board) {
+        commentRepository.deleteAllByBoard(board);
+    }
+
 
 }
 

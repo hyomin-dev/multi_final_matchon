@@ -27,6 +27,8 @@
         </select>
     </div>
 
+
+
     <div id="board-list">
         <table>
             <tr>
@@ -54,7 +56,6 @@
             <a th:if="${boardsPage.hasNext()}" th:href="@{/community(page=${boardsPage.number + 1}, category=${selectedCategory})}">다음</a>
         </div>
     </div>
-
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
