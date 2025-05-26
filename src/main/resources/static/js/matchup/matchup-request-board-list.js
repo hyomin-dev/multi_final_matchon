@@ -1,29 +1,33 @@
-let sportsType = '';
-let dateFilter = '';
+let boardId = '';
 const Status = {
     PENDING: "PENDING",
     APPROVED: "APPROVED",
     DENIED: "DENIED",
     CANCELREQUESTED: "CANCELREQUESTED"
 }
-document.addEventListener("DOMContentLoaded",async ()=>{
-    document.querySelector("#sports-type").addEventListener("change",(e)=>{
-        sportsType = e.target.value;
-    })
 
-    document.querySelector("#date-filter").addEventListener("change",(e)=>{
-        dateFilter = e.target.value;
-        //console.log(dateFilter);
-    })
-    document.querySelector("#filterBtn").addEventListener("click",()=>{
-        loadItems(1, sportsType, dateFilter);
-    })
+
+document.addEventListener("DOMContentLoaded",async ()=>{
+
+
+    const detailDto = document.querySelector("#matchup-request-detail-dto");
+    boardId = Number(detailDto.dataset.boardId);
+
+    const matchDatetime = detailDto.dataset.matchDatetime;
+    const matchDuration = detailDto.dataset.matchDuration;
+    const currentParticipantCount = detailDto.dataset.currentParticipantCount;
+    const maxParticipants = detailDto.dataset.maxParticipants;
+
+    calTime(matchDatetime, matchDuration);
+    checkMatchStatus(matchDatetime);
+
+
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
 })
 
 
-async function loadItems(page, sportsType='', dateFilter=''){
-    const response = await fetch(`/matchup/request/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}`,{
+async function loadItems(page){
+    const response = await fetch(`/matchup/request/board/list?page=${page-1}&board-id=${boardId}`,{
 
         method: "GET",
         credentials: "include"
@@ -37,7 +41,7 @@ async function loadItems(page, sportsType='', dateFilter=''){
     //console.log(pageInfo);
 
     renderList(items);
-    renderPagination(pageInfo,sportsType, dateFilter);
+    renderPagination(pageInfo);
 
 
 }
@@ -46,43 +50,26 @@ function renderList(items){
     boardArea.innerHTML = '';
 
     items.forEach(item=>{
-        const date = new Date(item.matchDatetime);
-
         const card = document.createElement("div");
         card.className = "matchup-card";
-        card.innerHTML = `                                             
-             <div class="card-3col">
-                  <!-- 1. 버튼 영역 -->
-                  <div class="button-group-vertical">
-                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}" class="detail-button">게시글 상세보기</a>
-                    <a href="/matchup/request/detail?request-id=${item.requestId}" class="detail-button">요청 상세보기</a>
-                  </div>
-
-                  <!-- 2. 경기 정보 영역 -->
-                  <div class="match-info">
-                    <div><strong>종목:</strong> ${item.sportsTypeName}</div>
-                    <div><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                    <div>경기장 주소: ${item.sportsFacilityAddress}</div>
-                    <div>📅 날짜: ${date.getMonth()+1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - ${calTime(item,date.getHours(), date.getMinutes())}</div>
-                    <div><strong>경기 상태:</strong> ${checkMatchStatus(item)}</div>
-                  </div>
-
-                  <!-- 3. 요청 상태 영역 -->
-                  <div class="request-info">
-                    <div><strong>현재 정원:</strong> (${item.currentParticipantCount} / ${item.maxParticipants})</div>
-                    <div><strong>신청 인원:</strong> ${item.participantCount}</div>
-                    <div><strong>요청 상태:</strong> ${manageRequestInfo(item)}</div>
-                    <div><strong>참가 요청 횟수:</strong> ${item.matchupRequestSubmittedCount}</div>
-                    <div><strong>취소 횟수:</strong> ${item.matchupCancelSubmittedCount}</div>
-                  </div>
-            </div>
+        card.innerHTML = `
+            <div class="card-content">
+                <div class="left-info">
+                    <div><strong><a href="/matchup/request/detail?request-id=${item.requestId}">상세보기</a></strong></div>
+                    <div><strong>신청자: ${item.applicantName}</strong></div>
+                    <div><strong>신청 인원: ${item.participantCount}</strong></div>
+                    <div><strong>요청 횟수: ${item.matchupRequestSubmittedCount}</strong></div>
+                    <div><strong>승인 취소 요청 횟수 : ${item.matchupCancelSubmittedCount}</strong></div>
+                    <div><strong>상태: ${manageRequestInfo(item)}</strong></div>
+                </div>               
+            </div>       
                 `;
         boardArea.appendChild(card);
 
     })
 }
 
-function renderPagination(pageInfo, sportsType, dateFilter){
+function renderPagination(pageInfo){
 
     // 프론트는 페이지 시작번호 1부터로 헷갈림
     const pageBlockSize = 5;
@@ -103,7 +90,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const firstBtn = document.createElement("button");
         firstBtn.textContent = "<<";
         firstBtn.addEventListener("click",()=>{
-            loadItems(1, sportsType, dateFilter);
+            loadItems(1);
 
         });
         pagingArea.appendChild(firstBtn);
@@ -114,7 +101,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const prevBtn = document.createElement("button");
         prevBtn.textContent = "<";
         prevBtn.addEventListener("click",()=>{
-            loadItems(startPage-1, sportsType, dateFilter);
+            loadItems(startPage-1);
 
         });
         pagingArea.appendChild(prevBtn);
@@ -128,7 +115,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
             btn.disabled = true;
 
         btn.addEventListener("click",()=>{
-            loadItems(i,sportsType, dateFilter);
+            loadItems(i);
         })
         pagingArea.appendChild(btn);
     }
@@ -138,7 +125,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const nextBtn = document.createElement("button");
         nextBtn.textContent = ">";
         nextBtn.addEventListener("click",()=>{
-            loadItems(endPage+1, sportsType, dateFilter);
+            loadItems(endPage+1);
 
         })
         pagingArea.appendChild(nextBtn);
@@ -150,7 +137,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const lastBtn = document.createElement("button");
         lastBtn.textContent  = ">>";
         lastBtn.addEventListener("click",()=>{
-            loadItems(pageInfo.totalPages, sportsType, dateFilter);
+            loadItems(pageInfo.totalPages);
         })
         pagingArea.appendChild(lastBtn);
 
@@ -159,19 +146,33 @@ function renderPagination(pageInfo, sportsType, dateFilter){
 
 }
 
-function calTime(item, startHour, startMinute){
+function calTime(matchDatetime, matchDuration){
+    //console.log(matchDatetime);
+    //console.log(matchDuration);
+
+    const date = new Date(matchDatetime);
+    //console.log(date);
+    const matchDateEle = document.querySelector("#match-date");
+
+    const month = date.getMonth()+1;
+    const day = date.getDate();
+
+    const startHour = date.getHours();
+    const startMinutes = date.getMinutes();
 
 
-    const [hour, minute, second] = item.matchDuration.split(":");
+    const [hour, minute, second] = matchDuration.split(":");
     const hourNum = parseInt(hour, 10);
     const minuteNum = parseInt(minute,10);
+
     let extraHour = 0
     let endMinute = 0;
-    if(startMinute+minuteNum>=60){
+
+    if(date.getMinutes()+minuteNum>=60){
         extraHour = 1;
-        endMinute = (startMinute+minuteNum)%60;
+        endMinute = (date.getMinutes()+minuteNum)%60;
     }else{
-        endMinute = startMinute+minuteNum;
+        endMinute = date.getMinutes()+minuteNum;
     }
 
     if(startHour+hourNum+extraHour>=24)
@@ -179,17 +180,19 @@ function calTime(item, startHour, startMinute){
     else
         endHour = startHour+hourNum+extraHour;
 
-    return `${endHour}시 ${endMinute}분`
+    matchDateEle.textContent = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
 
 }
 
-function checkMatchStatus(item){
-    const matchDate = new Date(item.matchDatetime);
+function checkMatchStatus(matchDatetime){
+    const matchStatusEle = document.querySelector("#match-status");
+
+    const matchDate = new Date(matchDatetime);
     const now = new Date();
     if(matchDate<now)
-        return "경기 종료"
+        matchStatusEle.textContent = "경기 종료";
     else
-        return "경기 시작전"
+        matchStatusEle.textContent =  "경기 시작전";
 }
 
 function manageRequestInfo(item){

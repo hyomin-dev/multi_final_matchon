@@ -1,6 +1,3 @@
-
-
-
 /* 제목 */
 h1 {
     text-align: center;
@@ -39,48 +36,22 @@ td {
     margin-top: 0.5rem;
 }
 
-/* 링크 버튼 */
-a#modify,
-a#chat1-1Btn,
-a#requestBtn {
-    display: inline-block;
-    margin: 0.5rem 0.5rem 0 0;
-    padding: 8px 14px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: bold;
-    color: white;
-}
-
-#modify {
-    background-color: #007a00;
-}
-
-#chat1-1Btn {
-    background-color: #004080;
-}
-
-#requestBtn {
-    background-color: #c0392b;
-}
-
-a#modify:hover,
-a#chat1-1Btn:hover,
-a#requestBtn:hover {
-    opacity: 0.9;
-}
-
 /* 버튼 컨테이너: 가운데 정렬 */
 .button-group {
     display: flex;
-    justify-content: center; /* 가로 가운데 정렬 */
+    justify-content: center;
     flex-wrap: wrap;
     gap: 1rem;
     margin-top: 2rem;
 }
 
 /* 공통 버튼 스타일 */
-.button-group a {
+.button-group a,
+a#modifyBtn,
+a#deleteBtn,
+a#chat1-1Btn,
+a#requestBtn,
+a.back-btn {
     display: inline-block;
     margin: 0.5rem;
     padding: 10px 16px;
@@ -88,21 +59,38 @@ a#requestBtn:hover {
     text-decoration: none;
     font-weight: bold;
     color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 /* 각 버튼 색상 */
-a#modify {
-    background-color: #007a00;
+a#modifyBtn {
+    background-color: #007a00; /* 초록 */
+}
+
+a#deleteBtn {
+    background-color: #e74c3c; /* 붉은색 */
 }
 
 a#chat1-1Btn {
-    background-color: #004080;
+    background-color: #004080; /* 파랑 */
 }
 
 a#requestBtn {
-    background-color: #c0392b;
+    background-color: #c0392b; /* 진한 빨강 */
 }
 
+a.back-btn {
+    background-color: #555; /* 진한 회색 (대비 향상) */
+}
+
+/* Hover 효과 (공통) */
+a#modifyBtn:hover,
+a#deleteBtn:hover,
+a#chat1-1Btn:hover,
+a#requestBtn:hover,
+a.back-btn:hover,
 .button-group a:hover {
     opacity: 0.9;
+    transform: translateY(-2px);
 }

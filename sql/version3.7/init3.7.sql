@@ -159,12 +159,14 @@ INSERT INTO faq (faq_id, created_date, created_person, modified_date, modified_p
                  faq_category, faq_content, faq_title, is_deleted, admin_id)
 VALUES (null, now(), 'admin', now(), 'admin', 'TEAM_GUEST', '팀 채팅 안내입니다.', '팀 채팅 안내', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'ACCOUNT', '개인정보는 이렇게 수정하시면 됩니다.', '개인정보 수정하는 법', 0, 1),
+
        (null, now(), 'admin', now(), 'admin', 'REPORT', '신고방법 이렇게 이용하시면 됩니다.', '신고 방법', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'TEAM_GUEST', 'Guest는 이렇게 이용하시면 됩니다.', 'Guest 이용 방법', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'HOWTOUSE', 'MatchON은 이렇게 이용하시면 됩니다.', 'MatchON 이용 방법', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'MANNER_TEMPERATURE', '매너온도의 계산 기준은 이렇습니다.', '매너온도 계산 기준 안내', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'HOWTOUSE', '챗봇은 이렇게 이용하시면 됩니다.', '챗봇 이용 방법', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'REPORT', '멤버 신고는 이렇게 하시면 됩니다.', '멤버 신고 안내', 0, 1);
+
 
 
 
@@ -190,6 +192,20 @@ VALUES (1, 2, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Me
         FALSE),
        (10, 4, 'Review content by Member10', 'Member10', '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28',
         FALSE);
+
+
+INSERT INTO review (team_review_id, review_writer, team_id, review_rating, content, created_person, created_date, modified_person, modified_date, is_deleted)
+VALUES (1, 1, 1, 2, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE),
+       (2, 2, 2, 3, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE),
+       (3, 3, 3, 5, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE),
+       (4, 4, 4, 1, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE),
+       (5, 5, 5, 3, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE),
+       (6, 6, 6, 4, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE),
+       (7, 7, 7, 2, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE),
+       (8, 8, 8, 1, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE),
+       (9, 9, 9, 4, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE),
+       (10, 10, 10, 3, 'Review content by Member1', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE);
+
 
 INSERT INTO response (review_id, review_response, created_person, created_date, modified_person,
                       modified_date, is_deleted)
@@ -254,6 +270,7 @@ VALUES (1, 1, 'Comment 1 content', 'Member2', '2025-05-17 20:52:28', 'Member2', 
        (10, 10, 'Comment 10 content', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', FALSE);
 
 INSERT INTO host_profile (host_id, host_name, created_date, modified_date, picture_attachment_enabled)
+
 VALUES	(1, 'Host1', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE),
 	    (2, 'Host2', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE),
 	    (3, 'Host3', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE),
@@ -264,6 +281,7 @@ VALUES	(1, 'Host1', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE),
 	    (8, 'Host8', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE),
 	    (9, 'Host9', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE),
 	    (10, 'Host10', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE);
+
 
 INSERT INTO inquiry_answer (inquiry_id, admin_id, answer_content, created_date, created_person,
                             modified_date, modified_person, is_deleted)
@@ -554,4 +572,6 @@ VALUES (1, 1, 1, FALSE, '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28',
        (8, 8, 8, TRUE, '2025-05-17 20:52:28', 'Member8', '2025-05-17 20:52:28', 'Member8'),
        (9, 9, 9, TRUE, '2025-05-17 20:52:28', 'Member9', '2025-05-17 20:52:28', 'Member9'),
        (10, 10, 10, TRUE, '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28', 'Member10');
+
+
 
