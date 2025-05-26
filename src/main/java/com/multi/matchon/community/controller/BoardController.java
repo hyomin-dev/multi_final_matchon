@@ -97,7 +97,7 @@ public class BoardController {
                          BindingResult bindingResult,
                          @RequestParam("files") MultipartFile[] files,
                          Model model,
-                         @AuthenticationPrincipal CustomUser user) throws IOException {
+                         @AuthenticationPrincipal CustomUser user) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", Category.values());
