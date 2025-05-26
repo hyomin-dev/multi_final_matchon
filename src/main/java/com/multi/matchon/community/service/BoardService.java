@@ -3,7 +3,6 @@ package com.multi.matchon.community.service;
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
 import com.multi.matchon.community.repository.BoardRepository;
-import com.multi.matchon.community.repository.CommentRepository;
 import com.multi.matchon.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
