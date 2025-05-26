@@ -39,11 +39,16 @@ th {
     margin-top: 0.5rem;
 }
 
-/* 버튼 링크 공통 */
-a#approved,
-a#denied,
-a#chat1-1Btn,
-a#requestBtn {
+/* 공통 버튼 스타일 */
+a#approvedBtn,
+a#deniedBtn,
+a#approveWithdrawRequestBtn,
+a#denyWithdrawRequestBtn,
+a#modifyBtn,
+a#cancelBtn,
+a#retryBtn,
+a#withdrawBtn,
+a.back-btn {
     display: inline-block;
     margin: 0.5rem 0.5rem 0 0;
     padding: 8px 14px;
@@ -51,28 +56,61 @@ a#requestBtn {
     text-decoration: none;
     font-weight: bold;
     color: white;
+    transition: opacity 0.2s ease-in-out;
 }
 
-/* 역할에 따른 버튼 색상 */
-#approved {
-    background-color: #007a00;
+/* 역할별 색상 지정 */
+#approvedBtn,
+#modifyBtn {
+    background-color: #007a00; /* 초록 */
 }
 
-#denied {
-    background-color: #c0392b;
+#deniedBtn,
+#cancelBtn{
+    background-color: #c0392b; /* 빨강 */
 }
 
-#chat1-1Btn {
-    background-color: #004080;
+#approveWithdrawRequestBtn,
+#retryBtn {
+    background-color: #9b59b6; /* 보라색 */
+}
+#denyWithdrawRequestBtn,
+#withdrawBtn {
+    background-color: #f39c12; /* 주황 */
+}
+a.back-btn {
+    background-color: #555; /* 진한 회색 (대비 향상) */
 }
 
-#requestBtn {
-    background-color: #888;
-}
 
-a#approved:hover,
-a#denied:hover,
-a#chat1-1Btn:hover,
-a#requestBtn:hover {
+/* Hover 효과 (모든 버튼 공통) */
+a#approvedBtn:hover,
+a#deniedBtn:hover,
+a#approveWithdrawRequestBtn:hover,
+a#denyWithdrawRequestBtn:hover,
+a#modifyBtn:hover,
+a#cancelBtn:hover,
+a#retryBtn:hover,
+a#withdrawBtn:hover,
+a.back-btn:hover {
     opacity: 0.9;
 }
+
+/* 버튼 그룹 정렬 */
+#button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.disabled {
+    background-color: #555 !important;  /* 더 진한 회색 */
+    color: #ddd !important;
+    pointer-events: none;          /* 클릭 안 되게 */
+    cursor: not-allowed;           /* 마우스 모양 변경 */
+    opacity: 0.7;                  /* 살짝 흐리게 */
+    text-decoration: none;
+}
+

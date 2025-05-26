@@ -5,6 +5,7 @@ import com.multi.matchon.common.domain.Attachment;
 import com.multi.matchon.common.domain.BoardType;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.dto.res.PageResponseDto;
+import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
 import com.multi.matchon.matchup.domain.MatchupBoard;
@@ -13,6 +14,7 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupBoardOverviewDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
 import com.multi.matchon.member.domain.Member;
 import com.sun.jdi.request.DuplicateRequestException;
@@ -24,9 +26,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +47,13 @@ public class MatchupBoardService {
 
     @Transactional
     public void registerMatchupBoard(ReqMatchupBoardDto reqMatchupBoardDto, CustomUser user) {
+
+
+
+        Long numberOfTodayMatchupBoards = matchupBoardRepository.countTodayMatchupBoards(user.getMember().getId(), LocalDateTime.now().minusHours(24));
+        if(numberOfTodayMatchupBoards>=3){
+            throw new CustomException("Matchup 게시글은 하루에 3번만 작성할 수 있습니다.");
+        }
 
         MatchupBoard newMatchupBoard = MatchupBoard.builder()
                 .member(user.getMember())
@@ -199,6 +210,12 @@ public class MatchupBoardService {
 
         attachmentRepository.save(findAttachments.get(0));
 
+    }
+
+    @Transactional(readOnly = true)
+    public ResMatchupBoardOverviewDto findResMatchupOverviewDto(Long boardId) {
+
+        return matchupBoardRepository.findResMatchupOverviewDto(boardId).orElseThrow(()->new IllegalArgumentException("Matchup"+boardId+"번 게시글이 없습니다."));
     }
     // ========================================================================================================
     //                                                    테스트 해본 코드

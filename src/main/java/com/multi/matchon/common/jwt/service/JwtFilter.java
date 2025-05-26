@@ -61,7 +61,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 // 쿠키 재설정
                 Cookie accessCookie = new Cookie("Authorization", newAccessToken);
-                accessCookie.setHttpOnly(true);
+                accessCookie.setHttpOnly(false);
                 accessCookie.setPath("/");
                 accessCookie.setMaxAge(60 * 60);
                 response.addCookie(accessCookie);

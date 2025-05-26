@@ -2,8 +2,7 @@ package com.multi.matchon.customerservice.domain;
 
 
 public enum CustomerServiceType {
-    // 이용방법
-    HOWTOUSE("이용방법"),
+
     // 계정
     ACCOUNT("계정"),
     // TEAM / GUEST

@@ -22,6 +22,7 @@ public class FaqDto {
     private String faqContent;
     private Boolean isDeleted;
     private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
     @Builder
     public FaqDto(Long faqId,
@@ -30,7 +31,8 @@ public class FaqDto {
                   String faqTitle,
                   String faqContent,
                   Boolean isDeleted,
-                  LocalDateTime createdDate) {
+                  LocalDateTime createdDate,
+                  LocalDateTime modifiedDate) {
         this.faqId = faqId;
         this.member = member;
         this.faqCategory = faqCategory;
@@ -38,6 +40,7 @@ public class FaqDto {
         this.faqContent = faqContent;
         this.isDeleted = isDeleted;
         this.createdDate = createdDate;
+        this.modifiedDate = modifiedDate;
     }
 
     public FaqDto withMember(Member member) {
@@ -49,6 +52,7 @@ public class FaqDto {
                 .faqContent(this.faqContent)
                 .isDeleted(this.isDeleted)
                 .createdDate(this.createdDate)
+                .modifiedDate(this.modifiedDate)
                 .build();
     }
 
