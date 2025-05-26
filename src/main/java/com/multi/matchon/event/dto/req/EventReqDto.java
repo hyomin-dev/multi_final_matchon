@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class ReqEventCreateDto {
+public class EventReqDto {
     private LocalDate eventDate;
     private EventRegionType eventRegionType;
     private String eventTitle;

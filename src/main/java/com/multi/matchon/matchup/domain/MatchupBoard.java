@@ -89,4 +89,12 @@ public class MatchupBoard extends BaseEntity {
     public void delete(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
+
+    public void increaseCurrentParticipantCount(Integer participantCount){
+        this.currentParticipantCount += participantCount;
+    }
+
+    public void decreaseCurrentParticipantCount(Integer participantCount){
+        this.currentParticipantCount -= participantCount;
+    }
 }

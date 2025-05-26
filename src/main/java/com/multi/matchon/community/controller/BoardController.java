@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -173,6 +174,7 @@ public class BoardController {
             model.addAttribute("boardId", id);
             return "community/form";
         }
+
 
         Board board = boardService.findById(id);
         if (!board.getMember().getId().equals(userDetails.getMember().getId())) {

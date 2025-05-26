@@ -26,7 +26,7 @@ public class HostProfile extends BaseTimeEntity {
 
     // 기관명 변경용 setter
     @Setter
-    @Column(name="host_name", columnDefinition = "VARCHAR(100)")
+    @Column(name="host_name", nullable = true, unique = true, length = 100)
     private String hostName;
 
     @Column(name="picture_attachment_enabled",nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE CHECK (picture_attachment_enabled = TRUE)")

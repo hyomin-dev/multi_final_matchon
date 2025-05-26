@@ -5,77 +5,20 @@
     <title>대회 상세</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7bb155da95fb31682683d7bb286174d2&libraries=services"></script>
-    <style>
-        #wrap {
-            max-width: 700px;
-            margin: 40px auto;
-            font-family: 'Noto Sans KR', sans-serif;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-        }
-        h2 {
-            text-align: center;
-            font-size: 26px;
-            font-weight: bold;
-            margin-bottom: 24px;
-        }
-        .info-box {
-            margin-bottom: 14px;
-            font-size: 16px;
-        }
-        label {
-            font-weight: 600;
-            display: inline-block;
-            width: 100px;
-        }
-        #map {
-            width: 100%;
-            height: 300px;
-            margin: 16px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        .btn-wrap {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 30px;
-        }
-        .btn {
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-        }
-        .back-btn {
-            background-color: #555;
-            color: white;
-        }
-        .approve-btn {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .deny-btn {
-            background-color: #f44336;
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/admin/admin-event-detail.css}">
+
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
+
 <div id="wrap">
     <h2 th:text="${event.eventTitle}">대회 제목</h2>
 
-    <div class="info-box"><label>등록자:</label> <span th:text="${event.member.memberName}"></span></div>
+    <div class="info-box"><label>주최기관:</label> <span th:text="${event.hostProfile.hostName}"></span></div>
     <div class="info-box"><label>일자:</label> <span th:text="${event.eventDate}"></span></div>
     <div class="info-box"><label>지역:</label> <span th:text="${regionLabel}"></span></div>
     <div class="info-box"><label>장소:</label> <span th:text="${event.eventAddress}"></span></div>
-    <div id="map"></div>
+    <div id="map" style="width: 100%; height: 300px; margin: 20px 0;"></div>
     <div class="info-box"><label>참가 방법:</label> <span th:text="${event.eventMethod}"></span></div>
     <div class="info-box"><label>문의:</label> <span th:text="${event.eventContact}"></span></div>
     <div class="info-box"><label>상태:</label> <span th:text="${statusLabel}"></span></div>
@@ -93,23 +36,48 @@
     </div>
 </div>
 
-<script th:inline="javascript">
-    let mapContainer = document.getElementById('map');
-    let address = /*[[${event.eventAddress}]]*/ '';
-    let mapOption = {
-        center: new kakao.maps.LatLng(33.450701, 126.570667),
-        level: 3
-    };
-    let map = new kakao.maps.Map(mapContainer, mapOption);
-    let geocoder = new kakao.maps.services.Geocoder();
-    geocoder.addressSearch(address, function(result, status) {
-        if (status === kakao.maps.services.Status.OK) {
-            let coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-            let marker = new kakao.maps.Marker({ map: map, position: coords });
-            map.setCenter(coords);
-        }
-    });
-</script>
 <div th:replace="~{common/footer::footer}"></div>
+
+<!-- Kakao API Key 바인딩 -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let kakaoApiKey = /*[[${@environment.getProperty('matchon.kakao-api')}]]*/ '';
+    let eventAddress = /*[[${event.eventAddress}]]*/ '';
+    /*]]>*/
+</script>
+
+<script>
+    function loadKakaoMap() {
+        const script = document.createElement('script');
+        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&autoload=false&libraries=services`;
+        script.onload = () => {
+            kakao.maps.load(() => {
+                initMap();
+            });
+        };
+        document.head.appendChild(script);
+    }
+
+    function initMap() {
+        const container = document.getElementById('map');
+        const options = {
+            center: new kakao.maps.LatLng(33.450701, 126.570667),
+            level: 3
+        };
+        const map = new kakao.maps.Map(container, options);
+        const geocoder = new kakao.maps.services.Geocoder();
+
+        geocoder.addressSearch(eventAddress, function (result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                new kakao.maps.Marker({ map: map, position: coords });
+                map.setCenter(coords);
+            }
+        });
+    }
+
+    // 실행
+    window.onload = loadKakaoMap;
+</script>
 </body>
 </html>

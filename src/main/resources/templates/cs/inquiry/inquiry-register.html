@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>문의 작성</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <style>
+        body {
+            background-color: #ffffff;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        #wrap {
+            max-width: 700px;
+            margin: 60px auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 6px;
+            display: block;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        input::placeholder, textarea::placeholder {
+            color: #999;
+        }
+        .btn-wrap {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn-wrap button, .btn-wrap a {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .submit-btn {
+            background-color: #007BFF;
+            color: white;
+        }
+        .cancel-btn {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+
+<div id="wrap">
+    <h2 th:text="${inquiry.id != null ? '문의 수정' : '문의 작성'}"></h2>
+    <form th:action="@{${inquiry.id} != null ? '/inquiry/update/' + ${inquiry.id} : '/inquiry/create'}"
+          th:object="${inquiry}" method="post">
+        <div>
+            <label for="inquiryCategory">카테고리</label>
+
+            <!-- 화면에 보여줄 select (수정 시 비활성화) -->
+            <select id="inquiryCategory"
+                    th:field="*{inquiryCategory}"
+                    th:disabled="${inquiry.id != null}" required>
+                <option value="">선택</option>
+                <option th:each="type : ${T(com.multi.matchon.customerservice.domain.CustomerServiceType).values()}"
+                        th:value="${type.name()}" th:text="${type.label}">
+                </option>
+            </select>
+
+            <!-- 수정 폼일 경우 값 전달용 hidden 필드 추가 -->
+            <input type="hidden"
+                   th:if="${inquiry.id != null}"
+                   th:name="inquiryCategory"
+                   th:value="${inquiry.inquiryCategory}" />
+        </div>
+        <div>
+            <label for="inquiryTitle">제목</label>
+            <input id="inquiryTitle" type="text" th:field="*{inquiryTitle}" maxlength="100"
+                   placeholder="제목을 입력해주세요" required>
+        </div>
+        <div>
+            <label for="inquiryContent">내용</label>
+            <textarea id="inquiryContent" th:field="*{inquiryContent}" rows="7"
+                      placeholder="내용을 입력해주세요" required></textarea>
+        </div>
+        <div class="btn-wrap">
+            <button type="submit" class="submit-btn" th:text="${inquiry.id != null ? '수정' : '작성'}"></button>
+            <a th:href="@{/inquiry}" class="cancel-btn">취소</a>
+        </div>
+    </form>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

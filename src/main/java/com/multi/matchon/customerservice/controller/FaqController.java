@@ -10,12 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -26,55 +24,63 @@ public class FaqController {
     private final FaqService faqService;
     private final MemberRepository memberRepository;
 
-    // 카테고리 선택 후 키워드 검색 -> 조회
     @GetMapping("/cs")
     public String faqShow(@RequestParam(required = false) CustomerServiceType category,
                           @RequestParam(required = false) String keyword,
-                          // DESC : 내림차순(최신 데이터가 먼저 추가됨..), ASC : 오름차순(최신 데이터를 뒤로 보냄..)
                           @PageableDefault(size = 8, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
+                          Principal principal,
                           Model model) {
 
-        Page<FaqDto> faqPage;
-
-        if (keyword != null && !keyword.isBlank()) {
-            if (category != null) {
-                faqPage = faqService.searchByCategoryAndTitlePaged(category, keyword, pageable);
-            } else {
-                faqPage = faqService.searchByTitlePaged(keyword, pageable);
-            }
-        } else {
-            faqPage = faqService.getFaqListPaged(category, pageable);
-        }
+        Page<FaqDto> faqPage = (keyword != null && !keyword.isBlank()) ?
+                (category != null
+                        ? faqService.searchByCategoryAndTitlePaged(category, keyword, pageable)
+                        : faqService.searchByTitlePaged(keyword, pageable))
+                : faqService.getFaqListPaged(category, pageable);
 
         model.addAttribute("faqList", faqPage.getContent());
         model.addAttribute("page", faqPage);
         model.addAttribute("category", category);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("isAdmin", isAdmin(principal));
+
         return "cs/cs";
     }
 
-    // 상세보기(챗봇 이용방법)
-    @GetMapping("/faq/howtochatbot")
-    public String faqChatbotPage() {
+    @GetMapping("/faq/detail/{id}")
+    public String detail(@PathVariable Long id, Model model, Principal principal) {
+        FaqDto faqDto = faqService.getFaqById(id);
+        model.addAttribute("faqDto", faqDto);
+
+        boolean isAdmin = false;
+        if (principal != null) {
+            String email = principal.getName();
+            Member member = memberRepository.findByMemberEmail(email).orElse(null);
+            if (member != null && member.getMemberRole().name().equals("ADMIN")) {
+                isAdmin = true;
+            }
+        }
+        System.out.println("isAdmin = " + isAdmin);
+        model.addAttribute("isAdmin", isAdmin);
+
         return "cs/cs-faq-detail";
     }
 
-    // faq 등록하기
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/faq/register")
-    public String write() {
+    public String showRegisterPage() {
         return "cs/cs-faq-register";
     }
 
-    // 등록하기를 파라미터로 받는다
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/faq/register")
-    public String write(@RequestParam String faqTitle,
-                        @RequestParam String faqContent,
-                        @RequestParam CustomerServiceType faqCategory,
-                        Principal principal) {
+    public String registerFaq(@RequestParam String faqTitle,
+                              @RequestParam String faqContent,
+                              @RequestParam CustomerServiceType faqCategory,
+                              Principal principal) {
 
         String email = principal.getName();
         Member member = memberRepository.findByMemberEmail(email)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("로그인한 사용자를 찾을 수 없습니다."));
 
         FaqDto faqDto = FaqDto.builder()
                 .faqTitle(faqTitle)
@@ -82,16 +88,43 @@ public class FaqController {
                 .faqCategory(faqCategory)
                 .build();
 
-        Long savedId = faqService.savePost(faqDto.withMember(member));
-
+        faqService.savePost(faqDto.withMember(member));
         return "redirect:/cs";
     }
 
-    // faq 상세보기
-    @GetMapping("/faq/detail/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/faq/edit/{id}")
+    public String showEditPage(@PathVariable Long id, Model model, Principal principal) {
         FaqDto faqDto = faqService.getFaqById(id);
         model.addAttribute("faqDto", faqDto);
-        return "cs/cs-faq-detail";
+        model.addAttribute("isAdmin", isAdmin(principal));
+        return "cs/cs-faq-edit";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/faq/edit/{id}")
+    public String updateFaq(@PathVariable Long id,
+                            @RequestParam String faqTitle,
+                            @RequestParam String faqContent,
+                            @RequestParam CustomerServiceType faqCategory,
+                            Principal principal,
+                            Model model) {
+        faqService.updateFaq(id, faqTitle, faqContent, faqCategory);
+        model.addAttribute("isAdmin", isAdmin(principal));
+        return "redirect:/faq/detail/" + id;
+    }
+
+    private boolean isAdmin(Principal principal) {
+        if (principal == null) return false;
+        String email = principal.getName();
+        Member member = memberRepository.findByMemberEmail(email).orElse(null);
+        return member != null && member.getMemberRole().name().equals("ADMIN");
+    }
+
+    @PostMapping("/faq/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // 관리자만 삭제 가능
+    public String deleteFaq(@PathVariable Long id) {
+        faqService.deleteFaqById(id); // 실제 삭제 로직 수행
+        return "redirect:/cs"; // 목록 페이지로 리디렉션
     }
 }

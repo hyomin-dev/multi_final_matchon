@@ -53,7 +53,7 @@
             </label>
             <label>
                 경기 진행 시간:
-                <select size="5" th:field="*{matchDuration}" required>
+                <select th:field="*{matchDuration}" required>
                     <option th:value="30">30분</option>
                     <option th:value="60">1시간</option>
                     <option th:value="90">1시간 30분</option>
@@ -64,15 +64,15 @@
             </label>
             <label>
                 현재 참가 인원:
-                <select size="5" th:field="*{currentParticipantsCount}" required></select>
+                <select th:field="*{currentParticipantsCount}" required></select>
             </label>
             <label>
                 총 모집 인원:
-                <select size="5" th:field="*{maxParticipants}" required></select>
+                <select th:field="*{maxParticipants}" required></select>
             </label>
             <label>
                 하한 매너 온도:
-                <select size="5" th:field="*{minMannerTemperature}" required></select>
+                <select th:field="*{minMannerTemperature}" required></select>
             </label>
             <label>
                 경기 방식 소개:

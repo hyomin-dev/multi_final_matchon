@@ -78,10 +78,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // efreshToken도 없음 or 만료
+            // accessToken + refreshToken 모두 없음 or 만료
             else if (!isExcludedPath(uri)) {
                 log.warn("[JwtFilter] accessToken + refreshToken 모두 없음 or 만료 → 로그인 필요");
-                response.sendRedirect("/login");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 클라이언트가 /login으로 리디렉트하도록 유도
                 return;
             }
         }

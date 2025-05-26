@@ -69,6 +69,7 @@ public class BoardService {
 
         // 2. 게시글 삭제
         boardRepository.deleteById(id);
+      
     }
 
 }
