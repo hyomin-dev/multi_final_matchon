@@ -129,6 +129,7 @@ CREATE TABLE inquiry
 (
     inquiry_id       BIGINT AUTO_INCREMENT PRIMARY KEY,
     writer_id        BIGINT       NOT NULL,
+
     inquiry_category ENUM('HOWTOUSE', 'TEAM_GUEST', 'EVENT', 'TUTORIAL', 'MANNER_TEMPERATURE', 'COMMUNITY', 'ACCOUNT', 'REPORT') NOT NULL,
     inquiry_title    VARCHAR(100) NOT NULL,
     inquiry_content  TEXT         NOT NULL,
@@ -157,18 +158,23 @@ CREATE TABLE faq
     CONSTRAINT FK_faq_2_member FOREIGN KEY (admin_id) REFERENCES member (member_id)
 );
 
-CREATE TABLE review
-(
-    team_review_id  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    review_writer   BIGINT,
-    review_rating   INT  NOT NULL,
-    content         TEXT NOT NULL,
-    created_person  VARCHAR(100),
-    created_date    DATETIME DEFAULT current_timestamp,
-    modified_person VARCHAR(100),
-    modified_date   DATETIME DEFAULT current_timestamp on update current_timestamp,
-    is_deleted      BOOLEAN  DEFAULT FALSE,
-    CONSTRAINT FK_review_2_member FOREIGN KEY (review_writer) REFERENCES member (member_id)
+
+
+CREATE TABLE review (
+                        team_review_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        review_writer BIGINT NOT NULL,
+                        team_id BIGINT NOT NULL,
+                        review_rating INT NOT NULL,
+                        content TEXT NOT NULL,
+                        created_person VARCHAR(100),
+                        created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        modified_person VARCHAR(100),
+                        modified_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        is_deleted BOOLEAN DEFAULT FALSE,
+                        CONSTRAINT FK_review_writer FOREIGN KEY (review_writer) REFERENCES member(member_id),
+                        CONSTRAINT FK_review_team FOREIGN KEY (team_id) REFERENCES team(team_id)
+
+
 );
 
 CREATE TABLE response
@@ -237,6 +243,7 @@ CREATE TABLE host_profile (
     created_date DATETIME 				DEFAULT CURRENT_TIMESTAMP,
     modified_date DATETIME 				DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     picture_attachment_enabled 			BOOLEAN DEFAULT TRUE CHECK (picture_attachment_enabled = TRUE),
+
     CONSTRAINT FK_host_profile_2_member FOREIGN KEY (host_id) REFERENCES member (member_id)
 );
 
@@ -249,6 +256,7 @@ CREATE TABLE host_profile (
 -- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
 -- inquiry_answer
+
 CREATE TABLE inquiry_answer 
 (
     answer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -533,3 +541,4 @@ WHERE faq_category = '5';
 
 DELETE FROM faq WHERE faq_id NOT IN (SELECT min_id FROM (SELECT MIN(faq_id) AS min_id FROM faq GROUP BY faq_category, faq_title, LEFT(faq_content, 100)) AS sub);
 ALTER TABLE faq ADD CONSTRAINT uq_unique_faq UNIQUE (faq_category, faq_title, faq_content(100));
+

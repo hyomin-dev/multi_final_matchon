@@ -28,6 +28,10 @@
          th:data-current-participant-count="${resMatchupRequestDto.currentParticipantCount}"
          th:data-max-participants="${resMatchupRequestDto.maxParticipants}"
          th:data-participant-count="${resMatchupRequestDto.participantCount}"
+         th:data-matchup-status="${resMatchupRequestDto.matchupStatus}"
+         th:data-matchup-request-submitted-count="${resMatchupRequestDto.matchupRequestSubmittedCount}"
+         th:data-matchup-cancel-submitted-count="${resMatchupRequestDto.matchupCancelSubmittedCount}"
+         th:data-is-deleted="${resMatchupRequestDto.isDeleted}"
     >
     </div>
     <table>
@@ -59,23 +63,54 @@
         </tr>
         <tr>
             <th>요청 상태:</th>
-            <td th:text="${resMatchupRequestDto.matchupStatus}"></td>
+            <td th:text="${resMatchupRequestDto.matchupStatus}" th:id="status"></td>
+        </tr>
+        <tr>
+            <th>참가 요청 횟수(최대 2번):</th>
+            <td th:text="${resMatchupRequestDto.matchupRequestSubmittedCount}"></td>
+        </tr>
+        <tr>
+            <th>승인 취소 요청 횟수(최대 1번):</th>
+            <td th:text="${resMatchupRequestDto.matchupCancelSubmittedCount}"></td>
         </tr>
     </table>
 
     <form th:object="${resMatchupRequestDto}" th:action="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}" method="post" >
-        <input type="hidden" th:field="*{requestId}"/>
-        <label>
-            소개:
-            <input type="text" th:text="*{selfIntro}" th:field="*{selfIntro}" placeholder="자기 소개를 입력하세요." required>
-        </label>
-        <label>
-            참가 인원:
-            <select size="5"  th:field="*{participantCount}" required></select>
-        </label>
+        <input type="hidden" th:field="*{requestId}">
+        <input type="hidden" th:field="*{matchDatetime}">
+<!--        <label>-->
+<!--            소개:-->
+<!--            <textarea cols="30" rows="5" placeholder="자기 소개를 입력하세요." th:text="*{selfIntro}" th:field="*{selfIntro}" required>-->
+<!--                </textarea>-->
+<!--        </label>-->
+<!--        <label>-->
+<!--            참가 인원:-->
+<!--            <select size="5"  th:field="*{participantCount}" required></select>-->
+<!--        </label>-->
+<!--        <div class="button-row">-->
+<!--            <button type="submit" class="modify-btn">수정하기</button>-->
+<!--            <button type="button" class="delete-btn">취소하기</button>-->
+<!--        </div>-->
+        <table>
+            <tr>
+                <th>소개:</th>
+                <td>
+                 <textarea placeholder="자기 소개를 입력하세요."
+                    th:text="*{selfIntro}" th:field="*{selfIntro}" required></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th>참가 인원:</th>
+                <td>
+                    <select th:field="*{participantCount}" required></select>
+                </td>
+            </tr>
+        </table>
+        <div class="button-row">
+            <button type="submit" class="modify-btn">수정하기</button>
+            <button type="button" class="delete-btn">취소하기</button>
+        </div>
 
-        <button type="submit">수정하기</button>
-        <button type="button" class="delete-btn">삭제하기</button>
     </form>
 </div>
 
