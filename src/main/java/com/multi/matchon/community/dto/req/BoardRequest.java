@@ -21,5 +21,14 @@ public class BoardRequest {
     @NotNull(message = "카테고리를 선택해주세요.")
     private Category category;
 
+    public BoardRequest(String title, String content, Category category) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+    }
+
+    public BoardRequest() {
+
+    }
 }
 

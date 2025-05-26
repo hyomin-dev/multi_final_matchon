@@ -4,12 +4,11 @@ import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
 import com.multi.matchon.community.repository.BoardRepository;
 import com.multi.matchon.member.domain.Member;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,20 +19,8 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final CommentService commentService;
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
     public List<Board> findAll() {
         return boardRepository.findAll();
-    }
-
-    public Board findById(Long id) {
-        return boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Board not found"));
-    }
-
-    public void save(Board board) {
-        boardRepository.save(board);
     }
 
     public Page<Board> findAll(Pageable pageable) {
@@ -44,15 +31,32 @@ public class BoardService {
         return boardRepository.findByCategory(category, pageable);
     }
 
+    public Board findById(Long id) {
+        return boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+    }
+
+    public void save(Board board) {
+        boardRepository.save(board);
+    }
+
     public Board findByAttachmentFilename(String filename) {
-        List<Board> boards = boardRepository.findAll(); // 성능 최적화 필요 시 쿼리로 개선
-        for (Board board : boards) {
-            if (board.getAttachmentPath() != null &&
-                    List.of(board.getAttachmentPath().split(";")).contains(filename)) {
-                return board;
-            }
-        }
-        return null;
+        return boardRepository.findAll().stream()
+                .filter(board -> board.getAttachmentPath() != null &&
+                        List.of(board.getAttachmentPath().split(";")).contains(filename))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public String findSavedFilenameByPartialName(String partialFilename) {
+        return boardRepository.findAll().stream()
+                .flatMap(board -> {
+                    if (board.getAttachmentPath() == null) return null;
+                    return List.of(board.getAttachmentPath().split(";")).stream();
+                })
+                .filter(saved -> saved != null && saved.startsWith(partialFilename))
+                .findFirst()
+                .orElse(null);
     }
 
     @Transactional
@@ -64,30 +68,7 @@ public class BoardService {
             throw new SecurityException("삭제 권한이 없습니다.");
         }
 
-        // 1. 댓글 먼저 삭제
         commentService.deleteAllByBoard(board);
-
-        // 2. 게시글 삭제
         boardRepository.deleteById(id);
     }
-
-    public String findSavedFilenameByPartialName(String partialFilename) {
-        List<Board> boards = boardRepository.findAll(); // 전체 게시글에서 attachmentPath 조회
-
-        for (Board board : boards) {
-            if (board.getAttachmentPath() == null) continue;
-
-            String[] savedFilenames = board.getAttachmentPath().split(";");
-            for (String saved : savedFilenames) {
-                if (saved.startsWith(partialFilename)) {  // 예: UUID_파일명
-                    return saved;  // 확장자까지 포함된 실제 저장 파일명
-                }
-            }
-        }
-
-        return null; // 일치하는 파일명이 없으면 null
-    }
-
-
 }
-
