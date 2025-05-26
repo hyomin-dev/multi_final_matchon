@@ -6,6 +6,8 @@
     <title>Title</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/chat/chat.css}">
+
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/webstomp-client@1/dist/webstomp.min.js"></script>
     <script th:src="@{/js/chat/chat.js}" defer></script>
@@ -14,7 +16,10 @@
   <div th:replace="~{common/header::header}"></div>
   <div id="wrap">
     <h1>chat</h1>
-
+      <div id="chat1-1-detail-dto"
+           th:data-login-email = "${#authentication.name}"
+      >
+      </div>
     <div class="container">
       <div class="card">
         <div class="card-title">채팅</div>

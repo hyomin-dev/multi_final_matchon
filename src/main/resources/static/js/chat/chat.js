@@ -1,8 +1,12 @@
+let stompClient = null;
+let chatBox = document.getElementById('chat-box');
+let messageInput = document.getElementById('messageInput');
+let sendBtn = document.getElementById('sendBtn');
+let loginEmail = "";
 document.addEventListener("DOMContentLoaded",async ()=>{
-    const chatBox = document.getElementById('chat-box');
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
 
+    const detailDto = document.querySelector("#chat1-1-detail-dto");
+    loginEmail = detailDto.dataset.loginEmail;
     const data = getJwtToken();
     console.log(data);
 
@@ -18,8 +22,33 @@ document.addEventListener("DOMContentLoaded",async ()=>{
             const msg = JSON.parse(message.body);
             appendMessage(msg);
             scrollToBottom();
-        }, { Authorization: `Bearer ${data}` });
+        }, {}); //Authorization: `Bearer ${data}`
     });
+
+    /*stompClient.connect({}, () => {
+        stompClient.subscribe(`/topic/1`, message => {
+            const msg = JSON.parse(message.body);
+            appendMessage(msg);
+            scrollToBottom();
+        }, { });
+    });*/
+
+    // 3. 메시지 전송
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // 4. 나가기 전 disconnect
+    window.addEventListener('beforeunload', () => {
+        fetch(`http://localhost:8090/chat/room/1/read`, { method: "POST" });
+        if (stompClient && stompClient.connected) {
+            stompClient.unsubscribe(`/topic/1`);
+            stompClient.disconnect();
+        }
+    });
+
+
 })
 
 function getJwtToken(){
@@ -30,7 +59,6 @@ function getJwtToken(){
     return tokenCookie ? tokenCookie.split('=')[1] : null;
 }
 
-let stompClient = null;
 
 // // 1. 채팅 내역 불러오기
 // fetch(`${YOUR_BACKEND_API_URL}/chat/history/${roomId}`)
@@ -53,41 +81,29 @@ stompClient.connect({ Authorization: `Bearer ${token}` }, () => {
     }, { Authorization: `Bearer ${token}` });
 });*/
 
-// // 3. 메시지 전송
-// sendBtn.addEventListener('click', sendMessage);
-// messageInput.addEventListener('keyup', (e) => {
-//     if (e.key === 'Enter') sendMessage();
-// });
-//
-// function sendMessage() {
-//     const msgText = messageInput.value.trim();
-//     if (!msgText) return;
-//
-//     const message = {
-//         senderEmail,
-//         message: msgText
-//     };
-//
-//     stompClient.send(`/publish/${roomId}`, JSON.stringify(message), {});
-//     messageInput.value = '';
-// }
 
-// function appendMessage(msg) {
-//     const msgDiv = document.createElement('div');
-//     msgDiv.className = 'chat-message ' + (msg.senderEmail === senderEmail ? 'sent' : 'received');
-//     msgDiv.innerHTML = `<strong>${msg.senderEmail}:</strong> ${msg.message}`;
-//     chatBox.appendChild(msgDiv);
-// }
-//
-// function scrollToBottom() {
-//     chatBox.scrollTop = chatBox.scrollHeight;
-// }
-//
-// // 4. 나가기 전 disconnect
-// window.addEventListener('beforeunload', () => {
-//     fetch(`${YOUR_BACKEND_API_URL}/chat/room/${roomId}/read`, { method: "POST" });
-//     if (stompClient && stompClient.connected) {
-//         stompClient.unsubscribe(`/topic/${roomId}`);
-//         stompClient.disconnect();
-//     }
-// });
+
+function sendMessage() {
+    const msgText = messageInput.value.trim();
+    if (!msgText) return;
+
+    const content = {
+        content: msgText
+    };
+
+    stompClient.send(`/publish/1`, JSON.stringify(content), {});
+    messageInput.value = '';
+}
+
+function appendMessage(msg) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-message ' + (msg.senderEmail === loginEmail ? 'sent' : 'received');
+    msgDiv.innerHTML = `<strong>${msg.senderEmail}:</strong> ${msg.content}`;
+    chatBox.appendChild(msgDiv);
+}
+
+function scrollToBottom() {
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
