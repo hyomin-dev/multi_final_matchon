@@ -161,9 +161,9 @@ VALUES (null, now(), 'admin', now(), 'admin', 'TEAM_GUEST', '팀 채팅 안내�
        (null, now(), 'admin', now(), 'admin', 'ACCOUNT', '개인정보는 이렇게 수정하시면 됩니다.', '개인정보 수정하는 법', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'REPORT', '신고방법 이렇게 이용하시면 됩니다.', '신고 방법', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'TEAM_GUEST', 'Guest는 이렇게 이용하시면 됩니다.', 'Guest 이용 방법', 0, 1),
-       (null, now(), 'admin', now(), 'admin', 'HOWTOUSE', 'MatchON은 이렇게 이용하시면 됩니다.', 'MatchON 이용 방법', 0, 1),
+       (null, now(), 'admin', now(), 'admin', 'TUTORIAL', 'MatchON은 이렇게 이용하시면 됩니다.', 'MatchON 이용 방법', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'MANNER_TEMPERATURE', '매너온도의 계산 기준은 이렇습니다.', '매너온도 계산 기준 안내', 0, 1),
-       (null, now(), 'admin', now(), 'admin', 'HOWTOUSE', '챗봇은 이렇게 이용하시면 됩니다.', '챗봇 이용 방법', 0, 1),
+       (null, now(), 'admin', now(), 'admin', 'TUTORIAL', '챗봇은 이렇게 이용하시면 됩니다.', '챗봇 이용 방법', 0, 1),
        (null, now(), 'admin', now(), 'admin', 'REPORT', '멤버 신고는 이렇게 하시면 됩니다.', '멤버 신고 안내', 0, 1);
 
 

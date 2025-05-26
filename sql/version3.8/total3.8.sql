@@ -1,7 +1,6 @@
 DROP DATABASE IF EXISTS matchon;
 CREATE DATABASE IF NOT EXISTS matchon;
-USE
-matchon;
+USE matchon;
 
 
 
@@ -129,7 +128,7 @@ CREATE TABLE inquiry
 (
     inquiry_id       BIGINT AUTO_INCREMENT PRIMARY KEY,
     writer_id        BIGINT       NOT NULL,
-    inquiry_category ENUM('HOWTOUSE', 'TEAM_GUEST', 'EVENT', 'TUTORIAL', 'MANNER_TEMPERATURE', 'COMMUNITY', 'ACCOUNT', 'REPORT') NOT NULL,
+    inquiry_category ENUM('TEAM_GUEST', 'EVENT', 'TUTORIAL', 'MANNER_TEMPERATURE', 'COMMUNITY', 'ACCOUNT', 'REPORT') NOT NULL,
     inquiry_title    VARCHAR(100) NOT NULL,
     inquiry_content  TEXT         NOT NULL,
     inquiry_status   ENUM('PENDING', 'COMPLETED') DEFAULT 'PENDING',
@@ -511,27 +510,3 @@ CREATE TABLE message_read_log
 
 -- ↑FK 3개인 것
 -- ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
-ALTER TABLE faq modify COLUMN faq_category enum('HOWTOUSE','ACCOUNT','TEAM_GUEST','SHOP','REPORT','MANNER_TEMPERATURE');
-
-UPDATE faq
-SET faq_category = 'HOWTOUSE'
-WHERE faq_category = '0';
-UPDATE faq
-SET faq_category = 'ACCOUNT'
-WHERE faq_category = '1';
-UPDATE faq
-SET faq_category = 'TEAM_GUEST'
-WHERE faq_category = '2';
-UPDATE faq
-SET faq_category = 'SHOP'
-WHERE faq_category = '3';
-UPDATE faq
-SET faq_category = 'REPORT'
-WHERE faq_category = '4';
-UPDATE faq
-SET faq_category = 'MANNER_TEMPERATURE'
-WHERE faq_category = '5';
-
-DELETE FROM faq WHERE faq_id NOT IN (SELECT min_id FROM (SELECT MIN(faq_id) AS min_id FROM faq GROUP BY faq_category, faq_title, LEFT(faq_content, 100)) AS sub);
-ALTER TABLE faq ADD CONSTRAINT uq_unique_faq UNIQUE (faq_category, faq_title, faq_content(100));
