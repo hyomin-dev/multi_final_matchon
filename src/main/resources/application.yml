@@ -27,6 +27,9 @@ jwt:
 matchon:
   kakao-api: ${KAKAO_API_KEY}
 
+jwt:
+  secret: ${JWT_SECRET}
+
 ---
 
 spring:
@@ -87,3 +90,4 @@ spring:
 file:
   upload-dir: C:/upload-dir
 
+#test

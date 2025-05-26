@@ -73,8 +73,8 @@ public class AwsS3Utils {
 
 
     public S3Resource downloadFile(String dirName, String savedName) throws IOException {
-        String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
-        S3Resource resource =  s3Operations.download(bucket,dirName+savedNameOnly);
+        //String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+        S3Resource resource =  s3Operations.download(bucket,dirName+savedName);
 
 //       ByteArrayOutputStream outputStream = (ByteArrayOutputStream) resource.getOutputStream();
 //       byte[] data = outputStream.toByteArray();
@@ -141,6 +141,22 @@ public class AwsS3Utils {
             return false;
         }
     }
+
+    /**
+     * 확장자 제거 없이 전체 파일명을 사용 - 전준혁
+     */
+    public S3Resource downloadFileWithFullName(String dirName, String fullFileName) throws IOException {
+        String s3Key = dirName + fullFileName;
+        return s3Operations.download(bucket, s3Key);
+    }
+
+    public String getObjectUrl(String dir, String filename, MultipartFile file) {
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        return "https://" + bucket + ".s3.amazonaws.com/" + dir + filename + "." + extension;
+    }
+
+
+
 
 
 

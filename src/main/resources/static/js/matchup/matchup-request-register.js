@@ -14,7 +14,33 @@ document.addEventListener("DOMContentLoaded",()=>{
     calTime(matchDatetime, matchDuration);
     setParticipantCount(currentParticipantCount, maxParticipants);
 
+    const form = document.querySelector("form");
+    form.addEventListener("submit", (e)=>{
+            submitCheck(e, matchDatetime);
+        }
+    )
+
 })
+
+function submitCheck(e, matchDatetime){
+    const selfIntroEle = document.querySelector("#selfIntro");
+    const participantCountEle = document.querySelector("#participantCount");
+    const date = new Date(matchDatetime);
+    const now = new Date();
+
+    if(selfIntroEle.value ===""){
+        alert("자기 소개를 입력하세요.");
+        e.preventDefault();
+    }else if(participantCountEle.value === ""){
+        alert("참가 인원을 입력하세요.");
+        e.preventDefault();
+    }else if(date<now){
+        alert("경기 시작 시간이 지나 등록할 수 없습니다.");
+        e.preventDefault();
+    }else{
+        alert("submit");
+    }
+}
 
 function drawMap(address, sportsFacilityName){
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div

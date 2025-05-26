@@ -1,6 +1,11 @@
 let sportsType = '';
 let dateFilter = '';
-
+const Status = {
+    PENDING: "PENDING",
+    APPROVED: "APPROVED",
+    DENIED: "DENIED",
+    CANCELREQUESTED: "CANCELREQUESTED"
+}
 document.addEventListener("DOMContentLoaded",async ()=>{
     document.querySelector("#sports-type").addEventListener("change",(e)=>{
         sportsType = e.target.value;
@@ -45,29 +50,32 @@ function renderList(items){
 
         const card = document.createElement("div");
         card.className = "matchup-card";
-        card.innerHTML = `
-            <div class="card-content">
-                <div class="left-info">
-                    <div><strong>현재 정원: (${item.currentParticipantCount} / ${item.maxParticipants})</strong></div>
-                    <div><strong>신청 인원: ${item.participantCount}</strong></div>
-                    <div><strong>요청 상태: ${item.matchupStatus}</strong></div>
-                    <div><strong>경기 상태: ${checkMatchStatus(item)}</strong></div>
-                    <div class="button-group">
-                        <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
-                            <button class="detail">게시글 상세보기</button>
-                        </a>
-                        <a href="/matchup/request/detail?request-id=${item.requestId}">
-                            <button class="detail">요청 상세보기</button>
-                        </a>
-                    </div>
-                </div>
-                <div class="right-info">
-                    <div><strong>종목: ${item.sportsTypeName}</strong></div>
-                    <div><strong>경기장: ${item.sportsFacilityName}</strong></div>
+        card.innerHTML = `                                             
+             <div class="card-3col">
+                  <!-- 1. 버튼 영역 -->
+                  <div class="button-group-vertical">
+                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}" class="detail-button">게시글 상세보기</a>
+                    <a href="/matchup/request/detail?request-id=${item.requestId}" class="detail-button">요청 상세보기</a>
+                  </div>
+
+                  <!-- 2. 경기 정보 영역 -->
+                  <div class="match-info">
+                    <div><strong>종목:</strong> ${item.sportsTypeName}</div>
+                    <div><strong>경기장:</strong> ${item.sportsFacilityName}</div>
                     <div>경기장 주소: ${item.sportsFacilityAddress}</div>
                     <div>📅 날짜: ${date.getMonth()+1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - ${calTime(item,date.getHours(), date.getMinutes())}</div>
-                </div>
-            </div>       
+                    <div><strong>경기 상태:</strong> ${checkMatchStatus(item)}</div>
+                  </div>
+
+                  <!-- 3. 요청 상태 영역 -->
+                  <div class="request-info">
+                    <div><strong>현재 정원:</strong> (${item.currentParticipantCount} / ${item.maxParticipants})</div>
+                    <div><strong>신청 인원:</strong> ${item.participantCount}</div>
+                    <div><strong>요청 상태:</strong> ${manageRequestInfo(item)}</div>
+                    <div><strong>참가 요청 횟수:</strong> ${item.matchupRequestSubmittedCount}</div>
+                    <div><strong>취소 횟수:</strong> ${item.matchupCancelSubmittedCount}</div>
+                  </div>
+            </div>
                 `;
         boardArea.appendChild(card);
 
@@ -182,4 +190,84 @@ function checkMatchStatus(item){
         return "경기 종료"
     else
         return "경기 시작전"
+}
+
+function manageRequestInfo(item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+
+    // console.log(item.matchupStatus);
+    // console.log(item.matchupRequestSubmittedCount);
+    // console.log(item.matchupCancelSubmittedCount);
+    // console.log(item.isDeleted);
+    // if(item.matchupStatus === Status.PENDING)
+    //     console.log("enum 사용");
+
+    // 1. 참가 요청 후 승인 대기
+    if(
+        (item.matchupStatus ===Status.PENDING && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount===0 && item.isDeleted===false) ||
+        (item.matchupStatus===Status.PENDING && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount===0 && item.isDeleted ===false)
+    ){
+        return "승인 대기";
+    }
+    // 2. 참가 요청 삭제
+    else if(
+        (item.matchupStatus===Status.PENDING && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount===0 && item.isDeleted===true) ||
+        (item.matchupStatus===Status.PENDING && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount===0 && item.isDeleted===true) ||
+        (item.matchupStatus===Status.DENIED && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount===0 && item.isDeleted===true)
+    ){
+        return "요청 삭제됨";
+    }
+    // 3. 참가 요청 승인
+    else if(
+        (item.matchupStatus===Status.APPROVED && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount===0 && item.isDeleted===false)||
+        (item.matchupStatus===Status.APPROVED && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount===0 && item.isDeleted===false)
+    ){
+        return "승인됨";
+    }
+    // 4. 참가 요청 반려
+    else if(
+        (item.matchupStatus === Status.DENIED && item.matchupRequestSubmittedCount ===2 && item.matchupCancelSubmittedCount ===0 && item.isDeleted ===false) ||
+        (item.matchupStatus === Status.DENIED && item.matchupRequestSubmittedCount ===1 && item.matchupCancelSubmittedCount ===0 && item.isDeleted ===false)
+    ){
+        return "반려됨";
+    }
+    // 8. 승인 취소 요청을 했으나 경기 시간이 지나 자동 참가 처리
+    else if(
+        (matchDate <= now) &&
+        (
+            (item.matchupStatus === Status.CANCELREQUESTED && item.matchupRequestSubmittedCount ===2 && item.matchupCancelSubmittedCount ===1 && item.isDeleted===false) ||
+            (item.matchupStatus === Status.CANCELREQUESTED && item.matchupRequestSubmittedCount ===1 && item.matchupCancelSubmittedCount ===1 && item.isDeleted===false)
+        )
+    ){
+        return "자동 참가"
+    }
+    // 5. 승인 취소 요청 상태
+    else if(
+        (item.matchupStatus === Status.CANCELREQUESTED && item.matchupRequestSubmittedCount ===2 && item.matchupCancelSubmittedCount ===1 && item.isDeleted===false) ||
+        (item.matchupStatus === Status.CANCELREQUESTED && item.matchupRequestSubmittedCount ===1 && item.matchupCancelSubmittedCount ===1 && item.isDeleted===false)
+    ){
+        return "승인 취소 요청";
+    }
+    // 6. 승인 취소 요청이 승인
+    else if(
+        (item.matchupStatus===Status.CANCELREQUESTED && item.matchupRequestSubmittedCount === 2 && item.matchupCancelSubmittedCount===1 && item.isDeleted===true) ||
+        (item.matchupStatus===Status.CANCELREQUESTED && item.matchupRequestSubmittedCount === 1 && item.matchupCancelSubmittedCount===1 && item.isDeleted===true)
+    ){
+        return "취소 요청 승인";
+    }
+    // 7. 승인 취소 요청이 반려
+    else if(
+        (item.matchupStatus===Status.APPROVED && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount===1 && item.isDeleted ===false) ||
+        (item.matchupStatus===Status.APPROVED && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount===1 && item.isDeleted ===false)
+    ){
+        return "취소 요청 반려";
+    }else{
+        return "서버 오류";
+    }
+
+
+
+
+
 }

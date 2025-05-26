@@ -16,4 +16,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             ORDER BY r.createdDate DESC
             """)
     List<Review> findReviewsByTeamId(@Param("teamId") Long teamId);
+
+
 }
