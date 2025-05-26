@@ -150,9 +150,11 @@ public class AwsS3Utils {
         return s3Operations.download(bucket, s3Key);
     }
 
-    public String getObjectUrl(String dir, String filename) {
-        return "https://" + bucket + ".s3.amazonaws.com/" + dir + filename;
+    public String getObjectUrl(String dir, String filename, MultipartFile file) {
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        return "https://" + bucket + ".s3.amazonaws.com/" + dir + filename + "." + extension;
     }
+
 
 
 

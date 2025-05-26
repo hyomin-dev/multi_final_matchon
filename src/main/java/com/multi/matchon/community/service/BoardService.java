@@ -71,5 +71,23 @@ public class BoardService {
         boardRepository.deleteById(id);
     }
 
+    public String findSavedFilenameByPartialName(String partialFilename) {
+        List<Board> boards = boardRepository.findAll(); // 전체 게시글에서 attachmentPath 조회
+
+        for (Board board : boards) {
+            if (board.getAttachmentPath() == null) continue;
+
+            String[] savedFilenames = board.getAttachmentPath().split(";");
+            for (String saved : savedFilenames) {
+                if (saved.startsWith(partialFilename)) {  // 예: UUID_파일명
+                    return saved;  // 확장자까지 포함된 실제 저장 파일명
+                }
+            }
+        }
+
+        return null; // 일치하는 파일명이 없으면 null
+    }
+
+
 }
 

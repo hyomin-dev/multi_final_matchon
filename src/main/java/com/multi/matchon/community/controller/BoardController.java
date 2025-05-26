@@ -13,6 +13,7 @@ import com.multi.matchon.member.service.MemberService;
 import io.awspring.cloud.s3.S3Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -113,10 +114,15 @@ public class BoardController {
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
                 String originalFilename = file.getOriginalFilename();
-                String uuidFileName = UUID.randomUUID() + "_" + originalFilename;
-                awsS3Utils.saveFile(dirName, uuidFileName, file);
+                String extension = FilenameUtils.getExtension(originalFilename);
+                String baseName = FilenameUtils.getBaseName(originalFilename);
 
-                savedFileNames.append(uuidFileName).append(";");
+                String uuidFileName = UUID.randomUUID() + "_" + baseName; // 확장자 없는 파일명
+                String fullFileName = uuidFileName + "." + extension;
+
+                awsS3Utils.saveFile(dirName, uuidFileName, file); // 확장자 없이 전달
+
+                savedFileNames.append(fullFileName).append(";");
                 originalFileNames.append(originalFilename).append(";");
                 hasAttachment = true;
             }
@@ -174,7 +180,6 @@ public class BoardController {
             return "community/form";
         }
 
-
         Board board = boardService.findById(id);
         if (!board.getMember().getId().equals(userDetails.getMember().getId())) {
             return "redirect:/community";
@@ -187,10 +192,15 @@ public class BoardController {
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
                 String originalFilename = file.getOriginalFilename();
-                String uuidFileName = UUID.randomUUID() + "_" + originalFilename;
+                String extension = FilenameUtils.getExtension(originalFilename);
+                String baseName = FilenameUtils.getBaseName(originalFilename);
+
+                String uuidFileName = UUID.randomUUID() + "_" + baseName;
+                String fullFileName = uuidFileName + "." + extension;
+
                 awsS3Utils.saveFile("community/", uuidFileName, file);
 
-                savedFileNames.append(uuidFileName).append(";");
+                savedFileNames.append(fullFileName).append(";");
                 originalFileNames.append(originalFilename).append(";");
                 hasAttachment = true;
             }
@@ -210,7 +220,13 @@ public class BoardController {
 
     @GetMapping("/download/{filename}")
     public String redirectToS3Download(@PathVariable String filename) {
-        String presignedUrl = awsS3Utils.createPresignedGetUrl("community/", filename);
+        String savedFilename = boardService.findSavedFilenameByPartialName(filename);
+
+        if (savedFilename == null) {
+            return "redirect:/community";
+        }
+
+        String presignedUrl = awsS3Utils.createPresignedGetUrl("community/", savedFilename);
         return "redirect:" + presignedUrl;
     }
 
@@ -250,10 +266,10 @@ public class BoardController {
 
         String originalFilename = image.getOriginalFilename();
         String uuidFileName = UUID.randomUUID() + "_" + originalFilename;
-        String dirName = "community/editor/";
+        String dirName = "community/images/";
 
         awsS3Utils.saveFile(dirName, uuidFileName, image);
-        String imageUrl = awsS3Utils.getObjectUrl(dirName, uuidFileName);
+        String imageUrl = awsS3Utils.getObjectUrl(dirName, uuidFileName, image);
 
         return ResponseEntity.ok().body(Map.of("url", imageUrl));
     }
