@@ -354,6 +354,14 @@ public class TeamService {
         review.softDelete();
     }
 
+    @Transactional(readOnly = true)
+    public List<ResReviewDto> getMyReviewsForTeam(Long teamId, String userEmail) {
+        return reviewRepository.findReviewsByTeamId(teamId).stream()
+                .filter(r -> r.getMember().getMemberEmail().equals(userEmail))
+                .map(ResReviewDto::from)
+                .collect(Collectors.toList());
+    }
+
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(

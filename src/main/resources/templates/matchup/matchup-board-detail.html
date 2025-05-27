@@ -120,7 +120,7 @@
     </a>
 
     <!-- 작성자가 아닌 사용자에게만 보이는 문의/참가요청 버튼 -->
-    <a id="chat1-1Btn" th:href="@{#}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.memberEmail != #authentication.name} ? 'display:inline' : 'display:none'">
+    <a id="chat1-1Btn" th:href="@{/chat}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.memberEmail != #authentication.name} ? 'display:inline' : 'display:none'">
       문의하기
     </a>
 

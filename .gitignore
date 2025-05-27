@@ -8,7 +8,7 @@ build/
 *.jar
 *.class
 src/main/resources/application-test.yml
-
+uploads/
 ### 아래는 스프링 부트, gitignore.io
 HELP.md
 .gradle

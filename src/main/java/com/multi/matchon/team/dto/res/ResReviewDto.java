@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class ResReviewDto {
+    private Long id; // ✅ THIS is required!
     private String reviewerName;
     private int rating;
     private String content;
@@ -16,6 +17,7 @@ public class ResReviewDto {
 
     public static ResReviewDto from(Review review) {
         return ResReviewDto.builder()
+                .id(review.getId()) // ✅ THIS too!
                 .reviewerName(review.getMember().getMemberName())
                 .rating(review.getReviewRating())
                 .content(review.getContent())
