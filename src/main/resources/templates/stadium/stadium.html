@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>STADIUM</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
 
     <style>
         .titlestadium {
@@ -20,19 +21,21 @@
             margin-bottom: 30px;
         }
 
+        .region-tabs-stadium a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .region-tabs-stadium a.active {
+            color: blue;
+            border-bottom: 2px solid blue;
+        }
+
         .stadium-card {
             display: flex;
             align-items: flex-start;
             border-top: 1px solid #ccc;
             padding: 20px 0;
-        }
-
-        .stadium-card img {
-            width: 150px;
-            height: 100px;
-            background-color: #eee;
-            margin-right: 20px;
-            object-fit: cover;
         }
 
         .stadium-info {
@@ -51,35 +54,57 @@
             font-weight: bold;
         }
 
+        .pagination {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .pagination a {
+            margin: 0 6px;
+            text-decoration: none;
+            color: #444;
+        }
+
+        .pagination a.active {
+            font-weight: bold;
+            color: blue;
+        }
     </style>
 </head>
 <body>
 
 <div th:replace="~{common/header::header}"></div>
-<div id="wrap">
 
+<div id="wrap">
     <h1 class="titlestadium">구장 목록</h1>
 
     <div class="region-tabs-stadium">
-        <div>서울</div>
-        <div>경기</div>
-        <div>강원</div>
-        <div>충청</div>
-        <div>전라</div>
-        <div>제주</div>
-        <div>경상</div>
+        <a th:href="@{/stadium}" th:classappend="${selectedRegion} == null ? 'active' : ''">전체</a>
+        <a th:href="@{/stadium(region='서울')}" th:classappend="${selectedRegion} == '서울' ? 'active' : ''">서울</a>
+        <a th:href="@{/stadium(region='경기')}" th:classappend="${selectedRegion} == '경기' ? 'active' : ''">경기</a>
+        <a th:href="@{/stadium(region='강원')}" th:classappend="${selectedRegion} == '강원' ? 'active' : ''">강원</a>
+        <a th:href="@{/stadium(region='충청')}" th:classappend="${selectedRegion} == '충청' ? 'active' : ''">충청</a>
+        <a th:href="@{/stadium(region='전라')}" th:classappend="${selectedRegion} == '전라' ? 'active' : ''">전라</a>
+        <a th:href="@{/stadium(region='제주')}" th:classappend="${selectedRegion} == '제주' ? 'active' : ''">제주</a>
+        <a th:href="@{/stadium(region='경상')}" th:classappend="${selectedRegion} == '경상' ? 'active' : ''">경상</a>
+        <a th:href="@{/stadium(region='세종')}" th:classappend="${selectedRegion} == '세종' ? 'active' : ''">세종</a>
     </div>
 
-    <div class="stadium-card">
-        <img src="" alt="경기장 이미지1">
-        <div class="stadium-location">경기 / 고양시</div>
-        <div class="stadium-name">고양 AoA 풋살 스타디움</div>
+
+    <div th:each="stadium : ${stadiums.content}" class="stadium-card">
+        <div class="stadium-info">
+            <div class="stadium-location"
+                 th:text="${stadium.faciRoadAddr.contains(stadium.cpNm) ? stadium.faciRoadAddr : stadium.cpNm + ' / ' + stadium.faciRoadAddr}">
+                지역 / 주소
+            </div>
+            <div class="stadium-name" th:text="${stadium.faciNm}">경기장 이름</div>
+        </div>
     </div>
 
-    <div class="stadium-card">
-        <img src="" alt="경기장 이미지2">
-        <div class="stadium-location">경기 / 고양시</div>
-        <div class="stadium-name">고양 데일리 그라운드 풋살장 마두점</div>
+    <div class="pagination" th:if="${stadiums.totalPages > 1}">
+        <a th:if="${!stadiums.first}" th:href="@{/stadium(page=${stadiums.number - 1}, region=${selectedRegion})}">&lt;</a>
+        <span class="page-number" th:text="${stadiums.number + 1} + ' / ' + ${stadiums.totalPages}">1 / 1</span>
+        <a th:if="${!stadiums.last}" th:href="@{/stadium(page=${stadiums.number + 1}, region=${selectedRegion})}">&gt;</a>
     </div>
 </div>
 
