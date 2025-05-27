@@ -137,6 +137,18 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
+    @GetMapping("/team/{teamId}/my-reviews")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<ResReviewDto>>> getMyReviews(
+            @PathVariable Long teamId,
+            @AuthenticationPrincipal CustomUser user) {
+
+        log.info("🔍 [Controller] user principal: {}", user);
+
+        List<ResReviewDto> myReviews = teamService.getMyReviewsForTeam(teamId, user.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(myReviews));
+    }
+
 }
 
 
