@@ -89,6 +89,7 @@
                         </div>
                     </form>
                 </div>
+
             </div> <!-- End of #reviewSection -->
 
             <!-- ✅ Join Request Section moved INSIDE -->
@@ -112,7 +113,8 @@
 
 
 
-<div th:replace="~{common/footer::footer}"></div>
+
+        <div th:replace="~{common/footer::footer}"></div>
 
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', () => {
@@ -125,6 +127,7 @@
         const tabReviews = document.getElementById('tab-reviews');
         const tabJoin = document.getElementById('tab-join');
         const joinRequestSection = document.getElementById('joinRequestSection');
+
 
 
         const joinTeamForm = document.getElementById('joinTeamForm');
@@ -146,6 +149,7 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
+
                         body: JSON.stringify({introduction})
                     });
 
@@ -171,6 +175,7 @@
                     }
                 } catch (error) {
                     console.error('❌ 에러 발생:', error);
+
                     alert('팀 가입 신청 중 오류가 발생했습니다.');
                 }
             });
@@ -194,8 +199,10 @@
             }
             fetch(`/team/team/${teamId}/review`, {
                 method: 'POST',
+
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({content, rating: parseInt(ratingInput.value)})
+
             })
                 .then(res => {
                     if (!res.ok) throw new Error();
@@ -215,8 +222,10 @@
             try {
                 const res = await fetch(`/team/team/review/${editingReviewId}`, {
                     method: 'PUT',
+
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({content: updatedContent, rating: +updatedRating})
+
                 });
                 if (!res.ok) throw new Error();
                 alert('리뷰가 수정되었습니다!');
@@ -329,6 +338,7 @@
                 });
         }
 
+
         function clearTabs() {
             tabInfo.classList.remove('active');
             tabReviews.classList.remove('active');
@@ -344,15 +354,19 @@
             clearTabs();
             infoSection.style.display = 'block';
             tabInfo.classList.add('active');
+
         });
 
         tabReviews.addEventListener('click', (e) => {
             e.preventDefault();
+
             clearTabs();
+
             reviewSection.style.display = 'block';
             reviewListView.style.display = 'block';
             reviewWriteView.style.display = 'none';
             tabReviews.classList.add('active');
+
             loadReviews();
         });
 
@@ -362,6 +376,7 @@
             joinRequestSection.style.display = 'block';
             tabJoin.classList.add('active');
         });
+
 
         writeReviewBtn.addEventListener('click', () => {
             reviewListView.style.display = 'none';

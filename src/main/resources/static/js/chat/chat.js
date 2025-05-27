@@ -6,6 +6,8 @@ let loginEmail = "";
 document.addEventListener("DOMContentLoaded",async ()=>{
 
     const detailDto = document.querySelector("#chat1-1-detail-dto");
+    // if(!detailDto)
+    //     return;
     loginEmail = detailDto.dataset.loginEmail;
     const data = getJwtToken();
     console.log(data);
@@ -19,6 +21,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
     stompClient.connect({ Authorization: `Bearer ${data}` }, () => {
         stompClient.subscribe(`/topic/1`, message => {
+            console.log(message);
             const msg = JSON.parse(message.body);
             appendMessage(msg);
             scrollToBottom();
@@ -67,21 +70,6 @@ function getJwtToken(){
 //         messages.forEach(msg => appendMessage(msg));
 //         scrollToBottom();
 //     });
-
-// 2. WebSocket 연결
-
-/*const sock = new SockJS(`http://localhost:8090/connect`);
-stompClient = webstomp.over(sock);
-
-stompClient.connect({ Authorization: `Bearer ${token}` }, () => {
-    stompClient.subscribe(`/topic/${roomId}`, message => {
-        const msg = JSON.parse(message.body);
-        appendMessage(msg);
-        scrollToBottom();
-    }, { Authorization: `Bearer ${token}` });
-});*/
-
-
 
 function sendMessage() {
     const msgText = messageInput.value.trim();
