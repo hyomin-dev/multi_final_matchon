@@ -111,35 +111,59 @@
         const cancelWriteBtn = document.getElementById('cancelWriteBtn');
         const myReviewsBtn = document.getElementById('myReviewsBtn');
 
-        tabInfo.addEventListener('click', (e) => {
+        let isEditing = false;
+        let editingReviewId = null;
+
+        function handleCreate(e) {
             e.preventDefault();
-            infoSection.style.display = 'block';
-            reviewSection.style.display = 'none';
-            tabInfo.classList.add('active');
-            tabReviews.classList.remove('active');
-        });
+            const content = document.getElementById('reviewContent').value;
+            const ratingInput = document.querySelector('input[name="rating"]:checked');
+            if (!content || !ratingInput) {
+                alert('내용과 별점을 모두 입력해주세요.');
+                return;
+            }
+            fetch(`/team/team/${teamId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content, rating: parseInt(ratingInput.value) })
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    reviewForm.reset();
+                    reviewWriteView.style.display = 'none';
+                    reviewListView.style.display = 'block';
+                    loadReviews();
+                })
+                .catch(() => alert('후기 작성에 실패했습니다. 다시 시도해주세요.'));
+        }
 
-        tabReviews.addEventListener('click', (e) => {
+        async function handleEdit(e) {
             e.preventDefault();
-            infoSection.style.display = 'none';
-            reviewSection.style.display = 'block';
-            reviewListView.style.display = 'block';
-            reviewWriteView.style.display = 'none';
-            tabReviews.classList.add('active');
-            tabInfo.classList.remove('active');
-            loadReviews();
-        });
+            const updatedContent = document.getElementById('reviewContent').value;
+            const updatedRating = document.querySelector('input[name="rating"]:checked').value;
 
-        writeReviewBtn.addEventListener('click', () => {
-            reviewListView.style.display = 'none';
-            reviewWriteView.style.display = 'block';
-        });
+            try {
+                const res = await fetch(`/team/team/review/${editingReviewId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: updatedContent, rating: +updatedRating })
+                });
+                if (!res.ok) throw new Error();
+                alert('리뷰가 수정되었습니다!');
+                reviewForm.reset();
+                reviewWriteView.style.display = 'none';
+                reviewListView.style.display = 'block';
+                loadReviews();
+            } catch {
+                alert('수정에 실패했습니다.');
+            } finally {
+                reviewForm.onsubmit = handleCreate;
+                isEditing = false;
+                editingReviewId = null;
+            }
+        }
 
-        cancelWriteBtn.addEventListener('click', () => {
-            reviewWriteView.style.display = 'none';
-            reviewListView.style.display = 'block';
-            reviewForm.reset();
-        });
+        reviewForm.onsubmit = handleCreate;
 
         reviewList.addEventListener('click', (e) => {
             if (e.target.classList.contains('btn-edit-review')) {
@@ -153,24 +177,10 @@
                 reviewWriteView.style.display = 'block';
                 reviewListView.style.display = 'none';
 
-                reviewForm.onsubmit = async (event) => {
-                    event.preventDefault();
-                    const updatedContent = document.getElementById('reviewContent').value;
-                    const updatedRating = document.querySelector('input[name="rating"]:checked').value;
-
-                    try {
-                        const res = await fetch(`/team/team/review/${reviewId}`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ content: updatedContent, rating: +updatedRating })
-                        });
-                        if (!res.ok) throw new Error();
-                        alert('리뷰가 수정되었습니다!');
-                        location.reload();
-                    } catch {
-                        alert('수정에 실패했습니다.');
-                    }
-                };
+                reviewForm.removeEventListener('submit', handleCreate);
+                isEditing = true;
+                editingReviewId = reviewId;
+                reviewForm.onsubmit = handleEdit;
             }
 
             if (e.target.classList.contains('btn-delete-review')) {
@@ -248,6 +258,41 @@
                     `).join('');
                 });
         }
+
+        tabInfo.addEventListener('click', (e) => {
+            e.preventDefault();
+            infoSection.style.display = 'block';
+            reviewSection.style.display = 'none';
+            tabInfo.classList.add('active');
+            tabReviews.classList.remove('active');
+        });
+
+        tabReviews.addEventListener('click', (e) => {
+            e.preventDefault();
+            infoSection.style.display = 'none';
+            reviewSection.style.display = 'block';
+            reviewListView.style.display = 'block';
+            reviewWriteView.style.display = 'none';
+            tabReviews.classList.add('active');
+            tabInfo.classList.remove('active');
+            loadReviews();
+        });
+
+        writeReviewBtn.addEventListener('click', () => {
+            reviewListView.style.display = 'none';
+            reviewWriteView.style.display = 'block';
+        });
+
+        cancelWriteBtn.addEventListener('click', () => {
+            reviewWriteView.style.display = 'none';
+            reviewListView.style.display = 'block';
+            reviewForm.reset();
+            if (isEditing) {
+                reviewForm.onsubmit = handleCreate;
+                isEditing = false;
+                editingReviewId = null;
+            }
+        });
     });
 </script>
 </body>
