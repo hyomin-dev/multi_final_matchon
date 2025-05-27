@@ -23,6 +23,11 @@ document.addEventListener("DOMContentLoaded",()=>{
         submitCheck(e);
     })
 
+    const backBtn = document.querySelector(".back-btn");
+    backBtn.addEventListener("click",()=>{
+        history.back();
+    });
+
 })
 
 function submitCheck(e){
