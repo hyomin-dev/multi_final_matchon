@@ -89,12 +89,31 @@
                         </div>
                     </form>
                 </div>
+                <div id="joinRequestSection" style="display: none;">
+                    <button id="joinTeamBtn" class="btn-primary">팀 가입 신청하기</button>
+
+                    <div id="joinModal" class="modal" style="display:none;">
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <h2>팀 가입 신청</h2>
+                            <form id="joinTeamForm">
+                                <div class="form-group">
+                                    <label for="introduction">가입하고 싶은 이유를 적어주세요</label>
+                                    <textarea id="introduction" rows="4" placeholder="자기소개 및 팀에 가입하고 싶은 이유" required></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-submit">신청하기</button>
+                                </div>
+                            </form>
             </div>
         </div>
     </div>
 </div>
+        </div>
+    </div>
+</div>
 
-<div th:replace="~{common/footer::footer}"></div>
+        <div th:replace="~{common/footer::footer}"></div>
 
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', () => {
@@ -105,6 +124,59 @@
         const reviewWriteView = document.getElementById('reviewWriteView');
         const tabInfo = document.getElementById('tab-info');
         const tabReviews = document.getElementById('tab-reviews');
+        const tabJoin = document.getElementById('tab-join');
+        const joinRequestSection = document.getElementById('joinRequestSection');
+
+        if (tabJoin && joinRequestSection) {
+            tabJoin.addEventListener('click', (e) => {
+                e.preventDefault();
+                infoSection.style.display = 'none';
+                reviewSection.style.display = 'none';
+                joinRequestSection.style.display = 'block';
+
+                tabInfo.classList.remove('active');
+                tabReviews.classList.remove('active');
+                tabJoin.classList.add('active');
+            });
+        }
+        const modal = document.getElementById('joinModal');
+        const joinTeamForm = document.getElementById('joinTeamForm');
+        if (joinTeamForm) {
+            joinTeamForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const introduction = document.getElementById('introduction').value.trim();
+                const wordCount = introduction.split(/\s+/).length;
+
+                if (wordCount > 200) {
+                    alert(`자기소개는 최대 200단어까지 입력할 수 있습니다. 현재: ${wordCount}단어`);
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/team/team/${teamId}/join-request`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ introduction })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        alert('팀 가입 신청이 완료되었습니다.');
+                        modal.style.display = 'none';
+                        joinTeamForm.reset();
+                    } else {
+                        alert(data.message || '팀 가입 신청에 실패했습니다. 다시 시도해주세요.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('팀 가입 신청 중 오류가 발생했습니다.');
+                }
+            });
+        }
         const infoSection = document.querySelector('.team-info');
         const reviewSection = document.getElementById('reviewSection');
         const writeReviewBtn = document.getElementById('writeReviewBtn');

@@ -34,6 +34,10 @@
             font-weight: bold;
             color: white;
         }
+
+        .btninquiry {
+            float: right;
+        }
         .btnsubmit { background-color: #007bff; }
         .btninquiry { background-color: rebeccapurple; }
     </style>
@@ -60,13 +64,14 @@
         <label for="keyword"></label>
         <input type="text" id="keyword" name="keyword" placeholder="검색.." th:value="${keyword}" />
         <button type="submit" style="color: dodgerblue;" >검색</button>
+        <a href="/inquiry" class="btninquiry">1:1 문의 작성</a>
     </form>
 
     <!-- 관리자만 버튼 보이게 -->
     <th:block th:if="${isAdmin}">
         <div class="btn-group">
             <a href="/faq/register" class="btnsubmit">FAQ 등록</a>
-            <a href="/inquiry" class="btninquiry">1:1 문의 작성</a>
+
 
         </div>
     </th:block>
