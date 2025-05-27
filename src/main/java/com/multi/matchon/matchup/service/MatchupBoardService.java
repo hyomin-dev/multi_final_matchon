@@ -87,6 +87,7 @@ public class MatchupBoardService {
 
         return ResMatchupBoardDto.builder()
                 .boardId(matchupBoard.getId())
+                .memberId(matchupBoard.getMember().getId())
                 .memberEmail(matchupBoard.getMember().getMemberEmail())
                 .memberName(matchupBoard.getMember().getMemberName())
                 .teamName(matchupBoard.getMember().getTeam().getTeamName())

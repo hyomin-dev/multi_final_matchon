@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
@@ -22,16 +23,16 @@ public class StompController {
     private final SimpMessageSendingOperations messageTemplate;
 
     @MessageMapping("/{roomId}")
-    public void sendMessage(@DestinationVariable Long roomId, ReqChatDto reqChatDto, Principal principal){
+    public void sendMessage(@DestinationVariable Long roomId, ReqChatDto reqChatDto, @AuthenticationPrincipal CustomUser user){
         String senderEmail = "none";
-        if (principal instanceof UsernamePasswordAuthenticationToken authentication) {
-            Object principalObj = authentication.getPrincipal();
-            if (principalObj instanceof CustomUser customUser) {
-                Member sender = customUser.getMember();
-                senderEmail = sender.getMemberEmail(); // 예시
-                // 이제 원하는대로 사용 가능
-            }
-        }
+//        if (principal instanceof UsernamePasswordAuthenticationToken authentication) {
+//            Object principalObj = authentication.getPrincipal();
+//            if (principalObj instanceof CustomUser customUser) {
+//                Member sender = customUser.getMember();
+//                senderEmail = sender.getMemberEmail(); // 예시
+//                // 이제 원하는대로 사용 가능
+//            }
+//        }
 
         log.info("message: {}",reqChatDto.getContent());
         ResChatDto resChatDto = ResChatDto.builder()

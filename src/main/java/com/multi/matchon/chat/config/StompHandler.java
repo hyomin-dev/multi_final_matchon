@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -55,6 +56,8 @@ public class StompHandler implements ChannelInterceptor {
                     userDetails, null, userDetails.getAuthorities());
 
             accessor.setUser(authentication);
+            SecurityContextHolder.getContextHolderStrategy().getContext().setAuthentication(authentication);
+
             log.info("connect 토큰 검증 완료");
 
 

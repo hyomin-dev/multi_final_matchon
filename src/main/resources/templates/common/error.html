@@ -14,7 +14,11 @@
         if(errorCode.includes("Matchup")){
             alert(errorCode)
             window.location.href="/matchup/board";
-        }else{
+        } else if(errorCode.includes("Chat")){
+            alert(errorCode);
+            window.close();
+        }
+        else{
             alert("알 수 없는 오류로 인해 메인 페이지로 이동합니다.")
             window.location.href="/";
         }
