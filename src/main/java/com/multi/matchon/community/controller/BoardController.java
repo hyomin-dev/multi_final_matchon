@@ -14,6 +14,7 @@ import com.multi.matchon.community.service.CommentService;
 import com.multi.matchon.member.domain.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
