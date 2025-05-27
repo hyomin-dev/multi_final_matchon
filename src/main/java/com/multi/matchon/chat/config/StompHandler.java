@@ -74,6 +74,7 @@ public class StompHandler implements ChannelInterceptor {
 
             Principal principal = accessor.getUser();
             String destination = accessor.getDestination();
+            //검증
             log.info("SUBSCRIBE Stage");
 
         }else if(StompCommand.SEND == accessor.getCommand()){
