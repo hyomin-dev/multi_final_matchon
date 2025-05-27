@@ -89,31 +89,30 @@
                         </div>
                     </form>
                 </div>
-                <div id="joinRequestSection" style="display: none;">
-                    <button id="joinTeamBtn" class="btn-primary">팀 가입 신청하기</button>
+            </div> <!-- End of #reviewSection -->
 
-                    <div id="joinModal" class="modal" style="display:none;">
-                        <div class="modal-content">
-                            <span class="close">&times;</span>
-                            <h2>팀 가입 신청</h2>
-                            <form id="joinTeamForm">
-                                <div class="form-group">
-                                    <label for="introduction">가입하고 싶은 이유를 적어주세요</label>
-                                    <textarea id="introduction" rows="4" placeholder="자기소개 및 팀에 가입하고 싶은 이유" required></textarea>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="submit" class="btn-submit">신청하기</button>
-                                </div>
-                            </form>
+            <!-- ✅ Join Request Section moved INSIDE -->
+            <div id="joinRequestSection" style="display: none;">
+                <h2>팀 가입 신청</h2>
+                <form id="joinTeamForm">
+                    <div class="form-group">
+                        <label for="introduction">간단한 자기소개</label>
+                        <textarea id="introduction" rows="4" placeholder="자기소개 및 팀에 가입하고 싶은 이유" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">신청하기</button>
+                        <button type="button" class="btn-cancel" id="cancelJoinBtn">취소</button>
+                    </div>
+                </form>
             </div>
-        </div>
-    </div>
-</div>
-        </div>
-    </div>
-</div>
+            </div>
+        </div> <!-- End of .team-content -->
+    </div> <!-- End of .content-wrapper -->
 
-        <div th:replace="~{common/footer::footer}"></div>
+
+
+
+<div th:replace="~{common/footer::footer}"></div>
 
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', () => {
@@ -127,19 +126,7 @@
         const tabJoin = document.getElementById('tab-join');
         const joinRequestSection = document.getElementById('joinRequestSection');
 
-        if (tabJoin && joinRequestSection) {
-            tabJoin.addEventListener('click', (e) => {
-                e.preventDefault();
-                infoSection.style.display = 'none';
-                reviewSection.style.display = 'none';
-                joinRequestSection.style.display = 'block';
 
-                tabInfo.classList.remove('active');
-                tabReviews.classList.remove('active');
-                tabJoin.classList.add('active');
-            });
-        }
-        const modal = document.getElementById('joinModal');
         const joinTeamForm = document.getElementById('joinTeamForm');
         if (joinTeamForm) {
             joinTeamForm.addEventListener('submit', async (e) => {
@@ -159,20 +146,31 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ introduction })
+                        body: JSON.stringify({introduction})
                     });
 
-                    const data = await response.json();
+                    let data = {};
+                    try {
+                        data = await response.json();
+                    } catch (jsonErr) {
+                        console.warn('⚠️ JSON 파싱 실패. 응답은:', await response.text());
+                        throw new Error('JSON 파싱 오류');
+                    }
 
                     if (response.ok && data.success) {
                         alert('팀 가입 신청이 완료되었습니다.');
-                        modal.style.display = 'none';
+                        joinFormContainer.style.display = 'none';
                         joinTeamForm.reset();
                     } else {
-                        alert(data.message || '팀 가입 신청에 실패했습니다. 다시 시도해주세요.');
+                        if (data.message?.includes('이미 요청한 팀')) {
+                            alert('이미 이 팀에 가입 신청을 했습니다.');
+                        } else {
+                            console.warn('서버 응답 메시지 없음 또는 미확인 오류:', data);
+                            alert(data.message || '팀 가입 신청에 실패했습니다. 다시 시도해주세요.');
+                        }
                     }
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.error('❌ 에러 발생:', error);
                     alert('팀 가입 신청 중 오류가 발생했습니다.');
                 }
             });
@@ -196,8 +194,8 @@
             }
             fetch(`/team/team/${teamId}/review`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content, rating: parseInt(ratingInput.value) })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({content, rating: parseInt(ratingInput.value)})
             })
                 .then(res => {
                     if (!res.ok) throw new Error();
@@ -217,8 +215,8 @@
             try {
                 const res = await fetch(`/team/team/review/${editingReviewId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: updatedContent, rating: +updatedRating })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({content: updatedContent, rating: +updatedRating})
                 });
                 if (!res.ok) throw new Error();
                 alert('리뷰가 수정되었습니다!');
@@ -331,23 +329,38 @@
                 });
         }
 
+        function clearTabs() {
+            tabInfo.classList.remove('active');
+            tabReviews.classList.remove('active');
+            tabJoin.classList.remove('active');
+
+            infoSection.style.display = 'none';
+            reviewSection.style.display = 'none';
+            joinRequestSection.style.display = 'none';
+        }
+
         tabInfo.addEventListener('click', (e) => {
             e.preventDefault();
+            clearTabs();
             infoSection.style.display = 'block';
-            reviewSection.style.display = 'none';
             tabInfo.classList.add('active');
-            tabReviews.classList.remove('active');
         });
 
         tabReviews.addEventListener('click', (e) => {
             e.preventDefault();
-            infoSection.style.display = 'none';
+            clearTabs();
             reviewSection.style.display = 'block';
             reviewListView.style.display = 'block';
             reviewWriteView.style.display = 'none';
             tabReviews.classList.add('active');
-            tabInfo.classList.remove('active');
             loadReviews();
+        });
+
+        tabJoin.addEventListener('click', (e) => {
+            e.preventDefault();
+            clearTabs();
+            joinRequestSection.style.display = 'block';
+            tabJoin.classList.add('active');
         });
 
         writeReviewBtn.addEventListener('click', () => {
