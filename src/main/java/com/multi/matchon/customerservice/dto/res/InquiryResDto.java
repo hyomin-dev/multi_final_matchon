@@ -14,6 +14,7 @@ public class InquiryResDto {
     private String statusLabel;
     private String memberName;
     private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
     private String answerContent;
     private Status inquiryStatus;
 
@@ -24,6 +25,7 @@ public class InquiryResDto {
         this.categoryLabel = inquiry.getInquiryCategory().getLabel();
         this.inquiryStatus = inquiry.getInquiryStatus();
         this.createdDate = inquiry.getCreatedDate();
+        this.modifiedDate = inquiry.getModifiedDate();
         this.answerContent = (inquiry.getAnswer() != null) ? inquiry.getAnswer().getAnswerContent() : null;
         this.memberName = inquiry.getMember().getMemberName();
     }
@@ -33,6 +35,7 @@ public class InquiryResDto {
     public String getInquiryContent() { return inquiryContent; }
     public String getCategoryLabel() { return categoryLabel; }
     public LocalDateTime getCreatedDate() { return createdDate; }
+    public LocalDateTime getModifiedDate() { return modifiedDate; }
     public String getAnswerContent() { return answerContent; }
     public Status getInquiryStatus() { return inquiryStatus; }
     public String getMemberName() { return memberName; }

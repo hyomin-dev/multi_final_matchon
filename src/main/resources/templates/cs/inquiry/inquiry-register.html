@@ -5,7 +5,6 @@
     <title>문의 작성</title>
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
     <style>
         body {
             background-color: #ffffff;
@@ -79,27 +78,20 @@
           th:object="${inquiry}" method="post">
         <div>
             <label for="inquiryCategory">카테고리</label>
-
-            <!-- 화면에 보여줄 select (수정 시 비활성화) -->
-            <select id="inquiryCategory"
-                    th:field="*{inquiryCategory}"
-                    th:disabled="${inquiry.id != null}" required>
+            <select id="inquiryCategory" th:field="*{inquiryCategory}" th:disabled="${inquiry.id != null}" required>
                 <option value="">선택</option>
                 <option th:each="type : ${T(com.multi.matchon.customerservice.domain.CustomerServiceType).values()}"
-                        th:value="${type.name()}" th:text="${type.label}">
-                </option>
+                        th:value="${type.name()}" th:text="${type.label}"></option>
             </select>
-
-            <!-- 수정 폼일 경우 값 전달용 hidden 필드 추가 -->
-            <input type="hidden"
-                   th:if="${inquiry.id != null}"
-                   th:name="inquiryCategory"
-                   th:value="${inquiry.inquiryCategory}" />
+            <input type="hidden" th:if="${inquiry.id != null}" th:name="inquiryCategory" th:value="${inquiry.inquiryCategory}" />
         </div>
         <div>
             <label for="inquiryTitle">제목</label>
             <input id="inquiryTitle" type="text" th:field="*{inquiryTitle}" maxlength="100"
-                   placeholder="제목을 입력해주세요" required>
+                   placeholder="제목을 입력해주세요" required oninput="updateTitleLength(this)">
+            <div style="text-align: right; font-size: 13px; color: #666;">
+                <span id="titleLengthCounter">0</span>/100자
+            </div>
         </div>
         <div>
             <label for="inquiryContent">내용</label>
@@ -112,6 +104,22 @@
         </div>
     </form>
 </div>
+
+<script>
+    function updateTitleLength(input) {
+        const counter = document.getElementById("titleLengthCounter");
+        const maxLen = 100;
+        const currentLen = input.value.length;
+
+        if (currentLen > maxLen) {
+            alert("제목은 100자까지 입력 가능합니다.");
+            input.value = input.value.substring(0, maxLen);
+            counter.textContent = maxLen;
+        } else {
+            counter.textContent = currentLen;
+        }
+    }
+</script>
 
 <div th:replace="~{common/footer::footer}"></div>
 </body>

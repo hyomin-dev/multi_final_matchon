@@ -5,7 +5,6 @@
     <title>문의 상세</title>
     <link rel="stylesheet" th:href="@{/css/header.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
-    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
     <style>
         body {
             background-color: #ffffff;
@@ -23,6 +22,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
+        }
+        .meta-time {
+            font-size: 13px;
+            color: #888;
+            text-align: right;
             margin-bottom: 20px;
         }
         .badge {
@@ -35,9 +40,13 @@
             background-color: #007BFF;
             color: white;
         }
-        .badge.status {
+        .badge.status.pending {
             background-color: #ccc;
             color: #333;
+        }
+        .badge.status.completed {
+            background-color: #28a745;
+            color: white;
         }
         h2 {
             font-size: 24px;
@@ -77,18 +86,9 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .edit-btn {
-            background-color: #007bff;
-            color: white;
-        }
-        .cancel-btn {
-            background-color: #6c757d;
-            color: white;
-        }
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-        }
+        .edit-btn { background-color: #007bff; color: white; }
+        .cancel-btn { background-color: #6c757d; color: white; }
+        .delete-btn { background-color: #dc3545; color: white; }
     </style>
 </head>
 <body>
@@ -98,10 +98,16 @@
 <div id="wrap">
     <div class="meta">
         <span class="badge category" th:text="${inquiry.categoryLabel}">카테고리</span>
-        <span class="badge status" th:text="${inquiry.getStatusLabel()}">상태</span>
+        <span class="badge status"
+              th:classappend="${inquiry.inquiryStatus.name() == 'COMPLETED'} ? ' completed' : ' pending'"
+              th:text="${inquiry.getStatusLabel()}">상태</span>
     </div>
 
-    <h2 th:text="${inquiry.inquiryTitle}">제목</h2>
+    <div class="meta-time">
+        작성일: <span th:text="${#temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm')}"></span>
+    </div>
+
+    <h2 th:text="${inquiry.inquiryTitle}" style="word-break: break-word; white-space: pre-wrap;">제목</h2>
 
     <div class="content-box" th:text="${inquiry.inquiryContent}">내용</div>
 
