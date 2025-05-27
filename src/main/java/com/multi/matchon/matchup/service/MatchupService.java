@@ -48,7 +48,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
+
 public class MatchupService{
 
     @Value("${spring.cloud.aws.s3.base-url}")
@@ -64,6 +64,7 @@ public class MatchupService{
 
     private final AwsS3Utils awsS3Utils;
 
+    @Transactional
     public void insertFile(MultipartFile multipartFile, MatchupBoard matchupBoard){
         String fileName = UUID.randomUUID().toString().replace("-","");
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
@@ -77,7 +78,7 @@ public class MatchupService{
                 .build();
         attachmentRepository.save(attachment);
     }
-
+    @Transactional
     public void updateFile(MultipartFile multipartFile, MatchupBoard findMatchupBoard){
         String fileName = UUID.randomUUID().toString().replace("-","");
 
