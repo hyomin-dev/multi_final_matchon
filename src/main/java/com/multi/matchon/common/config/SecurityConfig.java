@@ -42,6 +42,11 @@ public class SecurityConfig {
                         .requestMatchers("/inquiry", "/inquiry/**").authenticated()
                         .anyRequest().authenticated()
                 )
+                .headers(headers -> headers // 배포시 chat-icon 커스텀 변경 가능, localhost 환경에서는 custom X
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;")
+                        )
+                )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
