@@ -7,10 +7,12 @@ import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.common.util.FileUploadHelper;
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
+import com.multi.matchon.community.domain.ReportType;
 import com.multi.matchon.community.dto.req.BoardRequest;
 import com.multi.matchon.community.dto.req.CommentRequest;
 import com.multi.matchon.community.service.BoardService;
 import com.multi.matchon.community.service.CommentService;
+import com.multi.matchon.community.service.ReportService;
 import com.multi.matchon.member.domain.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +47,8 @@ public class BoardController {
 
     private final BoardService boardService;
     private final CommentService commentService;
+    private final ReportService reportService;
+
     private final AwsS3Utils awsS3Utils;
 
     @GetMapping
@@ -249,5 +253,6 @@ public class BoardController {
         boardService.deleteByIdAndUser(id, user.getMember());
         return ResponseEntity.ok().build();
     }
+
 
 }
