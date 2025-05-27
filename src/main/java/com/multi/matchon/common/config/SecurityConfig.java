@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 경로
                         .requestMatchers("/community/**").authenticated()//커뮤니티 작성 인증
                         .requestMatchers("/inquiry", "/inquiry/**").authenticated()
+                        .requestMatchers("/member/**").authenticated()//임시추가
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers // 배포시 chat-icon 커스텀 변경 가능, localhost 환경에서는 custom X
