@@ -22,6 +22,9 @@ spring:
         static: ${S3_REGION}
       stack:
         auto: false
+  thymeleaf:
+    cache: false
+
 
 
 matchon:

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>MATCHON - 팀 생성</title>
@@ -14,17 +14,23 @@
     <h1>팀 생성</h1>
 
     <form th:action="@{/team/team/register}" method="post" enctype="multipart/form-data" th:object="${ReqTeamDto}">
+        <div th:if="${#fields.hasErrors('*')}" class="error-block">
+            <p th:each="err : ${#fields.errors('*')}" th:text="${err}" class="error-message"></p>
+        </div>
         <label>팀명</label>
         <input type="text" th:field="*{teamName}" required />
+        <div th:if="${#fields.hasErrors('teamName')}" th:errors="*{teamName}" class="field-error"></div>
 
         <div>
             <label>팀원 모집 여부:</label>
             <input type="radio" name="recruitmentStatus" value="true" checked> 모집 중
             <input type="radio" name="recruitmentStatus" value="false"> 모집 완료
+            <div th:if="${#fields.hasErrors('recruitmentStatus')}" th:errors="*{recruitmentStatus}" class="field-error"></div>
         </div>
 
         <label>팀 소개</label>
         <textarea th:field="*{teamIntroduction}" rows="4" required></textarea>
+        <div th:if="${#fields.hasErrors('teamIntroduction')}" th:errors="*{teamIntroduction}" class="field-error"></div>
 
         <label>팀 지역</label>
         <div>
@@ -34,6 +40,7 @@
             <label><input type="radio" th:field="*{teamRegion}" value="CHUNGCHEONG_REGION" /> 충청권 (대전·세종·충남·충북)</label><br/>
             <label><input type="radio" th:field="*{teamRegion}" value="GANGWON_REGION" /> 강원권</label><br/>
             <label><input type="radio" th:field="*{teamRegion}" value="JEJU" /> 제주</label>
+            <div th:if="${#fields.hasErrors('teamRegion')}" th:errors="*{teamRegion}" class="field-error"></div>
         </div>
 
         <label>팀에 필요한 포지션</label>
@@ -49,6 +56,7 @@
             <label><input type="checkbox" th:field="*{recruitingPositions}" value="STRIKER_CENTER_FORWARD" /> 스트라이커 (ST)</label><br/>
             <label><input type="checkbox" th:field="*{recruitingPositions}" value="SECOND_STRIKER" /> 세컨드 스트라이커</label><br/>
             <label><input type="checkbox" th:field="*{recruitingPositions}" value="LEFT_RIGHT_WINGER" /> 와이드 윙어</label>
+            <div th:if="${#fields.hasErrors('recruitingPositions')}" th:errors="*{recruitingPositions}" class="field-error"></div>
         </div>
 
         <label>팀 이미지 선택</label>

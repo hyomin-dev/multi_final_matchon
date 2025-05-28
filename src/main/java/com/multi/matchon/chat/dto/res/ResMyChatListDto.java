@@ -9,10 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResChatDto {
+public class ResMyChatListDto {
 
-    private String senderEmail;
-    private String senderName;
-    private String content;
+    private Long roomId;
+    private String roomName;
+    private Boolean isGroupChat;
+    private Long unReadCount;
+
 
 }

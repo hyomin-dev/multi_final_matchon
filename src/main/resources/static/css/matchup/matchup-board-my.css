@@ -176,6 +176,13 @@ h1 {
     transform: translateY(-2px);
 }
 
+.no-result {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #777;
+    padding: 2rem 0;
+}
+
 
 
 

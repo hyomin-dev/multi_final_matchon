@@ -1,0 +1,11 @@
+.field-error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+.error-block {
+    background-color: #ffe6e6;
+    padding: 10px;
+    border: 1px solid red;
+    margin-bottom: 16px;
+}
