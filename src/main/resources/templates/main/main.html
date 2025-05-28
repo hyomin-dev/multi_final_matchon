@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <title>Matchon - Main</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+
     <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
 </head>
 
@@ -45,45 +47,24 @@
         <button th:onclick="|location.href='@{/introduction}'|">GO!</button>
     </div>
 
-    <!-- ===== CHATBOT (로그인한 사용자만 보임) ===== -->
     <sec:authorize access="isAuthenticated()">
-        <df-messenger
-                intent="WELCOME"
-                chat-icon="/img/aichatbot.png"
-                chat-title="Matchon 챗봇"
-                agent-id="db490e06-39f9-4c1a-80a3-baf3d3306fb4"
-                language-code="ko">
-        </df-messenger>
+        <!-- 챗봇 아이콘 -->
+        <img src="/img/aichatbot.png" id="chatbot-launcher"
+             style="position: fixed; bottom: 30px; right: 20px; width: 80px; cursor: pointer; z-index: 1000;">
 
-        <script>
-            window.addEventListener("df-messenger-loaded", function () {
-                setTimeout(() => {
-                    const df = document.querySelector("df-messenger");
-                    const outer = df?.shadowRoot;
-                    const chat = outer?.querySelector("df-messenger-chat")?.shadowRoot;
-                    const launcher = chat?.querySelector(".launch-button");
-                    const launcherImg = launcher?.querySelector("img");
-
-                    if (launcher) {
-                        launcher.style.background = "white"; // 또는 transparent
-                        launcher.style.width = "120px";
-                        launcher.style.height = "120px";
-                        launcher.style.borderRadius = "50%";
-                        launcher.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.2)";
-                        launcher.style.display = "flex";
-                        launcher.style.alignItems = "center";
-                        launcher.style.justifyContent = "center";
-                    }
-
-                    if (launcherImg) {
-                        launcherImg.style.width = "80%";
-                        launcherImg.style.height = "80%";
-                        launcherImg.style.objectFit = "contain";
-                    }
-                }, 300);
-            });
-        </script>
+        <div id="chatbot-modal" style="display: none; position: fixed; bottom: 120px; right: 30px;
+        width: 400px; height: 600px; border-radius: 15px; overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; background: white; display: flex; flex-direction: column;">
+            <div style="background: #333; color: white; padding: 10px; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center; height: 40px; flex-shrink: 0;">
+                <span>MatchON 챗봇</span>
+                <button id="chatbot-close" style="background: transparent; border: none;
+                color: white; font-size: 18px; cursor: pointer;">✕</button>
+            </div>
+            <iframe src="/aichat" style="flex: 1; border: none;"></iframe>
+        </div>
     </sec:authorize>
+
 
     <!-- ===== FOOTER ===== -->
     <footer class="footer">
@@ -94,6 +75,7 @@
 <!-- ===== SCRIPT ===== -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // 로그인 상태 확인 후 버튼 표시
         fetch('/auth/check', {
             method: 'GET',
             credentials: 'include'
@@ -125,6 +107,40 @@
             document.getElementById("btn-admin").style.display = "none";
             document.getElementById("btn-logout").style.display = "none";
         });
+
+        // 챗봇 열기/닫기 로직
+        const launcher = document.getElementById("chatbot-launcher");
+        const modal = document.getElementById("chatbot-modal");
+        const closeBtn = document.getElementById("chatbot-close");
+
+        fetch('/auth/check', {
+            credentials: 'include'
+        }).then(res => {
+            if (!res.ok) {
+                if (launcher) launcher.remove();
+                if (modal) modal.remove();
+            }
+        });
+
+        if (launcher) {
+            launcher.addEventListener("click", function () {
+                fetch("/auth/check", {
+                    credentials: "include"
+                }).then(res => {
+                    if (res.ok) {
+                        modal.style.display = "block";
+                    } else {
+                        alert("로그인 후 사용 가능합니다.");
+                    }
+                });
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener("click", function () {
+                modal.style.display = "none";
+            });
+        }
     });
 
     function logout() {
@@ -140,14 +156,7 @@
         });
     }
 
-    // 뒤로가기로 챗봇이 다시 보이는 것 방지
-    window.addEventListener("pageshow", function () {
-        const df = document.querySelector("df-messenger");
-        const isLoggedIn = document.getElementById("btn-logout")?.style.display !== "none";
-        if (!isLoggedIn && df) {
-            df.remove();
-        }
-    });
 </script>
+<script th:src="@{/js/aibot/aichatbot.js}"></script>
 </body>
 </html>
