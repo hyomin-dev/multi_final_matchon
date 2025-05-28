@@ -7,7 +7,6 @@ import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.common.util.FileUploadHelper;
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
-import com.multi.matchon.community.domain.ReportType;
 import com.multi.matchon.community.dto.req.BoardRequest;
 import com.multi.matchon.community.dto.req.CommentRequest;
 import com.multi.matchon.community.service.BoardService;
