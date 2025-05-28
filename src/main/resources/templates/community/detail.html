@@ -107,8 +107,20 @@
         <h3>신고하기</h3>
         <input type="hidden" id="reportTargetType">
         <input type="hidden" id="reportTargetId">
-        <label for="reportReason">신고 사유</label>
-        <textarea id="reportReason" rows="4" placeholder="신고 사유를 입력하세요."></textarea>
+
+        <label for="reportReasonSelect">신고 사유</label>
+        <select id="reportReasonSelect" required>
+            <option value="">-- 선택하세요 --</option>
+            <option value="욕설/비방/괴롭힘">욕설/비방/괴롭힘</option>
+            <option value="상업/광고성 글">상업/광고성 글</option>
+            <option value="도배성 글">도배성 글</option>
+            <option value="카테고리 취지에 맞지 않는 글">카테고리 취지에 맞지 않는 글</option>
+            <option value="기타">기타</option>
+        </select>
+
+        <label for="reportReasonDetail" style="margin-top: 10px;">상세 사유</label>
+        <textarea id="reportReasonDetail" rows="4" placeholder="상세 사유를 입력하세요. (기타 선택 시 필수)" required></textarea>
+
         <div class="modal-buttons">
             <button onclick="submitReport()">제출</button>
             <button onclick="closeReportModal()">취소</button>
@@ -209,7 +221,8 @@
     function openReportModal(type, id) {
         document.getElementById("reportTargetType").value = type;
         document.getElementById("reportTargetId").value = id;
-        document.getElementById("reportReason").value = "";
+        document.getElementById("reportReasonSelect").value = ""; // 드롭다운 초기화
+        document.getElementById("reportReasonDetail").value = ""; // 상세사유 초기화
         document.getElementById("reportModal").style.display = "flex";
     }
 
@@ -220,14 +233,24 @@
     function submitReport() {
         const type = document.getElementById("reportTargetType").value;
         const id = document.getElementById("reportTargetId").value;
-        const reason = document.getElementById("reportReason").value.trim();
+        const selectedReason = document.getElementById("reportReasonSelect").value;
+        const detailReason = document.getElementById("reportReasonDetail").value.trim();
+        const token = localStorage.getItem("accessToken");
 
-        if (!reason) {
-            alert("신고 사유를 입력해주세요.");
+        if (!selectedReason) {
+            alert("신고 사유를 선택해주세요.");
             return;
         }
 
-        const token = localStorage.getItem("accessToken");
+        if (selectedReason === "기타" && !detailReason) {
+            alert("기타 사유를 선택한 경우, 상세 사유를 입력해주세요.");
+            return;
+        }
+
+        // 선택한 사유와 상세 사유를 결합 (예: "욕설/비방/괴롭힘 - 상대방을 반복적으로 비방함")
+        const finalReason = detailReason
+            ? `${selectedReason} - ${detailReason}`
+            : selectedReason;
 
         fetch("/community/report", {
             method: "POST",
@@ -235,7 +258,7 @@
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Authorization": "Bearer " + token
             },
-            body: `type=${type}&targetId=${id}&reason=${encodeURIComponent(reason)}`
+            body: `type=${type}&targetId=${id}&reason=${encodeURIComponent(finalReason)}`
         })
             .then(res => {
                 if (res.status === 401) {
@@ -250,6 +273,7 @@
             })
             .catch(() => alert("신고 중 오류가 발생했습니다."));
     }
+
 </script>
 </body>
 </html>
