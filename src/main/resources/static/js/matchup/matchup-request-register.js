@@ -20,6 +20,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         }
     )
 
+    const cancelBtn = document.querySelector(".cancel-btn");
+    cancelBtn.addEventListener("click",()=>{
+        history.back();
+    })
+
+
 })
 
 function submitCheck(e, matchDatetime){

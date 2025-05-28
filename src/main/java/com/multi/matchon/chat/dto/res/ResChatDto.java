@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ResChatDto {
 
     private String senderEmail;
+    private String senderName;
     private String content;
 
 }

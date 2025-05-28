@@ -140,6 +140,7 @@
                 highlightStars(val);
             });
 
+
             star.addEventListener('mouseout', () => {
                 highlightStars(selectedRating);
             });
@@ -160,10 +161,12 @@
         }
 
 
+
             const joinTeamForm = document.getElementById('joinTeamForm');
             if (joinTeamForm) {
                 joinTeamForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
+
 
                     const introduction = document.getElementById('introduction').value.trim();
                     const wordCount = introduction.split(/\s+/).length;
@@ -227,6 +230,7 @@
                 if (!content || isNaN(rating) || rating < 1 || rating > 5) {
                     alert('내용과 별점을 모두 입력해주세요.');
                     return;
+
                 }
 
                 fetch(`/team/team/${teamId}/review`, {
@@ -254,11 +258,14 @@
                 return;
             }
 
+
             try {
                 const res = await fetch(`/team/team/review/${editingReviewId}`, {
                     method: 'PUT',
+
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ content: updatedContent, rating: updatedRating })
+
                 });
 
                 if (!res.ok) throw new Error();
@@ -370,6 +377,7 @@
                             <p class="review-content">${review.content}</p>
                         </div>
                     `).join('');
+
                     });
             }
 
@@ -378,6 +386,7 @@
                 tabInfo.classList.remove('active');
                 tabReviews.classList.remove('active');
                 tabJoin.classList.remove('active');
+
 
                 infoSection.style.display = 'none';
                 reviewSection.style.display = 'none';

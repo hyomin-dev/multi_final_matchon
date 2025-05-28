@@ -20,6 +20,8 @@ spring:
         static: ${S3_REGION}
       stack:
         auto: false
+  thymeleaf:
+    cache: false
 
 matchon:
   kakao-api: ${KAKAO_API_KEY}
