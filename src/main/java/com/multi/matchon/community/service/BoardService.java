@@ -71,4 +71,6 @@ public class BoardService {
         commentService.deleteAllByBoard(board);
         boardRepository.deleteById(id);
     }
+
+
 }

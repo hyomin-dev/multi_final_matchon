@@ -8,21 +8,20 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
-#  cloud:
-#    aws:
-#      credentials:
-#        access-key: ${AWS_ACCESS_KEY}
-#        secret-key: ${AWS_SECRET_KEY}
-#      s3:
-#        bucket: ${S3_BUCKET}
-#        base-url: ${S3_BASE_URL}
-#      region:
-#        static: ${S3_REGION}
-#      stack:
-#        auto: false
-
-jwt:
-  secret: ${JWT_SECRET}
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      s3:
+        bucket: ${S3_BUCKET}
+        base-url: ${S3_BASE_URL}
+      region:
+        static: ${S3_REGION}
+      stack:
+        auto: false
+  thymeleaf:
+    cache: false
 
 matchon:
   kakao-api: ${KAKAO_API_KEY}

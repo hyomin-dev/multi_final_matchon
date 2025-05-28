@@ -90,7 +90,10 @@ function submitCheck(e){
     } else if(maxParticipantsEle.value ===""){
         alert("총 모집 인원을 입력하세요.");
         e.preventDefault();
-    } else if(minMannerTemperatureEle.value ===""){
+    }else if(Number(currentParticipantCountEle.value) >Number(maxParticipantsEle.value)){
+       alert(`현재 참가 인원은 총 모집 인원보다 적어야 합니다.`)
+       e.preventDefault();
+   } else if(minMannerTemperatureEle.value ===""){
         alert("하한 매너 온도를 입력하세요.");
         e.preventDefault();
     } else if(matchDescriptionEle.value ===""){
