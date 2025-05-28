@@ -3,7 +3,6 @@ package com.multi.matchon.chat.service;
 import com.multi.matchon.chat.domain.ChatMessage;
 import com.multi.matchon.chat.domain.ChatParticipant;
 import com.multi.matchon.chat.domain.ChatRoom;
-import com.multi.matchon.chat.domain.MessageReadLog;
 import com.multi.matchon.chat.dto.res.ResChatDto;
 import com.multi.matchon.chat.dto.res.ResMyChatListDto;
 import com.multi.matchon.chat.repository.ChatMessageRepository;
@@ -101,18 +100,6 @@ public class ChatService {
                 .build();
 
         chatMessageRepository.save(chatMessage);
-
-        List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoom(chatRoom);
-
-        for(ChatParticipant c: chatParticipants){
-            MessageReadLog messageReadLog = MessageReadLog.builder()
-                    .chatRoom(chatRoom)
-                    .member(c.getMember())
-                    .chatMessage(chatMessage)
-                    .isRead(c.getMember().equals(sender))
-                    .build();
-            messageReadLogRepository.save(messageReadLog);
-        }
 
 
 
