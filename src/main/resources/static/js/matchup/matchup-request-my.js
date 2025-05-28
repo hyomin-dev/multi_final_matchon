@@ -45,6 +45,15 @@ function renderList(items){
     const boardArea = document.querySelector("#request-container");
     boardArea.innerHTML = '';
 
+    if(items.length ===0){
+        boardArea.innerHTML = `
+            <div class="no-result">
+                요청한 글이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
 
