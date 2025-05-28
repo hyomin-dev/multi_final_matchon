@@ -608,6 +608,7 @@ a:link, a:visited, a:hover, a:active {
     justify-content: center;
 }
 
+
 .modal-content {
     background: white;
     padding: 20px;
@@ -627,6 +628,7 @@ a:link, a:visited, a:hover, a:active {
     justify-content: space-between;
 }
 
+
 #reportReasonSelect {
     width: 100%;
     padding: 8px;
@@ -636,6 +638,7 @@ a:link, a:visited, a:hover, a:active {
     border-radius: 6px;
     background-color: #f9f9f9;
 }
+
 
 
 

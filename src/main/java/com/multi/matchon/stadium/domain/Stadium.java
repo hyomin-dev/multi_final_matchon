@@ -1,7 +1,6 @@
 package com.multi.matchon.stadium.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
-import com.sun.jdi.BooleanValue;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,19 +20,23 @@ public class Stadium extends BaseEntity {
     @Column(name="stadium_id")
     private Long id;
 
+    // 시설 이름
     @Column(name="stadium_name", nullable = false, columnDefinition = "VARCHAR(100)")
-    private String stadiumName;
+    private String faciNm;
 
+    // 시도명
     @Column(name="stadium_region", nullable = false, columnDefinition = "VARCHAR(100)")
-    private String stadiumRegion;
+    private String cpNm;
 
+    // 도로명 주소
     @Column(name="stadium_address", nullable = false, columnDefinition = "VARCHAR(255)")
-    private String stadiumAddress;
+    private String faciRoadAddr;
 
-    @Column(name="stadium_image_attchment_enabled", nullable = false)
-    @Builder.Default
-    private Boolean stadiumImageAttchmentEnabled=false;
+    // 전화번호
+    @Column(name="stadium_Tel", nullable = false, columnDefinition = "VARCHAR(255)")
+    private String faciTelNo;
 
+    // 삭제 여부
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;

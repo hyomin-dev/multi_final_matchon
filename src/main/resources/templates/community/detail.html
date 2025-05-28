@@ -107,7 +107,6 @@
         <h3>신고하기</h3>
         <input type="hidden" id="reportTargetType">
         <input type="hidden" id="reportTargetId">
-
         <label for="reportReasonSelect">신고 사유</label>
         <select id="reportReasonSelect" required>
             <option value="">-- 선택하세요 --</option>
@@ -120,7 +119,6 @@
 
         <label for="reportReasonDetail" style="margin-top: 10px;">상세 사유</label>
         <textarea id="reportReasonDetail" rows="4" placeholder="상세 사유를 입력하세요. (기타 선택 시 필수)" required></textarea>
-
         <div class="modal-buttons">
             <button onclick="submitReport()">제출</button>
             <button onclick="closeReportModal()">취소</button>
@@ -247,10 +245,11 @@
             return;
         }
 
-        // 선택한 사유와 상세 사유를 결합 (예: "욕설/비방/괴롭힘 - 상대방을 반복적으로 비방함")
+
         const finalReason = detailReason
             ? `${selectedReason} - ${detailReason}`
             : selectedReason;
+
 
         fetch("/community/report", {
             method: "POST",
@@ -258,6 +257,7 @@
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Authorization": "Bearer " + token
             },
+
             body: `type=${type}&targetId=${id}&reason=${encodeURIComponent(finalReason)}`
         })
             .then(res => {
@@ -273,7 +273,6 @@
             })
             .catch(() => alert("신고 중 오류가 발생했습니다."));
     }
-
 </script>
 </body>
 </html>

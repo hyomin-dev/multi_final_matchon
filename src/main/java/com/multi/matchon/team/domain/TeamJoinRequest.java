@@ -33,4 +33,26 @@ public class TeamJoinRequest extends BaseEntity {
     @Column(name="is_deleted", nullable = false)
     @Builder.Default
     private Boolean isDeleted=false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="team_id", nullable = false)
+    private Team team;
+
+    @Column(name="introduction", columnDefinition = "TEXT")
+    private String introduction;
+
+    public void approved() {
+        if (this.joinRequestStatus != Status.PENDING) {
+            throw new IllegalStateException("이미 처리된 요청입니다.");
+        }
+        this.joinRequestStatus = Status.APPROVED;
+    }
+
+    public void denied() {
+        if (this.joinRequestStatus != Status.PENDING) {
+            throw new IllegalStateException("이미 처리된 요청입니다.");
+        }
+        this.joinRequestStatus = Status.DENIED;
+    }
 }
+

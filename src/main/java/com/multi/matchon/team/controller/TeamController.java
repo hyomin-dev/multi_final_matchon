@@ -3,11 +3,10 @@ package com.multi.matchon.team.controller;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.PageResponseDto;
-import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
-import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.team.dto.req.ReqReviewDto;
 import com.multi.matchon.team.dto.req.ReqTeamDto;
 import com.multi.matchon.team.dto.req.ReqTeamJoinDto;
+import com.multi.matchon.team.dto.res.ResJoinRequestDto;
 import com.multi.matchon.team.dto.res.ResReviewDto;
 import com.multi.matchon.team.dto.res.ResTeamDto;
 import com.multi.matchon.team.service.TeamService;
@@ -147,6 +146,38 @@ public class TeamController {
 
         List<ResReviewDto> myReviews = teamService.getMyReviewsForTeam(teamId, user.getUsername());
         return ResponseEntity.ok(ApiResponse.ok(myReviews));
+    }
+
+    @PostMapping("/team/{teamId}/join-request")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> sendJoinRequest(@PathVariable Long teamId,
+                                                             @RequestBody ReqTeamJoinDto joinDto, @AuthenticationPrincipal CustomUser user) {
+
+        teamService.sendJoinRequest(teamId, user, joinDto);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @GetMapping("/team/{teamId}/join-requests")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<ResJoinRequestDto>>> getPendingJoinRequests(
+            @PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
+
+        List<ResJoinRequestDto> requests = teamService.getJoinRequestsForTeam(teamId, user);
+        return ResponseEntity.ok(ApiResponse.ok(requests));
+    }
+
+    @PostMapping("/team/join-request/{requestId}/approve")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> approveJoinRequest(@PathVariable Long requestId) {
+        teamService.approveJoinRequest(requestId);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @PostMapping("/team/join-request/{requestId}/reject")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> rejectJoinRequest(@PathVariable Long requestId) {
+        teamService.rejectJoinRequest(requestId);
+        return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
 }

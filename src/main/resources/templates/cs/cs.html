@@ -20,7 +20,26 @@
         .pagination a:hover { color: #007bff; }
         .pagination .page-number { font-weight: bold; font-size: 20px; }
         .titlefaq, .title2faq { text-align: center; }
-        .btnsubmit, .btn1 { float: right; }
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .btnsubmit, .btninquiry {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            color: white;
+        }
+
+        .btninquiry {
+            float: right;
+        }
+        .btnsubmit { background-color: #007bff; }
+        .btninquiry { background-color: rebeccapurple; }
     </style>
 </head>
 <body>
@@ -44,10 +63,18 @@
 
         <label for="keyword"></label>
         <input type="text" id="keyword" name="keyword" placeholder="검색.." th:value="${keyword}" />
-        <button type="submit">검색</button>
-
-        <a href="/inquiry" class="btn1">1:1 문의 작성</a>
+        <button type="submit" style="color: dodgerblue;" >검색</button>
+        <a href="/inquiry" class="btninquiry">1:1 문의 작성</a>
     </form>
+
+    <!-- 관리자만 버튼 보이게 -->
+    <th:block th:if="${isAdmin}">
+        <div class="btn-group">
+            <a href="/faq/register" class="btnsubmit">FAQ 등록</a>
+
+
+        </div>
+    </th:block>
 
     <br>
     <table>
@@ -76,9 +103,6 @@
                         삭제
                     </button>
                 </form>
-
-
-
             </td>
         </tr>
         </tbody>
@@ -89,22 +113,6 @@
         <span class="page-number" th:text="${page.number + 1} + ' / ' + ${page.totalPages}">1</span>
         <a th:if="${!page.last}" th:href="@{/cs(page=${page.number + 1}, category=${category}, keyword=${keyword})}">&gt;</a>
     </div>
-
-    <!-- 관리자만 FAQ 등록 버튼 표시 -->
-    <th:block th:if="${isAdmin}">
-        <div style="text-align: right; margin: 10px 0;">
-            <a href="/faq/register" style="
-                display: inline-block;
-                padding: 8px 16px;
-                background-color: #007bff;
-                color: white;
-                border-radius: 4px;
-                text-decoration: none;
-                font-weight: bold;">
-                FAQ 등록
-            </a>
-        </div>
-    </th:block>
 
 </div>
 <div th:replace="~{common/footer::footer}"></div>
