@@ -1,0 +1,120 @@
+/* === board-list.css === */
+.board-table {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    table-layout: fixed;
+}
+
+.board-table th, .board-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.board-table th {
+    background-color: #f7f9fb;
+    font-weight: 600;
+}
+
+.board-table tr:hover {
+    background-color: #f3faff;
+}
+
+.col-no      { width: 8%;  }
+.col-category { width: 14%; }
+.col-title   { width: 44%; }
+.col-author  { width: 14%; }
+.col-date    { width: 20%; }
+
+.board-top-bar {
+    width: 90%;
+    margin: 20px auto 10px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.category-select-box {
+    width: 90%;
+    margin: 20px auto 10px auto;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 10px;
+}
+
+.category-select {
+    width: 180px;
+    height: 40px;
+    padding: 10px 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2c3e50;
+    background-color: #f9f9f9;
+    border: 2px solid #3498db;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.write-button {
+    width: 80px;
+    height: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 6px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.write-button:hover {
+    background-color: #2980b9;
+}
+
+.pagination {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #333;
+    text-decoration: none;
+}
+
+.pagination a.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.pagination a:hover {
+    background-color: #e0e0e0;
+}
+
+.board-title-link {
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.board-title-link:hover {
+    color: #3498db;
+    text-decoration: underline;
+}
