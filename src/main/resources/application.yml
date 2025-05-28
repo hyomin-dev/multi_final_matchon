@@ -20,9 +20,14 @@ spring:
         static: ${S3_REGION}
       stack:
         auto: false
+  thymeleaf:
+    cache: false
 
 matchon:
   kakao-api: ${KAKAO_API_KEY}
+
+jwt:
+  secret: ${JWT_SECRET}
 
 ---
 
@@ -79,13 +84,10 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
 
-jwt:
-  secret: ${JWT_SECRET}
+
 
 file:
   upload-dir: C:/upload-dir
 
-# 023900409029300
-#djdjjldjljkljdflkjl
 
-#djjdldjldjljddjljldlkjdjkl
+

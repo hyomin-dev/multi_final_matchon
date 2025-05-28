@@ -436,3 +436,15 @@ html, body {
     flex: 1;
 }
 
+.rating-group .star {
+    font-size: 2rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.rating-group .star.selected,
+.rating-group .star.hovered {
+    color: gold;
+}
+

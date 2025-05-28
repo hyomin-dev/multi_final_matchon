@@ -2,14 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-
     <meta charset="UTF-8">
     <title>Matchon - Main</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
-
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
 </head>
-<div class="hero">
 
+<body>
+<div class="hero">
+    <!-- ===== NAVIGATION ===== -->
     <div class="navbar">
         <div>
             <img src="/img/matchon_logo.png" alt="Matchon Logo" class="logo">
@@ -17,52 +18,90 @@
         <div class="center">
             <a th:href="@{/introduction}">INTRODUCTION</a>
             <a th:href="@{/matchup/board}">MATCHUP</a>
-            <a th:href="@{/guest}">GUEST</a>
+<!--            <a th:href="@{/guest}">GUEST</a>-->
             <a th:href="@{/stadium}">STADIUM</a>
-            <!--            <div class="community">-->
-            <!--                <a href="/list" style="text-decoration: none; color: inherit;">COMMUNITY</a>-->
-            <!--            </div>-->
             <a th:href="@{/community}">COMMUNITY</a>
             <a th:href="@{/schedule}">SCHEDULE</a>
             <a th:href="@{/cs}">CS</a>
             <a th:href="@{/team}">TEAM</a>
         </div>
         <div class="icons">
-            <img src="/img/chat-white.png">
+            <img id="chat-icon" src="/img/chat-white.png">
             <img src="/img/bell-white.png">
         </div>
         <div class="auth">
-            <!-- 로그인 전 -->
             <a id="btn-login" th:href="@{/login}" class="btn">LOGIN</a>
             <a id="btn-signup" th:href="@{/signup}" class="btn">SIGN UP</a>
-
-            <!-- 로그인 후 -->
             <a id="btn-mypage" th:href="@{/mypage}" class="btn" style="display: none;">MY</a>
             <a id="btn-admin" th:href="@{/admin}" class="btn" style="display: none;">ADMIN</a>
             <a id="btn-logout" href="javascript:logout()" class="btn" style="display: none;">LOGOUT</a>
         </div>
     </div>
 
+    <!-- ===== HERO TEXT ===== -->
     <div class="hero-text">
         <h1>Wanna Match?</h1>
         <h1>You're On!</h1>
         <button th:onclick="|location.href='@{/introduction}'|">GO!</button>
     </div>
 
+    <!-- ===== CHATBOT (로그인한 사용자만 보임) ===== -->
+    <sec:authorize access="isAuthenticated()">
+        <df-messenger
+                intent="WELCOME"
+                chat-icon="/img/aichatbot.png"
+                chat-title="Matchon 챗봇"
+                agent-id="db490e06-39f9-4c1a-80a3-baf3d3306fb4"
+                language-code="ko">
+        </df-messenger>
 
-    <div id="chatbot-img">
-        <a th:href="@{#}"><img src="/img/aichatbot.png" alt="aichatbot" width="80" height="80"></a>
-    </div>
+        <script>
+            window.addEventListener("df-messenger-loaded", function () {
+                setTimeout(() => {
+                    const df = document.querySelector("df-messenger");
+                    const outer = df?.shadowRoot;
+                    const chat = outer?.querySelector("df-messenger-chat")?.shadowRoot;
+                    const launcher = chat?.querySelector(".launch-button");
+                    const launcherImg = launcher?.querySelector("img");
 
+                    if (launcher) {
+                        launcher.style.background = "white"; // 또는 transparent
+                        launcher.style.width = "120px";
+                        launcher.style.height = "120px";
+                        launcher.style.borderRadius = "50%";
+                        launcher.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.2)";
+                        launcher.style.display = "flex";
+                        launcher.style.alignItems = "center";
+                        launcher.style.justifyContent = "center";
+                    }
 
+                    if (launcherImg) {
+                        launcherImg.style.width = "80%";
+                        launcherImg.style.height = "80%";
+                        launcherImg.style.objectFit = "contain";
+                    }
+                }, 300);
+            });
+        </script>
+    </sec:authorize>
+
+    <!-- ===== FOOTER ===== -->
     <footer class="footer">
         team@matchon.com | 02-123-123
     </footer>
-
-
 </div>
+
+<!-- ===== SCRIPT ===== -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const chatImg = document.querySelector("#chat-icon");
+
+        if (chatImg) {
+            chatImg.addEventListener("click", () => {
+                window.location.href = "/chat/my/rooms"; // 새 창에서 열기
+            });
+        }
+
         fetch('/auth/check', {
             method: 'GET',
             credentials: 'include'
@@ -75,80 +114,49 @@
                 const logoutBtn = document.getElementById("btn-logout");
 
                 if (data.role === "ADMIN") {
-                    // 관리자
-                    if (loginBtn) loginBtn.style.display = "none";
-                    if (signupBtn) signupBtn.style.display = "none";
-                    if (adminBtn) adminBtn.style.display = "inline-block";
-                    if (myBtn) myBtn.style.display = "none";
-                    if (logoutBtn) logoutBtn.style.display = "inline-block";
+                    loginBtn.style.display = "none";
+                    signupBtn.style.display = "none";
+                    adminBtn.style.display = "inline-block";
+                    myBtn.style.display = "none";
+                    logoutBtn.style.display = "inline-block";
                 } else {
-                    // 일반 유저
-                    if (loginBtn) loginBtn.style.display = "none";
-                    if (signupBtn) signupBtn.style.display = "none";
-                    if (adminBtn) adminBtn.style.display = "none";
-                    if (myBtn) myBtn.style.display = "inline-block";
-                    if (logoutBtn) logoutBtn.style.display = "inline-block";
+                    loginBtn.style.display = "none";
+                    signupBtn.style.display = "none";
+                    adminBtn.style.display = "none";
+                    myBtn.style.display = "inline-block";
+                    logoutBtn.style.display = "inline-block";
                 }
-            })
-            .catch(() => {
-                // 로그인 안 되어 있을 경우
-                document.getElementById("btn-login").style.display = "inline-block";
-                document.getElementById("btn-signup").style.display = "inline-block";
-                document.getElementById("btn-mypage").style.display = "none";
-                document.getElementById("btn-admin").style.display = "none";
-                document.getElementById("btn-logout").style.display = "none";
-            });
+            }).catch(() => {
+            document.getElementById("btn-login").style.display = "inline-block";
+            document.getElementById("btn-signup").style.display = "inline-block";
+            document.getElementById("btn-mypage").style.display = "none";
+            document.getElementById("btn-admin").style.display = "none";
+            document.getElementById("btn-logout").style.display = "none";
+        });
+
     });
 
-    // secureFetch: API 요청 → accessToken 만료 시 자동 재발급 → 다시 요청
-    function secureFetch(url, options = {}) {
-        const method = options.method || 'GET';
-        const headers = options.headers || {};
-        const body = options.body || null;
-
-        return fetch(url, {
-            method: method,
-            headers: headers,
-            body: body,
-            credentials: 'include'
-        })
-            .then(response => {
-                if (response.status === 401) {
-                    // accessToken 만료 → refreshToken으로 재발급 시도
-                    return fetch('/auth/reissue', {
-                        method: 'POST',
-                        credentials: 'include'
-                    })
-                        .then(reissueRes => {
-                            if (reissueRes.ok) {
-                                return fetch(url, {
-                                    method: method,
-                                    headers: headers,
-                                    body: body,
-                                    credentials: 'include'
-                                });
-                            } else {
-                                alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-                                window.location.href = "/login";
-                                throw new Error("세션 만료");
-                            }
-                        });
-                }
-                return response;
-            });
-    }
-
-    // 로그아웃 처리 → accessToken, refreshToken 쿠키 삭제
     function logout() {
+        const dfMessenger = document.querySelector("df-messenger");
+        if (dfMessenger) dfMessenger.remove();
+
         fetch('/auth/logout', {
             method: 'POST',
             credentials: 'include'
-        })
-            .then(res => {
-                alert("로그아웃 되었습니다.");
-                window.location.href = "/main";
-            });
+        }).then(() => {
+            alert("로그아웃 되었습니다.");
+            window.location.href = "/main";
+        });
     }
+
+    // 뒤로가기로 챗봇이 다시 보이는 것 방지
+    window.addEventListener("pageshow", function () {
+        const df = document.querySelector("df-messenger");
+        const isLoggedIn = document.getElementById("btn-logout")?.style.display !== "none";
+        if (!isLoggedIn && df) {
+            df.remove();
+        }
+    });
 </script>
 </body>
 </html>

@@ -7,10 +7,9 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/team/team-detail.css}">
 </head>
 <body>
-    <div th:replace="~{common/header::header}"></div>
+<div th:replace="~{common/header::header}"></div>
 
-    <div class="page-body">
-
+<div class="page-body">
     <div class="content-wrapper">
         <div class="team-tabs">
             <a href="#" id="tab-info" class="active">홈/소개</a>
@@ -33,14 +32,12 @@
                     <h2>팀 소개</h2>
                     <p th:text="${team.teamIntroduction}">팀 소개 내용</p>
                 </div>
-
                 <div class="info-box">
                     <h2>팀 활동 지역</h2>
                     <div class="area-box">
                         <p th:text="${team.teamRegion}">활동 지역</p>
                     </div>
                 </div>
-
                 <div class="info-box">
                     <h2>팀에서 필요한 포지션</h2>
                     <div class="position-box">
@@ -57,7 +54,6 @@
 
             <!-- Review Section -->
             <div id="reviewSection" class="review-section" style="display:none;">
-                <!-- Review List View -->
                 <div id="reviewListView" class="info-box">
                     <h2>팀 후기</h2>
                     <div id="reviewList" class="review-list">
@@ -65,22 +61,24 @@
                     </div>
                     <div class="review-actions">
                         <button id="writeReviewBtn" class="btn-primary">후기 쓰기</button>
+                        <button id="myReviewsBtn" class="btn-secondary">내가 쓴 후기 보기</button>
                     </div>
                 </div>
 
-                <!-- Review Write View -->
                 <div id="reviewWriteView" class="info-box" style="display:none;">
                     <h2>후기 쓰기</h2>
                     <form id="reviewForm" class="review-form">
                         <div class="form-group">
                             <label>별점</label>
-                            <div class="rating-group">
-                                <label><input type="radio" name="rating" value="1" required> ⭐</label>
-                                <label><input type="radio" name="rating" value="2"> ⭐⭐</label>
-                                <label><input type="radio" name="rating" value="3"> ⭐⭐⭐</label>
-                                <label><input type="radio" name="rating" value="4"> ⭐⭐⭐⭐</label>
-                                <label><input type="radio" name="rating" value="5"> ⭐⭐⭐⭐⭐</label>
+                            <div class="rating-group" id="starRating">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
                             </div>
+                            <input type="hidden" name="rating" id="ratingInput" required>
+                            <p id="selectedRatingText"></p>
                         </div>
 
                         <div class="form-group">
@@ -93,68 +91,270 @@
                         </div>
                     </form>
                 </div>
+
+            </div> <!-- End of #reviewSection -->
+
+            <!-- ✅ Join Request Section moved INSIDE -->
+            <div id="joinRequestSection" style="display: none;">
+                <h2>팀 가입 신청</h2>
+                <form id="joinTeamForm">
+                    <div class="form-group">
+                        <label for="introduction">간단한 자기소개</label>
+                        <textarea id="introduction" rows="4" placeholder="자기소개 및 팀에 가입하고 싶은 이유" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">신청하기</button>
+                        <button type="button" class="btn-cancel" id="cancelJoinBtn">취소</button>
+                    </div>
+                </form>
             </div>
-        </div>
-    </div>
+            </div>
+        </div> <!-- End of .team-content -->
+    </div> <!-- End of .content-wrapper -->
 
-    </div>
 
 
-    <div th:replace="~{common/footer::footer}"></div>
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            const infoSection = document.querySelector('.team-info');
-            const reviewSection = document.getElementById('reviewSection');
-            const reviewListView = document.getElementById('reviewListView');
-            const reviewWriteView = document.getElementById('reviewWriteView');
-            const tabInfo = document.getElementById('tab-info');
-            const tabReviews = document.getElementById('tab-reviews');
-            const writeReviewBtn = document.getElementById('writeReviewBtn');
-            const cancelWriteBtn = document.getElementById('cancelWriteBtn');
-            const teamId = /*[[${team.teamId}]]*/ '';
 
-            // Tab switching logic
-            tabInfo.addEventListener('click', (e) => {
-                e.preventDefault();
-                infoSection.style.display = 'block';
-                reviewSection.style.display = 'none';
-                tabInfo.classList.add('active');
-                tabReviews.classList.remove('active');
+
+        <div th:replace="~{common/footer::footer}"></div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const teamId = /*[[${team.teamId}]]*/ '';
+        const reviewList = document.getElementById('reviewList');
+        const reviewForm = document.getElementById('reviewForm');
+        const reviewListView = document.getElementById('reviewListView');
+        const reviewWriteView = document.getElementById('reviewWriteView');
+        const tabInfo = document.getElementById('tab-info');
+        const tabReviews = document.getElementById('tab-reviews');
+        const tabJoin = document.getElementById('tab-join');
+        const joinRequestSection = document.getElementById('joinRequestSection');
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('ratingInput');
+        const ratingText = document.getElementById('selectedRatingText');
+        let selectedRating = 0;
+
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const val = parseInt(star.getAttribute('data-value'));
+                highlightStars(val);
             });
 
-            tabReviews.addEventListener('click', (e) => {
+
+            star.addEventListener('mouseout', () => {
+                highlightStars(selectedRating);
+            });
+
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.getAttribute('data-value'));
+                ratingInput.value = selectedRating;
+                ratingText.textContent = `${selectedRating}점 선택됨`;
+                highlightStars(selectedRating);
+            });
+        });
+
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                const val = parseInt(star.getAttribute('data-value'));
+                star.classList.toggle('selected', val <= rating);
+            });
+        }
+
+
+
+            const joinTeamForm = document.getElementById('joinTeamForm');
+            if (joinTeamForm) {
+                joinTeamForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+
+                    const introduction = document.getElementById('introduction').value.trim();
+                    const wordCount = introduction.split(/\s+/).length;
+
+                    if (wordCount > 200) {
+                        alert(`자기소개는 최대 200단어까지 입력할 수 있습니다. 현재: ${wordCount}단어`);
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`/team/team/${teamId}/join-request`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+
+                            body: JSON.stringify({introduction})
+                        });
+
+                        let data = {};
+                        try {
+                            data = await response.json();
+                        } catch (jsonErr) {
+                            console.warn('⚠️ JSON 파싱 실패. 응답은:', await response.text());
+                            throw new Error('JSON 파싱 오류');
+                        }
+
+                        if (response.ok && data.success) {
+                            alert('팀 가입 신청이 완료되었습니다.');
+                            joinFormContainer.style.display = 'none';
+                            joinTeamForm.reset();
+                        } else {
+                            if (data.message?.includes('이미 요청한 팀')) {
+                                alert('이미 이 팀에 가입 신청을 했습니다.');
+                            } else {
+                                console.warn('서버 응답 메시지 없음 또는 미확인 오류:', data);
+                                alert(data.message || '팀 가입 신청에 실패했습니다. 다시 시도해주세요.');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('❌ 에러 발생:', error);
+
+                        alert('팀 가입 신청 중 오류가 발생했습니다.');
+                    }
+                });
+            }
+
+            const infoSection = document.querySelector('.team-info');
+            const reviewSection = document.getElementById('reviewSection');
+            const writeReviewBtn = document.getElementById('writeReviewBtn');
+            const cancelWriteBtn = document.getElementById('cancelWriteBtn');
+            const myReviewsBtn = document.getElementById('myReviewsBtn');
+
+            let isEditing = false;
+            let editingReviewId = null;
+
+            function handleCreate(e) {
                 e.preventDefault();
-                infoSection.style.display = 'none';
-                reviewSection.style.display = 'block';
-                reviewListView.style.display = 'block';
+                const content = document.getElementById('reviewContent').value;
+                const rating = parseInt(document.getElementById('ratingInput').value);
+                if (!content || isNaN(rating) || rating < 1 || rating > 5) {
+                    alert('내용과 별점을 모두 입력해주세요.');
+                    return;
+
+                }
+
+                fetch(`/team/team/${teamId}/review`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, rating })
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error();
+                        reviewForm.reset();
+                        reviewWriteView.style.display = 'none';
+                        reviewListView.style.display = 'block';
+                        loadReviews();
+                    })
+                    .catch(() => alert('후기 작성에 실패했습니다. 다시 시도해주세요.'));
+            }
+
+        async function handleEdit(e) {
+            e.preventDefault();
+            const updatedContent = document.getElementById('reviewContent').value.trim();
+            const updatedRating = parseInt(document.getElementById('ratingInput').value);
+
+            if (!updatedContent || isNaN(updatedRating) || updatedRating < 1 || updatedRating > 5) {
+                alert('내용과 별점을 모두 입력해주세요.');
+                return;
+            }
+
+
+            try {
+                const res = await fetch(`/team/team/review/${editingReviewId}`, {
+                    method: 'PUT',
+
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: updatedContent, rating: updatedRating })
+
+                });
+
+                if (!res.ok) throw new Error();
+
+                alert('리뷰가 수정되었습니다!');
+                reviewForm.reset();
                 reviewWriteView.style.display = 'none';
-                tabReviews.classList.add('active');
-                tabInfo.classList.remove('active');
-                if (teamId) {
-                    loadReviews();
+                reviewListView.style.display = 'block';
+                loadReviews();
+            } catch {
+                alert('수정에 실패했습니다.');
+            } finally {
+                reviewForm.onsubmit = handleCreate;
+                isEditing = false;
+                editingReviewId = null;
+            }
+        }
+
+            reviewForm.onsubmit = handleCreate;
+
+            reviewList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-edit-review')) {
+                    const reviewId = e.target.dataset.id;
+                    const reviewBox = e.target.closest('.review-item');
+                    const content = reviewBox.querySelector('.review-content').textContent;
+                    const rating = reviewBox.querySelector('.review-rating').textContent.length;
+
+                    document.getElementById('reviewContent').value = content;
+                    document.querySelector(`input[name="rating"][value="${rating}"]`).checked = true;
+                    reviewWriteView.style.display = 'block';
+                    reviewListView.style.display = 'none';
+
+                    reviewForm.removeEventListener('submit', handleCreate);
+                    isEditing = true;
+                    editingReviewId = reviewId;
+                    reviewForm.onsubmit = handleEdit;
+                }
+
+                if (e.target.classList.contains('btn-delete-review')) {
+                    const reviewId = e.target.dataset.id;
+                    if (!confirm('정말 삭제하시겠습니까?')) return;
+                    fetch(`/team/team/review/${reviewId}`, {
+                        method: 'DELETE'
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error();
+                            alert('삭제되었습니다.');
+                            location.reload();
+                        })
+                        .catch(() => alert('삭제에 실패했습니다.'));
                 }
             });
 
-            // Switch to write review view
-            writeReviewBtn.addEventListener('click', () => {
-                reviewListView.style.display = 'none';
-                reviewWriteView.style.display = 'block';
-            });
+            myReviewsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                fetch(`/team/team/${teamId}/my-reviews`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const reviews = data.data;
+                        if (!reviews.length) {
+                            reviewList.innerHTML = '<p class="no-reviews">내가 작성한 후기가 없습니다.</p>';
+                            return;
+                        }
 
-            // Cancel writing and return to list view
-            cancelWriteBtn.addEventListener('click', () => {
-                reviewWriteView.style.display = 'none';
-                reviewListView.style.display = 'block';
-                document.getElementById('reviewForm').reset();
+                        reviewList.innerHTML = reviews.map(review => `
+                        <div class="review-item" data-id="${review.id}">
+                            <div class="review-header">
+                                <div class="review-author-info">
+                                    <img src="/img/default-avatar.png" alt="User" class="author-avatar">
+                                    <span class="review-author">${review.reviewerName}</span>
+                                </div>
+                                <div class="review-meta">
+                                    <span class="review-rating">${'⭐'.repeat(review.rating)}</span>
+                                    <span class="review-date">${review.createdDate.split('T')[0]}</span>
+                                </div>
+                            </div>
+                            <p class="review-content">${review.content}</p>
+                            <div class="form-actions">
+                                <button class="btn-edit-review btn-secondary" data-id="${review.id}">수정</button>
+                                <button class="btn-delete-review btn-cancel" data-id="${review.id}">삭제</button>
+                            </div>
+                        </div>
+                    `).join('');
+                    });
             });
 
             function loadReviews() {
-                const reviewList = document.getElementById('reviewList');
                 fetch(`/team/team/${teamId}/reviews`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Failed to load reviews');
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(response => {
                         const reviews = response.data;
                         if (!reviews || reviews.length === 0) {
@@ -163,63 +363,82 @@
                         }
 
                         reviewList.innerHTML = reviews.map(review => `
-                            <div class="review-item">
-                                <div class="review-header">
-                                    <div class="review-author-info">
-                                        <img src="/img/default-avatar.png" alt="User" class="author-avatar">
-                                        <span class="review-author">${review.reviewerName || '익명'}</span>
-                                    </div>
-                                    <div class="review-meta">
-                                        <span class="review-rating">${'⭐'.repeat(review.rating)}</span>
-                                        <span class="review-date">${review.createdDate.split('T')[0]}</span>
-                                    </div>
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div class="review-author-info">
+                                    <img src="/img/default-avatar.png" alt="User" class="author-avatar">
+                                    <span class="review-author">${review.reviewerName || '익명'}</span>
                                 </div>
-                                <p class="review-content">${review.content}</p>
+                                <div class="review-meta">
+                                    <span class="review-rating">${'⭐'.repeat(review.rating)}</span>
+                                    <span class="review-date">${review.createdDate.split('T')[0]}</span>
+                                </div>
                             </div>
-                        `).join('');
-                    })
-                    .catch(error => {
-                        console.error('Error loading reviews:', error);
-                        reviewList.innerHTML = '<p class="error-message">후기를 불러오는데 실패했습니다.</p>';
+                            <p class="review-content">${review.content}</p>
+                        </div>
+                    `).join('');
+
                     });
             }
 
-            const reviewForm = document.getElementById('reviewForm');
-            if (reviewForm) {
-                reviewForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const content = document.getElementById('reviewContent').value;
-                    const ratingInput = document.querySelector('input[name="rating"]:checked');
 
-                    if (!content || !ratingInput) {
-                        alert('내용과 별점을 모두 입력해주세요.');
-                        return;
-                    }
+            function clearTabs() {
+                tabInfo.classList.remove('active');
+                tabReviews.classList.remove('active');
+                tabJoin.classList.remove('active');
 
-                    fetch(`/team/team/${teamId}/review`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            content,
-                            rating: parseInt(ratingInput.value)
-                        })
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Review submission failed');
-                        reviewForm.reset();
-                        reviewWriteView.style.display = 'none';
-                        reviewListView.style.display = 'block';
-                        loadReviews();
-                    })
-                    .catch(error => {
-                        console.error('Error submitting review:', error);
-                        alert('후기 작성에 실패했습니다. 다시 시도해주세요.');
-                    });
-                });
+
+                infoSection.style.display = 'none';
+                reviewSection.style.display = 'none';
+                joinRequestSection.style.display = 'none';
             }
-        });
-    </script>
+
+            tabInfo.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearTabs();
+                infoSection.style.display = 'block';
+                tabInfo.classList.add('active');
+
+            });
+
+            tabReviews.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                clearTabs();
+
+                reviewSection.style.display = 'block';
+                reviewListView.style.display = 'block';
+                reviewWriteView.style.display = 'none';
+                tabReviews.classList.add('active');
+
+                loadReviews();
+            });
+
+            tabJoin.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearTabs();
+                joinRequestSection.style.display = 'block';
+                tabJoin.classList.add('active');
+            });
+
+
+            writeReviewBtn.addEventListener('click', () => {
+                reviewListView.style.display = 'none';
+                reviewWriteView.style.display = 'block';
+            });
+
+            cancelWriteBtn.addEventListener('click', () => {
+                reviewWriteView.style.display = 'none';
+                reviewListView.style.display = 'block';
+                reviewForm.reset();
+                if (isEditing) {
+                    reviewForm.onsubmit = handleCreate;
+                    isEditing = false;
+                    editingReviewId = null;
+                }
+            });
+
+    });
+</script>
 </body>
 </html>

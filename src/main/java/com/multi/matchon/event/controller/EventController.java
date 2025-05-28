@@ -26,12 +26,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.multi.matchon.common.domain.Status.*;
 
@@ -93,15 +95,19 @@ public class EventController {
     public String showEventForm(
             @RequestParam("selectedDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
             @AuthenticationPrincipal CustomUser customUser,
+            RedirectAttributes redirectAttributes,
             Model model) {
 
         Member member = customUser.getMember();
 
-        HostProfile hostProfile = hostProfileRepository.findByMember(member)
-                .orElseThrow(() -> new IllegalStateException("호스트 프로필이 없습니다."));
+        Optional<HostProfile> optionalHost = hostProfileRepository.findByMember(member);
+        if (optionalHost.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "⚠️ 주최기관이 미등록 상태입니다. 마이페이지에서 먼저 등록해주세요.");
+            return "redirect:/mypage";
+        }
 
         model.addAttribute("selectedDate", selectedDate);
-        model.addAttribute("hostName", hostProfile.getHostName());
+        model.addAttribute("hostName", optionalHost.get().getHostName());
         return "event/event-register";
     }
 
@@ -109,12 +115,18 @@ public class EventController {
     @PostMapping("/event/new")
     @PreAuthorize("hasRole('HOST')")
     public String createEvent(@AuthenticationPrincipal CustomUser customUser,
-                              @ModelAttribute EventReqDto dto) {
+                              @ModelAttribute EventReqDto dto,
+                              RedirectAttributes redirectAttributes) {
 
         Member member = customUser.getMember();
 
-        HostProfile hostProfile = hostProfileRepository.findByMember(member)
-                .orElseThrow(() -> new IllegalStateException("호스트 프로필이 없습니다."));
+        Optional<HostProfile> optionalHost = hostProfileRepository.findByMember(member);
+        if (optionalHost.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "❌ 주최기관이 없습니다.");
+            return "redirect:/mypage";
+        }
+
+        HostProfile hostProfile = optionalHost.get();
 
         EventRequest event = EventRequest.builder()
                 .member(member)
@@ -125,7 +137,7 @@ public class EventController {
                 .eventAddress(dto.getEventAddress())
                 .eventMethod(dto.getEventMethod())
                 .eventContact(dto.getEventContact())
-                .eventStatus(PENDING) // 상태 기본값: PENDING
+                .eventStatus(Status.PENDING)
                 .build();
 
         eventRepository.save(event);

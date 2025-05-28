@@ -3,8 +3,9 @@ package com.multi.matchon.community.service;
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
 import com.multi.matchon.community.repository.BoardRepository;
+import com.multi.matchon.member.domain.Member;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,21 +17,10 @@ import java.util.List;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    private final CommentService commentService;
 
     public List<Board> findAll() {
         return boardRepository.findAll();
-    }
-
-    public Board findById(Long id) {
-        return boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Board not found"));
-    }
-
-    public void save(Board board) {
-        boardRepository.save(board);
     }
 
     public Page<Board> findAll(Pageable pageable) {
@@ -41,11 +31,46 @@ public class BoardService {
         return boardRepository.findByCategory(category, pageable);
     }
 
-    public void softDelete(Long boardId) {
-        Board board = findById(boardId);
-        board.setIsDeleted(true);
-        save(board);
+    public Board findById(Long id) {
+        return boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
     }
 
-}
+    public void save(Board board) {
+        boardRepository.save(board);
+    }
 
+    public Board findByAttachmentFilename(String filename) {
+        return boardRepository.findAll().stream()
+                .filter(board -> board.getAttachmentPath() != null &&
+                        List.of(board.getAttachmentPath().split(";")).contains(filename))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public String findSavedFilenameByPartialName(String partialFilename) {
+        return boardRepository.findAll().stream()
+                .flatMap(board -> {
+                    if (board.getAttachmentPath() == null) return null;
+                    return List.of(board.getAttachmentPath().split(";")).stream();
+                })
+                .filter(saved -> saved != null && saved.startsWith(partialFilename))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Transactional
+    public void deleteByIdAndUser(Long id, Member member) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        if (!board.getMember().getId().equals(member.getId())) {
+            throw new SecurityException("삭제 권한이 없습니다.");
+        }
+
+        commentService.deleteAllByBoard(board);
+        boardRepository.deleteById(id);
+    }
+
+
+}

@@ -41,6 +41,7 @@ async function loadItems(page, sportsType='', region='', dateFilter=''){
     const items = data.data.items;
     const pageInfo = data.data.pageInfo;
     //console.log(pageInfo);
+    console.log(items);
 
     renderList(items);
     renderPagination(pageInfo,sportsType, region, dateFilter);
@@ -50,6 +51,16 @@ async function loadItems(page, sportsType='', region='', dateFilter=''){
 function renderList(items){
     const boardArea = document.querySelector("#board-container");
     boardArea.innerHTML = '';
+
+    if(items.length ===0){
+        boardArea.innerHTML = `
+            <div class="no-result">
+                현재 작성된 게시글이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
 
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);

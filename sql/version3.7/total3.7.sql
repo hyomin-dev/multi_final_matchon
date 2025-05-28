@@ -130,6 +130,7 @@ CREATE TABLE inquiry
     inquiry_id       BIGINT AUTO_INCREMENT PRIMARY KEY,
     writer_id        BIGINT       NOT NULL,
 
+
     inquiry_category ENUM('HOWTOUSE', 'TEAM_GUEST', 'EVENT', 'TUTORIAL', 'MANNER_TEMPERATURE', 'COMMUNITY', 'ACCOUNT', 'REPORT') NOT NULL,
     inquiry_title    VARCHAR(100) NOT NULL,
     inquiry_content  TEXT         NOT NULL,
@@ -173,7 +174,6 @@ CREATE TABLE review (
                         is_deleted BOOLEAN DEFAULT FALSE,
                         CONSTRAINT FK_review_writer FOREIGN KEY (review_writer) REFERENCES member(member_id),
                         CONSTRAINT FK_review_team FOREIGN KEY (team_id) REFERENCES team(team_id)
-
 
 );
 
@@ -236,6 +236,7 @@ CREATE TABLE comment
 );
 
 -- host_profile
+
 CREATE TABLE host_profile (
     host_profile_id 					BIGINT AUTO_INCREMENT PRIMARY KEY,
     host_id 							BIGINT NOT NULL,
@@ -243,6 +244,7 @@ CREATE TABLE host_profile (
     created_date DATETIME 				DEFAULT CURRENT_TIMESTAMP,
     modified_date DATETIME 				DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     picture_attachment_enabled 			BOOLEAN DEFAULT TRUE CHECK (picture_attachment_enabled = TRUE),
+
 
     CONSTRAINT FK_host_profile_2_member FOREIGN KEY (host_id) REFERENCES member (member_id)
 );
@@ -257,20 +259,21 @@ CREATE TABLE host_profile (
 
 -- inquiry_answer
 
+
 CREATE TABLE inquiry_answer 
+
 (
-    answer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    inquiry_id BIGINT UNIQUE NOT NULL, -- UNIQUE 추가
-    admin_id BIGINT NOT NULL,
-    answer_content TEXT NOT NULL,
-    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    created_person VARCHAR(100),
-    modified_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    answer_id       BIGINT AUTO_INCREMENT PRIMARY KEY,
+    inquiry_id      BIGINT NOT NULL,
+    admin_id        BIGINT NOT NULL,
+    answer_content  TEXT   NOT NULL,
+    created_date    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_person  VARCHAR(100),
+    modified_date   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     modified_person VARCHAR(100),
-    is_deleted BOOLEAN DEFAULT FALSE,
-    CONSTRAINT FK_inquiry_answer_2_inquiry FOREIGN KEY (inquiry_id) REFERENCES inquiry(inquiry_id),
-    CONSTRAINT FK_inquiry_answer_2_member FOREIGN KEY (admin_id) REFERENCES member(member_id)
-);
+    is_deleted      BOOLEAN  DEFAULT FALSE,
+    CONSTRAINT FK_inquiry_answer_2_inquiry FOREIGN KEY (inquiry_id) REFERENCES inquiry (inquiry_id),
+    CONSTRAINT FK_inquiry_answer_2_member FOREIGN KEY (admin_id) REFERENCES member (member_id)
 
 
 CREATE TABLE matchup_board

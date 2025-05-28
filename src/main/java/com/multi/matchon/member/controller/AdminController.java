@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Controller
@@ -77,11 +76,10 @@ public class AdminController {
         Inquiry inquiry = inquiryRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new NoSuchElementException("문의가 존재하지 않습니다."));
 
-        if (inquiry.getInquiryStatus() == Status.COMPLETED || inquiry.getAnswer() != null) {
+        // 답변 존재 여부만으로 판단
+        if (inquiryAnswerRepository.findActiveAnswerByInquiryId(inquiry.getId()).isPresent()) {
             throw new IllegalStateException("이미 답변이 등록된 문의입니다.");
         }
-
-        inquiry.complete();
 
         InquiryAnswer answer = InquiryAnswer.builder()
                 .inquiry(inquiry)
@@ -89,8 +87,10 @@ public class AdminController {
                 .answerContent(answerContent)
                 .build();
 
-        inquiry.setAnswer(answer); // 양방향 연결
+        inquiry.setAnswer(answer);
         inquiryAnswerRepository.save(answer);
+
+        inquiry.complete(); // 상태는 저장 이후 변경
 
         return "redirect:/admin/inquiry";
     }

@@ -2,6 +2,8 @@ package com.multi.matchon.team.service;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.team.domain.Review;
+import com.multi.matchon.team.dto.res.ResJoinRequestDto;
+import com.multi.matchon.team.repository.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,10 +26,6 @@ import com.multi.matchon.team.dto.req.ReqTeamDto;
 import com.multi.matchon.team.dto.req.ReqTeamJoinDto;
 import com.multi.matchon.team.dto.res.ResReviewDto;
 import com.multi.matchon.team.dto.res.ResTeamDto;
-import com.multi.matchon.team.repository.RecruitingPositionRepository;
-import com.multi.matchon.team.repository.ReviewRepository;
-import com.multi.matchon.team.repository.TeamMemberRepository;
-import com.multi.matchon.team.repository.TeamNameRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -80,6 +78,7 @@ public class TeamService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final TeamJoinRequestRepository teamJoinRequestRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -96,22 +95,44 @@ public class TeamService {
 
 
     public void teamRegister(ReqTeamDto reqTeamDto, CustomUser user) {
+
+        if (reqTeamDto.getTeamName() == null || reqTeamDto.getTeamName().trim().isEmpty()) {
+            throw new IllegalArgumentException("팀 이름은 필수입니다.");
+        }
+
+        if (reqTeamDto.getTeamIntroduction() == null || reqTeamDto.getTeamIntroduction().trim().isEmpty()) {
+            throw new IllegalArgumentException("팀 소개는 필수입니다.");
+        }
+
+        if (reqTeamDto.getTeamRegion() == null) {
+            throw new IllegalArgumentException("팀 지역은 필수입니다.");
+        }
+
+        if (reqTeamDto.getRecruitingPositions() == null || reqTeamDto.getRecruitingPositions().isEmpty()) {
+            throw new IllegalArgumentException("한 개 이상의 포지션을 선택해야 합니다.");
+        }
+
+        if (reqTeamDto.getRecruitmentStatus() == null) {
+            throw new IllegalArgumentException("모집 여부를 선택해야 합니다.");
+        }
         // Check if the user already has an active team
         if (teamRepository.existsByCreatedPersonAndIsDeletedFalse(user.getUsername())) {
             throw new IllegalArgumentException("이미 팀이 있습니다.");
         }
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + user.getUsername()));
+
         Team newTeam = Team.builder()
                 .teamName(reqTeamDto.getTeamName())
                 .teamRegion(RegionType.valueOf(reqTeamDto.getTeamRegion()))
                 .teamRatingAverage(reqTeamDto.getTeamRatingAverage())
                 .recruitmentStatus(reqTeamDto.getRecruitmentStatus()).teamIntroduction(reqTeamDto.getTeamIntroduction())
                 .teamAttachmentEnabled(true)
+                .createdPerson(member.getMemberName())
                 .build();
         Team savedTeam = teamRepository.save(newTeam);
 
         // Add creator as team member (leader)
-        Member member = memberRepository.findByMemberEmail(user.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + user.getUsername()));
 
         TeamMember teamMember = TeamMember.builder()
                 .team(savedTeam)
@@ -273,13 +294,18 @@ public class TeamService {
             throw new IllegalArgumentException("이미 다른 팀에 소속되어 있습니다.");
         }
 
-        // Check if position is valid
+        Positions userPosition = member.getPositions(); // from Member entity
+        if (userPosition == null) {
+            throw new IllegalArgumentException("회원님의 포지션 정보가 설정되지 않았습니다.");
+        }
+
         boolean isValidPosition = team.getRecruitingPositions().stream()
-                .anyMatch(rp -> rp.getPositions().getPositionName().name().equals(joinRequest.getPosition()));
+                .anyMatch(rp -> rp.getPositions().getId().equals(userPosition.getId())); // safer comparison by ID
 
         if (!isValidPosition) {
-            throw new IllegalArgumentException("선택한 포지션이 팀의 모집 포지션과 일치하지 않습니다.");
+            throw new IllegalArgumentException("회원님의 포지션은 해당 팀에서 모집 중인 포지션이 아닙니다.");
         }
+
 
         // Create team member with pending status
         TeamMember teamMember = TeamMember.builder()
@@ -353,6 +379,99 @@ public class TeamService {
         // Soft delete the review
         review.softDelete();
     }
+
+    @Transactional(readOnly = true)
+    public List<ResReviewDto> getMyReviewsForTeam(Long teamId, String userEmail) {
+        return reviewRepository.findReviewsByTeamId(teamId).stream()
+                .filter(r -> r.getMember().getMemberEmail().equals(userEmail))
+                .map(ResReviewDto::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void sendJoinRequest(Long teamId, CustomUser user, ReqTeamJoinDto joinDto) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        if (member.getTeam() != null) {
+            throw new IllegalArgumentException("이미 다른 팀에 소속되어 있습니다.");
+        }
+
+        // ✅ Word count check
+        String intro = joinDto.getIntroduction();
+        if (intro != null && intro.trim().split("\\s+").length > 200) {
+            throw new IllegalArgumentException("자기소개는 최대 200단어까지 입력할 수 있습니다.");
+        }
+
+        boolean exists = teamJoinRequestRepository.existsByMemberAndTeamAndIsDeletedFalse(member, team);
+        if (exists) throw new IllegalArgumentException("이미 요청한 팀입니다.");
+
+        TeamJoinRequest joinRequest = TeamJoinRequest.builder()
+                .member(member)
+                .team(team)
+                .joinRequestStatus(Status.PENDING)
+                .isDeleted(false)
+                .introduction(intro)
+                .build();
+
+        teamJoinRequestRepository.save(joinRequest);
+    }
+    @Transactional(readOnly = true)
+    public List<ResJoinRequestDto> getJoinRequestsForTeam(Long teamId, CustomUser user) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+
+        // Optional: check if user is team leader
+        Member currentUser = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        boolean isLeader = teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, currentUser);
+        if (!isLeader) {
+            throw new IllegalArgumentException("팀 리더만 신청 목록을 조회할 수 있습니다.");
+        }
+
+        List<TeamJoinRequest> requests = teamJoinRequestRepository.findByTeamIdAndJoinRequestStatus(teamId, Status.PENDING);
+
+        return requests.stream()
+                .map(ResJoinRequestDto::from)
+                .collect(Collectors.toList());
+    }
+    @Transactional
+    public void approveJoinRequest(Long requestId) {
+        TeamJoinRequest request = teamJoinRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("요청을 찾을 수 없습니다."));
+
+        if (request.getJoinRequestStatus() != Status.PENDING) {
+            throw new IllegalStateException("이미 처리된 요청입니다.");
+        }
+
+        request.approved();
+
+        TeamMember newMember = TeamMember.builder()
+                .member(request.getMember())
+                .team(request.getTeam())
+                .introduction("팀장 승인됨")
+                .teamLeaderStatus(false)
+                .build();
+
+        teamMemberRepository.save(newMember);
+    }
+
+    @Transactional
+    public void rejectJoinRequest(Long requestId) {
+        TeamJoinRequest request = teamJoinRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("요청을 찾을 수 없습니다."));
+
+        if (request.getJoinRequestStatus() != Status.PENDING) {
+            throw new IllegalStateException("이미 처리된 요청입니다.");
+        }
+
+        request.denied();
+    }
+
 
 }
 
