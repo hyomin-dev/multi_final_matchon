@@ -14,41 +14,39 @@ window.onload = () => {
     }
 };
 
-// === 챗봇 런처 및 모달 처리: 이벤트 위임 방식 적용 ===
 document.addEventListener("DOMContentLoaded", () => {
-    // 로그인 상태 확인 후 챗봇 제거
+    const launcher = document.getElementById("chatbot-launcher");
+    const modal = document.getElementById("chatbot-modal");
+    const closeBtn = document.getElementById("chatbot-close");
+
     fetch("/auth/check", { credentials: "include" })
         .then(res => {
             if (!res.ok) {
-                const launcher = document.getElementById("chatbot-launcher");
-                const modal = document.getElementById("chatbot-modal");
                 if (launcher) launcher.remove();
                 if (modal) modal.remove();
             }
         });
 
-    // 이벤트 위임: 챗봇 열기/닫기
-    document.addEventListener("click", function (e) {
-        if (e.target.id === "chatbot-launcher") {
+    if (launcher) {
+        launcher.addEventListener("click", () => {
             fetch("/auth/check", { credentials: "include" })
                 .then(res => {
                     if (res.ok) {
-                        const modal = document.getElementById("chatbot-modal");
-                        if (modal) modal.style.display = "flex";
+                        modal.style.display = "flex";
                     } else {
                         alert("로그인 후 사용 가능합니다.");
                     }
                 });
-        }
+        });
+    }
 
-        if (e.target.id === "chatbot-close") {
-            const modal = document.getElementById("chatbot-modal");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
             if (modal) modal.style.display = "none";
-        }
-    });
+        });
+    }
 });
 
-// === 챗봇 대화 UI 기능 ===
 function initChat() {
     document.getElementById("chat-start").style.display = "none";
     document.getElementById("chat-ui").style.display = "block";
