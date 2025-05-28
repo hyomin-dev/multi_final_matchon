@@ -36,6 +36,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             select new com.multi.matchon.matchup.dto.res
             .ResMatchupBoardListDto( 
             t1.id,
+            t2.id,
             t2.memberEmail,
             t2.memberName,
             t3.teamName,
@@ -63,6 +64,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             select new com.multi.matchon.matchup.dto.res
             .ResMatchupBoardListDto( 
             t1.id,
+            t2.id,
             t2.memberEmail,
             t2.memberName,
             t3.teamName,

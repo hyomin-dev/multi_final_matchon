@@ -20,7 +20,7 @@
         <div class="center">
             <a th:href="@{/introduction}">INTRODUCTION</a>
             <a th:href="@{/matchup/board}">MATCHUP</a>
-            <a th:href="@{/guest}">GUEST</a>
+<!--            <a th:href="@{/guest}">GUEST</a>-->
             <a th:href="@{/stadium}">STADIUM</a>
             <a th:href="@{/community}">COMMUNITY</a>
             <a th:href="@{/schedule}">SCHEDULE</a>
@@ -28,7 +28,7 @@
             <a th:href="@{/team}">TEAM</a>
         </div>
         <div class="icons">
-            <img src="/img/chat-white.png">
+            <img id="chat-icon" src="/img/chat-white.png">
             <img src="/img/bell-white.png">
         </div>
         <div class="auth">
@@ -75,7 +75,17 @@
 <!-- ===== SCRIPT ===== -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
         // 로그인 상태 확인 후 버튼 표시
+
+        const chatImg = document.querySelector("#chat-icon");
+
+        if (chatImg) {
+            chatImg.addEventListener("click", () => {
+                window.location.href = "/chat/my/rooms"; // 새 창에서 열기
+            });
+        }
+
         fetch('/auth/check', {
             method: 'GET',
             credentials: 'include'
@@ -107,6 +117,7 @@
             document.getElementById("btn-admin").style.display = "none";
             document.getElementById("btn-logout").style.display = "none";
         });
+
 
         // 챗봇 열기/닫기 로직
         const launcher = document.getElementById("chatbot-launcher");
@@ -141,6 +152,7 @@
                 modal.style.display = "none";
             });
         }
+
     });
 
     function logout() {

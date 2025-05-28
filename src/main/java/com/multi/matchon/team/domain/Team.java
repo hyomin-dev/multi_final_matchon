@@ -57,6 +57,9 @@ public class Team extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
+    @Column(name = "created_person", nullable = false, columnDefinition = "VARCHAR(100)")
+    private String createdPerson;
+
 
 
 

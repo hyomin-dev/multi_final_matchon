@@ -36,6 +36,8 @@ public class ResTeamDto {
 
     private Double teamRatingAverage;
 
+    private String createdBy;
+
 
 
     public static ResTeamDto from(Team team, String imageUrl) {
@@ -47,6 +49,7 @@ public class ResTeamDto {
                 .RecruitmentStatus(team.getRecruitmentStatus())
                 .imageUrl(imageUrl)
                 .teamIntroduction(team.getTeamIntroduction())
+                .createdBy(team.getCreatedPerson())
                 .recruitingPositions(
                         team.getRecruitingPositions().stream()
                                 .map(rp -> rp.getPositions().getPositionName().name())
