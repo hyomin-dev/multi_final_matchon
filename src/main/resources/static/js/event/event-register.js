@@ -12,3 +12,19 @@ function getAddress() {
         }
     }).open();
 }
+
+function checkHostBeforeSubmit() {
+    const hostSpan = document.getElementById('hostNameSpan');
+    const text = hostSpan?.innerText.trim();
+
+    console.log("HostSpan 내용:", text); // 디버깅용
+
+    if (!text || text === '미등록') {
+        alert("⚠️ 주최기관이 미등록 상태입니다. MY에서 먼저 등록해주세요.");
+        window.location.href = "/mypage";
+        return false; // 폼 전송 중단
+    }
+
+    return true;
+}
+

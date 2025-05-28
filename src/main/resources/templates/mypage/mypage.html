@@ -64,26 +64,29 @@
                 const positionSelect = document.getElementById("positionSelect");
                 const timeSelect = document.getElementById("timeSelect");
 
+                if (positionSelect) {
+                    data.positionNames.forEach(pos => {
+                        const option = document.createElement("option");
+                        option.value = pos;
+                        option.text = positionLabelMap[pos] || pos;
+                        if (pos === currentPosition.replace(/"/g, '').trim()) {
+                            option.selected = true;
+                        }
+                        positionSelect.appendChild(option);
+                    });
+                }
 
-                data.positionNames.forEach(pos => {
-                    const option = document.createElement("option");
-                    option.value = pos;
-                    option.text = positionLabelMap[pos] || pos;
-                    if (pos === currentPosition.replace(/"/g, '').trim()) {
-                        option.selected = true;
-                    }
-                    positionSelect.appendChild(option);
-                });
-
-                data.timeTypes.forEach(time => {
-                    const option = document.createElement("option");
-                    option.value = time;
-                    option.text = timeLabelMap[time] || time;
-                    if (time === currentTimeType.replace(/"/g, '').trim()) {
-                        option.selected = true;
-                    }
-                    timeSelect.appendChild(option);
-                });
+                if (timeSelect) {
+                    data.timeTypes.forEach(time => {
+                        const option = document.createElement("option");
+                        option.value = time;
+                        option.text = timeLabelMap[time] || time;
+                        if (time === currentTimeType.replace(/"/g, '').trim()) {
+                            option.selected = true;
+                        }
+                        timeSelect.appendChild(option);
+                    });
+                }
             });
     });
 
@@ -152,6 +155,10 @@
             else res.text().then(msg => alert("등록 오류: " + msg));
         });
     }
+</script>
+
+<script th:if="${errorMessage != null}" th:inline="javascript">
+    alert([[${errorMessage}]]);
 </script>
 </body>
 </html>

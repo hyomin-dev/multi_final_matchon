@@ -256,26 +256,17 @@ VALUES	(1, 'Host1', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE),
 
 INSERT INTO inquiry_answer (inquiry_id, admin_id, answer_content, created_date, created_person,
                             modified_date, modified_person, is_deleted)
-VALUES (1, 1, 'Answer content for inquiry 1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', 'Member1',
-        FALSE),
-       (2, 2, 'Answer content for inquiry 2', '2025-05-17 20:52:28', 'Member2', '2025-05-17 20:52:28', 'Member2',
-        FALSE),
-       (3, 1, 'Answer content for inquiry 3', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', 'Member1',
-        FALSE),
-       (4, 2, 'Answer content for inquiry 4', '2025-05-17 20:52:28', 'Member2', '2025-05-17 20:52:28', 'Member2',
-        FALSE),
-       (5, 1, 'Answer content for inquiry 5', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', 'Member1',
-        FALSE),
-       (6, 2, 'Answer content for inquiry 6', '2025-05-17 20:52:28', 'Member2', '2025-05-17 20:52:28', 'Member2',
-        FALSE),
-       (7, 1, 'Answer content for inquiry 7', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', 'Member1',
-        FALSE),
-       (8, 2, 'Answer content for inquiry 8', '2025-05-17 20:52:28', 'Member2', '2025-05-17 20:52:28', 'Member2',
-        FALSE),
-       (9, 1, 'Answer content for inquiry 9', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', 'Member1',
-        FALSE),
-       (10, 2, 'Answer content for inquiry 10', '2025-05-17 20:52:28', 'Member2', '2025-05-17 20:52:28', 'Member2',
-        FALSE);
+VALUES
+    (2, 1, 'Answer content for inquiry 2', '2025-05-17 20:52:28', 'Member1',
+     '2025-05-17 20:52:28', 'Member1', FALSE),
+    (4, 1, 'Answer content for inquiry 4', '2025-05-17 20:52:28', 'Member1',
+     '2025-05-17 20:52:28', 'Member1', FALSE),
+    (6, 1, 'Answer content for inquiry 6', '2025-05-17 20:52:28', 'Member1',
+     '2025-05-17 20:52:28', 'Member1', FALSE),
+    (8, 2, 'Answer content for inquiry 8', '2025-05-17 20:52:28', 'Member2',
+     '2025-05-17 20:52:28', 'Member2', FALSE),
+    (10, 2, 'Answer content for inquiry 10', '2025-05-17 20:52:28', 'Member2',
+     '2025-05-17 20:52:28', 'Member2', FALSE);
 
 
 
