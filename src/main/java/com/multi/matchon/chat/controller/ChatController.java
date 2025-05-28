@@ -1,5 +1,6 @@
 package com.multi.matchon.chat.controller;
 
+import com.multi.matchon.chat.dto.res.ResChatDto;
 import com.multi.matchon.chat.dto.res.ResMyChatListDto;
 import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
@@ -62,5 +63,17 @@ public class ChatController {
 
         return ResponseEntity.ok().body(ApiResponse.ok(resMyChatListDtos));
 
+    }
+
+    @GetMapping("/history{roomId}")
+    public ResponseEntity<ApiResponse<List<ResChatDto>>> getChatHistory(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
+        List<ResChatDto> resChatDtos = chatService.findAllChatHistory(roomId, user);
+        return ResponseEntity.ok().body(ApiResponse.ok(resChatDtos));
+    }
+
+    @PostMapping("/room/read")
+    public ResponseEntity<?> readAllMessage(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
+        chatService.readAllMessage(roomId, user);
+        return ResponseEntity.ok().build();
     }
 }

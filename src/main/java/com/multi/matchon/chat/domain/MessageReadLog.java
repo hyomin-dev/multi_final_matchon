@@ -37,4 +37,7 @@ public class MessageReadLog extends BaseEntity {
     @Builder.Default
     private Boolean isRead=false;
 
+    public void updateIsRead(Boolean isRead) {
+        this.isRead = isRead;
+    }
 }

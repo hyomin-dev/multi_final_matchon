@@ -3,6 +3,7 @@ package com.multi.matchon.chat.repository;
 
 import com.multi.matchon.chat.domain.ChatParticipant;
 import com.multi.matchon.chat.domain.ChatRoom;
+import com.multi.matchon.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,4 +36,26 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     List<ChatParticipant> findAllByMemberId(@Param("memberId") Long memberId);
 
     List<ChatParticipant> findByChatRoom(ChatRoom chatRoom);
+
+
+    @Query("""
+            select t1
+            from ChatParticipant t1
+            join fetch t1.member
+            where t1.chatRoom =:chatRoom
+            
+            """)
+    List<ChatParticipant> findByChatRoomWithMember(@Param("chatRoom") ChatRoom chatRoom);
+
+
+    @Query("""
+            select
+                case
+                    when count(t1) >0 then true
+                    else false
+                end
+            from ChatParticipant t1
+            where t1.chatRoom=:chatRoom and t1.member=:sender
+            """)
+    Boolean isRoomParticipantByChatRoomAndMember(@Param("chatRoom") ChatRoom chatRoom,@Param("sender") Member sender);
 }
