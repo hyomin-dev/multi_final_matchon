@@ -23,4 +23,9 @@ public class StadiumService {
     public Page<Stadium> getStadiumsByRegion(String region, Pageable pageable) {
         return stadiumRepository.findByCpNmContaining(region, pageable);
     }
+
+    public Stadium getStadiumById(Long id) {
+        return stadiumRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 구장이 존재하지 않습니다."));
+    }
 }

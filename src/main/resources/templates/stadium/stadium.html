@@ -76,7 +76,7 @@
 <div th:replace="~{common/header::header}"></div>
 
 <div id="wrap">
-    <h1 class="titlestadium">구장 목록</h1>
+    <h1 class="titlestadium">STADIUM</h1>
 
     <div class="region-tabs-stadium">
         <a th:href="@{/stadium}" th:classappend="${selectedRegion} == null ? 'active' : ''">전체</a>
@@ -97,7 +97,10 @@
                  th:text="${stadium.faciRoadAddr.contains(stadium.cpNm) ? stadium.faciRoadAddr : stadium.cpNm + ' / ' + stadium.faciRoadAddr}">
                 지역 / 주소
             </div>
-            <div class="stadium-name" th:text="${stadium.faciNm}">경기장 이름</div>
+            <!-- 구장 이름 누르면 구장 상세보기로 이동-->
+            <div class="stadium-name">
+                <a th:href="@{/stadium/{id}(id=${stadium.id})}" th:text="${stadium.faciNm}">경기장 이름</a>
+            </div>
         </div>
     </div>
 
