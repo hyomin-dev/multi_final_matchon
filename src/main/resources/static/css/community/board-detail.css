@@ -37,6 +37,13 @@
     padding-right: 140px;
 }
 
+.post-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
 .post-action-right {
     position: absolute;
     top: 10px;
@@ -45,6 +52,9 @@
     gap: 8px;
     align-items: center;
 }
+
+.post-action-right button {
+    margin-left: 10px;
 
 .board-delete-button {
     background-color: transparent;
@@ -61,6 +71,17 @@
 .board-delete-button:hover {
     background-color: rgba(217, 83, 79, 0.1);
 }
+
+.back-link {
+    font-size: 14px;
+    color: #3498db;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
 
 /* 첨부파일 */
 .attachment-box {
@@ -153,20 +174,23 @@
 }
 
 .btn-comment-delete:hover {
-    background-color: mistyrose;
+    background-color: lemonchiffon;
     color: #d32f2f;
 }
 
 .report-button {
+    padding: 3px 9px;
     color: red;
     background: none;
     border: none;
     cursor: pointer;
     font-weight: bold;
-    padding: 0;
-    font-size: 14px;
+    font-size: 13px;
+
 }
 
 .report-button:hover {
     background-color: mistyrose;
+    transform: scale(1.05);
+    transition: transform 0.2s ease, background-color 0.2s ease; /* 부드럽게 확대되도록 */
 }

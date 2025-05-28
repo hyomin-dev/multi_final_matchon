@@ -16,21 +16,27 @@
 
     <div class="content-box">
         <div class="post-header">
-            <div class="post-action-right">
-                <div th:if="${board.member.id == #authentication.principal.member.id}">
-                    <button type="button"
-                            class="board-delete-button"
-                            th:onclick="'deletePost(' + ${board.id} + ')'">
-                        ✖ 삭제
-                    </button>
-                </div>
 
-                <div th:if="${board.member.id != #authentication.principal.member.id}">
-                    <button type="button"
-                            class="report-button"
-                            th:onclick="'openReportModal(\'BOARD\', ' + ${board.id} + ')'">
-                        ⚠ 게시글 신고
-                    </button>
+            <div class="post-header-actions">
+
+                <a th:href="@{/community}" class="back-link">← 목록으로</a>
+
+                <div class="post-action-right">
+                    <div th:if="${board.member.id == #authentication.principal.member.id}">
+                        <button type="button"
+                                class="board-delete-button"
+                                th:onclick="'deletePost(' + ${board.id} + ')'">
+                            ✖ 삭제
+                        </button>
+                    </div>
+
+                    <div th:if="${board.member.id != #authentication.principal.member.id}">
+                        <button type="button"
+                                class="report-button"
+                                th:onclick="'openReportModal(\'BOARD\', ' + ${board.id} + ')'">
+                            ⚠ 게시글 신고
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -57,10 +63,6 @@
             </div>
         </div>
 
-        <div class="post-actions">
-            <a th:href="@{/community}" class="back-link">목록으로</a>
-        </div>
-
         <div th:if="${board.member.id == #authentication.principal.member.id}" class="post-actions">
             <a th:href="@{'/community/' + ${board.id} + '/edit'}" class="edit-link">수정하기</a>
         </div>
@@ -70,7 +72,7 @@
         <h3>댓글</h3>
         <form id="commentForm">
             <textarea id="commentContent" placeholder="댓글을 입력하세요."></textarea>
-            <button type="submit">댓글 작성</button>
+            <button type="submit">작성 완료</button>
         </form>
 
         <ul id="commentList">
@@ -103,17 +105,13 @@
     </div>
 </div>
 
-<!-- 신고 모달 -->
 <div id="reportModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
-
-        <!-- 신고 타이틀 영역 (아이콘 + 텍스트) -->
         <h3 class="report-modal-title">
             <img th:src="@{/img/free-icon-sirens-4377558.png}" alt="신고 아이콘" class="report-icon">
             신고하기
         </h3>
 
-        <!-- 숨겨진 필드 -->
         <input type="hidden" id="reportTargetType">
         <input type="hidden" id="reportTargetId">
 
