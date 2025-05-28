@@ -95,22 +95,44 @@ public class TeamService {
 
 
     public void teamRegister(ReqTeamDto reqTeamDto, CustomUser user) {
+
+        if (reqTeamDto.getTeamName() == null || reqTeamDto.getTeamName().trim().isEmpty()) {
+            throw new IllegalArgumentException("팀 이름은 필수입니다.");
+        }
+
+        if (reqTeamDto.getTeamIntroduction() == null || reqTeamDto.getTeamIntroduction().trim().isEmpty()) {
+            throw new IllegalArgumentException("팀 소개는 필수입니다.");
+        }
+
+        if (reqTeamDto.getTeamRegion() == null) {
+            throw new IllegalArgumentException("팀 지역은 필수입니다.");
+        }
+
+        if (reqTeamDto.getRecruitingPositions() == null || reqTeamDto.getRecruitingPositions().isEmpty()) {
+            throw new IllegalArgumentException("한 개 이상의 포지션을 선택해야 합니다.");
+        }
+
+        if (reqTeamDto.getRecruitmentStatus() == null) {
+            throw new IllegalArgumentException("모집 여부를 선택해야 합니다.");
+        }
         // Check if the user already has an active team
         if (teamRepository.existsByCreatedPersonAndIsDeletedFalse(user.getUsername())) {
             throw new IllegalArgumentException("이미 팀이 있습니다.");
         }
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + user.getUsername()));
+
         Team newTeam = Team.builder()
                 .teamName(reqTeamDto.getTeamName())
                 .teamRegion(RegionType.valueOf(reqTeamDto.getTeamRegion()))
                 .teamRatingAverage(reqTeamDto.getTeamRatingAverage())
                 .recruitmentStatus(reqTeamDto.getRecruitmentStatus()).teamIntroduction(reqTeamDto.getTeamIntroduction())
                 .teamAttachmentEnabled(true)
+                .createdPerson(member.getMemberName())
                 .build();
         Team savedTeam = teamRepository.save(newTeam);
 
         // Add creator as team member (leader)
-        Member member = memberRepository.findByMemberEmail(user.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + user.getUsername()));
 
         TeamMember teamMember = TeamMember.builder()
                 .team(savedTeam)
