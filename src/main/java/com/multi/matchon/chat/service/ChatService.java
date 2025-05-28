@@ -1,7 +1,10 @@
 package com.multi.matchon.chat.service;
 
+import com.multi.matchon.chat.domain.ChatMessage;
 import com.multi.matchon.chat.domain.ChatParticipant;
 import com.multi.matchon.chat.domain.ChatRoom;
+import com.multi.matchon.chat.domain.MessageReadLog;
+import com.multi.matchon.chat.dto.res.ResChatDto;
 import com.multi.matchon.chat.dto.res.ResMyChatListDto;
 import com.multi.matchon.chat.repository.ChatMessageRepository;
 import com.multi.matchon.chat.repository.ChatParticipantRepository;
@@ -31,9 +34,9 @@ public class ChatService {
 
     public Long findPrivateChatRoom(Long receiverId, Long senderId) {
 
-        Member receiver = memberRepository.findByIdAndIsDeletedFalse(receiverId).orElseThrow(()->new IllegalArgumentException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
+        Member receiver = memberRepository.findByIdAndIsDeletedFalse(receiverId).orElseThrow(()->new CustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
 
-        Member sender = memberRepository.findByIdAndIsDeletedFalse(senderId).orElseThrow(()->new IllegalArgumentException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
+        Member sender = memberRepository.findByIdAndIsDeletedFalse(senderId).orElseThrow(()->new CustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
 
 
         // 여기까지 왔다는 것은 receiverId와 senderId가 유효
@@ -83,6 +86,35 @@ public class ChatService {
         }
 
         return resMyChatListDtos;
+
+    }
+
+    public void saveMessage(Long roomId, ResChatDto resChatDto) {
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndIsDeletedFalse(roomId).orElseThrow(()->new CustomException("Chat 해당 채팅방 번호를 가진 채팅방은 존재하지 않습니다."));
+
+        Member sender =  memberRepository.findByMemberEmailAndIsDeletedFalse(resChatDto.getSenderEmail()).orElseThrow(()->new CustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
+
+        ChatMessage chatMessage = ChatMessage.builder()
+                .chatRoom(chatRoom)
+                .member(sender)
+                .content(resChatDto.getContent())
+                .build();
+
+        chatMessageRepository.save(chatMessage);
+
+        List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoom(chatRoom);
+
+        for(ChatParticipant c: chatParticipants){
+            MessageReadLog messageReadLog = MessageReadLog.builder()
+                    .chatRoom(chatRoom)
+                    .member(c.getMember())
+                    .chatMessage(chatMessage)
+                    .isRead(c.getMember().equals(sender))
+                    .build();
+            messageReadLogRepository.save(messageReadLog);
+        }
+
+
 
     }
 }

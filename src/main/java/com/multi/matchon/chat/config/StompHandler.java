@@ -56,29 +56,34 @@ public class StompHandler implements ChannelInterceptor {
                     userDetails, null, userDetails.getAuthorities());
 
             accessor.setUser(authentication);
-            SecurityContextHolder.getContextHolderStrategy().getContext().setAuthentication(authentication);
 
             log.info("connect 토큰 검증 완료");
 
 
         }else if(StompCommand.SUBSCRIBE == accessor.getCommand()){
 
-//            log.info("subscribe 토큰 검증 시작");
-//
-//            String accessToken = accessor.getFirstNativeHeader("Authorization");
-//            String token = accessToken.substring(7);
-//
-//            Jwts.parserBuilder()
-//                    .setSigningKey(secretKey)
-//                    .build()
-//                    .parseClaimsJws(token);
-//
-//            log.info("subscribe 토큰 검증 완료");
+            log.info("subscribe 토큰 검증 시작");
 
-            Principal principal = accessor.getUser();
-            String destination = accessor.getDestination();
-            //검증
-            log.info("SUBSCRIBE Stage");
+            String accessToken = accessor.getFirstNativeHeader("Authorization");
+            String token = accessToken.substring(7);
+
+            String email = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+
+            CustomUser userDetails = (CustomUser) customUserDetailsService.loadUserByUsername(email);
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+
+            accessor.setUser(authentication);
+
+            log.info("subscribe 토큰 검증 완료");
+
+
 
         }else if(StompCommand.SEND == accessor.getCommand()){
             log.info("SEND Stage");

@@ -2,6 +2,7 @@ package com.multi.matchon.chat.controller;
 
 import com.multi.matchon.chat.dto.req.ReqChatDto;
 import com.multi.matchon.chat.dto.res.ResChatDto;
+import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.member.domain.Member;
 import lombok.RequiredArgsConstructor;
@@ -21,18 +22,19 @@ import java.security.Principal;
 public class StompController {
 
     private final SimpMessageSendingOperations messageTemplate;
+    private final ChatService chatService;
 
     @MessageMapping("/{roomId}")
-    public void sendMessage(@DestinationVariable Long roomId, ReqChatDto reqChatDto, @AuthenticationPrincipal CustomUser user){
+    public void sendMessage(@DestinationVariable("roomId") Long roomId, ReqChatDto reqChatDto, Principal principal){
         String senderEmail = "none";
-//        if (principal instanceof UsernamePasswordAuthenticationToken authentication) {
-//            Object principalObj = authentication.getPrincipal();
-//            if (principalObj instanceof CustomUser customUser) {
-//                Member sender = customUser.getMember();
-//                senderEmail = sender.getMemberEmail(); // 예시
-//                // 이제 원하는대로 사용 가능
-//            }
-//        }
+        if (principal instanceof UsernamePasswordAuthenticationToken authentication) {
+            Object principalObj = authentication.getPrincipal();
+            if (principalObj instanceof CustomUser customUser) {
+                Member sender = customUser.getMember();
+                senderEmail = sender.getMemberEmail(); // 예시
+                // 이제 원하는대로 사용 가능
+            }
+        }
 
         log.info("message: {}",reqChatDto.getContent());
         ResChatDto resChatDto = ResChatDto.builder()
@@ -40,6 +42,7 @@ public class StompController {
                 .content(reqChatDto.getContent())
                 .build();
 
+        chatService.saveMessage(roomId, resChatDto);
         messageTemplate.convertAndSend("/topic/"+roomId,resChatDto);
     }
 }

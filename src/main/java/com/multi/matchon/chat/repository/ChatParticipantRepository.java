@@ -33,4 +33,6 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             
             """)
     List<ChatParticipant> findAllByMemberId(@Param("memberId") Long memberId);
+
+    List<ChatParticipant> findByChatRoom(ChatRoom chatRoom);
 }

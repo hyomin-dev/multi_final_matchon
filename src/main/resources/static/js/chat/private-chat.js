@@ -3,10 +3,10 @@ let chatBox = document.getElementById('chat-box');
 let messageInput = document.getElementById('messageInput');
 let sendBtn = document.getElementById('sendBtn');
 
-let roomId = "";
+
 
 document.addEventListener("DOMContentLoaded",async ()=>{
-
+    let roomId = "";
     const detailDto = document.querySelector("#chat1-1-detail-dto");
     // if(!detailDto)
     //     return;
@@ -22,7 +22,9 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     // const token = localStorage.getItem("token");
 
     if(!roomId && receiverId)
-        roomId = await getPrivateChatRoomId(receiverId);
+        roomId = Number(await getPrivateChatRoomId(receiverId));
+
+    console.log(roomId);
 
 
     const sock = new SockJS(`/connect`);
@@ -46,7 +48,9 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     });*/
 
     // 3. 메시지 전송
-    sendBtn.addEventListener('click', sendMessage);
+    sendBtn.addEventListener('click', ()=>{
+        sendMessage(roomId);
+    });
     messageInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') sendMessage(roomId);
     });
@@ -89,8 +93,6 @@ async function getPrivateChatRoomId(receiverId){
 
     return data.data;
 
-
-
 }
 
 
@@ -119,7 +121,7 @@ function sendMessage(roomId) {
         content: msgText
     };
 
-    stompClient.send(`/publish/${roomId}`, JSON.stringify(content), {});
+    stompClient.send(`/publish/${roomId}`, JSON.stringify(content));
     messageInput.value = '';
 }
 
