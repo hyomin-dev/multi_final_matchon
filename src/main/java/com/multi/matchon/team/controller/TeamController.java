@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -43,7 +44,13 @@ public class TeamController {
         return mv;
     }
     @PostMapping("/team/register")
-    public String teamRegister(@ModelAttribute ReqTeamDto reqTeamDto, @AuthenticationPrincipal CustomUser user){
+    public String teamRegister(@Valid @ModelAttribute ReqTeamDto reqTeamDto, BindingResult result,
+                               @AuthenticationPrincipal CustomUser user){
+
+        if (result.hasErrors()) {
+            return "team/team-register";
+        }
+
         teamService.teamRegister(reqTeamDto, user);
 
         log.info("team 등록 완료");
