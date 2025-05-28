@@ -2,6 +2,8 @@ package com.multi.matchon.community.service;
 
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
+import com.multi.matchon.community.domain.Report;
+import com.multi.matchon.community.domain.ReportType;
 import com.multi.matchon.community.repository.BoardRepository;
 import com.multi.matchon.member.domain.Member;
 import jakarta.transaction.Transactional;
@@ -71,4 +73,6 @@ public class BoardService {
         commentService.deleteAllByBoard(board);
         boardRepository.deleteById(id);
     }
+
+
 }
