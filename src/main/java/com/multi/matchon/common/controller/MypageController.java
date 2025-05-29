@@ -4,6 +4,7 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.PositionName;
 import com.multi.matchon.common.domain.TimeType;
 import com.multi.matchon.common.service.MypageService;
+import com.multi.matchon.event.repository.HostProfileRepository;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class MypageController {
 
     private final MemberService memberService;
     private final MypageService mypageService;
+    private final HostProfileRepository hostProfileRepository;
 
     @GetMapping
     @Transactional(readOnly = true)
@@ -56,6 +58,13 @@ public class MypageController {
         Member member = memberService.findForMypage(user.getUsername());
         mypageService.updateHostName(member, hostName);
         return ResponseEntity.ok("기관명 저장 완료");
+    }
+
+    @GetMapping("/hostName/exist")
+    @ResponseBody
+    public ResponseEntity<Boolean> checkHostNameExist(@RequestParam String name) {
+        boolean exists = hostProfileRepository.findByHostName(name).isPresent();
+        return ResponseEntity.ok(exists);
     }
 
     @GetMapping("/enums")
