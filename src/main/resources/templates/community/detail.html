@@ -271,7 +271,7 @@
             body: `type=${type}&targetId=${id}&reasonType=${selectedReasonType}&reason=${encodeURIComponent(detailReason)}`
         })
 
-                .then(res => {
+            .then(res => {
                 if (res.status === 401) {
                     alert("로그인이 필요합니다.");
                     location.href = "/login";
@@ -288,3 +288,4 @@
 </script>
 </body>
 </html>
+
