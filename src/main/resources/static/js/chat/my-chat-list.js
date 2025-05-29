@@ -41,7 +41,7 @@ async function getMyChatRooms(){
         exitBtn.addEventListener("click",(e)=>{
             let reply = confirm("정말 차단하시겠습니까?");
             if(reply){
-                window.location.href = `/chat/room/private/block?roomid=${item.roomId}`;
+                window.location.href = `/chat/room/private/block?roomId=${item.roomId}`;
             }else{
                 e.preventDefault();
             }
@@ -64,6 +64,9 @@ function expressIsGroutChat(isGroupChat){
 function expressChatExit(isGroupChat){
     if(isGroupChat === "true")
         return "나가기";
-    else
-        return "차단";
+    else{
+
+
+    }
+
 }

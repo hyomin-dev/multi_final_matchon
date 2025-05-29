@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +30,9 @@ public class ChatRoom extends BaseEntity {
 
     @Column(name="chat_room_name", nullable = false, columnDefinition = "VARCHAR(255)")
     private String chatRoomName;
+
+    @OneToMany(mappedBy = "chatRoom")
+    private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
     @Column(name="is_deleted")
     @Builder.Default

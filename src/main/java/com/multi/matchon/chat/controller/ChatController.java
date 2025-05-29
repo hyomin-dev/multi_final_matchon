@@ -81,8 +81,8 @@ public class ChatController {
     }
 
     @GetMapping("/room/private/block")
-    public String blockUser(@RequestParam("roomId") Long roomId){
-
+    public String blockUser(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
+        chatService.blockUser(roomId, user);
         return "redirect:/chat/my/rooms";
     }
 

@@ -29,12 +29,11 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             select t1
             from ChatParticipant t1
             join fetch t1.chatRoom t2
-            where t1.member.id =:memberId
+            where t1.member.id =:memberId and t1.isDeleted=false
             
             """)
-    List<ChatParticipant> findAllByMemberId(@Param("memberId") Long memberId);
+    List<ChatParticipant> findAllByMemberIdAndIsDeletedFalse(@Param("memberId") Long memberId);
 
-    List<ChatParticipant> findByChatRoom(ChatRoom chatRoom);
 
 
     @Query("""
@@ -57,4 +56,24 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             where t1.chatRoom=:chatRoom and t1.member=:sender
             """)
     Boolean isRoomParticipantByChatRoomAndMember(@Param("chatRoom") ChatRoom chatRoom,@Param("sender") Member sender);
+
+
+//    @Query("""
+//            select
+//             t1
+//             from ChatParticipant t1
+//             join fetch t1.member t2
+//             where t1.chatRoom.id =:roomId and t2!=:my and t1.chatRole=com.multi.matchon.chat.domain.ChatRole.MEMBER
+//            """)
+//    Optional<ChatParticipant> findByRoomIdAndMy(@Param("roomId") Long roomId,@Param("my") Member my);
+
+        @Query("""
+            select
+             t1
+             from ChatParticipant t1
+             join fetch t1.member t2
+             where t1.chatRoom.id =:roomId and t1.chatRole=com.multi.matchon.chat.domain.ChatRole.MEMBER and t1.chatRoom.isGroupChat=false and t2 !=:blocker
+            """)
+
+    Optional<ChatParticipant> findByRoomIdAndMemberAndRoleMember(@Param("roomId") Long roomId,@Param("blocker") Member blocker);
 }

@@ -1,9 +1,6 @@
 package com.multi.matchon.chat.service;
 
-import com.multi.matchon.chat.domain.ChatMessage;
-import com.multi.matchon.chat.domain.ChatParticipant;
-import com.multi.matchon.chat.domain.ChatRoom;
-import com.multi.matchon.chat.domain.MessageReadLog;
+import com.multi.matchon.chat.domain.*;
 import com.multi.matchon.chat.dto.res.ResChatDto;
 import com.multi.matchon.chat.dto.res.ResMyChatListDto;
 import com.multi.matchon.chat.repository.*;
@@ -19,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,9 +67,11 @@ public class ChatService {
     @Transactional
     public void addParticipantToRoom(ChatRoom chatRoom, Member member){
         ChatParticipant chatParticipant = ChatParticipant.builder()
-                .chatRoom(chatRoom)
+                //.chatRoom(chatRoom) // 양방향 쓸것이기 때문에 없앰
                 .member(member)
                 .build();
+
+        chatParticipant.changeChatRoom(chatRoom);
 
         chatParticipantRepository.save(chatParticipant);
     }
@@ -109,16 +110,37 @@ public class ChatService {
     @Transactional(readOnly = true)
     public List<ResMyChatListDto> findAllMyChatRoom(CustomUser user) { // 차단 검사
 
-        List<ChatParticipant> chatParticipants = chatParticipantRepository.findAllByMemberId(user.getMember().getId());
+        List<ChatParticipant> chatParticipants = chatParticipantRepository.findAllByMemberIdAndIsDeletedFalse(user.getMember().getId());
+
+//        List<ChatUserBlock> chatUserBlocks = chatUserBlockRepository.findAllByBlocker(user.getMember());
+//        Set<Long> blockedIds = chatUserBlocks.stream()
+//                .map(chatUserBlock -> chatUserBlock.getBlocked().getId())
+//                .collect(Collectors.toSet());
+        Set<Long> blockedIds = chatUserBlockRepository.findAllByBlocker(user.getMember()).stream()
+                .map(chatUserBlock -> chatUserBlock.getBlocked().getId())
+                .collect(Collectors.toSet());
 
         List<ResMyChatListDto> resMyChatListDtos = new ArrayList<>();
 
         for(ChatParticipant c: chatParticipants){
             Long count = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(c.getChatRoom(), user.getMember());
+            Boolean isBlock = false;
+            if(!c.getChatRoom().getIsGroupChat()){
+                Member opponent = c.getChatRoom().getChatParticipants().stream()
+                        .filter(chatParticipant -> !chatParticipant.getMember().getId().equals(user.getMember().getId()) && !chatParticipant.getIsDeleted())
+                        .findFirst()
+                        .map(ChatParticipant::getMember)
+                        .orElse(null);
+                if(opponent!=null)
+                    isBlock = blockedIds.contains(opponent.getId());
+            }
+
+
             ResMyChatListDto resMyChatListDto = ResMyChatListDto.builder()
                     .roomId(c.getChatRoom().getId())
                     .roomName(c.getChatRoom().getChatRoomName())
                     .isGroupChat(c.getChatRoom().getIsGroupChat())
+                    .isBlock(isBlock)
                     .unReadCount(count)
                     .build();
 
@@ -186,6 +208,28 @@ public class ChatService {
 
         int count = messageReadLogRepository.updateMessagesRead(chatRoom, sender);
         log.info("읽음 처리 메시지: {}",count);
+
+    }
+
+    @Transactional
+    public void blockUser(Long roomId, CustomUser user) {
+
+        Member blocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(()->new CustomException("blockUser 차단할 대상이 없습니다."));
+
+        // 자신을 채팅 참여자에서 제외 ,, blockUser 이미 차단된 유저입니다."
+        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(),blocked);
+
+        if(chatUserBlock.isPresent()){
+            throw new CustomException("blockUser 이미 차단한 유저입니다.");
+        }
+
+        ChatUserBlock newChatUserBlock = ChatUserBlock.builder()
+                .blocker(user.getMember())
+                .blocked(blocked)
+                .build();
+        chatUserBlockRepository.save(newChatUserBlock);
+
+        log.info("blockUser: {} → {}", user.getMember().getId(), blocked.getId());
 
     }
 

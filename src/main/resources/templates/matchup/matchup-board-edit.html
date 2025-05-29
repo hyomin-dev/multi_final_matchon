@@ -52,7 +52,7 @@
         </label>
         <label>
             팀 소개
-            <textarea cols="30" rows="5" th:field="*{teamIntro}" required>
+            <textarea cols="30" rows="5" th:field="*{teamIntro}" required maxlength="100">
             </textarea>
         </label>
         <label>
@@ -109,7 +109,7 @@
         </label>
         <label>
             경기 방식 소개
-            <textarea cols="30" rows="5" th:field="*{matchDescription}" required>
+            <textarea cols="30" rows="5" th:field="*{matchDescription}" required maxlength="1000">
             </textarea>
         </label>
 
