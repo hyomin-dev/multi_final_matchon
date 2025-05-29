@@ -1,12 +1,14 @@
 package com.multi.matchon.team.dto.req;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,5 +27,6 @@ public class ReqTeamDto {
 
     private Double teamRatingAverage;
 
+    private Long teamId;
 
 }
