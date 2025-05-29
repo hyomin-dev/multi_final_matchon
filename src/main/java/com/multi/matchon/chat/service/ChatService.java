@@ -216,13 +216,14 @@ public class ChatService {
 
         Member blocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(()->new CustomException("blockUser 차단할 대상이 없습니다."));
 
-        // 자신을 채팅 참여자에서 제외 ,, blockUser 이미 차단된 유저입니다."
+        // chatUserBlock에서 자신과 상대방이 있는지 조회
         Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(),blocked);
 
         if(chatUserBlock.isPresent()){
             throw new CustomException("blockUser 이미 차단한 유저입니다.");
         }
 
+        // 상대방을 차단
         ChatUserBlock newChatUserBlock = ChatUserBlock.builder()
                 .blocker(user.getMember())
                 .blocked(blocked)
@@ -230,6 +231,21 @@ public class ChatService {
         chatUserBlockRepository.save(newChatUserBlock);
 
         log.info("blockUser: {} → {}", user.getMember().getId(), blocked.getId());
+
+    }
+
+    @Transactional
+    public void unblockUser(Long roomId, CustomUser user){
+        Member unblocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(()->new CustomException("blockUser 차단할 대상이 없습니다."));
+
+        // chatUserBlock에서 자신과 상대방이 있는지 조회
+        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(),unblocked);
+
+        if(chatUserBlock.isPresent()){
+            chatUserBlockRepository.delete(chatUserBlock.get());
+        }else{
+            throw new CustomException("blockUser 차단된 유저가 없습니다.");
+        }
 
     }
 

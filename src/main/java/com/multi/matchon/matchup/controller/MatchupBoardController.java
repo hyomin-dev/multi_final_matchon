@@ -49,7 +49,7 @@ public class MatchupBoardController {
     @GetMapping("/detail")
     public ModelAndView getMatchupBoardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
         log.info("matchup-board-id: {}",boardId);
-        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId);
+        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId, user);
         mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-detail");
         return mv;
@@ -101,16 +101,16 @@ public class MatchupBoardController {
     @GetMapping("/edit")
     public ModelAndView showMatchupBoardEditPage(@RequestParam("boardId") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
 
-        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId);
+        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId, user);
         mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-edit");
         return mv;
     }
 
     @PostMapping("/edit")
-    public ModelAndView editMatchupBoard(@ModelAttribute ResMatchupBoardDto resMatchupBoardDto, ModelAndView mv){
-        matchupBoardService.updateBoard(resMatchupBoardDto);
-        ResMatchupBoardDto updateResMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(resMatchupBoardDto.getBoardId());
+    public ModelAndView editMatchupBoard(@ModelAttribute ResMatchupBoardDto resMatchupBoardDto, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
+        matchupBoardService.updateBoard(resMatchupBoardDto, user);
+        //ResMatchupBoardDto updateResMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(resMatchupBoardDto.getBoardId(), user);
         //mv.addObject("resMatchupBoardDto", updateResMatchupBoardDto);
 //        mv.setViewName("matchup/matchup-board-detail");
         mv.setViewName("redirect:/matchup/board/detail?matchup-board-id="+resMatchupBoardDto.getBoardId());

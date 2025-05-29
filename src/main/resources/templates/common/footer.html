@@ -14,21 +14,21 @@
     <!-- 로그인한 사용자만 챗봇 접근 가능 -->
     <sec:authorize access="isAuthenticated()">
         <!-- 챗봇 런처 아이콘 -->
-        <img src="/img/aichatbot.png" id="chatbot-launcher"
-             style="position: fixed; bottom: 30px; right: 20px; width: 80px; cursor: pointer; z-index: 1000;">
+<!--        <img src="/img/aichatbot.png" id="chatbot-launcher"-->
+<!--             style="position: fixed; bottom: 30px; right: 20px; width: 80px; cursor: pointer; z-index: 1000;">-->
 
-        <!-- 챗봇 모달 -->
-        <div id="chatbot-modal" style="display: none; position: fixed; bottom: 120px; right: 30px;
-            width: 400px; height: 600px; border-radius: 15px; overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; background: white; display: flex; flex-direction: column;">
-            <div style="background: #333; color: white; padding: 10px; font-weight: bold;
-                display: flex; justify-content: space-between; align-items: center; height: 40px; flex-shrink: 0;">
-                <span>MatchON 챗봇</span>
-                <button id="chatbot-close" style="background: transparent; border: none;
-                    color: white; font-size: 18px; cursor: pointer;">✕</button>
-            </div>
-            <iframe src="/aichat" style="flex: 1; border: none;"></iframe>
-        </div>
+<!--        &lt;!&ndash; 챗봇 모달 &ndash;&gt;-->
+<!--        <div id="chatbot-modal" style="display: none; position: fixed; bottom: 120px; right: 30px;-->
+<!--            width: 400px; height: 600px; border-radius: 15px; overflow: hidden;-->
+<!--            box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; background: white; display: flex; flex-direction: column;">-->
+<!--            <div style="background: #333; color: white; padding: 10px; font-weight: bold;-->
+<!--                display: flex; justify-content: space-between; align-items: center; height: 40px; flex-shrink: 0;">-->
+<!--                <span>MatchON 챗봇</span>-->
+<!--                <button id="chatbot-close" style="background: transparent; border: none;-->
+<!--                    color: white; font-size: 18px; cursor: pointer;">✕</button>-->
+<!--            </div>-->
+<!--            <iframe src="/aichat" style="flex: 1; border: none;"></iframe>-->
+<!--        </div>-->
     </sec:authorize>
 
     <!-- 공통 챗봇 JS 로드 -->

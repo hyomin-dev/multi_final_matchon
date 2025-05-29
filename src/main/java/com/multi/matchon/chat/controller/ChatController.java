@@ -86,6 +86,12 @@ public class ChatController {
         return "redirect:/chat/my/rooms";
     }
 
+    @GetMapping("/room/private/unblock")
+    public String unblockUser(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
+        chatService.unblockUser(roomId, user);
+        return "redirect:/chat/my/rooms";
+    }
+
 
     // 삭제
 }

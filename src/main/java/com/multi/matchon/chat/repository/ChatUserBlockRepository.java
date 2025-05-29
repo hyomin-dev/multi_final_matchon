@@ -13,7 +13,12 @@ import java.util.Optional;
 public interface ChatUserBlockRepository extends JpaRepository<ChatUserBlock, Long> {
 
 
-    Optional<ChatUserBlock> findByBlockerAndBlocked(Member blocker, Member blocked);
+    @Query("""
+            select t1
+            from ChatUserBlock t1
+            where t1.blocker =:blocker and t1.blocked=:blocked
+            """)
+    Optional<ChatUserBlock> findByBlockerAndBlocked(@Param("blocker") Member blocker, @Param("blocked") Member blocked);
 
 
     @Query("""
