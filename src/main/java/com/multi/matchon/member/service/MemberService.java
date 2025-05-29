@@ -37,7 +37,7 @@ public class MemberService {
 
     //이메일로 회원조회
     public Member findByEmail(String email) {
-        return memberRepository.findByMemberEmail(email)
+        return memberRepository.findByMemberEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 

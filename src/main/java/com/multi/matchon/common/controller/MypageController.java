@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,7 @@ public class MypageController {
     private final MemberService memberService;
     private final MypageService mypageService;
     private final HostProfileRepository hostProfileRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     @Transactional(readOnly = true)
@@ -90,5 +92,18 @@ public class MypageController {
             log.error("마이페이지 수정 실패", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("수정 실패: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<String> withdraw(@AuthenticationPrincipal CustomUser user,
+                                           @RequestParam String password) {
+        Member member = memberService.findByEmail(user.getUsername());
+
+        if (!passwordEncoder.matches(password, member.getMemberPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호가 일치하지 않습니다.");
+        }
+
+        mypageService.withdraw(member);
+        return ResponseEntity.ok("탈퇴 완료");
     }
 }
