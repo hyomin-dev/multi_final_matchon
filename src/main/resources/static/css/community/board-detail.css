@@ -44,6 +44,10 @@
     margin-bottom: 10px;
 }
 
+.post-actions {
+    margin-top: 12px;
+}
+
 .post-action-right {
     position: absolute;
     top: 10px;
@@ -82,7 +86,6 @@
     text-decoration: underline;
 }
 
-
 /* 첨부파일 */
 .attachment-box {
     background-color: #f8f9fb;
@@ -116,7 +119,7 @@
     background-color: #fdfdfd;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
     border: 1px solid #e0e0e0;
 }
 
@@ -192,5 +195,5 @@
 .report-button:hover {
     background-color: mistyrose;
     transform: scale(1.05);
-    transition: transform 0.2s ease, background-color 0.2s ease; /* 부드럽게 확대되도록 */
+    transition: transform 0.2s ease, background-color 0.2s ease;
 }
