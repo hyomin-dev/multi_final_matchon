@@ -32,28 +32,28 @@ VALUES
     (TRUE, 'Chat Room 9', '2025-05-17 20:52:28', 'Member9', '2025-05-17 20:52:28', 'Member9', FALSE),
     (FALSE, 'Chat Room 10', '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28', 'Member10', FALSE);
 
-INSERT INTO stadium (stadium_region, stadium_name, stadium_address, stadium_image_attchment_enabled,
+INSERT INTO stadium (stadium_region, stadium_name, stadium_address, stadium_tel,
                      create_date, create_person, modified_date, modified_person, is_deleted)
 VALUES
-    ('Seoul', 'Seoul Stadium', 'Seoul Address', FALSE, '2025-05-17 20:52:28', 'Admin1', '2025-05-17 20:52:28',
+    ('Seoul', 'Seoul Stadium', 'Seoul Address', '010-1234', '2025-05-17 20:52:28', 'Admin1', '2025-05-17 20:52:28',
      'Admin1', FALSE),
-    ('Busan', 'Busan Stadium', 'Busan Address', FALSE, '2025-05-17 20:52:28', 'Admin2', '2025-05-17 20:52:28',
+    ('Busan', 'Busan Stadium', 'Busan Address', '010-1234', '2025-05-17 20:52:28', 'Admin2', '2025-05-17 20:52:28',
      'Admin2', FALSE),
-    ('Incheon', 'Incheon Stadium', 'Incheon Address', FALSE, '2025-05-17 20:52:28', 'Admin3',
+    ('Incheon', 'Incheon Stadium', 'Incheon Address', '010-1234', '2025-05-17 20:52:28', 'Admin3',
      '2025-05-17 20:52:28', 'Admin3', FALSE),
-    ('Daegu', 'Daegu Stadium', 'Daegu Address', FALSE, '2025-05-17 20:52:28', 'Admin4', '2025-05-17 20:52:28',
+    ('Daegu', 'Daegu Stadium', 'Daegu Address', '010-1234', '2025-05-17 20:52:28', 'Admin4', '2025-05-17 20:52:28',
      'Admin4', FALSE),
-    ('Daejeon', 'Daejeon Stadium', 'Daejeon Address', FALSE, '2025-05-17 20:52:28', 'Admin5',
+    ('Daejeon', 'Daejeon Stadium', 'Daejeon Address', '010-1234', '2025-05-17 20:52:28', 'Admin5',
      '2025-05-17 20:52:28', 'Admin5', FALSE),
-    ('Gwangju', 'Gwangju Stadium', 'Gwangju Address', FALSE, '2025-05-17 20:52:28', 'Admin6',
+    ('Gwangju', 'Gwangju Stadium', 'Gwangju Address', '010-1234', '2025-05-17 20:52:28', 'Admin6',
      '2025-05-17 20:52:28', 'Admin6', FALSE),
-    ('Suwon', 'Suwon Stadium', 'Suwon Address', FALSE, '2025-05-17 20:52:28', 'Admin7', '2025-05-17 20:52:28',
+    ('Suwon', 'Suwon Stadium', 'Suwon Address', '010-1234', '2025-05-17 20:52:28', 'Admin7', '2025-05-17 20:52:28',
      'Admin7', FALSE),
-    ('Ulsan', 'Ulsan Stadium', 'Ulsan Address', FALSE, '2025-05-17 20:52:28', 'Admin8', '2025-05-17 20:52:28',
+    ('Ulsan', 'Ulsan Stadium', 'Ulsan Address', '010-1234', '2025-05-17 20:52:28', 'Admin8', '2025-05-17 20:52:28',
      'Admin8', FALSE),
-    ('Jeju', 'Jeju Stadium', 'Jeju Address', FALSE, '2025-05-17 20:52:28', 'Admin9', '2025-05-17 20:52:28',
+    ('Jeju', 'Jeju Stadium', 'Jeju Address', '010-1234', '2025-05-17 20:52:28', 'Admin9', '2025-05-17 20:52:28',
      'Admin9', FALSE),
-    ('Sejong', 'Sejong Stadium', 'Sejong Address', FALSE, '2025-05-17 20:52:28', 'Admin10',
+    ('Sejong', 'Sejong Stadium', 'Sejong Address', '010-1234', '2025-05-17 20:52:28', 'Admin10',
      '2025-05-17 20:52:28', 'Admin10', FALSE);
 
 INSERT INTO positions (position_name)
@@ -462,9 +462,3 @@ VALUES (1, 1, 1, FALSE, '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28',
        (8, 8, 8, TRUE, '2025-05-17 20:52:28', 'Member8', '2025-05-17 20:52:28', 'Member8'),
        (9, 9, 9, TRUE, '2025-05-17 20:52:28', 'Member9', '2025-05-17 20:52:28', 'Member9'),
        (10, 10, 10, TRUE, '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28', 'Member10');
-
-
-
-
-
-
