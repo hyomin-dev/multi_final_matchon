@@ -34,6 +34,21 @@
             <button type="button" id="scheduleButton">대회 등록하러 가기</button>
         </div>
     </div>
+
+    <!-- ✅ 회원 탈퇴 영역 -->
+    <div id="withdrawSection">
+        <h3>회원 탈퇴</h3>
+        <button type="button" onclick="openWithdrawPopup()">탈퇴하기</button>
+    </div>
+</div>
+
+<!-- ✅ 비밀번호 입력 팝업 -->
+<div id="withdrawPopup"
+     style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%); background:white; padding:20px; border:1px solid #ccc; z-index:1000; width:300px; text-align:center;">
+    <p>탈퇴하시려면 비밀번호를 입력해주세요.</p>
+    <input type="password" id="withdrawPasswordPopup" placeholder="비밀번호 입력" style="width:80%; padding:5px;"><br><br>
+    <button onclick="confirmWithdraw()" style="margin-right:10px;">확인</button>
+    <button onclick="closeWithdrawPopup()">취소</button>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
@@ -43,6 +58,7 @@
     const currentTimeType = /*[[${myTimeType}]]*/ "";
     const hostName = /*[[${hostName}]]*/ null;
 </script>
+
 <script>
     const positionLabelMap = {
         "GOALKEEPER": "골키퍼", "CENTER_BACK": "센터백", "LEFT_RIGHT_BACK": "풀백",
@@ -69,9 +85,7 @@
                         const option = document.createElement("option");
                         option.value = pos;
                         option.text = positionLabelMap[pos] || pos;
-                        if (pos === currentPosition.replace(/"/g, '').trim()) {
-                            option.selected = true;
-                        }
+                        if (pos === currentPosition.replace(/"/g, '').trim()) option.selected = true;
                         positionSelect.appendChild(option);
                     });
                 }
@@ -81,13 +95,27 @@
                         const option = document.createElement("option");
                         option.value = time;
                         option.text = timeLabelMap[time] || time;
-                        if (time === currentTimeType.replace(/"/g, '').trim()) {
-                            option.selected = true;
-                        }
+                        if (time === currentTimeType.replace(/"/g, '').trim()) option.selected = true;
                         timeSelect.appendChild(option);
                     });
                 }
             });
+
+        const scheduleButton = document.getElementById("scheduleButton");
+        if (scheduleButton) {
+            scheduleButton.addEventListener("click", () => {
+                const hostNameInput = document.getElementById("hostNameInput")?.value.trim();
+                if (!hostNameInput || hostNameInput.toLowerCase() === "null") {
+                    alert("주최 기관명이 비어 있습니다. 먼저 입력하고 등록 버튼을 눌러 저장하세요.");
+                    return;
+                }
+                if (!hostName || hostName.trim().toLowerCase() !== hostNameInput.toLowerCase()) {
+                    alert("기관명이 아직 저장되지 않았습니다. 먼저 '등록' 버튼을 눌러 기관명을 저장하세요.");
+                    return;
+                }
+                location.href = "/schedule";
+            });
+        }
     });
 
     function getCookie(name) {
@@ -104,10 +132,7 @@
         if (!token) return alert("로그인이 필요합니다.");
 
         const temperature = parseFloat(document.getElementById("temperatureInput").value);
-        if (temperature < 30) {
-            alert("마이온도는 30도 미만으로 수정할 수 없습니다.");
-            return;
-        }
+        if (temperature < 30) return alert("마이온도는 30도 미만으로 수정할 수 없습니다.");
 
         const data = {
             positionName: document.getElementById("positionSelect").value,
@@ -132,31 +157,6 @@
         });
     }
 
-    // 주최 기관이 없는 경우 대회 등록 버튼 클릭 방지
-    document.addEventListener("DOMContentLoaded", () => {
-        const scheduleButton = document.getElementById("scheduleButton");
-
-        if (scheduleButton) {
-            scheduleButton.addEventListener("click", () => {
-                const hostNameInput = document.getElementById("hostNameInput")?.value.trim();
-
-                if (!hostNameInput || hostNameInput.toLowerCase() === "null") {
-                    alert("주최 기관명이 비어 있습니다. 먼저 입력하고 등록 버튼을 눌러 저장하세요.");
-                    return;
-                }
-
-                // 서버에서 가져온 hostName (DB 저장된 값)
-                if (!hostName || hostName.trim().toLowerCase() !== hostNameInput.toLowerCase()) {
-                    alert("기관명이 아직 저장되지 않았습니다. 먼저 '등록' 버튼을 눌러 기관명을 저장하세요.");
-                    return;
-                }
-
-                // 이동
-                location.href = "/schedule";
-            });
-        }
-    });
-
     function uploadProfile() {
         const file = document.getElementById("profileImageInput").files[0];
         if (!file) return alert("파일을 선택해주세요.");
@@ -177,7 +177,6 @@
         const name = document.getElementById("hostNameInput").value.trim();
         if (!name) return alert("기관명을 입력해주세요.");
 
-        // 서버 중복 체크 후 등록
         fetch(`/mypage/hostName/exist?name=${encodeURIComponent(name)}`)
             .then(res => res.json())
             .then(exists => {
@@ -196,6 +195,48 @@
                     else res.text().then(msg => alert("등록 오류: " + msg));
                 });
             });
+    }
+
+    function openWithdrawPopup() {
+        document.getElementById("withdrawPopup").style.display = "block";
+    }
+
+    function closeWithdrawPopup() {
+        document.getElementById("withdrawPopup").style.display = "none";
+    }
+
+    function confirmWithdraw() {
+        const password = document.getElementById("withdrawPasswordPopup").value.trim();
+        if (!password) {
+            alert("비밀번호를 입력해주세요.");
+            return;
+        }
+
+        if (!confirm("정말 탈퇴하시겠습니까?")) return;
+
+        fetch("/mypage/withdraw", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ password }),
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) {
+                alert("탈퇴가 완료되었습니다.");
+                logout();
+            } else {
+                res.text().then(msg => alert("오류: " + msg));
+            }
+        });
+    }
+
+    function logout() {
+        fetch('/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        }).then(res => {
+            alert("로그아웃 되었습니다.");
+            window.location.href = "/main?_=" + new Date().getTime();
+        });
     }
 </script>
 
