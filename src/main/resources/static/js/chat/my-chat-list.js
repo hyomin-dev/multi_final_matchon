@@ -27,7 +27,7 @@ async function getMyChatRooms(){
             <div class="chat-col chat-unread"><strong>${item.unReadCount}</strong></div>
             <div class="chat-col chat-actions">
                 <button class="btn enter-btn">입장</button>
-                <button class="btn exit-btn">퇴장</button>
+                <button class="btn exit-btn">${expressChatExit(item.isGroupChat)}</button>
             </div>           
         `;
 
@@ -36,11 +36,18 @@ async function getMyChatRooms(){
 
         enterBtn.addEventListener("click",()=>{
             window.open(`/chat/my/room?roomId=${item.roomId}`,"_black");
+        });
+
+        exitBtn.addEventListener("click",(e)=>{
+            let reply = confirm("정말 차단하시겠습니까?");
+            if(reply){
+                window.location.href = `/chat/room/private/block?roomid=${item.roomId}`;
+            }else{
+                e.preventDefault();
+            }
         })
 
-
         chatRoomList.appendChild(card);
-
 
     });
 }
@@ -52,4 +59,11 @@ function expressIsGroutChat(isGroupChat){
     else
         return "1대1 채팅";
 
+}
+
+function expressChatExit(isGroupChat){
+    if(isGroupChat === "true")
+        return "나가기";
+    else
+        return "차단";
 }

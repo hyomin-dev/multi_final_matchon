@@ -24,7 +24,7 @@ public class ChatController {
 
     private final ChatService chatService;
 
-
+    // 등록
 
     @GetMapping("/my/room")
     public ModelAndView showPrivateChatPageByRoomId(@RequestParam("roomId") Long roomId, ModelAndView mv){
@@ -50,6 +50,7 @@ public class ChatController {
         return ResponseEntity.ok().body(ApiResponse.ok(roomId));
     }
 
+    // 조회
 
     @GetMapping("/my/rooms")
     public String showMyChatRooms(){
@@ -71,9 +72,20 @@ public class ChatController {
         return ResponseEntity.ok().body(ApiResponse.ok(resChatDtos));
     }
 
+    //수정
+
     @PostMapping("/room/read")
     public ResponseEntity<?> readAllMessage(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
         chatService.readAllMessage(roomId, user);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/room/private/block")
+    public String blockUser(@RequestParam("roomId") Long roomId){
+
+        return "redirect:/chat/my/rooms";
+    }
+
+
+    // 삭제
 }

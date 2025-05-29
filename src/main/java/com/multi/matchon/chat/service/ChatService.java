@@ -6,10 +6,7 @@ import com.multi.matchon.chat.domain.ChatRoom;
 import com.multi.matchon.chat.domain.MessageReadLog;
 import com.multi.matchon.chat.dto.res.ResChatDto;
 import com.multi.matchon.chat.dto.res.ResMyChatListDto;
-import com.multi.matchon.chat.repository.ChatMessageRepository;
-import com.multi.matchon.chat.repository.ChatParticipantRepository;
-import com.multi.matchon.chat.repository.ChatRoomRepository;
-import com.multi.matchon.chat.repository.MessageReadLogRepository;
+import com.multi.matchon.chat.repository.*;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.member.domain.Member;
@@ -32,17 +29,22 @@ public class ChatService {
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MessageReadLogRepository messageReadLogRepository;
+    private final ChatUserBlockRepository chatUserBlockRepository;
     private final MemberRepository memberRepository;
 
 
     // 등록
     @Transactional
     public Long findPrivateChatRoom(Long receiverId, Long senderId) {
+        // 차단 검사
 
         Member receiver = memberRepository.findByIdAndIsDeletedFalse(receiverId).orElseThrow(()->new CustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
 
         Member sender = memberRepository.findByIdAndIsDeletedFalse(senderId).orElseThrow(()->new CustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
 
+        // 서로서로 차단했는지 확인
+
+        //Boolean isBlock = chatUserBlockRepository.isBlockByReceiver(receiver);
 
         // 여기까지 왔다는 것은 receiverId와 senderId가 유효
         Optional<ChatRoom> chatRoom = chatParticipantRepository.findPrivateChatRoomByReceiverIdAndSenderId(receiverId, senderId);
@@ -105,7 +107,7 @@ public class ChatService {
     // 조회
 
     @Transactional(readOnly = true)
-    public List<ResMyChatListDto> findAllMyChatRoom(CustomUser user) {
+    public List<ResMyChatListDto> findAllMyChatRoom(CustomUser user) { // 차단 검사
 
         List<ChatParticipant> chatParticipants = chatParticipantRepository.findAllByMemberId(user.getMember().getId());
 

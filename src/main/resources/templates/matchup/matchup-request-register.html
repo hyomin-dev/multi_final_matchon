@@ -33,15 +33,15 @@
   </div>
   <table>
     <tr>
-      <th>종목: </th>
+      <th>종목 </th>
       <td th:text="${reqMatchupRequestDto.sportsTypeName}"></td>
     </tr>
     <tr>
-      <th>경기장명:</th>
+      <th>경기장명</th>
       <td th:text="${reqMatchupRequestDto.sportsFacilityName}"></td>
     </tr>
     <tr>
-      <th>경기장 주소:</th>
+      <th>경기장 주소</th>
       <td th:text="${reqMatchupRequestDto.sportsFacilityAddress}"></td>
     </tr>
     <tr>
@@ -64,12 +64,12 @@
     <input type="hidden" th:field="*{boardId}"/>
 
     <label>
-      소개:
+      소개
       <textarea placeholder="자기 소개를 입력하세요." th:field="*{selfIntro}" required>
                 </textarea>
     </label>
     <label>
-      참가 인원:
+      참가 인원
       <select th:field="*{participantCount}" required></select>
     </label>
 

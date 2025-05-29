@@ -21,8 +21,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             from ChatParticipant t1
             join ChatParticipant t2
             on t1.chatRoom.id = t2.chatRoom.id
-            where t1.member.id =:receiverId and t2.member.id=:senderId and t1.chatRoom.isGroupChat = false
-            
+            where t1.member.id =:receiverId and t2.member.id=:senderId and t1.chatRoom.isGroupChat = false and t1.member.isDeleted = false and t2.member.isDeleted = false
             """)
     Optional<ChatRoom> findPrivateChatRoomByReceiverIdAndSenderId(Long receiverId, Long senderId);
 

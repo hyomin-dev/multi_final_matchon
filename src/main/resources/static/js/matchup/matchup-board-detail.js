@@ -8,6 +8,7 @@ async function setContent(){
     const detailDto = document.querySelector("#matchup-board-detail-dto");
 
     const memberEmail = detailDto.dataset.memberEmail;
+    const memberName = detailDto.dataset.memberName;
     const sportsFacilityName = detailDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = detailDto.dataset.sportsFacilityAddress;
     const matchDatetime = detailDto.dataset.matchDatetime;
@@ -23,7 +24,7 @@ async function setContent(){
     //console.log(matchDatetime);
     //console.log(loginMemberName);
 
-    setWriter(memberEmail, loginEmail);
+    setWriter(memberName);
     drawMap(sportsFacilityAddress, sportsFacilityName);
     calTime(matchDatetime, matchDuration);
     checkStatus(matchDatetime, currentParticipantCount, maxParticipants, memberEmail, loginEmail, minMannerTemperature, myMannerTemperature);
@@ -51,12 +52,15 @@ async function setContent(){
 }
 
 
-function setWriter(memberEmail, loginEmail){
+function setWriter(memberName){ // memberEmail, loginEmail
+
     const writerEle = document.querySelector("#writer");
-    if(memberEmail===loginEmail)
-        writerEle.innerHTML = "나";
-    else
-        writerEle.innerHTML = memberEmail;
+    // if(memberEmail===loginEmail)
+    //     writerEle.innerHTML = "나";
+    // else
+    //     writerEle.innerHTML = memberEmail;
+
+    writerEle.textContent = memberName;
 }
 
 

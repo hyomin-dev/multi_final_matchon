@@ -36,15 +36,15 @@
     </div>
     <table>
         <tr>
-            <th>종목: </th>
+            <th>종목 </th>
             <td th:text="${resMatchupRequestDto.sportsTypeName}"></td>
         </tr>
         <tr>
-            <th>경기장명:</th>
+            <th>경기장명</th>
             <td th:text="${resMatchupRequestDto.sportsFacilityName}"></td>
         </tr>
         <tr>
-            <th>경기장 주소:</th>
+            <th>경기장 주소</th>
             <td th:text="${resMatchupRequestDto.sportsFacilityAddress}"></td>
         </tr>
         <tr>
@@ -62,15 +62,15 @@
             <td th:text="${'('+ resMatchupRequestDto.currentParticipantCount + ' / '+resMatchupRequestDto.maxParticipants + ')'}"></td>
         </tr>
         <tr>
-            <th>요청 상태:</th>
+            <th>요청 상태</th>
             <td th:text="${resMatchupRequestDto.matchupStatus}" th:id="status"></td>
         </tr>
         <tr>
-            <th>참가 요청 횟수(최대 2번):</th>
+            <th>참가 요청 횟수(최대 2번)</th>
             <td th:text="${resMatchupRequestDto.matchupRequestSubmittedCount}"></td>
         </tr>
         <tr>
-            <th>승인 취소 요청 횟수(최대 1번):</th>
+            <th>승인 취소 요청 횟수(최대 1번)</th>
             <td th:text="${resMatchupRequestDto.matchupCancelSubmittedCount}"></td>
         </tr>
     </table>
@@ -93,14 +93,14 @@
 <!--        </div>-->
         <table>
             <tr>
-                <th>소개:</th>
+                <th>소개</th>
                 <td>
                  <textarea placeholder="자기 소개를 입력하세요."
                     th:text="*{selfIntro}" th:field="*{selfIntro}" required></textarea>
                 </td>
             </tr>
             <tr>
-                <th>참가 인원:</th>
+                <th>참가 인원</th>
                 <td>
                     <select th:field="*{participantCount}" required></select>
                 </td>
