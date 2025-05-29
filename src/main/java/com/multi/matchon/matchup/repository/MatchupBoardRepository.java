@@ -22,13 +22,13 @@ import java.util.Optional;
 public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Long> {
     //List<MatchupBoard> findAll();
 
-    @Query("select t1 from MatchupBoard t1 join fetch t1.member where t1.isDeleted=false")
+    @Query("select t1 from MatchupBoard t1 join fetch t1.member where t1.isDeleted=false and t1.member.isDeleted=false")
     List<MatchupBoard> findAllWithMember();
 
-    @Query("select t1 from MatchupBoard t1 join fetch t1.member join fetch t1.sportsType where t1.isDeleted=false")
+    @Query("select t1 from MatchupBoard t1 join fetch t1.member join fetch t1.sportsType where t1.isDeleted=false and t1.member.isDeleted=false")
     List<MatchupBoard> findAllWithMemberAndWithSportsType();
 
-    @Query("select t1 from MatchupBoard t1 join fetch t1.sportsType where t1.id=:boardId and t1.isDeleted=false ")
+    @Query("select t1 from MatchupBoard t1 join fetch t1.sportsType where t1.id=:boardId and t1.isDeleted=false and t1.member.isDeleted=false")
     Optional<MatchupBoard> findMatchupBoardByBoardIdAndIsDeleted(@Param("boardId") Long boardId);
 
 

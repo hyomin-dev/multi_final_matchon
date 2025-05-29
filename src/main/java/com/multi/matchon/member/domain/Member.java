@@ -64,18 +64,6 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Member member = (Member) o;
-        return Objects.equals(getId(), member.getId()) && Objects.equals(getMemberEmail(), member.getMemberEmail()) && Objects.equals(getMemberPassword(), member.getMemberPassword()) && Objects.equals(getMemberName(), member.getMemberName()) && getMemberRole() == member.getMemberRole() && Objects.equals(getPositions(), member.getPositions()) && getTimeType() == member.getTimeType() && Objects.equals(getTeam(), member.getTeam()) && Objects.equals(getMyTemperature(), member.getMyTemperature()) && Objects.equals(getPictureAttachmentEnabled(), member.getPictureAttachmentEnabled()) && Objects.equals(getIsDeleted(), member.getIsDeleted());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getMemberEmail(), getMemberPassword(), getMemberName(), getMemberRole(), getPositions(), getTimeType(), getTeam(), getMyTemperature(), getPictureAttachmentEnabled(), getIsDeleted());
-    }
 
     // 삭제
     public void markAsDeleted() {
