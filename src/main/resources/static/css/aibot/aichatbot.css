@@ -10,22 +10,27 @@
 }
 
 .chat-header {
-    background: #F1828B;
-    color: black;
+    background: #255E93;
+    color: white;
     padding: 14px;
-    text-align: center;
     font-weight: bold;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    position: relative;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
 }
 
 .chat-close {
     background: transparent;
     border: none;
-    font-size: 16px;
+    font-size: 18px;
     color: white;
     cursor: pointer;
+    position: absolute;
+    right: 12px;
+    top: 8px;
 }
 
 #chat-start {

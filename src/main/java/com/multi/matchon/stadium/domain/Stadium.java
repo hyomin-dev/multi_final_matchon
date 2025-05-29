@@ -22,24 +22,23 @@ public class Stadium extends BaseEntity {
 
     // 시설 이름
     @Column(name="stadium_name", nullable = false, columnDefinition = "VARCHAR(100)")
-    private String faciNm;
+    private String stadiumName;
 
     // 시도명
     @Column(name="stadium_region", nullable = false, columnDefinition = "VARCHAR(100)")
-    private String cpNm;
+    private String stadiumRegion;
 
     // 도로명 주소
     @Column(name="stadium_address", nullable = false, columnDefinition = "VARCHAR(255)")
-    private String faciRoadAddr;
+    private String stadiumAddress;
 
     // 전화번호
-    @Column(name="stadium_Tel", nullable = false, columnDefinition = "VARCHAR(255)")
-    private String faciTelNo;
+    @Column(name="stadium_tel", nullable = false, columnDefinition = "VARCHAR(255)")
+    private String stadiumTel;
 
     // 삭제 여부
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
-
 
 }
