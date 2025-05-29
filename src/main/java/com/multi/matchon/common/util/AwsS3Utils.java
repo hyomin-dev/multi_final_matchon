@@ -21,9 +21,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import java.time.Duration;
 
@@ -142,17 +139,16 @@ public class AwsS3Utils {
         }
     }
 
-    /**
-     * 확장자 제거 없이 전체 파일명을 사용 - 전준혁
-     */
-    public S3Resource downloadFileWithFullName(String dirName, String fullFileName) throws IOException {
-        String s3Key = dirName + fullFileName;
-        return s3Operations.download(bucket, s3Key);
-    }
-
     public String getObjectUrl(String dir, String filename, MultipartFile file) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         return "https://" + bucket + ".s3.amazonaws.com/" + dir + filename + "." + extension;
+    }
+
+    /**
+     * 저장 경로 전체를 인자로 받아 다운로드 (예: "community/파일명.ext")
+     */
+    public S3Resource downloadFileWithFullName(String fullPath) throws IOException {
+        return s3Operations.download(bucket, fullPath);
     }
 
 

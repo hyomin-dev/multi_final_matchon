@@ -65,4 +65,41 @@ public class Member extends BaseTimeEntity {
     private Boolean isDeleted=false;
 
 
+    // 삭제
+    public void markAsDeleted() {
+        this.isDeleted = true;
+    }
+
+    // 복원
+    public void unmarkAsDeleted() {
+        this.isDeleted = false;
+    }
+
+    public void restoreAsUser(String encodedPassword, String name) {
+        this.unmarkAsDeleted();
+        this.memberPassword = encodedPassword;
+        this.memberName = name;
+        this.memberRole = MemberRole.USER;
+        this.pictureAttachmentEnabled = true;
+        this.myTemperature = 36.5;
+
+        this.positions = null;
+        this.timeType = null;
+    }
+
+    public void restoreAsHost(String encodedPassword, String name) {
+        this.unmarkAsDeleted();
+        this.memberPassword = encodedPassword;
+        this.memberName = name;
+        this.memberRole = MemberRole.HOST;
+        this.pictureAttachmentEnabled = true;
+    }
+
+    public void clearPersonalInfo() {
+        this.positions = null;
+        this.timeType = null;
+        this.myTemperature = null;
+        this.pictureAttachmentEnabled = null;
+    }
+
 }

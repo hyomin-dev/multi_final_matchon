@@ -4,6 +4,7 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.PositionName;
 import com.multi.matchon.common.domain.TimeType;
 import com.multi.matchon.common.service.MypageService;
+import com.multi.matchon.event.repository.HostProfileRepository;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,8 @@ public class MypageController {
 
     private final MemberService memberService;
     private final MypageService mypageService;
+    private final HostProfileRepository hostProfileRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     @Transactional(readOnly = true)
@@ -58,6 +62,13 @@ public class MypageController {
         return ResponseEntity.ok("기관명 저장 완료");
     }
 
+    @GetMapping("/hostName/exist")
+    @ResponseBody
+    public ResponseEntity<Boolean> checkHostNameExist(@RequestParam String name) {
+        boolean exists = hostProfileRepository.findByHostName(name).isPresent();
+        return ResponseEntity.ok(exists);
+    }
+
     @GetMapping("/enums")
     @ResponseBody
     public Map<String, Object> getEnums() {
@@ -81,5 +92,18 @@ public class MypageController {
             log.error("마이페이지 수정 실패", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("수정 실패: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<String> withdraw(@AuthenticationPrincipal CustomUser user,
+                                           @RequestParam String password) {
+        Member member = memberService.findByEmail(user.getUsername());
+
+        if (!passwordEncoder.matches(password, member.getMemberPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호가 일치하지 않습니다.");
+        }
+
+        mypageService.withdraw(member);
+        return ResponseEntity.ok("탈퇴 완료");
     }
 }
