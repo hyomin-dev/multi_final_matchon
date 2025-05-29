@@ -29,6 +29,11 @@ public class ChatParticipant extends BaseEntity {
     @JoinColumn(name="member_id",nullable = false)
     private Member member;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="chat_role")
+    @Builder.Default
+    private ChatRole chatRole = ChatRole.MEMBER;
+
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;

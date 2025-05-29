@@ -8,6 +8,8 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+  jmx:
+    enabled: false
   cloud:
     aws:
       credentials:
@@ -20,10 +22,14 @@ spring:
         static: ${S3_REGION}
       stack:
         auto: false
+  thymeleaf:
+    cache: false
+
+
 
 matchon:
   kakao-api: ${KAKAO_API_KEY}
-
+  dialogflow-key-path: ${DIALOGFLOW_KEY_PATH}
 jwt:
   secret: ${JWT_SECRET}
 

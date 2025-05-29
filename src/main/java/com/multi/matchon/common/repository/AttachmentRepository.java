@@ -18,5 +18,8 @@ public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
     @Query("select t1 from Attachment t1 where t1.boardType=:boardType and t1.boardNumber=:matchupBoardId and t1.isDeleted=false")
     List<Attachment> findAllByBoardTypeAndBoardNumber(@Param("boardType") BoardType boardType,@Param("matchupBoardId") Long matchupBoardId);
 
+    //커뮤니티 전용 다운로드용 메서드
+    @Query("SELECT a FROM Attachment a WHERE a.savedName = :savedName AND a.boardType = com.multi.matchon.common.domain.BoardType.BOARD")
+    Optional<Attachment> findCommunityAttachmentBySavedName(@Param("savedName") String savedName);
 
 }

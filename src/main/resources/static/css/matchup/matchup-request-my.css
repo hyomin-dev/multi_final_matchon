@@ -123,3 +123,18 @@ h1 {
     background-color: #d0d0d0;
     cursor: not-allowed;
 }
+
+/* 페이징 영역 가운데 정렬 */
+#paging-container {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.no-result {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #777;
+    padding: 2rem 0;
+}

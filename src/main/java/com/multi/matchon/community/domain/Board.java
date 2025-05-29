@@ -3,6 +3,9 @@ package com.multi.matchon.community.domain;
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
@@ -45,22 +48,15 @@ public class Board extends BaseEntity {
         this.isDeleted = deleted;
     }
 
-    @Column(name = "attachment_path")
-    private String attachmentPath;
-
-    @Column(name = "attachment_original_name")
-    private String attachmentOriginalName;
-
-    public void update(String title, String content, Category category,
-                       String attachmentPath, String attachmentOriginalName) {
+    public void update(String title, String content, Category category) {
         this.title = title;
         this.content = content;
         this.category = category;
-        this.attachmentPath = attachmentPath;
-        this.attachmentOriginalName = attachmentOriginalName;
     }
 
+    public void update(@NotBlank(message = "제목은 필수입니다.") @Size(max = 50, message = "제목은 50자 이하로 입력해주세요.") String title, @NotBlank(message = "내용은 필수입니다.") String content, @NotNull(message = "카테고리를 선택해주세요.") Category category, Object o, Object o1) {
+    }
+
+    public void setBoardAttachmentEnabled(boolean b) {
+    }
 }
-
-
-

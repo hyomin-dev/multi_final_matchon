@@ -5,16 +5,31 @@
     <title>Title</title>
 </head>
 <body>
-  <script th:inline="javascript">
+    <div id="error-detail-dto"
+         th:data-error-message="${errorMessage}"
+
+    >
+    </div>
+
+
+  <script defer>
+      //th:inline="javascript"
+      const detailDto = document.querySelector("#error-detail-dto");
+      const errorMessage = detailDto.dataset.errorMessage;
+
     (function(){
 
-      const errorCode = [[${errorMessage}]]
+      //const errorCode = [[${errorMessage}]]
       //console.log(errorCode);
 
-        if(errorCode.includes("Matchup")){
-            alert(errorCode)
+        if(errorMessage.includes("Matchup")){
+            alert(errorMessage)
             window.location.href="/matchup/board";
-        }else{
+        } else if(errorMessage.includes("Chat")){
+            alert(errorMessage);
+            window.close();
+        }
+        else{
             alert("알 수 없는 오류로 인해 메인 페이지로 이동합니다.")
             window.location.href="/";
         }

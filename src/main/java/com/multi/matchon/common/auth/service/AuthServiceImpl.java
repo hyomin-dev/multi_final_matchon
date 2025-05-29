@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService{
         // hostProfile 생성
         HostProfile hostProfile = HostProfile.builder()
                 .member(member)
-                .hostName("") // 사용자가 나중에 입력
+                .hostName(null) // 사용자가 나중에 입력
                 .build();
 
         hostProfileRepository.save(hostProfile);

@@ -52,15 +52,16 @@
         <div class="post-body">
             <div th:utext="${board.content}" class="post-content"></div>
 
-            <div th:if="${board.boardAttachmentEnabled}" class="attachment-box">
+            <div th:if="${attachments != null and !attachments.isEmpty()}" class="attachment-box">
                 <strong>첨부파일</strong>
                 <ul>
-                    <li th:each="path, iterStat : ${savedPaths}">
-                        <a th:href="@{/community/download-force/{filename}(filename=${path})}"
-                           th:text="${originalNames[iterStat.index]}"></a>
+                    <li th:each="att : ${attachments}">
+                        <a th:href="@{/community/download-force/{filename}(filename=${att.savedName})}"
+                           th:text="${att.originalName}"></a>
                     </li>
                 </ul>
             </div>
+
         </div>
 
         <div th:if="${board.member.id == #authentication.principal.member.id}" class="post-actions">
@@ -119,11 +120,11 @@
             <label for="reportReasonSelect">신고 사유</label>
             <select id="reportReasonSelect" required>
                 <option value="">-- 선택하세요 --</option>
-                <option value="욕설/비방/괴롭힘">욕설/비방/괴롭힘</option>
-                <option value="상업/광고성 글">상업/광고성 글</option>
-                <option value="도배성 글">도배성 글</option>
-                <option value="카테고리 취지에 맞지 않는 글">카테고리 취지에 맞지 않는 글</option>
-                <option value="기타">기타</option>
+                <option value="ABUSE">욕설/비방/괴롭힘</option>
+                <option value="ADVERTISEMENT">상업/광고성 글</option>
+                <option value="SPAM">도배성 글</option>
+                <option value="IRRELEVANT">카테고리 취지에 맞지 않는 글</option>
+                <option value="ETC">기타</option>
             </select>
         </div>
 
@@ -245,34 +246,32 @@
     function submitReport() {
         const type = document.getElementById("reportTargetType").value;
         const id = document.getElementById("reportTargetId").value;
-        const selectedReason = document.getElementById("reportReasonSelect").value;
+        const selectedReasonType = document.getElementById("reportReasonSelect").value;
         const detailReason = document.getElementById("reportReasonDetail").value.trim();
-        const token = localStorage.getItem("accessToken");
 
-        if (!selectedReason) {
+        // 필수 유효성 검사
+        if (!selectedReasonType) {
             alert("신고 사유를 선택해주세요.");
             return;
         }
-
-        if (selectedReason === "기타" && !detailReason) {
+        if (selectedReasonType === "ETC" && !detailReason) {
             alert("기타 사유를 선택한 경우, 상세 사유를 입력해주세요.");
             return;
         }
 
-        // 선택한 사유와 상세 사유를 결합
-        const finalReason = detailReason
-            ? `${selectedReason} - ${detailReason}`
-            : selectedReason;
+        const token = localStorage.getItem("accessToken");
 
+        // 상세 사유와 카테고리 정보 동시 전송
         fetch("/community/report", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Authorization": "Bearer " + token
             },
-            body: `type=${type}&targetId=${id}&reason=${encodeURIComponent(finalReason)}`
+            body: `type=${type}&targetId=${id}&reasonType=${selectedReasonType}&reason=${encodeURIComponent(detailReason)}`
         })
-            .then(res => {
+
+                .then(res => {
                 if (res.status === 401) {
                     alert("로그인이 필요합니다.");
                     location.href = "/login";
