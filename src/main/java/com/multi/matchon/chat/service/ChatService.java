@@ -66,8 +66,9 @@ public class ChatService {
 
     @Transactional
     public void addParticipantToRoom(ChatRoom chatRoom, Member member){
+
         ChatParticipant chatParticipant = ChatParticipant.builder()
-                //.chatRoom(chatRoom) // 양방향 쓸것이기 때문에 없앰
+                .chatRoom(chatRoom) // 양방향 쓸것이기 때문에 없앰
                 .member(member)
                 .build();
 

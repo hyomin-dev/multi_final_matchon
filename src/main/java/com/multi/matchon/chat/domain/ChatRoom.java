@@ -32,6 +32,7 @@ public class ChatRoom extends BaseEntity {
     private String chatRoomName;
 
     @OneToMany(mappedBy = "chatRoom")
+    @Builder.Default
     private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
     @Column(name="is_deleted")
