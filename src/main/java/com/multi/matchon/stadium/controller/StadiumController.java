@@ -19,17 +19,25 @@ public class StadiumController {
     private final StadiumService stadiumService;
 
     @GetMapping("/stadium")
-    public String showStadiumList(@RequestParam(required = false) String region, @PageableDefault(size = 10) Pageable pageable, Model model) {
+    public String showStadiumList(@RequestParam(required = false) String region,
+                                  @RequestParam(required = false) String keyword,
+                                  @PageableDefault(size = 10) Pageable pageable,
+                                  Model model) {
+
         Page<Stadium> stadiums;
 
-        if (region != null && !region.isEmpty()) {
-            stadiums = stadiumService.getStadiumsByRegion(region, pageable);
+        if (keyword != null && !keyword.isBlank()) {
+            stadiums = stadiumService.searchStadiumsByName(keyword, pageable);
+        } else if (region != null && !region.isBlank()) {
+            stadiums = stadiumService.filterStadiumsByRegion(region, pageable);
         } else {
             stadiums = stadiumService.getAllStadiums(pageable);
         }
 
         model.addAttribute("stadiums", stadiums);
         model.addAttribute("selectedRegion", region);
+        model.addAttribute("keyword", keyword);
+
         return "stadium/stadium";
     }
 
@@ -37,7 +45,7 @@ public class StadiumController {
     public String showStadiumDetail(@PathVariable Long id, Model model) {
         Stadium stadium = stadiumService.getStadiumById(id);
         model.addAttribute("stadium", stadium);
-        return "stadium/stadium-detail"; // 구장 상세보기 페이지로 이동.
+        return "stadium/stadium-detail";
     }
 
     @GetMapping("/stadium/map")
