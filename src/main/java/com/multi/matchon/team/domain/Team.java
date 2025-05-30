@@ -57,8 +57,20 @@ public class Team extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
+    public void softDelete() {
+        this.isDeleted = true;
+    }
+
     @Column(name = "created_person", nullable = false, columnDefinition = "VARCHAR(100)")
     private String createdPerson;
+
+    public void updateInfo(String name, String intro, RegionType region, Double rating, Boolean recruitStatus) {
+        this.teamName = name;
+        this.teamIntroduction = intro;
+        this.teamRegion = region;
+        this.teamRatingAverage = rating;
+        this.recruitmentStatus = recruitStatus;
+    }
 
 
 
