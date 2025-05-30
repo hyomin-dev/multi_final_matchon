@@ -184,20 +184,27 @@
 }
 
 .report-button {
-    padding: 3px 9px;
-    color: red;
+    padding: 3px 8px;
+    color: #F44336;
     background: none;
     border: none;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 13px;
 
 }
 
 .report-button:hover {
     background-color: mistyrose;
+    color: red;
     transform: scale(1.05);
     transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.post-action-right .report-button {
+    padding: 4px 10px;
+    font-weight: bold;
+    font-size: 14px;
 }
 
 /*수정버튼*/
