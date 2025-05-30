@@ -101,5 +101,12 @@ h1 {
     opacity: 0.6;
 }
 
+.no-result {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #777;
+    padding: 2rem 0;
+}
+
 
 

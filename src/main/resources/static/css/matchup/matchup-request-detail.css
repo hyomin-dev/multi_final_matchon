@@ -114,3 +114,9 @@ a.back-btn:hover {
     text-decoration: none;
 }
 
+td {
+    word-break: break-all;    /* 글자 단위 줄바꿈 (한글/영어 모두 적용) */
+    white-space: normal;
+}
+
+

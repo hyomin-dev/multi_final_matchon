@@ -81,8 +81,8 @@ function renderList(items){
             
             <div class="card-section">
                 <div><strong>종목:</strong> ${item.sportsTypeName}</div>
-                <div><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                <div><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
+                <div class="truncate"><strong>경기장:</strong> ${item.sportsFacilityName}</div>
+                <div class="truncate"><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
                 <div>
                     📅 날짜: ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
                     ${calTime(item, date.getHours(), date.getMinutes())}

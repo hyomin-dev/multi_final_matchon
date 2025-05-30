@@ -70,8 +70,8 @@ function renderList(items){
                   <!-- 2. 경기 정보 영역 -->
                   <div class="match-info">
                     <div><strong>종목:</strong> ${item.sportsTypeName}</div>
-                    <div><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                    <div>경기장 주소: ${item.sportsFacilityAddress}</div>
+                    <div class="truncate"><strong>경기장:</strong> ${item.sportsFacilityName}</div>
+                    <div class="truncate">경기장 주소: ${item.sportsFacilityAddress}</div>
                     <div>📅 날짜: ${date.getMonth()+1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - ${calTime(item,date.getHours(), date.getMinutes())}</div>
                     <div><strong>경기 상태:</strong> ${checkMatchStatus(item)}</div>
                   </div>
