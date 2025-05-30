@@ -40,6 +40,7 @@ public class TeamController {
     @GetMapping("/team/register")
     public ModelAndView teamRegister(ModelAndView mv){
         mv.setViewName("/team/team-register");
+        mv.addObject("formActionUrl", "/team/register");
         mv.addObject("ReqTeamDto",new ReqTeamDto());
         return mv;
     }
@@ -80,15 +81,18 @@ public class TeamController {
     }
 
     @GetMapping("/team/{teamId}")
-    public ModelAndView viewTeamDetail(@PathVariable Long teamId) {
+    public ModelAndView viewTeamDetail(@PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
         ModelAndView mv = new ModelAndView("team/team-detail");
 
         ResTeamDto teamDto = teamService.findTeamById(teamId);
         mv.addObject("team", teamDto);
 
+        // Add team leader status flag
+        boolean isLeader = teamService.isTeamLeader(teamId, user.getUsername()); // you'll add this method
+        mv.addObject("isTeamLeader", isLeader);
+
         return mv;
     }
-
     @PostMapping("/join/{teamId}")
     @ResponseBody
     public ResponseEntity<ApiResponse<Void>> joinTeam(
@@ -187,6 +191,32 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
+    @GetMapping("/team/edit/{teamId}")
+    public ModelAndView editTeamPage(@PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
+        ReqTeamDto dto = teamService.getTeamEditForm(teamId, user); // include validation to ensure leader
+        ModelAndView mv = new ModelAndView("team/team-edit");
+        mv.addObject("ReqTeamDto", dto);
+        return mv;
+    }
+
+    @DeleteMapping("/team/{teamId}")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> deleteTeam(@PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
+        teamService.deleteTeam(teamId, user);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @PostMapping("/team/update")
+    public String updateTeam(@ModelAttribute ReqTeamDto reqTeamDto,
+                             @AuthenticationPrincipal CustomUser user) {
+
+
+        teamService.updateTeam(reqTeamDto, user);
+
+
+        return "redirect:/team"; // or wherever you want to redirect after update
+
+    }
 }
 
 
