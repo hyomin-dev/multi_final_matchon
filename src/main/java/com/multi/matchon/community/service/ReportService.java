@@ -9,11 +9,11 @@ import com.multi.matchon.community.repository.CommentRepository;
 import com.multi.matchon.community.repository.ReportRepository;
 import com.multi.matchon.member.domain.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,30 +45,74 @@ public class ReportService {
 
     public List<ReportResponse> getAllReports() {
         List<Report> reports = reportRepository.findAll(Sort.by(Sort.Direction.DESC, "createdDate"));
+        return reports.stream()
+                .map(report -> {
+                    String targetWriterName = resolveTargetWriterName(report);
+                    return ReportResponse.builder()
+                            .id(report.getId())
+                            .reportType(report.getReportType().name())
+                            .targetId(report.getTargetId())
+                            .targetWriterName(targetWriterName)
+                            .reporterName(report.getReporter().getMemberName())
+                            .reasonType(report.getReasonType().getLabel())
+                            .reason(report.getReason())
+                            .createdDate(report.getCreatedDate())
+                            .boardId(resolveBoardId(report))
+                            .build();
+                }).toList();
+    }
 
-        return reports.stream().map(report -> {
-            String targetWriterName = null;
+    public Page<ReportResponse> getReportsPaged(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        return reportRepository.findAll(pageable)
+                .map(report -> {
+                    String targetWriterName = null;
+                    if (report.getReportType() == ReportType.BOARD) {
+                        targetWriterName = boardRepository.findById(report.getTargetId())
+                                .map(board -> board.getMember().getMemberName())
+                                .orElse(null);
+                    } else if (report.getReportType() == ReportType.COMMENT) {
+                        targetWriterName = commentRepository.findById(report.getTargetId())
+                                .map(comment -> comment.getMember().getMemberName())
+                                .orElse(null);
+                    }
 
-            if (report.getReportType() == ReportType.BOARD) {
-                targetWriterName = boardRepository.findById(report.getTargetId())
-                        .map(board -> board.getMember().getMemberName())
-                        .orElse(null);
-            } else if (report.getReportType() == ReportType.COMMENT) {
-                targetWriterName = commentRepository.findById(report.getTargetId())
-                        .map(comment -> comment.getMember().getMemberName())
-                        .orElse(null);
-            }
+                    return ReportResponse.builder()
+                            .id(report.getId())
+                            .reportType(report.getReportType().name())
+                            .targetId(report.getTargetId())
+                            .targetWriterName(targetWriterName)
+                            .reporterName(report.getReporter().getMemberName())
+                            .reasonType(report.getReasonType().getLabel())
+                            .reason(report.getReason())
+                            .createdDate(report.getCreatedDate())
+                            .boardId(resolveBoardId(report))
+                            .build();
+                });
+    }
 
-            return ReportResponse.builder()
-                    .id(report.getId())
-                    .reportType(report.getReportType().name())
-                    .targetId(report.getTargetId())
-                    .targetWriterName(targetWriterName)
-                    .reporterName(report.getReporter().getMemberName())
-                    .reasonType(report.getReasonType().getLabel())
-                    .reason(report.getReason())
-                    .createdDate(report.getCreatedDate())
-                    .build();
-        }).collect(Collectors.toList());
+
+    private String resolveTargetWriterName(Report report) {
+        if (report.getReportType() == ReportType.BOARD) {
+            return boardRepository.findById(report.getTargetId())
+                    .map(board -> board.getMember().getMemberName())
+                    .orElse(null);
+        } else if (report.getReportType() == ReportType.COMMENT) {
+            return commentRepository.findById(report.getTargetId())
+                    .map(comment -> comment.getMember().getMemberName())
+                    .orElse(null);
+        }
+        return null;
+    }
+
+    private Long resolveBoardId(Report report) {
+        if (report.getReportType() == ReportType.BOARD) {
+            return report.getTargetId();
+        } else if (report.getReportType() == ReportType.COMMENT) {
+            return commentRepository.findById(report.getTargetId())
+                    .map(comment -> comment.getBoard().getId())
+                    .orElse(null);
+        }
+        return null;
     }
 }

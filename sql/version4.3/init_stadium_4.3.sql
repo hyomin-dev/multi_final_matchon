@@ -1,7 +1,3 @@
-
-use matchon;
--- truncate table stadium;
-
 INSERT INTO stadium (stadium_name, stadium_region, stadium_address, stadium_tel)
 VALUES ('청계중앙공원 축구장', '경기도', '경기도 화성시 동탄대로시범길 133 (청계동)', '031-355-1292'),
        ('율면체육공원축구장', '경기도', '경기 이천시 율면 본죽리 30-17', '031-644-4315'),
@@ -2847,19 +2843,15 @@ VALUES ('청계중앙공원 축구장', '경기도', '경기도 화성시 동탄
        ('시각장애인축구장', '광주광역시', '', '062-613-3553'),
        ('(축구장-01) 양산종합운동장 주경기장', '경상남도', '경상남도 양산시 양산대로 849 (북부동)', '055-379-8532');
 
--- DELETE FROM stadium
--- WHERE stadium_id IN (
---     SELECT * FROM (
---                       SELECT stadium_id
---                       FROM (
---                                SELECT stadium_id,
---                                       ROW_NUMBER() OVER (PARTITION BY stadium_name, stadium_tel ORDER BY stadium_id) AS rn
---                                FROM stadium
---                            ) AS ranked
---                       WHERE rn > 1
---                   ) AS temp_ids
--- );
-
-
-
-
+DELETE FROM stadium
+WHERE stadium_id IN (
+    SELECT * FROM (
+                      SELECT stadium_id
+                      FROM (
+                               SELECT stadium_id,
+                                      ROW_NUMBER() OVER (PARTITION BY stadium_name, stadium_tel ORDER BY stadium_id) AS rn
+                               FROM stadium
+                           ) AS ranked
+                      WHERE rn > 1
+                  ) AS temp_ids
+);

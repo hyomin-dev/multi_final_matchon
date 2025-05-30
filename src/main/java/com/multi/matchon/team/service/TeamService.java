@@ -87,7 +87,7 @@ public class TeamService {
 
 
     public List<Team> findAll() {
-        List<Team> teamBoards = teamRepository.findAll();
+        List<Team> teamBoards = teamRepository.findAllNotDeleted();
 
 
         return teamBoards;
@@ -174,21 +174,16 @@ public class TeamService {
             return;
         }
 
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        String ext = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
-        String savedName = uuid + "." + ext;
-
-        String teamDir = "attachments/team/";
-
-        awsS3Utils.saveFile(teamDir, savedName, multipartFile); // uploads to correct key
+        String fileName = UUID.randomUUID().toString().replace("-", "");
+        awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
 
         Attachment attachment = Attachment.builder()
                 .boardType(BoardType.TEAM)
                 .boardNumber(team.getId())
                 .fileOrder(0)
                 .originalName(multipartFile.getOriginalFilename())
-                .savedName(savedName)
-                .savePath(teamDir)
+                .savedName(fileName+multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")))
+                .savePath(FILE_DIR)
                 .build();
 
         attachmentRepository.save(attachment);
@@ -246,7 +241,7 @@ public class TeamService {
         Page<ResTeamDto> dtoPage = teamPage.map(team -> {
             Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
             String imageUrl = attachment
-                    .map(att -> S3BaseUrl + "team/" + att.getSavedName())
+                    .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
                     .orElse("/img/default-team.png");
 
             return ResTeamDto.from(team, imageUrl);
@@ -267,12 +262,12 @@ public class TeamService {
 
 
     public ResTeamDto findTeamById(Long teamId) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다: " + teamId));
 
         Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
         String imageUrl = attachment
-                .map(att -> S3BaseUrl + "team/" + att.getSavedName())
+                .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
                 .orElse("/img/default-team.png");
 
         return ResTeamDto.from(team, imageUrl);
@@ -280,7 +275,7 @@ public class TeamService {
 
     @Transactional
     public void processTeamJoinRequest(Long teamId, ReqTeamJoinDto joinRequest, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다: " + teamId));
 
         if (!team.getRecruitmentStatus()) {
@@ -390,7 +385,7 @@ public class TeamService {
 
     @Transactional
     public void sendJoinRequest(Long teamId, CustomUser user, ReqTeamJoinDto joinDto) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         Member member = memberRepository.findByMemberEmail(user.getUsername())
@@ -421,7 +416,7 @@ public class TeamService {
     }
     @Transactional(readOnly = true)
     public List<ResJoinRequestDto> getJoinRequestsForTeam(Long teamId, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         // Optional: check if user is team leader
@@ -472,7 +467,111 @@ public class TeamService {
         request.denied();
     }
 
+    @Transactional(readOnly = true)
+    public boolean isTeamLeader(Long teamId, String userEmail) {
+        Member member = memberRepository.findByMemberEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
+        return teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(
+                teamRepository.findByIdNotDeleted(teamId).orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다.")),
+                member
+        );
+    }
+
+    @Transactional
+    public void deleteTeam(Long teamId, CustomUser user) {
+
+        Team team = teamRepository.findByIdNotDeleted(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("삭제된 팀이거나 존재하지 않습니다."));
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        boolean isLeader = teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, member);
+        if (!isLeader) throw new IllegalArgumentException("팀 리더만 삭제할 수 있습니다.");
+
+        team.softDelete(); // if you support soft delete
+
+
+        teamRepository.save(team);
+    }
+
+
+    @Transactional(readOnly = true)
+    public ReqTeamDto getTeamEditForm(Long teamId, CustomUser user) {
+        Team team = teamRepository.findByIdNotDeleted(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        boolean isLeader = teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, member);
+        if (!isLeader) {
+            throw new IllegalArgumentException("팀 리더만 수정할 수 있습니다.");
+        }
+
+        List<String> recruitingPositionNames = team.getRecruitingPositions().stream()
+                .map(rp -> rp.getPositions().getPositionName().name())
+                .collect(Collectors.toList());
+
+        return ReqTeamDto.builder()
+                .teamId(team.getId())
+                .teamName(team.getTeamName())
+                .teamIntroduction(team.getTeamIntroduction())
+                .teamRegion(team.getTeamRegion().name())
+                .teamRatingAverage(team.getTeamRatingAverage())
+                .recruitmentStatus(team.getRecruitmentStatus())
+                .recruitingPositions(recruitingPositionNames)
+                // Note: teamImageFile is not set here because it's a file upload, not stored in entity
+                .build();
+    }
+    @Transactional
+    public void updateTeam(ReqTeamDto dto, CustomUser user) {
+        if (dto.getTeamId() == null) {
+            throw new IllegalArgumentException("팀 ID가 없습니다.");
+        }
+
+
+        Team team = teamRepository.findByIdNotDeleted(dto.getTeamId())
+
+                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        boolean isLeader = teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, member);
+        if (!isLeader) {
+            throw new IllegalArgumentException("팀 리더만 수정할 수 있습니다.");
+        }
+
+        // Update fields
+        team.updateInfo(dto.getTeamName(), dto.getTeamIntroduction(),
+                RegionType.valueOf(dto.getTeamRegion()), dto.getTeamRatingAverage(), dto.getRecruitmentStatus());
+
+        // Remove and re-insert recruiting positions
+        recruitingPositionRepository.deleteByTeam(team);
+
+        em.flush();
+
+
+
+        for (String posName : dto.getRecruitingPositions()) {
+            PositionName enumValue = PositionName.valueOf(posName.trim());
+            Positions position = positionsRepository.findByPositionName(enumValue)
+                    .orElseThrow(() -> new IllegalArgumentException("포지션 정보 오류: " + posName));
+
+            RecruitingPosition rp = RecruitingPosition.builder()
+                    .team(team)
+                    .positions(position)
+                    .build();
+
+            recruitingPositionRepository.save(rp);
+        }
+
+        // Update image if necessary
+        if (dto.getTeamImageFile() != null && !dto.getTeamImageFile().isEmpty()) {
+            updateFile(dto.getTeamImageFile(), team);
+        }
+    }
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(

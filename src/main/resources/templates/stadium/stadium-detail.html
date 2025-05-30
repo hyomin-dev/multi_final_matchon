@@ -21,6 +21,8 @@
     <h1 class="stadiumdetail">구장 상세보기</h1>
 
     <div class="stadium-info-detail">
+        <img th:src="${stadium.fullImageUrl}" alt="구장 이미지" width="300">
+
         <p><span th:text="${stadium.stadiumRegion}">지역명</span></p>
         <p><span th:text="${stadium.stadiumAddress}">주소</span></p>
         <p><span th:text="${stadium.stadiumTel}">전화번호</span></p>
