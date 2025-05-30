@@ -12,34 +12,44 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name="stadium")
-//@Setter: JPA entity에서 setter사용은 자제, test용
+@Table(name = "stadium")
 public class Stadium extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="stadium_id")
+    @Column(name = "stadium_id")
     private Long id;
 
-    // 시설 이름
-    @Column(name="stadium_name", nullable = false, columnDefinition = "VARCHAR(100)")
-    private String faciNm;
+    @Column(name = "stadium_name", nullable = false, columnDefinition = "VARCHAR(100)")
+    private String stadiumName;
 
-    // 시도명
-    @Column(name="stadium_region", nullable = false, columnDefinition = "VARCHAR(100)")
-    private String cpNm;
+    @Column(name = "stadium_region", nullable = false, columnDefinition = "VARCHAR(100)")
+    private String stadiumRegion;
 
-    // 도로명 주소
-    @Column(name="stadium_address", nullable = false, columnDefinition = "VARCHAR(255)")
-    private String faciRoadAddr;
+    @Column(name = "stadium_address", nullable = false, columnDefinition = "VARCHAR(255)")
+    private String stadiumAddress;
 
-    // 전화번호
-    @Column(name="stadium_Tel", nullable = false, columnDefinition = "VARCHAR(255)")
-    private String faciTelNo;
+    @Column(name = "stadium_tel", nullable = false, columnDefinition = "VARCHAR(255)")
+    private String stadiumTel;
 
-    // 삭제 여부
-    @Column(name="is_deleted")
+    @Column(name = "is_deleted")
     @Builder.Default
-    private Boolean isDeleted=false;
+    private Boolean isDeleted = false;
 
+    // 예: "1_청계중앙공원축구장.jpg"
+    @Column(name = "image_url")
+    private String imageUrl;
 
+    public String getFullImageUrl() {
+        String regionFolder = switch (stadiumRegion) {
+            case "경기도" -> "gyeonggi";
+            case "서울특별시" -> "seoul";
+            case "부산광역시" -> "busan";
+            case "인천광역시" -> "incheon";
+            default -> "unknown";
+        };
+
+        return "https://matchon-seongeun-bucket.s3.eu-north-1.amazonaws.com/stadium/region/"
+                + regionFolder + "/" + imageUrl;
+    }
 }

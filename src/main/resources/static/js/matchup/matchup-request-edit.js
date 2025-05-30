@@ -143,7 +143,7 @@ function setParticipantCount(currentParticipantCount, maxParticipants, participa
 
     const participantCountEle = document.querySelector("#participantCount");
 
-    for(let i=1; i<=(maxParticipants-currentParticipantCount);i++){
+    for(let i=0; i<=(maxParticipants-currentParticipantCount);i++){
         const option = document.createElement("option");
         option.value = i;
         option.textContent = i;
