@@ -10,6 +10,8 @@ build/
 *.class
 src/main/resources/application-test.yml
 uploads/
+src/main/resources/*.json
+
 ### 아래는 스프링 부트, gitignore.io
 HELP.md
 .gradle

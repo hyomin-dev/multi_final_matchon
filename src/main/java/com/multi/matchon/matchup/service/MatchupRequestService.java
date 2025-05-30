@@ -78,6 +78,14 @@ public class MatchupRequestService {
             throw new CustomException("Matchup 경기 시작 시간이 지나 참가 요청할 수 없습니다.");
         }
 
+        if(findMatchupBoard.getCurrentParticipantCount()>findMatchupBoard.getMaxParticipants()){
+            throw new CustomException("Matchup 현재 모집 인원을 초과해서 참가 요청을 할 수 없습니다.");
+        }
+
+        if(findMatchupBoard.getCurrentParticipantCount()+reqMatchupRequestDto.getParticipantCount()>findMatchupBoard.getMaxParticipants()){
+            throw new CustomException("Matchup 신청 하신 인원은 현재 모집원을 초과해서 신청할 수 없습니다.");
+        }
+
         // 2. boardId와 applicantId에 대응되는 request가 있는 지 판단
 
         Optional<MatchupRequest> findMatchupRequestOptional = matchupRequestRepository.findByMatchupBoardIdAndApplicantId(reqMatchupRequestDto.getBoardId(), user.getMember().getId());

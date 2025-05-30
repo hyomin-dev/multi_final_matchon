@@ -5,6 +5,7 @@
   <title>MATCHON</title>
   <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
   <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
   <script th:src="@{/js/matchup/matchup-board-detail.js}" defer></script>
   <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
   <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-board-detail.css}">
@@ -21,6 +22,7 @@
   <h1>MATCHUP 글 상세보기</h1>
   <div id="matchup-board-detail-dto"
        th:data-member-email="${resMatchupBoardDto.memberEmail}"
+       th:data-member-name = "${resMatchupBoardDto.memberName}"
        th:data-sports-facility-name="${resMatchupBoardDto.sportsFacilityName}"
        th:data-sports-facility-address="${resMatchupBoardDto.sportsFacilityAddress}"
        th:data-match-datetime="${resMatchupBoardDto.matchDatetime}"
@@ -36,32 +38,32 @@
   </div>
   <table>
     <tr>
-      <th>종목: </th>
+      <th>종목 </th>
       <td th:text="${resMatchupBoardDto.sportsTypeName}"></td>
     </tr>
     <tr>
-      <th>작성자: </th>
+      <th>작성자 </th>
       <td id="writer"></td>
     </tr>
     <tr>
-      <th>소속팀:</th>
+      <th>소속팀</th>
       <td th:text="${resMatchupBoardDto.teamName}"></td>
     </tr>
     <tr>
-      <th>팀 소개:</th>
+      <th>팀 소개</th>
       <td th:text="${resMatchupBoardDto.teamIntro}"></td>
     </tr>
     <tr>
-      <th>경기장 예약내역:</th>
+      <th>경기장 예약내역</th>
 
-      <td >미리보기: <a id="reservationUrl" th:text="${resMatchupBoardDto.originalName}" target="_blank" download></a></td>
+      <td >미리보기 <a id="reservationUrl" th:text="${resMatchupBoardDto.originalName}" target="_blank" download></a></td>
     </tr>
     <tr>
-      <th>경기장명:</th>
+      <th>경기장명</th>
       <td th:text="${resMatchupBoardDto.sportsFacilityName}"></td>
     </tr>
     <tr>
-      <th>경기장 주소:</th>
+      <th>경기장 주소</th>
       <td th:text="${resMatchupBoardDto.sportsFacilityAddress}"></td>
     </tr>
     <tr>
@@ -91,7 +93,7 @@
       <td th:text="${resMatchupBoardDto.myMannerTemperature}"></td>
     </tr>
     <tr>
-      <th>경기 방식: </th>
+      <th>경기 방식 </th>
       <td th:text="${resMatchupBoardDto.matchDescription}"></td>
     </tr>
   </table>
