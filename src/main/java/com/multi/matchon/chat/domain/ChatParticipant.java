@@ -37,4 +37,19 @@ public class ChatParticipant extends BaseEntity {
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
+
+    public void deleteParticipant(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public void changeChatRoom(ChatRoom chatRoom){
+        if(this.chatRoom!=null)
+            this.chatRoom.getChatParticipants().remove(this);
+
+        this.chatRoom = chatRoom;
+
+        if(!chatRoom.getChatParticipants().contains(this))
+            chatRoom.getChatParticipants().add(this);
+
+    }
 }

@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     const form = document.querySelector("form");
     form.addEventListener("submit", (e)=>{
-        submitCheck(e);
+        submitCheck(e, myMannerTemperature);
     })
 
     const backBtn = document.querySelector(".back-btn");
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 })
 
-function submitCheck(e){
+function submitCheck(e, myMannerTemperature){
 
     const teamNameEle = document.querySelector("#teamName");
 
@@ -96,7 +96,10 @@ function submitCheck(e){
    } else if(minMannerTemperatureEle.value ===""){
         alert("하한 매너 온도를 입력하세요.");
         e.preventDefault();
-    } else if(matchDescriptionEle.value ===""){
+    } else if(minMannerTemperatureEle.value>myMannerTemperature){
+       alert(`하한 매너 온도는 내 매너 온도 ${myMannerTemperature} 이상이어야 합니다.`);
+       e.preventDefault();
+   } else if(matchDescriptionEle.value ===""){
         alert("경기 방식 소개를 입력하세요");
         e.preventDefault();
     } else{
