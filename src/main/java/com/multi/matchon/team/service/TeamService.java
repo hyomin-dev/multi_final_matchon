@@ -480,6 +480,7 @@ public class TeamService {
 
     @Transactional
     public void deleteTeam(Long teamId, CustomUser user) {
+
         Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("삭제된 팀이거나 존재하지 않습니다."));
         Member member = memberRepository.findByMemberEmail(user.getUsername())
@@ -489,6 +490,7 @@ public class TeamService {
         if (!isLeader) throw new IllegalArgumentException("팀 리더만 삭제할 수 있습니다.");
 
         team.softDelete(); // if you support soft delete
+
 
         teamRepository.save(team);
     }
@@ -528,7 +530,9 @@ public class TeamService {
             throw new IllegalArgumentException("팀 ID가 없습니다.");
         }
 
+
         Team team = teamRepository.findByIdNotDeleted(dto.getTeamId())
+
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         Member member = memberRepository.findByMemberEmail(user.getUsername())
@@ -545,7 +549,9 @@ public class TeamService {
 
         // Remove and re-insert recruiting positions
         recruitingPositionRepository.deleteByTeam(team);
+
         em.flush();
+
 
 
         for (String posName : dto.getRecruitingPositions()) {
