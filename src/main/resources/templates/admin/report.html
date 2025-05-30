@@ -13,44 +13,73 @@
 
 <h1>신고 목록</h1>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>유형</th>
-        <th>신고대상</th>
-        <th>신고자</th>
-        <th>신고분류</th>
-        <th>상세사유</th>
-        <th>신고일</th>
-        <th>보기</th> <!-- ✅ 새 열 추가 -->
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="report, stat : ${reports}">
-        <td data-label="번호" th:text="${stat.index + 1}">1</td>
-        <td data-label="유형" th:text="${report.reportType}">BOARD</td>
-        <td data-label="신고대상" th:text="${report.targetWriterName}">Name</td>
-        <td data-label="신고자" th:text="${report.reporterName}">홍길동</td>
-        <td data-label="신고분류" th:text="${report.reasonType}">욕설/비방/괴롭힘</td>
-        <td data-label="상세사유" th:text="${report.reason}">구체적인 이유</td>
-        <td data-label="신고일" th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">2025-05-28</td>
-        <td data-label="보기">
-            <!-- 게시글 보기 -->
-            <a th:if="${report.reportType == 'BOARD'}"
-               th:href="@{'/community/' + ${report.boardId}}"
-               class="view-link">게시글 보기</a>
+<div id="reportTableArea" th:fragment="reportTableArea">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>유형</th>
+            <th>신고대상</th>
+            <th>신고자</th>
+            <th>신고분류</th>
+            <th>상세사유</th>
+            <th>신고일</th>
+            <th>보기</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="report, stat : ${reports}">
+            <!-- null 방지 삼항 연산자 추가 -->
+            <td th:text="${(currentPage != null ? currentPage : 0) * 5 + stat.index + 1}">1</td>
+            <td th:text="${report.reportType}">BOARD</td>
+            <td th:text="${report.targetWriterName}">Name</td>
+            <td th:text="${report.reporterName}">홍길동</td>
+            <td th:text="${report.reasonType}">욕설/비방</td>
+            <td th:text="${report.reason}">사유</td>
+            <td th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">날짜</td>
+            <td>
+                <a th:if="${report.reportType == 'BOARD'}"
+                   th:href="@{'/community/' + ${report.boardId}}" class="view-link">게시글</a>
+                <a th:if="${report.reportType == 'COMMENT'}"
+                   th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}" class="view-link">댓글</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
-            <!-- 댓글 보기: highlight 파라미터 포함 -->
-            <a th:if="${report.reportType == 'COMMENT'}"
-               th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}"
-               class="view-link">댓글 보기</a>
-        </td>
-
-    </tr>
-    </tbody>
-</table>
+    <th:block th:if="${totalPages != null and totalPages > 1}">
+        <div class="pagination">
+            <ul>
+                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a href="#" th:attr="data-page=${i}" th:text="${i + 1}"
+                       th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                </li>
+            </ul>
+        </div>
+    </th:block>
+</div>
 
 <div th:replace="~{common/footer::footer}"></div>
 </body>
+
+<script>
+    function bindPaginationLinks() {
+        document.querySelectorAll(".pagination a").forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                const page = this.getAttribute("data-page");
+
+                fetch(`/community/report/reports/page?page=${page}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        document.getElementById("reportTableArea").innerHTML = html;
+                        bindPaginationLinks(); // 비동기로 로드된 영역에 이벤트 재바인딩
+                    });
+            });
+        });
+    }
+
+    // 최초 바인딩
+    document.addEventListener("DOMContentLoaded", bindPaginationLinks);
+</script>
 </html>
