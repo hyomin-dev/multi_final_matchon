@@ -5,8 +5,7 @@
     <title>STADIUM</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-
-    <!-- services 라이브러리 포함 (지오코더 쓰려면 꼭 필요!) -->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a7fac0ef351b12f799117f0847bf1d23&libraries=services"></script>
 
     <style>
@@ -45,7 +44,7 @@
 
 
         <div class="stadium-address">
-            <strong></strong> <span id="address" th:text="${stadium.faciRoadAddr}">서울시 어딘가</span>
+            <strong></strong> <span id="address" th:text="${stadium.stadiumAddress}">서울시 어딘가</span>
         </div>
     </div>
 

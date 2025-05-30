@@ -6,8 +6,7 @@
     <title>STADIUM</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
-
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <style>
         .stadiumdetail {
             text-align: center;
@@ -22,9 +21,11 @@
     <h1 class="stadiumdetail">구장 상세보기</h1>
 
     <div class="stadium-info-detail">
-        <p><span th:text="${stadium.cpNm}">지역명</span></p>
-        <p><span th:text="${stadium.faciRoadAddr}">주소</span></p>
-        <p><span th:text="${stadium.faciTelNo}">전화번호</span></p>
+        <img th:src="${stadium.fullImageUrl}" alt="구장 이미지" width="300">
+
+        <p><span th:text="${stadium.stadiumRegion}">지역명</span></p>
+        <p><span th:text="${stadium.stadiumAddress}">주소</span></p>
+        <p><span th:text="${stadium.stadiumTel}">전화번호</span></p>
         <a th:href="@{/stadium/map(id=${stadium.id})}">구장 위치</a>
     </div>
 

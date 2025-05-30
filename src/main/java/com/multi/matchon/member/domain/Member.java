@@ -64,17 +64,42 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Member member = (Member) o;
-        return Objects.equals(getId(), member.getId()) && Objects.equals(getMemberEmail(), member.getMemberEmail()) && Objects.equals(getMemberPassword(), member.getMemberPassword()) && Objects.equals(getMemberName(), member.getMemberName()) && getMemberRole() == member.getMemberRole() && Objects.equals(getPositions(), member.getPositions()) && getTimeType() == member.getTimeType() && Objects.equals(getTeam(), member.getTeam()) && Objects.equals(getMyTemperature(), member.getMyTemperature()) && Objects.equals(getPictureAttachmentEnabled(), member.getPictureAttachmentEnabled()) && Objects.equals(getIsDeleted(), member.getIsDeleted());
+
+    // 삭제
+    public void markAsDeleted() {
+        this.isDeleted = true;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getMemberEmail(), getMemberPassword(), getMemberName(), getMemberRole(), getPositions(), getTimeType(), getTeam(), getMyTemperature(), getPictureAttachmentEnabled(), getIsDeleted());
+    // 복원
+    public void unmarkAsDeleted() {
+        this.isDeleted = false;
+    }
+
+    public void restoreAsUser(String encodedPassword, String name) {
+        this.unmarkAsDeleted();
+        this.memberPassword = encodedPassword;
+        this.memberName = name;
+        this.memberRole = MemberRole.USER;
+        this.pictureAttachmentEnabled = true;
+        this.myTemperature = 36.5;
+
+        this.positions = null;
+        this.timeType = null;
+    }
+
+    public void restoreAsHost(String encodedPassword, String name) {
+        this.unmarkAsDeleted();
+        this.memberPassword = encodedPassword;
+        this.memberName = name;
+        this.memberRole = MemberRole.HOST;
+        this.pictureAttachmentEnabled = true;
+    }
+
+    public void clearPersonalInfo() {
+        this.positions = null;
+        this.timeType = null;
+        this.myTemperature = null;
+        this.pictureAttachmentEnabled = null;
     }
 
 }

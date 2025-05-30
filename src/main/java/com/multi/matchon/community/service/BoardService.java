@@ -4,6 +4,10 @@ import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
 import com.multi.matchon.community.repository.BoardRepository;
 import com.multi.matchon.member.domain.Member;
+import com.multi.matchon.common.domain.Attachment;
+import com.multi.matchon.common.domain.BoardType;
+import com.multi.matchon.common.repository.AttachmentRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +22,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final CommentService commentService;
+    private final AttachmentRepository attachmentRepository; // 첨부파일 repository 주입
 
     public List<Board> findAll() {
         return boardRepository.findAll();
@@ -40,25 +45,6 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    public Board findByAttachmentFilename(String filename) {
-        return boardRepository.findAll().stream()
-                .filter(board -> board.getAttachmentPath() != null &&
-                        List.of(board.getAttachmentPath().split(";")).contains(filename))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public String findSavedFilenameByPartialName(String partialFilename) {
-        return boardRepository.findAll().stream()
-                .flatMap(board -> {
-                    if (board.getAttachmentPath() == null) return null;
-                    return List.of(board.getAttachmentPath().split(";")).stream();
-                })
-                .filter(saved -> saved != null && saved.startsWith(partialFilename))
-                .findFirst()
-                .orElse(null);
-    }
-
     @Transactional
     public void deleteByIdAndUser(Long id, Member member) {
         Board board = boardRepository.findById(id)
@@ -68,9 +54,21 @@ public class BoardService {
             throw new SecurityException("삭제 권한이 없습니다.");
         }
 
+        // 댓글 먼저 삭제
         commentService.deleteAllByBoard(board);
+
+        // 첨부파일 소프트 삭제
+        softDeleteCommunityAttachments(id);
+
+        // 게시글 삭제
         boardRepository.deleteById(id);
     }
 
+    private void softDeleteCommunityAttachments(Long boardId) {
+        List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, boardId);
+        for (Attachment att : attachments) {
+            att.delete(true);
+        }
+    }
 
 }
