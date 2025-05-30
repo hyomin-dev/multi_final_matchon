@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>FAQ 수정</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+
+    <style>
+        .container {
+            width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{common/header::header}"></div>
+<div class="container">
+    <h2>FAQ 수정</h2>
+    <form th:action="@{/faq/edit/{id}(id=${faqDto.faqId})}" method="post">
+
+        <label for="faqCategory">카테고리</label>
+        <select id="faqCategory" name="faqCategory">
+            <option th:each="type : ${T(com.multi.matchon.customerservice.domain.CustomerServiceType).values()}"
+                    th:value="${type}" th:text="${type.label}"
+                    th:selected="${faqDto.faqCategory == type}">
+            </option>
+        </select>
+
+        <label for="faqTitle">제목</label>
+        <input type="text" id="faqTitle" name="faqTitle" th:value="${faqDto.faqTitle}" required>
+
+        <label for="faqContent">내용</label>
+        <textarea id="faqContent" name="faqContent" rows="10" required
+                  th:text="${faqDto.faqContent}"></textarea>
+
+        <button type="submit">수정 완료</button>
+    </form>
+</div>
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

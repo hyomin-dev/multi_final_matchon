@@ -1,20 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}">
 </head>
-
 <body>
-    <th:block th:fragment="footer">
-    <div id="chatbot-img">
-        <a th:href="@{#}"><img src="/img/aichatbot.png" alt="aichatbot" width="80" height="80"></a>
-    </div>
+<div th:fragment="footer">
     <hr class="navy_hr">
-    <footer class="footer">
-        team@matchon.com | 02-123-123
-    </footer>
+    <footer class="footer">team@matchon.com | 02-123-123</footer>
 
-    </th:block>
+    <!-- 로그인한 사용자만 챗봇 접근 가능 -->
+    <sec:authorize access="isAuthenticated()">
+        <!-- 챗봇 런처 아이콘 -->
+        <img src="/img/aichatbot.png" id="chatbot-launcher"
+             style="position: fixed; bottom: 30px; right: 20px; width: 80px; cursor: pointer; z-index: 1000;">
+
+        <!-- 챗봇 모달 -->
+        <div id="chatbot-modal" style="display: none; position: fixed; bottom: 120px; right: 30px;
+            width: 400px; height: 600px; border-radius: 15px; overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; background: white; flex-direction: column;">
+            <div class="chat-header">
+                <span>MatchON 챗봇</span>
+                <button class="chat-close" id="chatbot-close">✕</button>
+            </div>
+            <iframe src="/aichat" style="flex: 1; border: none;"></iframe>
+        </div>
+    </sec:authorize>
+
+    <!-- 공통 챗봇 JS 로드 -->
+    <script th:src="@{/js/aibot/aichatbot.js}"></script>
+</div>
 </body>
 </html>

@@ -34,7 +34,13 @@ public class ResMatchupRequestListDto {
 
     private Status matchupStatus;
 
-    public ResMatchupRequestListDto(Long boardId, Long requestId, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress,  LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants ,Integer participantCount, Status matchupStatus) {
+    private Integer matchupRequestSubmittedCount;
+
+    private Integer matchupCancelSubmittedCount;
+
+    private Boolean isDeleted;
+
+    public ResMatchupRequestListDto(Long boardId, Long requestId, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress,  LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants ,Integer participantCount, Status matchupStatus, Integer matchupRequestSubmittedCount, Integer matchupCancelSubmittedCount, Boolean isDeleted) {
         this.boardId = boardId;
         this.matchDatetime = matchDatetime;
         this.matchDuration = matchDuration;
@@ -46,5 +52,8 @@ public class ResMatchupRequestListDto {
         this.sportsTypeName = sportsTypeName;
         this.currentParticipantCount = currentParticipantCount;
         this.maxParticipants = maxParticipants;
+        this.matchupRequestSubmittedCount = matchupRequestSubmittedCount;
+        this.matchupCancelSubmittedCount = matchupCancelSubmittedCount;
+        this.isDeleted = isDeleted;
     }
 }

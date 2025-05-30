@@ -16,30 +16,35 @@ document.addEventListener("DOMContentLoaded",()=>{
     setReservationFile(originalName, savedName);
     setMaxParticipants(currentParticipantCount, maxParticipants);
     setMannerTemperature(minMannerTemperature);
-    setButton(boardId);
+    setButton();
 
     const form = document.querySelector("form");
     form.addEventListener("submit", (e)=>{
-        submitCheck(e);
+        submitCheck(e, myMannerTemperature);
     })
+
+    const backBtn = document.querySelector(".back-btn");
+    backBtn.addEventListener("click",()=>{
+        history.back();
+    });
 
 })
 
-function submitCheck(e){
+function submitCheck(e, myMannerTemperature){
+
+    const teamNameEle = document.querySelector("#teamName");
 
     const teamIntroEle = document.querySelector("#teamIntro");
 
     const sportsFacilityNameEle = document.querySelector("#sportsFacilityName");
 
-    //document.querySelector("#teamName").disabled=false;
     const sportsFacilityAddressEle = document.querySelector("#sportsFacilityAddress");
 
-    const matchDateTimeEle = document.querySelector("#matchDateTime");
-    //console.log(matchDateTimeEle.value);
+    const matchDatetimeEle = document.querySelector("#matchDatetime");
 
     const matchDurationEle = document.querySelector("#matchDuration");
 
-    const currentParticipantsCountEle = document.querySelector("#currentParticipantsCount");
+    const currentParticipantCountEle = document.querySelector("#currentParticipantCount");
     //console.log(currentParticipantsCountEle.value);
 
     const maxParticipantsEle = document.querySelector("#maxParticipants");
@@ -51,9 +56,18 @@ function submitCheck(e){
 
     const matchDescriptionEle = document.querySelector("#matchDescription");
 
+    //console.log(matchDatetimeEle.value);
+    const matchDate = new Date(matchDatetimeEle.value);
+    const now = new Date();
+    // if(matchDate < now){
+    //     console.log("test");
+    // }
 
-    if(teamIntroEle.value ===""){
-        alert("팀 소개를 입력해주세요.");
+   if(teamNameEle.value === ""){
+        alert("소속 팀이 있어야 합니다.");
+        e.preventDefault();
+    } else if(teamIntroEle.value ===""){
+        alert("팀 소개를 입력하세요.");
         e.preventDefault();
     } else if(sportsFacilityNameEle.value ===""){
         alert("경기장 명을 입력하세요.");
@@ -61,28 +75,37 @@ function submitCheck(e){
     } else if(sportsFacilityAddressEle.value ===""){
         alert("경기장 주소를 입력하세요.");
         e.preventDefault();
-    } else if(matchDateTimeEle.value ===""){
+    } else if(matchDatetimeEle.value ===""){
         alert("경기 날짜를 입력하세요");
+        e.preventDefault();
+    }  else if(matchDate<now){
+        alert("경기 시작 시간이 지나 수정할 수 없습니다.");
         e.preventDefault();
     } else if(matchDurationEle.value ===""){
         alert("경기 진행 시간을 입력하세요.");
         e.preventDefault();
-    } else if(currentParticipantsCountEle.value ===""){
+    } else if(currentParticipantCountEle.value ===""){
         alert("현재 참가 인원을 입력하세요.")
         e.preventDefault();
     } else if(maxParticipantsEle.value ===""){
         alert("총 모집 인원을 입력하세요.");
         e.preventDefault();
-    } else if(minMannerTemperatureEle.value ===""){
+    }else if(Number(currentParticipantCountEle.value) >Number(maxParticipantsEle.value)){
+       alert(`현재 참가 인원은 총 모집 인원보다 적어야 합니다.`)
+       e.preventDefault();
+   } else if(minMannerTemperatureEle.value ===""){
         alert("하한 매너 온도를 입력하세요.");
         e.preventDefault();
-    } else if(matchDescriptionEle.value ===""){
+    } else if(minMannerTemperatureEle.value>myMannerTemperature){
+       alert(`하한 매너 온도는 내 매너 온도 ${myMannerTemperature} 이상이어야 합니다.`);
+       e.preventDefault();
+   } else if(matchDescriptionEle.value ===""){
         alert("경기 방식 소개를 입력하세요");
         e.preventDefault();
     } else{
         alert("submit");
-    }
 
+    }
 }
 
 async function setSportsType(sportsTypeName){
@@ -177,18 +200,18 @@ function setMannerTemperature(minMannerTemperature){
     }
 }
 
-async function setButton(boardId){
-    const deleteBtn = document.querySelector(".delete-btn");
-    deleteBtn.addEventListener("click",async ()=>{
-        const response = await fetch(`/matchup/board/delete?boardId=${boardId}`,{
-            method: "GET",
-            credentials: "include"
-        })
-        if(!response.ok)
-            throw new Error(`HTTP error! Status:${response.status}`)
-        alert("삭제 완료");
-        window.location.href="/matchup";
-    })
+async function setButton(){
+    // const deleteBtn = document.querySelector(".delete-btn");
+    // deleteBtn.addEventListener("click",async ()=>{
+    //     const response = await fetch(`/matchup/board/delete?boardId=${boardId}`,{
+    //         method: "GET",
+    //         credentials: "include"
+    //     })
+    //     if(!response.ok)
+    //         throw new Error(`HTTP error! Status:${response.status}`)
+    //     alert("삭제 완료");
+    //     window.location.href="/matchup";
+    // })
 
     const toggleBtn = document.querySelector("#toggleBtn");
     const reservationLoadBox = document.querySelector("#reservationLoadBox");

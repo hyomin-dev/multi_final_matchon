@@ -45,6 +45,8 @@ public interface TeamNameRepository extends JpaRepository <Team, Long> {
             @Param("region") RegionType region,
             Pageable pageable
     );
+
+    boolean existsByCreatedPersonAndIsDeletedFalse(String createdPerson);
 }
 
 //    research needed!!

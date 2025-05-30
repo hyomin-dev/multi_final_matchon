@@ -1,8 +1,17 @@
 package com.multi.matchon.member.controller;
 
+import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.Status;
+import com.multi.matchon.community.domain.Report;
+import com.multi.matchon.community.dto.res.ReportResponse;
+import com.multi.matchon.community.service.ReportService;
+import com.multi.matchon.customerservice.domain.Inquiry;
+import com.multi.matchon.customerservice.domain.InquiryAnswer;
+import com.multi.matchon.customerservice.dto.res.InquiryResDto;
+import com.multi.matchon.customerservice.repository.InquiryAnswerRepository;
+import com.multi.matchon.customerservice.repository.InquiryRepository;
 import com.multi.matchon.event.domain.EventRequest;
-import com.multi.matchon.event.dto.res.ResMyEventDto;
+import com.multi.matchon.event.dto.res.EventResDto;
 import com.multi.matchon.event.repository.EventRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +21,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Controller
 @RequestMapping("/admin")
@@ -26,10 +37,75 @@ import java.util.List;
 public class AdminController {
 
     private final EventRepository eventRepository;
+    private final InquiryRepository inquiryRepository;
+    private final InquiryAnswerRepository inquiryAnswerRepository;
+    private final ReportService reportService;
 
     @GetMapping
     public String adminHome() {
         return "admin/admin-home";
+    }
+
+    @GetMapping("/inquiry")
+    public String listAdminInquiries(@RequestParam(defaultValue = "0") int page,
+                                     Model model,
+                                     HttpServletRequest request) {
+        int size = 10;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Page<Inquiry> inquiryPage = inquiryRepository.findAllByIsDeletedFalse(pageable);
+
+        model.addAttribute("inquiries", inquiryPage);
+
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+            return "admin/admin-inquiry-list :: adminInquiryTableArea"; // fragment만 반환
+        }
+
+        return "admin/admin-inquiry-list";
+    }
+
+    @GetMapping("/inquiry/{id}")
+    public String getInquiryDetail(@PathVariable Long id, Model model) {
+        Inquiry inquiry = inquiryRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new NoSuchElementException("문의 없음"));
+
+        InquiryResDto dto = new InquiryResDto(inquiry); // DTO 변환
+        model.addAttribute("inquiry", dto);
+        return "admin/admin-inquiry-answer";
+    }
+
+    @PostMapping("/inquiry/{id}/answer")
+    @Transactional
+    public String submitAnswer(@PathVariable Long id,
+                               @RequestParam String answerContent,
+                               @AuthenticationPrincipal CustomUser admin) {
+        Inquiry inquiry = inquiryRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new NoSuchElementException("문의가 존재하지 않습니다."));
+
+        // 답변 존재 여부만으로 판단
+        if (inquiryAnswerRepository.findActiveAnswerByInquiryId(inquiry.getId()).isPresent()) {
+            throw new IllegalStateException("이미 답변이 등록된 문의입니다.");
+        }
+
+        InquiryAnswer answer = InquiryAnswer.builder()
+                .inquiry(inquiry)
+                .member(admin.getMember())
+                .answerContent(answerContent)
+                .build();
+
+        inquiry.setAnswer(answer);
+        inquiryAnswerRepository.save(answer);
+
+        inquiry.complete(); // 상태는 저장 이후 변경
+
+        return "redirect:/admin/inquiry";
+    }
+
+    @PostMapping("/inquiry/{id}/delete")
+    @Transactional
+    public String deleteInquiry(@PathVariable Long id) {
+        Inquiry inquiry = inquiryRepository.findById(id).orElseThrow();
+        inquiry.markDeleted();
+        return "redirect:/admin/inquiry";
     }
 
 
@@ -38,14 +114,13 @@ public class AdminController {
         return "admin/admin-event-list";
     }
 
-
     @ResponseBody
     @GetMapping("/event/page")
-    public Page<ResMyEventDto> getEventPage(@RequestParam(defaultValue = "0") int page) {
+    public Page<EventResDto> getEventPage(@RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createdDate").descending());
         Page<EventRequest> eventPage = eventRepository.findAll(pageable);
 
-        return eventPage.map(e -> new ResMyEventDto(
+        return eventPage.map(e -> new EventResDto(
                 e.getId(),
                 e.getEventTitle(),
                 e.getMember().getMemberName(),
@@ -53,7 +128,6 @@ public class AdminController {
                 e.getCreatedDate()
         ));
     }
-
 
     @GetMapping("/event/{id}")
     public String adminEventDetail(@PathVariable Long id, Model model) {
@@ -89,5 +163,12 @@ public class AdminController {
     public String updateEventStatus(@PathVariable Long id, @RequestParam("status") Status status) {
         eventRepository.updateEventStatus(id, status);
         return "redirect:/admin/event";
+    }
+
+    @GetMapping("/reports")
+    public String listAllReports(Model model) {
+        List<ReportResponse> reports = reportService.getAllReports();
+        model.addAttribute("reports", reports);
+        return "admin/report";
     }
 }

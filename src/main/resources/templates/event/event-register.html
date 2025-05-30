@@ -6,8 +6,10 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/event/event-register.css}">
-    <script th:src="@{/js/event/event-register.js}" defer></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <script th:src="@{/js/event/event-register.js}"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
@@ -15,7 +17,7 @@
 <div id="wrap">
     <h2>대회 등록</h2>
 
-    <form action="/event/new" method="post">
+    <form action="/event/new" method="post" onsubmit="return checkHostBeforeSubmit();">
 
         <div class="form-box">
             <label>날짜 :</label>
@@ -25,7 +27,7 @@
 
         <div class="form-box">
             <label>주최기관 :</label>
-            <span th:text="${hostName}"></span>
+            <span id="hostNameSpan" th:text="${hostName} ?: '미등록'">미등록</span>
         </div>
 
         <!-- 권역 선택 -->

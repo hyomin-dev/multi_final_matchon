@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <!-- 관리자 권한인 게정만 등록, 수정, 삭제 가능 / 사용자는 조회만 가능 -->
     <title>FAQ 등록</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
 
     <style>
         .write-box {
@@ -87,10 +89,9 @@
 
             <select class="all-list" name="faqCategory" required>
                 <option value="" disabled selected>카테고리 선택</option>
-                <option value="HOWTOUSE">이용방법</option>
+                <option value="TUTORIAL">이용방법</option>
                 <option value="ACCOUNT">계정</option>
                 <option value="TEAM_GUEST">Team / Guest</option>
-                <option value="SHOP">쇼핑몰</option>
                 <option value="REPORT">신고</option>
                 <option value="MANNER_TEMPERATURE">매너온도</option>
             </select>

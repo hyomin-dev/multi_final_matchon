@@ -44,6 +44,16 @@ function renderList(items){
     const boardArea = document.querySelector("#board-container");
     boardArea.innerHTML = '';
 
+    if(items.length ===0){
+        boardArea.innerHTML = `
+            <div class="no-result">
+                작성한 글이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
+
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
 
@@ -53,12 +63,7 @@ function renderList(items){
              <div class="card-section center">
                 <div><strong>작성자:</strong> ${item.memberName}</div>
                 <div><strong>팀 이름:</strong> ${item.teamName}</div>
-                <div>
-                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
-                        <button class="detail">상세보기</button>
-                    </a>
-                    <button class="request">요청 확인</button>
-                </div>
+                
             </div>
 
             <div class="card-section center">
@@ -74,6 +79,15 @@ function renderList(items){
             <div class="card-section center">
                 <div>${checkStatus(item)}</div>
                 <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>
+                <div>
+                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
+                        <button class="detail">상세보기</button>
+                    </a>
+                    <a href="/matchup/request/board?board-id=${item.boardId}">
+                        <button class="request">요청 확인</button>
+                    </a>
+                    
+                </div>
             </div>    
                 `;
         boardArea.appendChild(card);

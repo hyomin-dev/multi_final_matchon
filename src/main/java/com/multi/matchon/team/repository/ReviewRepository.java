@@ -11,10 +11,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("""
             SELECT r FROM Review r 
             JOIN FETCH r.member m 
-            JOIN TeamMember tm ON tm.member = m
-            WHERE tm.team.id = :teamId
+            WHERE r.team.id = :teamId
             AND r.isDeleted = false 
             ORDER BY r.createdDate DESC
             """)
     List<Review> findReviewsByTeamId(@Param("teamId") Long teamId);
+
+
 }

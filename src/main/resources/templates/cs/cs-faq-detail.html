@@ -6,6 +6,7 @@
     <title>Faq-detail</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
 
     <style>
         .pagination button {
@@ -85,6 +86,14 @@
     <form th:action="@{/cs}" method="get">
         <button type="submit" class="btnturnmenu">메뉴로 돌아가기</button>
     </form>
+
+    <!-- 관리자만 수정 버튼 표시 -->
+    <th:block th:if="${isAdmin}">
+        <form th:action="@{/faq/edit/{id}(id=${faqDto.faqId})}" method="get">
+            <button type="submit" style="float: right; margin-right: 10px;">수정하기</button>
+        </form>
+    </th:block>
+
 
 </div>
 <div th:replace="~{common/footer::footer}"></div>

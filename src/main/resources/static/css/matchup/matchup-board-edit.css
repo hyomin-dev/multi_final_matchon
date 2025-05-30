@@ -105,8 +105,12 @@ textarea {
     background-color: #007a00;
 }
 
-.btn .delete-btn {
+.btn button {
     background-color: #c0392b;
+}
+
+.btn .back-btn{
+    background-color: #555
 }
 
 .btn button:hover {

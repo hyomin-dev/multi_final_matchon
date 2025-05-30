@@ -25,6 +25,10 @@ public class Review extends BaseEntity {
     @JoinColumn(name="review_writer", nullable = false)
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
+
     @Column(name="review_rating", nullable = false)
     private Integer reviewRating;
 

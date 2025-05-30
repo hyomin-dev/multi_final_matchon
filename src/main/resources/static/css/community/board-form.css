@@ -1,0 +1,66 @@
+.form-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e2e2;
+}
+
+.form-group {
+    margin-bottom: 2px;
+}
+
+.form-group.author-group {
+    margin-top: 2px;
+    margin-bottom: 20px;
+}
+
+.form-group-editor {
+    margin-bottom: 30px;
+}
+
+.toast-editor-container {
+    border: none;
+    padding: 0;
+    margin-top: 8px;
+    box-shadow: none;
+    background: transparent;
+}
+
+.toastui-editor-defaultUI {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.btn-outline-danger {
+    padding: 8px 15px;
+    background-color: white;
+    color: #f44336;
+    border: 2px solid #f44336;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-outline-danger:hover {
+    background-color: mistyrose;
+}
+
+/* 파일 미리보기 */
+.file-preview div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.file-preview button,
+.file-delete-btn {
+    color: red;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}

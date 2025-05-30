@@ -1,6 +1,7 @@
 package com.multi.matchon.common.service;
 
 import com.multi.matchon.common.domain.*;
+import com.multi.matchon.common.jwt.repository.RefreshTokenRepository;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.PositionsRepository;
 import com.multi.matchon.common.util.AwsS3Utils;
@@ -21,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +35,7 @@ public class MypageService {
     private final AwsS3Utils awsS3Utils;
     private final AttachmentRepository attachmentRepository;
     private final MemberRepository memberRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -61,7 +60,6 @@ public class MypageService {
         }
 
 
-
         Optional<Attachment> profileAttachment = attachmentRepository.findLatestAttachment(BoardType.MEMBER, member.getId());
         String imageUrl = profileAttachment
                 .map(att -> awsS3Utils.createPresignedGetUrl(PROFILE_DIR, att.getSavedName()))
@@ -73,6 +71,10 @@ public class MypageService {
     }
 
     public void updateHostName(Member member, String newHostName) {
+        if (hostProfileRepository.findByHostName(newHostName).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 기관명입니다.");
+        }
+
         HostProfile profile = hostProfileRepository.findByMember(member)
                 .orElseGet(() -> {
                     HostProfile newProfile = HostProfile.builder()
@@ -132,4 +134,23 @@ public class MypageService {
         em.clear();
     }
 
+    @Transactional
+    public void withdraw(Member member) {
+        // 토큰 삭제
+        refreshTokenRepository.deleteByMember(member);
+
+        // 프로필 이미지 soft delete + S3 삭제
+        attachmentRepository.findLatestAttachment(BoardType.MEMBER, member.getId())
+                .ifPresent(att -> {
+                    awsS3Utils.deleteFile(att.getSavePath(), att.getSavedName());
+                    att.delete(true); // isDeleted = true로 소프트 삭제
+                    attachmentRepository.save(att); // 저장
+                });
+
+        // 개인정보 초기화
+        member.clearPersonalInfo(); // 이름, 온도, 팀, 포지션, 프로필사진정보 등 null 처리
+
+        // 탈퇴 처리
+        member.markAsDeleted(); // is_deleted = true
+    }
 }

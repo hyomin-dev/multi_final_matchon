@@ -8,6 +8,5 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ReqTeamJoinDto {
-    private String position;
     private String introduction;
-} 
+}

@@ -8,6 +8,8 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+  jmx:
+    enabled: false
   cloud:
     aws:
       credentials:
@@ -20,9 +22,16 @@ spring:
         static: ${S3_REGION}
       stack:
         auto: false
+  thymeleaf:
+    cache: false
+
+
 
 matchon:
   kakao-api: ${KAKAO_API_KEY}
+  dialogflow-key-path: ${DIALOGFLOW_KEY_PATH}
+jwt:
+  secret: ${JWT_SECRET}
 
 ---
 
@@ -79,9 +88,10 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
 
-jwt:
-  secret: ${JWT_SECRET}
+
 
 file:
   upload-dir: C:/upload-dir
+
+
 

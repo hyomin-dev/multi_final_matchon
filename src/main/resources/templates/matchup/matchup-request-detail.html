@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-request-detail.css}">
     <script th:src="@{/js/matchup/matchup-request-detail.js}" defer></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
     <style>
         a {
@@ -19,79 +20,132 @@
 <div id="wrap">
     <h1>MATCHUP 참가 요청 상세보기</h1>
     <div id="matchup-request-detail-dto"
-
+         th:data-board-id = "${resMatchupRequestDto.boardId}"
+         th:data-request-id = "${resMatchupRequestDto.requestId}"
          th:data-sports-facility-name="${resMatchupRequestDto.sportsFacilityName}"
          th:data-sports-facility-address="${resMatchupRequestDto.sportsFacilityAddress}"
          th:data-match-datetime="${resMatchupRequestDto.matchDatetime}"
          th:data-match-duration="${resMatchupRequestDto.matchDuration}"
+         th:data-matchup-status="${resMatchupRequestDto.matchupStatus}"
+         th:data-matchup-request-submitted-count="${resMatchupRequestDto.matchupRequestSubmittedCount}"
+         th:data-matchup-cancel-submitted-count="${resMatchupRequestDto.matchupCancelSubmittedCount}"
+         th:data-is-deleted="${resMatchupRequestDto.isDeleted}"
+         th:data-current-participant-count ="${resMatchupRequestDto.currentParticipantCount}"
+         th:data-max-participants ="${resMatchupRequestDto.maxParticipants}"
+         th:data-participant-count = "${resMatchupRequestDto.participantCount}"
+         th:data-board-writer-email = "${resMatchupRequestDto.boardWriterEmail}"
+         th:data-applicant-email = "${resMatchupRequestDto.applicantEmail}"
+         th:data-login-member-email = "${#authentication.name}"
     >
     </div>
 
     <table>
-        <th:block th:if="${resMatchupRequestDto.boardWriter == #authentication.name}">
-            <tr>
-                <th>지원자: </th>
-                <td th:text="${resMatchupRequestDto.applicant}"></td>
-            </tr>
-        </th:block>
+<!--        <th:block th:if="${resMatchupRequestDto.boardWriter == #authentication.name}">-->
+<!--            <tr>-->
+<!--                <th>지원자: </th>-->
+<!--                <td th:text="${resMatchupRequestDto.applicant}"></td>-->
+<!--            </tr>-->
+<!--        </th:block>-->
 
-        <th:block th:if="${resMatchupRequestDto.applicant == #authentication.name}">
-            <tr>
-                <th>게시글 작성자: </th>
-                <td th:text="${resMatchupRequestDto.boardWriter}"></td>
-            </tr>
-        </th:block>
+<!--        <th:block th:if="${resMatchupRequestDto.applicant == #authentication.name}">-->
+<!--            <tr>-->
+<!--                <th>게시글 작성자: </th>-->
+<!--                <td th:text="${resMatchupRequestDto.boardWriter}"></td>-->
+<!--            </tr>-->
+<!--        </th:block>-->
 
+        <tr th:style="${resMatchupRequestDto.boardWriter == #authentication.name} ? '' : 'display:none'">
+            <th>지원자 </th>
+            <td th:text="${resMatchupRequestDto.applicant}"></td>
+        </tr>
+
+        <tr th:style="${resMatchupRequestDto.applicant == #authentication.name} ? '' : 'display:none'">
+            <th>게시글 작성자 </th>
+            <td th:text="${resMatchupRequestDto.boardWriter}"></td>
+        </tr>
         <tr>
-            <th>종목: </th>
+            <th>종목 </th>
             <td th:text="${resMatchupRequestDto.sportsTypeName}"></td>
         </tr>
         <tr>
-            <th>자기소개: </th>
+            <th>신청자 </th>
+            <td th:text="${resMatchupRequestDto.applicant}"></td>
+        </tr>
+        <tr>
+            <th>자기소개 </th>
             <td th:text="${resMatchupRequestDto.selfIntro}"></td>
         </tr>
         <tr>
-            <th>경기장명:</th>
+            <th>경기장명</th>
             <td th:text="${resMatchupRequestDto.sportsFacilityName}"></td>
         </tr>
         <tr>
-            <th>경기장 주소:</th>
+            <th>경기장 주소</th>
             <td th:text="${resMatchupRequestDto.sportsFacilityAddress}"></td>
         </tr>
         <tr>
-            <th>경기장 위치:</th>
+            <th>경기장 위치</th>
             <td>
                 <div id="map" style="width:100%;height:350px;"></div>
             </td>
         </tr>
         <tr>
-            <th>경기 날짜:</th>
+            <th>경기 날짜</th>
             <td id="match-date"></td>
         </tr>
         <tr>
-            <th>현재 정원:</th>
+            <th>현재 정원</th>
             <td th:text="'(' + ${resMatchupRequestDto.currentParticipantCount} + '/' + ${resMatchupRequestDto.maxParticipants} +')'"></td>
         </tr>
         <tr>
-            <th>신청 인원:</th>
+            <th>신청 인원</th>
             <td th:text="${resMatchupRequestDto.participantCount}"></td>
         </tr>
         <tr>
-            <th>요청 상태:</th>
-            <td th:text="${resMatchupRequestDto.matchupStatus}"></td>
+            <th>요청 상태</th>
+            <td th:id="status"></td>
+        </tr>
+        <tr>
+            <th>참가 요청 횟수(최대 2번)</th>
+            <td th:text="${resMatchupRequestDto.matchupRequestSubmittedCount}"></td>
+        </tr>
+        <tr>
+            <th>승인 취소 요청 횟수(최대 1번)</th>
+            <td th:text="${resMatchupRequestDto.matchupCancelSubmittedCount}"></td>
         </tr>
     </table>
-    <th:block th:if="${resMatchupRequestDto.boardWriterEmail == #authentication.name}">
-        <a th:href="@{#}" id="approved">승인</a>
-        <a th:href="@{#}" id="denied">반려</a>
-    </th:block>
-    <th:block th:if="${resMatchupRequestDto.applicantEmail == #authentication.name}">
-        <a id="chat1-1Btn" th:href="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}">수정하기</a>
-        <a id="requestBtn" th:href="@{#}">요청취소하기</a>
-    </th:block>
+<!--    <th:block th:if="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now()}">-->
+<!--        <th:block th:if="${resMatchupRequestDto.boardWriterEmail == #authentication.name}">-->
+<!--&lt;!&ndash;            <a th:href="@{#}" id="approved">승인</a>&ndash;&gt;-->
+<!--&lt;!&ndash;            <a th:href="@{#}" id="denied">반려</a>&ndash;&gt;-->
+<!--        </th:block>-->
+<!--        <th:block th:if="${resMatchupRequestDto.applicantEmail == #authentication.name}">-->
+<!--&lt;!&ndash;            <a id="modifyBtn" th:href="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}">수정하기</a>&ndash;&gt;-->
+<!--&lt;!&ndash;            <a id="deleteBtn" th:href="@{#}"></a>&ndash;&gt;-->
+<!--        </th:block>-->
+<!--    </th:block>-->
+    <div id="button-group">
+
+        <a  id="approvedBtn" th:href="@{/matchup/request/approve(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">참가 요청 승인</a>
+
+        <a id="deniedBtn" th:href="@{/matchup/request/deny(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">참가 요청 반려</a>
+
+        <a  id="approveWithdrawRequestBtn" th:href="@{/matchup/request/approve(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">취소 요청 승인</a>
+
+        <a id="denyWithdrawRequestBtn" th:href="@{/matchup/request/deny(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">취소 요청 반려</a>
 
 
+        <a id="modifyBtn" th:href="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.applicantEmail == #authentication.name} ? 'display:inline' : 'display:none' "  >수정하기</a>
 
+        <a id="cancelBtn" th:href="@{/matchup/request/cancel(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.applicantEmail == #authentication.name} ? 'display:inline' : 'display:none' "  >요청 취소</a>
+
+        <a id="retryBtn" th:href="@{/matchup/request/retry(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.applicantEmail == #authentication.name} ? 'display:inline' : 'display:none' "  >재 요청</a>
+
+        <a id="withdrawBtn" th:href="@{/matchup/request/cancel-request(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.applicantEmail == #authentication.name} ? 'display:inline' : 'display:none' "  >승인 취소 요청</a>
+
+        <a onclick="history.back()" class="back-btn">뒤로가기</a>
+
+    </div>
 
 </div>
 

@@ -7,6 +7,7 @@
   <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
   <script th:src="@{/js/matchup/matchup-request-register.js}" defer></script>
   <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-request-register.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
 
 
   <style>
@@ -33,15 +34,15 @@
   </div>
   <table>
     <tr>
-      <th>종목: </th>
+      <th>종목 </th>
       <td th:text="${reqMatchupRequestDto.sportsTypeName}"></td>
     </tr>
     <tr>
-      <th>경기장명:</th>
+      <th>경기장명</th>
       <td th:text="${reqMatchupRequestDto.sportsFacilityName}"></td>
     </tr>
     <tr>
-      <th>경기장 주소:</th>
+      <th>경기장 주소</th>
       <td th:text="${reqMatchupRequestDto.sportsFacilityAddress}"></td>
     </tr>
     <tr>
@@ -64,17 +65,20 @@
     <input type="hidden" th:field="*{boardId}"/>
 
     <label>
-      소개:
-      <input type="text" th:field="*{selfIntro}" placeholder="자기 소개를 입력하세요." required>
+      소개
+      <textarea placeholder="자기 소개를 입력하세요." th:field="*{selfIntro}" required maxlength="300">
+                </textarea>
     </label>
     <label>
-      참가 인원:
-      <select size="5" th:field="*{participantCount}" required></select>
+      참가 인원
+      <select th:field="*{participantCount}" required></select>
     </label>
 
+  <div class="button-wrapper">
+      <button type="submit">요청하기</button>
+      <button type="button" class="cancel-btn">취소하기</button>
+  </div>
 
-    <button type="submit">요청하기</button>
-    <button type="button" class="cancel-btn">취소하기</button>
   </form>
 </div>
 

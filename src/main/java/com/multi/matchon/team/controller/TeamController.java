@@ -3,11 +3,10 @@ package com.multi.matchon.team.controller;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.PageResponseDto;
-import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
-import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.team.dto.req.ReqReviewDto;
 import com.multi.matchon.team.dto.req.ReqTeamDto;
 import com.multi.matchon.team.dto.req.ReqTeamJoinDto;
+import com.multi.matchon.team.dto.res.ResJoinRequestDto;
 import com.multi.matchon.team.dto.res.ResReviewDto;
 import com.multi.matchon.team.dto.res.ResTeamDto;
 import com.multi.matchon.team.service.TeamService;
@@ -18,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -40,11 +40,18 @@ public class TeamController {
     @GetMapping("/team/register")
     public ModelAndView teamRegister(ModelAndView mv){
         mv.setViewName("/team/team-register");
+        mv.addObject("formActionUrl", "/team/register");
         mv.addObject("ReqTeamDto",new ReqTeamDto());
         return mv;
     }
     @PostMapping("/team/register")
-    public String teamRegister(@ModelAttribute ReqTeamDto reqTeamDto, @AuthenticationPrincipal CustomUser user){
+    public String teamRegister(@Valid @ModelAttribute ReqTeamDto reqTeamDto, BindingResult result,
+                               @AuthenticationPrincipal CustomUser user){
+
+        if (result.hasErrors()) {
+            return "team/team-register";
+        }
+
         teamService.teamRegister(reqTeamDto, user);
 
         log.info("team 등록 완료");
@@ -74,15 +81,18 @@ public class TeamController {
     }
 
     @GetMapping("/team/{teamId}")
-    public ModelAndView viewTeamDetail(@PathVariable Long teamId) {
+    public ModelAndView viewTeamDetail(@PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
         ModelAndView mv = new ModelAndView("team/team-detail");
 
         ResTeamDto teamDto = teamService.findTeamById(teamId);
         mv.addObject("team", teamDto);
 
+        // Add team leader status flag
+        boolean isLeader = teamService.isTeamLeader(teamId, user.getUsername()); // you'll add this method
+        mv.addObject("isTeamLeader", isLeader);
+
         return mv;
     }
-
     @PostMapping("/join/{teamId}")
     @ResponseBody
     public ResponseEntity<ApiResponse<Void>> joinTeam(
@@ -137,6 +147,74 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
+    @GetMapping("/team/{teamId}/my-reviews")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<ResReviewDto>>> getMyReviews(
+            @PathVariable Long teamId,
+            @AuthenticationPrincipal CustomUser user) {
+
+        log.info("🔍 [Controller] user principal: {}", user);
+
+        List<ResReviewDto> myReviews = teamService.getMyReviewsForTeam(teamId, user.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(myReviews));
+    }
+
+    @PostMapping("/team/{teamId}/join-request")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> sendJoinRequest(@PathVariable Long teamId,
+                                                             @RequestBody ReqTeamJoinDto joinDto, @AuthenticationPrincipal CustomUser user) {
+
+        teamService.sendJoinRequest(teamId, user, joinDto);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @GetMapping("/team/{teamId}/join-requests")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<ResJoinRequestDto>>> getPendingJoinRequests(
+            @PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
+
+        List<ResJoinRequestDto> requests = teamService.getJoinRequestsForTeam(teamId, user);
+        return ResponseEntity.ok(ApiResponse.ok(requests));
+    }
+
+    @PostMapping("/team/join-request/{requestId}/approve")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> approveJoinRequest(@PathVariable Long requestId) {
+        teamService.approveJoinRequest(requestId);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @PostMapping("/team/join-request/{requestId}/reject")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> rejectJoinRequest(@PathVariable Long requestId) {
+        teamService.rejectJoinRequest(requestId);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @GetMapping("/team/edit/{teamId}")
+    public ModelAndView editTeamPage(@PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
+        ReqTeamDto dto = teamService.getTeamEditForm(teamId, user); // include validation to ensure leader
+        ModelAndView mv = new ModelAndView("team/team-edit");
+        mv.addObject("ReqTeamDto", dto);
+        return mv;
+    }
+
+    @DeleteMapping("/team/{teamId}")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> deleteTeam(@PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
+        teamService.deleteTeam(teamId, user);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @PostMapping("/team/update")
+    public String updateTeam(@ModelAttribute ReqTeamDto reqTeamDto,
+                             @AuthenticationPrincipal CustomUser user) {
+
+
+        teamService.updateTeam(reqTeamDto, user);
+
+        return "redirect:/team/team-list"; // or wherever you want to redirect after update
+    }
 }
 
 
