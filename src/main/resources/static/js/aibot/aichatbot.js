@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 
-
+   
     document.addEventListener("click", function (e) {
         if (e.target.id === "chatbot-launcher") {
             fetch("/auth/check", { credentials: "include" })
@@ -42,9 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         alert("로그인 후 사용 가능합니다.");
                     }
                 });
-        }
-    });
-
+        });
+    }
 
     if (closeBtn) {
         closeBtn.addEventListener("click", () => {
