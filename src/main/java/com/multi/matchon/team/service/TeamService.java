@@ -87,7 +87,7 @@ public class TeamService {
 
 
     public List<Team> findAll() {
-        List<Team> teamBoards = teamRepository.findAll();
+        List<Team> teamBoards = teamRepository.findAllNotDeleted();
 
 
         return teamBoards;
@@ -262,7 +262,7 @@ public class TeamService {
 
 
     public ResTeamDto findTeamById(Long teamId) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다: " + teamId));
 
         Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
@@ -275,7 +275,7 @@ public class TeamService {
 
     @Transactional
     public void processTeamJoinRequest(Long teamId, ReqTeamJoinDto joinRequest, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다: " + teamId));
 
         if (!team.getRecruitmentStatus()) {
@@ -385,7 +385,7 @@ public class TeamService {
 
     @Transactional
     public void sendJoinRequest(Long teamId, CustomUser user, ReqTeamJoinDto joinDto) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         Member member = memberRepository.findByMemberEmail(user.getUsername())
@@ -416,7 +416,7 @@ public class TeamService {
     }
     @Transactional(readOnly = true)
     public List<ResJoinRequestDto> getJoinRequestsForTeam(Long teamId, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         // Optional: check if user is team leader
@@ -473,15 +473,15 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
         return teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(
-                teamRepository.findById(teamId).orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다.")),
+                teamRepository.findByIdNotDeleted(teamId).orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다.")),
                 member
         );
     }
 
     @Transactional
     public void deleteTeam(Long teamId, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findByIdNotDeleted(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("삭제된 팀이거나 존재하지 않습니다."));
         Member member = memberRepository.findByMemberEmail(user.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
@@ -489,12 +489,14 @@ public class TeamService {
         if (!isLeader) throw new IllegalArgumentException("팀 리더만 삭제할 수 있습니다.");
 
         team.softDelete(); // if you support soft delete
+
+        teamRepository.save(team);
     }
 
 
     @Transactional(readOnly = true)
     public ReqTeamDto getTeamEditForm(Long teamId, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         Member member = memberRepository.findByMemberEmail(user.getUsername())
@@ -526,7 +528,7 @@ public class TeamService {
             throw new IllegalArgumentException("팀 ID가 없습니다.");
         }
 
-        Team team = teamRepository.findById(dto.getTeamId())
+        Team team = teamRepository.findByIdNotDeleted(dto.getTeamId())
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         Member member = memberRepository.findByMemberEmail(user.getUsername())
@@ -543,6 +545,7 @@ public class TeamService {
 
         // Remove and re-insert recruiting positions
         recruitingPositionRepository.deleteByTeam(team);
+        em.flush();
 
 
         for (String posName : dto.getRecruitingPositions()) {
