@@ -15,6 +15,7 @@ import com.multi.matchon.community.service.BoardService;
 import com.multi.matchon.community.service.CommentService;
 import com.multi.matchon.community.service.ReportService;
 import com.multi.matchon.member.domain.Member;
+import com.multi.matchon.member.domain.MemberRole;
 import io.awspring.cloud.s3.S3Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -84,12 +85,16 @@ public class BoardController {
     public String form(Model model, @AuthenticationPrincipal CustomUser user) {
         if (user == null) return "redirect:/login";
 
+        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN; // 역할 기반 분기
+
         model.addAttribute("boardRequest", new BoardRequest());
         model.addAttribute("categories", Category.values());
         model.addAttribute("memberName", user.getMember().getMemberName());
         model.addAttribute("formAction", "/community");
+        model.addAttribute("isAdmin", isAdmin); // 관리자 여부 추가
         return FORM_VIEW;
     }
+
 
     @PostMapping
     public String create(@Valid @ModelAttribute("boardRequest") BoardRequest boardRequest,
@@ -98,8 +103,17 @@ public class BoardController {
                          Model model,
                          @AuthenticationPrincipal CustomUser user) {
 
+        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN;
+
+        if (!isAdmin && boardRequest.getCategory() == Category.ANNOUNCEMENT) {
+            bindingResult.rejectValue("category", "accessDenied", "공지사항은 관리자만 작성할 수 있습니다.");
+        }
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", Category.values());
+            model.addAttribute("memberName", user.getMember().getMemberName());
+            model.addAttribute("formAction", "/community");
+            model.addAttribute("isAdmin", isAdmin); // 다시 주입
             return FORM_VIEW;
         }
 
@@ -141,6 +155,8 @@ public class BoardController {
             return "redirect:/community";
         }
 
+        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN;
+
         BoardRequest request = new BoardRequest(board.getTitle(), board.getContent(), board.getCategory());
 
         model.addAttribute("boardRequest", request);
@@ -148,9 +164,10 @@ public class BoardController {
         model.addAttribute("memberName", user.getMember().getMemberName());
         model.addAttribute("formAction", "/community/" + id + "/edit");
         model.addAttribute("boardId", id);
-
+        model.addAttribute("isAdmin", isAdmin); // 관리자 여부 추가
         return FORM_VIEW;
     }
+
 
     @PostMapping("/{id}/edit")
     public String update(@PathVariable Long id,
@@ -160,11 +177,18 @@ public class BoardController {
                          Model model,
                          @AuthenticationPrincipal CustomUser user) throws IOException {
 
+        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN;
+
+        if (!isAdmin && boardRequest.getCategory() == Category.ANNOUNCEMENT) {
+            bindingResult.rejectValue("category", "accessDenied", "공지사항은 관리자만 작성할 수 있습니다.");
+        }
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", Category.values());
             model.addAttribute("memberName", user.getMember().getMemberName());
             model.addAttribute("formAction", "/community/" + id + "/edit");
             model.addAttribute("boardId", id);
+            model.addAttribute("isAdmin", isAdmin);
             return FORM_VIEW;
         }
 
