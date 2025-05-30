@@ -37,8 +37,10 @@
                 <select th:field="*{category}" required>
                     <option value="">-- 선택하세요 --</option>
                     <option th:each="category : ${categories}"
+                            th:if="${isAdmin} or ${category.name() != 'ANNOUNCEMENT'}"
                             th:value="${category}"
-                            th:text="${category.displayName}"></option>
+                            th:text="${category.displayName}">
+                    </option>
                 </select>
                 <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
             </div>
@@ -175,3 +177,5 @@
 </script>
 </body>
 </html>
+
+
