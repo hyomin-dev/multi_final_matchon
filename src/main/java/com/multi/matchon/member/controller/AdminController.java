@@ -2,6 +2,9 @@ package com.multi.matchon.member.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.Status;
+import com.multi.matchon.community.domain.Report;
+import com.multi.matchon.community.dto.res.ReportResponse;
+import com.multi.matchon.community.service.ReportService;
 import com.multi.matchon.customerservice.domain.Inquiry;
 import com.multi.matchon.customerservice.domain.InquiryAnswer;
 import com.multi.matchon.customerservice.dto.res.InquiryResDto;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Controller
@@ -35,6 +39,7 @@ public class AdminController {
     private final EventRepository eventRepository;
     private final InquiryRepository inquiryRepository;
     private final InquiryAnswerRepository inquiryAnswerRepository;
+    private final ReportService reportService;
 
     @GetMapping
     public String adminHome() {
@@ -158,5 +163,12 @@ public class AdminController {
     public String updateEventStatus(@PathVariable Long id, @RequestParam("status") Status status) {
         eventRepository.updateEventStatus(id, status);
         return "redirect:/admin/event";
+    }
+
+    @GetMapping("/reports")
+    public String listAllReports(Model model) {
+        List<ReportResponse> reports = reportService.getAllReports();
+        model.addAttribute("reports", reports);
+        return "admin/report";
     }
 }

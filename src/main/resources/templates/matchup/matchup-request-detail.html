@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-request-detail.css}">
     <script th:src="@{/js/matchup/matchup-request-detail.js}" defer></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
     <style>
         a {
@@ -54,62 +55,62 @@
 <!--        </th:block>-->
 
         <tr th:style="${resMatchupRequestDto.boardWriter == #authentication.name} ? '' : 'display:none'">
-            <th>지원자: </th>
+            <th>지원자 </th>
             <td th:text="${resMatchupRequestDto.applicant}"></td>
         </tr>
 
         <tr th:style="${resMatchupRequestDto.applicant == #authentication.name} ? '' : 'display:none'">
-            <th>게시글 작성자: </th>
+            <th>게시글 작성자 </th>
             <td th:text="${resMatchupRequestDto.boardWriter}"></td>
         </tr>
         <tr>
-            <th>종목: </th>
+            <th>종목 </th>
             <td th:text="${resMatchupRequestDto.sportsTypeName}"></td>
         </tr>
         <tr>
-            <th>신청자: </th>
+            <th>신청자 </th>
             <td th:text="${resMatchupRequestDto.applicant}"></td>
         </tr>
         <tr>
-            <th>자기소개: </th>
+            <th>자기소개 </th>
             <td th:text="${resMatchupRequestDto.selfIntro}"></td>
         </tr>
         <tr>
-            <th>경기장명:</th>
+            <th>경기장명</th>
             <td th:text="${resMatchupRequestDto.sportsFacilityName}"></td>
         </tr>
         <tr>
-            <th>경기장 주소:</th>
+            <th>경기장 주소</th>
             <td th:text="${resMatchupRequestDto.sportsFacilityAddress}"></td>
         </tr>
         <tr>
-            <th>경기장 위치:</th>
+            <th>경기장 위치</th>
             <td>
                 <div id="map" style="width:100%;height:350px;"></div>
             </td>
         </tr>
         <tr>
-            <th>경기 날짜:</th>
+            <th>경기 날짜</th>
             <td id="match-date"></td>
         </tr>
         <tr>
-            <th>현재 정원:</th>
+            <th>현재 정원</th>
             <td th:text="'(' + ${resMatchupRequestDto.currentParticipantCount} + '/' + ${resMatchupRequestDto.maxParticipants} +')'"></td>
         </tr>
         <tr>
-            <th>신청 인원:</th>
+            <th>신청 인원</th>
             <td th:text="${resMatchupRequestDto.participantCount}"></td>
         </tr>
         <tr>
-            <th>요청 상태:</th>
+            <th>요청 상태</th>
             <td th:id="status"></td>
         </tr>
         <tr>
-            <th>참가 요청 횟수(최대 2번):</th>
+            <th>참가 요청 횟수(최대 2번)</th>
             <td th:text="${resMatchupRequestDto.matchupRequestSubmittedCount}"></td>
         </tr>
         <tr>
-            <th>승인 취소 요청 횟수(최대 1번):</th>
+            <th>승인 취소 요청 횟수(최대 1번)</th>
             <td th:text="${resMatchupRequestDto.matchupCancelSubmittedCount}"></td>
         </tr>
     </table>

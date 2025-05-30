@@ -76,7 +76,7 @@ public class MatchupBoardService {
     // 조회
 
     @Transactional(readOnly = true)
-    public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId) {
+    public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId, CustomUser user) {
 
         MatchupBoard matchupBoard = matchupBoardRepository.findMatchupBoardByBoardId(boardId).orElseThrow(()->new IllegalArgumentException("Matchup"+boardId +"번 게시글이 존재하지 않습니다."));
 
@@ -100,7 +100,7 @@ public class MatchupBoardService {
                 .currentParticipantCount(matchupBoard.getCurrentParticipantCount())
                 .maxParticipants(matchupBoard.getMaxParticipants())
                 .minMannerTemperature(matchupBoard.getMinMannerTemperature())
-                .myMannerTemperature(matchupBoard.getMember().getMyTemperature())
+                .myMannerTemperature(user.getMember().getMyTemperature()) //matchupBoard.getMember().getMyTemperature()
                 .matchDescription(matchupBoard.getMatchDescription())
                 .originalName(attachments.get(0).getOriginalName())
                 .savedName(attachments.get(0).getSavedName())
@@ -169,8 +169,30 @@ public class MatchupBoardService {
     // 수정
 
     @Transactional
-    public void updateBoard(ResMatchupBoardDto resMatchupBoardDto) {
+    public void updateBoard(ResMatchupBoardDto resMatchupBoardDto, CustomUser user) {
         MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(resMatchupBoardDto.getBoardId()).orElseThrow(()->new IllegalArgumentException("Matchup"+resMatchupBoardDto.getBoardId()+"번 게시글이 없습니다."));
+
+
+//        if(resMatchupBoardDto.getTeamIntro()==null)
+//            throw new CustomException("Matchup 소속 팀이 있어야 합니다.");
+//        else if(resMatchupBoardDto.getSportsFacilityName() ==null)
+//            throw new CustomException("Matchup 경기장 명을 입력하세요.");
+//        else if(resMatchupBoardDto.getSportsFacilityAddress() == null)
+//            throw new CustomException("Matchup 경기장 주소를 입력하세요.");
+//        else if(resMatchupBoardDto.getMatchDatetime() == null)
+//            throw new CustomException("")
+
+        if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now()))
+            throw new CustomException("Matchup 경기 시작 시간이 지나 수정할 수 없습니다.");
+
+        if(resMatchupBoardDto.getMatchDatetime().isBefore(LocalDateTime.now()))
+            throw new CustomException("Matchup 경기 시작 시간은 현재 시간 이후만 가능합니다.");
+
+        if(findMatchupBoard.getCurrentParticipantCount()>resMatchupBoardDto.getMaxParticipants())
+            throw new CustomException("Matchup 총 모집 인원은 현재 모집된 인원 이상이여야 합니다.");
+
+        if(resMatchupBoardDto.getMinMannerTemperature()>user.getMember().getMyTemperature())
+            throw new CustomException("Matchup 하한 매너 온도는 내 매너온도 이상이어야 합니다.");
 
         findMatchupBoard.update(
                 sportsTypeRepository.findBySportsTypeName(resMatchupBoardDto.getSportsTypeName()).orElseThrow(()-> new IllegalArgumentException("Matchup"+resMatchupBoardDto.getSportsTypeName()+"는 에서 지원하지 않는 종목입니다.")),
@@ -187,7 +209,7 @@ public class MatchupBoardService {
         matchupBoardRepository.save(findMatchupBoard);
 
         //if(resMatchupBoardDto.getReservationFile())
-        System.out.println("Tt");
+        //System.out.println("Tt");
 
         if(!Objects.requireNonNull(resMatchupBoardDto.getReservationFile().getOriginalFilename()).isBlank()){
             matchupService.updateFile(resMatchupBoardDto.getReservationFile(), findMatchupBoard);
