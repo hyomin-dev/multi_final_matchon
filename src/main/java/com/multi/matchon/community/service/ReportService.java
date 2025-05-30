@@ -68,7 +68,20 @@ public class ReportService {
                     .reasonType(report.getReasonType().getLabel())
                     .reason(report.getReason())
                     .createdDate(report.getCreatedDate())
+                    .boardId(resolveBoardId(report))
                     .build();
         }).collect(Collectors.toList());
     }
+
+    private Long resolveBoardId(Report report) {
+        if (report.getReportType() == ReportType.BOARD) {
+            return report.getTargetId(); // 게시글 ID 자체
+        } else if (report.getReportType() == ReportType.COMMENT) {
+            return commentRepository.findById(report.getTargetId())
+                    .map(comment -> comment.getBoard().getId())
+                    .orElse(null); // 댓글이 속한 게시글 ID
+        }
+        return null;
+    }
+
 }

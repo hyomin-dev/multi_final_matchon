@@ -17,26 +17,15 @@
 
     <div class="content-box">
         <div class="post-header">
-
             <div class="post-header-actions">
-
                 <a th:href="@{/community}" class="back-link">← 목록으로</a>
-
                 <div class="post-action-right">
                     <div th:if="${board.member.id == #authentication.principal.member.id}">
-                        <button type="button"
-                                class="board-delete-button"
-                                th:onclick="'deletePost(' + ${board.id} + ')'">
-                            ✖ 삭제
-                        </button>
+                        <button type="button" class="board-delete-button" th:onclick="'deletePost(' + ${board.id} + ')'">✖ 삭제</button>
                     </div>
-
                     <div th:if="${board.member.id != #authentication.principal.member.id}">
-                        <button type="button"
-                                class="report-button"
-                                th:onclick="'openReportModal(\'BOARD\', ' + ${board.id} + ')'">
-                            ⚠ 게시글 신고
-                        </button>
+                        <button type="button" class="report-button"
+                                th:onclick="'openReportModal(\'BOARD\', ' + ${board.id} + ')'">⚠ 게시글 신고</button>
                     </div>
                 </div>
             </div>
@@ -62,7 +51,6 @@
                     </li>
                 </ul>
             </div>
-
         </div>
 
         <div th:if="${board.member.id == #authentication.principal.member.id}" class="post-actions">
@@ -78,13 +66,15 @@
         </form>
 
         <ul id="commentList">
-            <li th:each="comment : ${comments}" th:attr="data-comment-id=${comment.id}">
+            <li th:each="comment : ${comments}"
+                th:attr="data-comment-id=${comment.id}, id='comment-' + ${comment.id}"
+                th:classappend="${highlightedCommentId != null and highlightedCommentId == comment.id} ? 'highlight'">
+
                 <div class="comment-meta">
                     <small>
                         <span th:text="${comment.member.memberName}">작성자</span> |
                         <span th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</span>
                     </small>
-
                     <div class="comment-actions">
                         <button type="button" class="btn-comment-delete"
                                 th:data-comment-id="${comment.id}"
@@ -92,9 +82,7 @@
                                 th:if="${comment.member.id == #authentication.principal.member.id}">
                             ✖ 삭제
                         </button>
-
-                        <button type="button"
-                                class="report-button"
+                        <button type="button" class="report-button"
                                 th:if="${comment.member.id != #authentication.principal.member.id}"
                                 th:onclick="'openReportModal(\'COMMENT\', ' + ${comment.id} + ')'">
                             ⚠ 댓글 신고
@@ -141,33 +129,29 @@
     </div>
 </div>
 
-
 <div th:replace="~{common/footer::footer}"></div>
 
 <script>
     function deletePost(boardId) {
         if (!confirm("정말 삭제하시겠습니까?")) return;
-
         fetch(`/community/${boardId}/delete`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
-        })
-            .then(response => {
-                if (response.status === 401) {
-                    alert("로그인이 필요한 서비스입니다.");
-                    window.location.href = "/login";
-                } else if (response.ok) {
-                    alert("삭제되었습니다.");
-                    window.location.href = "/community";
-                } else {
-                    alert("삭제에 실패했습니다.");
-                }
-            })
-            .catch(error => {
-                console.error("삭제 요청 오류:", error);
-                alert("오류가 발생했습니다.");
-            });
+        }).then(response => {
+            if (response.status === 401) {
+                alert("로그인이 필요한 서비스입니다.");
+                window.location.href = "/login";
+            } else if (response.ok) {
+                alert("삭제되었습니다.");
+                window.location.href = "/community";
+            } else {
+                alert("삭제에 실패했습니다.");
+            }
+        }).catch(error => {
+            console.error("삭제 요청 오류:", error);
+            alert("오류가 발생했습니다.");
+        });
     }
 
     document.getElementById("commentForm").addEventListener("submit", function (e) {
@@ -175,7 +159,6 @@
         const content = document.getElementById("commentContent").value.trim();
         const boardId = document.location.pathname.split("/")[2];
         const token = localStorage.getItem("accessToken");
-
         if (!content) {
             alert("댓글을 입력해주세요.");
             return;
@@ -193,6 +176,7 @@
             .then(data => {
                 const commentList = document.getElementById("commentList");
                 const newComment = document.createElement("li");
+                newComment.classList.add("highlighted");
                 newComment.innerHTML = `
                 <div class="comment-meta">
                     <small><b>${data.memberName}</b> | ${data.createdDate}</small>
@@ -203,11 +187,10 @@
                 <p>${data.content}</p>`;
                 commentList.prepend(newComment);
                 document.getElementById("commentContent").value = "";
-            })
-            .catch(err => {
-                console.error("댓글 등록 오류:", err);
-                alert("댓글 등록 실패");
-            });
+            }).catch(err => {
+            console.error("댓글 등록 오류:", err);
+            alert("댓글 등록 실패");
+        });
     });
 
     document.addEventListener("click", function (e) {
@@ -215,28 +198,25 @@
             const commentId = e.target.dataset.commentId;
             const boardId = e.target.dataset.boardId;
             const token = localStorage.getItem("accessToken");
-
             if (!confirm("댓글을 삭제하시겠습니까?")) return;
-
             fetch(`/community/${boardId}/comments/${commentId}`, {
                 method: "DELETE",
                 headers: { 'Authorization': 'Bearer ' + token }
-            })
-                .then(res => {
-                    if (res.ok) {
-                        e.target.closest("li").remove();
-                    } else {
-                        alert("댓글 삭제 실패");
-                    }
-                });
+            }).then(res => {
+                if (res.ok) {
+                    e.target.closest("li").remove();
+                } else {
+                    alert("댓글 삭제 실패");
+                }
+            });
         }
     });
 
     function openReportModal(type, id) {
         document.getElementById("reportTargetType").value = type;
         document.getElementById("reportTargetId").value = id;
-        document.getElementById("reportReasonSelect").value = ""; // 드롭다운 초기화
-        document.getElementById("reportReasonDetail").value = ""; // 상세사유 초기화
+        document.getElementById("reportReasonSelect").value = "";
+        document.getElementById("reportReasonDetail").value = "";
         document.getElementById("reportModal").style.display = "flex";
     }
 
@@ -250,7 +230,6 @@
         const selectedReasonType = document.getElementById("reportReasonSelect").value;
         const detailReason = document.getElementById("reportReasonDetail").value.trim();
 
-        // 필수 유효성 검사
         if (!selectedReasonType) {
             alert("신고 사유를 선택해주세요.");
             return;
@@ -261,8 +240,6 @@
         }
 
         const token = localStorage.getItem("accessToken");
-
-        // 상세 사유와 카테고리 정보 동시 전송
         fetch("/community/report", {
             method: "POST",
             headers: {
@@ -270,23 +247,30 @@
                 "Authorization": "Bearer " + token
             },
             body: `type=${type}&targetId=${id}&reasonType=${selectedReasonType}&reason=${encodeURIComponent(detailReason)}`
-        })
-
-            .then(res => {
-                if (res.status === 401) {
-                    alert("로그인이 필요합니다.");
-                    location.href = "/login";
-                } else if (res.ok) {
-                    alert("신고가 접수되었습니다.");
-                    closeReportModal();
-                } else {
-                    res.text().then(msg => alert(msg));
-                }
-            })
-            .catch(() => alert("신고 중 오류가 발생했습니다."));
+        }).then(res => {
+            if (res.status === 401) {
+                alert("로그인이 필요합니다.");
+                location.href = "/login";
+            } else if (res.ok) {
+                alert("신고가 접수되었습니다.");
+                closeReportModal();
+            } else {
+                res.text().then(msg => alert(msg));
+            }
+        }).catch(() => alert("신고 중 오류가 발생했습니다."));
     }
 
+    window.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const highlightId = params.get("highlight");
+        if (highlightId) {
+            const el = document.getElementById("comment-" + highlightId);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "center" });
+                el.classList.add("highlight");
+            }
+        }
+    });
 </script>
 </body>
 </html>
-

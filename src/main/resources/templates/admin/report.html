@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/report.css}"> <!-- 분리된 CSS 추가 -->
+    <link rel="stylesheet" th:href="@{/css/admin/report.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
 </head>
 <body>
@@ -23,6 +23,7 @@
         <th>신고분류</th>
         <th>상세사유</th>
         <th>신고일</th>
+        <th>보기</th> <!-- ✅ 새 열 추가 -->
     </tr>
     </thead>
     <tbody>
@@ -34,6 +35,18 @@
         <td data-label="신고분류" th:text="${report.reasonType}">욕설/비방/괴롭힘</td>
         <td data-label="상세사유" th:text="${report.reason}">구체적인 이유</td>
         <td data-label="신고일" th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">2025-05-28</td>
+        <td data-label="보기">
+            <!-- 게시글 보기 -->
+            <a th:if="${report.reportType == 'BOARD'}"
+               th:href="@{'/community/' + ${report.boardId}}"
+               class="view-link">게시글 보기</a>
+
+            <!-- 댓글 보기: highlight 파라미터 포함 -->
+            <a th:if="${report.reportType == 'COMMENT'}"
+               th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}"
+               class="view-link">댓글 보기</a>
+        </td>
+
     </tr>
     </tbody>
 </table>
