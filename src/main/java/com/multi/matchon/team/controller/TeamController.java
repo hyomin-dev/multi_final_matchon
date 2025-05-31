@@ -213,7 +213,9 @@ public class TeamController {
 
         teamService.updateTeam(reqTeamDto, user);
 
-        return "redirect:/team/team-list"; // or wherever you want to redirect after update
+
+        return "redirect:/team"; // or wherever you want to redirect after update
+
     }
 }
 

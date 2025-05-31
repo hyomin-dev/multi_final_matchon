@@ -25,8 +25,8 @@
 
     <div class="match-info" th:object="${resMatchupBoardOverviewDto}">
         <p>종목: <span th:text="*{sportsTypeName}">SOCCER</span></p>
-        <p>경기장: <span th:text="*{sportsFacilityName}">ㄱㄱ</span></p>
-        <p>주소: <span th:text="*{sportsFacilityAddress}"></span></p>
+        <p class="truncate">경기장: <span th:text="*{sportsFacilityName}"></span></p>
+        <p class="truncate">주소: <span th:text="*{sportsFacilityAddress}"></span></p>
         <p>📅 날짜: <span id="match-date"></span></p>
         <p id="match-status"></p>
         <p>( <span th:text="*{currentParticipantCount}"></span> / <span th:text="*{maxParticipants}"></span> )</p>
