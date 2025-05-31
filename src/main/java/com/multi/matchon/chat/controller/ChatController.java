@@ -35,7 +35,7 @@ public class ChatController {
         return mv;
     }
 
-    // private-chat page
+    // private-chat page로 이동
     @GetMapping("/private")
     public ModelAndView showPrivateChatPageByReceiverId(@RequestParam("receiverId") Long receiverId, ModelAndView mv){
         mv.setViewName("chat/private-chat");
@@ -43,6 +43,7 @@ public class ChatController {
         return mv;
     }
 
+    // private-chat room 생성 또는 조회
     @ResponseBody
     @GetMapping("/room/private")
     public ResponseEntity<ApiResponse<Long>> getPrivateChatRoom(@RequestParam Long receiverId, @AuthenticationPrincipal CustomUser user){
@@ -54,21 +55,28 @@ public class ChatController {
 
     // 조회
 
+    /*
+    * private chat room 페이지 이동
+    * */
     @GetMapping("/my/rooms")
     public String showMyChatRooms(){
         return "chat/my-chat-list";
     }
 
-
+    /*
+    * 내가 속한 채팅방 목록 전달하는 메서드
+    * */
     @PostMapping("/my/rooms")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getMyChatRooms(@AuthenticationPrincipal CustomUser user){
         List<ResMyChatListDto> resMyChatListDtos = chatService.findAllMyChatRoom(user);
 
         return ResponseEntity.ok().body(ApiResponse.ok(resMyChatListDtos));
-
     }
 
+    /*
+    * 내가 속한 채팅방에서 대화 기록 전달하는 메서드
+    * */
     @GetMapping("/history{roomId}")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<ResChatDto>>> getChatHistory(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
@@ -89,6 +97,15 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
+    /*
+    * 특정 group chat room 페이지 이동
+    * */
+    @GetMapping("/group/room")
+    public ModelAndView showGroupChatPageByRoomId(@RequestParam("roomId") Long roomId, ModelAndView mv){
+        mv.setViewName("chat/group-chat");
+        mv.addObject("roomId",roomId);
+        return mv;
+    }
 
     //수정
 
