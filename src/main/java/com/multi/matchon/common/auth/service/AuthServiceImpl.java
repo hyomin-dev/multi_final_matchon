@@ -36,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void signupUser(SignupRequestDto dto) {
+        validatePassword(dto.getPassword());
         Optional<Member> existing = memberRepository.findByMemberEmail(dto.getEmail());
 
         if (existing.isPresent()) {
@@ -64,6 +65,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void signupHost(SignupRequestDto dto) {
+        validatePassword(dto.getPassword());
         Optional<Member> existing = memberRepository.findByMemberEmail(dto.getEmail());
 
         if (existing.isPresent()) {
@@ -163,5 +165,17 @@ public class AuthServiceImpl implements AuthService {
 
         String newAccessToken = jwtTokenProvider.createAccessToken(email, member.getMemberRole());
         return new TokenResponseDto(newAccessToken, refreshToken);
+    }
+
+    // 비밀번호 체크
+    private void validatePassword(String password) {
+        if (!password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]{8,}$")) {
+            throw new IllegalArgumentException("비밀번호는 대문자, 소문자, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.");
+        }
+
+        // 같은 문자 3번 이상 연속 사용 금지
+        if (password.matches("(.)\\1\\1")) {
+            throw new IllegalArgumentException("같은 문자를 연속으로 사용할 수 없습니다.");
+        }
     }
 }

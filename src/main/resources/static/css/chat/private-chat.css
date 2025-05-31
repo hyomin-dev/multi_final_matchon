@@ -60,3 +60,11 @@ h1 {
 #sendBtn:hover {
     background-color: #155fa0;
 }
+
+.chat-message.system-message {
+    text-align: center;
+    font-style: italic;
+    color: #999;
+    margin: 10px 0;
+}
+

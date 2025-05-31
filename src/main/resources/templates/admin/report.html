@@ -153,4 +153,25 @@
 
 </script>
 </body>
+
+<script>
+    function bindPaginationLinks() {
+        document.querySelectorAll(".pagination a").forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                const page = this.getAttribute("data-page");
+
+                fetch(`/community/report/reports/page?page=${page}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        document.getElementById("reportTableArea").innerHTML = html;
+                        bindPaginationLinks(); // 비동기로 로드된 영역에 이벤트 재바인딩
+                    });
+            });
+        });
+    }
+
+    // 최초 바인딩
+    document.addEventListener("DOMContentLoaded", bindPaginationLinks);
+</script>
 </html>

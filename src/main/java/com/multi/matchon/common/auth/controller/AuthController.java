@@ -46,6 +46,13 @@ public class AuthController {
         return ResponseEntity.ok("주최자 회원가입 성공");
     }
 
+    @GetMapping("/check-email")
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
+        // 삭제되지 않은 계정 기준으로 체크
+        boolean exists = memberRepository.findByMemberEmailAndIsDeletedFalse(email).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
     // 현재 로그인 상태 확인 API (main.html 에서 fetch로 확인)
     @GetMapping("/check")
     public ResponseEntity<?> checkLogin(@AuthenticationPrincipal CustomUser user) {
