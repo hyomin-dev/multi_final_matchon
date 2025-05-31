@@ -11,9 +11,8 @@
     <hr class="navy_hr">
     <footer class="footer">team@matchon.com | 02-123-123</footer>
 
-    <!-- 로그인한 사용자만 챗봇 접근 가능 -->
     <sec:authorize access="isAuthenticated()">
-        <!-- 챗봇 런처 아이콘 -->
+        <!-- 챗봇 런처 -->
         <img src="/img/aichatbot.png" id="chatbot-launcher"
              style="position: fixed; bottom: 30px; right: 20px; width: 80px; cursor: pointer; z-index: 1000;">
 
@@ -25,11 +24,10 @@
                 <span>MatchON 챗봇</span>
                 <button class="chat-close" id="chatbot-close">✕</button>
             </div>
-            <iframe src="/aichat" style="flex: 1; border: none;"></iframe>
+            <iframe src="/aichat" style="flex: 1; border: none;" id="chatbot-frame"></iframe>
         </div>
     </sec:authorize>
 
-    <!-- 공통 챗봇 JS 로드 -->
     <script th:src="@{/js/aibot/aichatbot.js}"></script>
 </div>
 </body>

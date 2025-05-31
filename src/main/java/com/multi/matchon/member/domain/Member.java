@@ -85,6 +85,32 @@ public class Member extends BaseTimeEntity {
     }
 
 
+    // 임시비밀번호용
+    @Column(name = "is_temporary_password", nullable = false)
+    @Builder.Default
+    private Boolean isTemporaryPassword = false;
+
+    @Column(name = "suspended_until")
+    private LocalDateTime suspendedUntil;  // 정지 기한. null이면 정지 아님.
+
+    public boolean isSuspended() {
+        return suspendedUntil != null && LocalDateTime.now().isBefore(suspendedUntil);
+    }
+
+    public void suspend(int days) {
+        this.suspendedUntil = LocalDateTime.now().plusDays(days);
+    }
+
+    public void suspendPermanently() {
+        this.suspendedUntil = LocalDateTime.of(9999, 12, 31, 23, 59);
+    }
+
+    public void unsuspend() {
+        this.suspendedUntil = null;
+    }
+
+
+
     // 삭제
     public void markAsDeleted() {
         this.isDeleted = true;
@@ -120,6 +146,14 @@ public class Member extends BaseTimeEntity {
         this.timeType = null;
         this.myTemperature = null;
         this.pictureAttachmentEnabled = null;
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.memberPassword = encodedPassword;
+    }
+
+    public void setIsTemporaryPassword(boolean isTemporaryPassword) {
+        this.isTemporaryPassword = isTemporaryPassword;
     }
 
 }
