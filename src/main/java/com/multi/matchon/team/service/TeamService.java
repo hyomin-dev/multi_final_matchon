@@ -128,7 +128,7 @@ public class TeamService {
                 .teamRatingAverage(reqTeamDto.getTeamRatingAverage())
                 .recruitmentStatus(reqTeamDto.getRecruitmentStatus()).teamIntroduction(reqTeamDto.getTeamIntroduction())
                 .teamAttachmentEnabled(true)
-                .createdPerson(member.getMemberName())
+                .createdPerson(member.getMemberEmail())
                 .build();
         Team savedTeam = teamRepository.save(newTeam);
 
