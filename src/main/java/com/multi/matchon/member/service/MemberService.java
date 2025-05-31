@@ -41,4 +41,29 @@ public class MemberService {
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
+    //회원 정지
+    @Transactional
+    public void suspendMemberById(Long memberId, Integer days) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+
+        if (member.getMemberRole().name().equals("ADMIN")) {
+            throw new IllegalStateException("관리자는 정지할 수 없습니다.");
+        }
+
+        if (days == null) {
+            member.suspendPermanently(); // 영구 정지
+        } else {
+            member.suspend(days); // 일정 기간 정지
+        }
+    }
+
+    @Transactional
+    public void unsuspendMemberById(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+
+        member.unsuspend(); // 정지 해제
+    }
+
 }

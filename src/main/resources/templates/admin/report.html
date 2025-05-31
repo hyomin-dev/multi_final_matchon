@@ -6,60 +6,152 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/admin/report.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
 
 <h1>신고 목록</h1>
 
-<div id="reportTableArea" th:fragment="reportTableArea">
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>유형</th>
-            <th>신고대상</th>
-            <th>신고자</th>
-            <th>신고분류</th>
-            <th>상세사유</th>
-            <th>신고일</th>
-            <th>보기</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="report, stat : ${reports}">
-            <!-- null 방지 삼항 연산자 추가 -->
-            <td th:text="${(currentPage != null ? currentPage : 0) * 5 + stat.index + 1}">1</td>
-            <td th:text="${report.reportType}">BOARD</td>
-            <td th:text="${report.targetWriterName}">Name</td>
-            <td th:text="${report.reporterName}">홍길동</td>
-            <td th:text="${report.reasonType}">욕설/비방</td>
-            <td th:text="${report.reason}">사유</td>
-            <td th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">날짜</td>
-            <td>
-                <a th:if="${report.reportType == 'BOARD'}"
-                   th:href="@{'/community/' + ${report.boardId}}" class="view-link">게시글</a>
-                <a th:if="${report.reportType == 'COMMENT'}"
-                   th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}" class="view-link">댓글</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>유형</th>
+        <th>신고대상</th>
+        <th>신고자</th>
+        <th>신고분류</th>
+        <th>상세사유</th>
+        <th>신고일</th>
+        <th>보기</th>
+        <th>회원 처리</th>
+    </tr>
+    </thead>
 
-    <th:block th:if="${totalPages != null and totalPages > 1}">
-        <div class="pagination">
-            <ul>
-                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                    <a href="#" th:attr="data-page=${i}" th:text="${i + 1}"
-                       th:classappend="${i == currentPage} ? 'active' : ''"></a>
-                </li>
-            </ul>
-        </div>
-    </th:block>
+
+    <!-- tbody fragment -->
+    <tbody id="reportBody" th:fragment="reportBody">
+    <tr th:each="report, stat : ${reports}">
+        <td th:text="${(currentPage != null ? currentPage : 0) * 5 + stat.index + 1}">1</td>
+        <td th:text="${report.reportType}">BOARD</td>
+        <td th:text="${report.targetWriterName}">Name</td>
+        <td th:text="${report.reporterName}">홍길동</td>
+        <td th:text="${report.reasonType}">욕설/비방</td>
+        <td th:text="${report.reason}">사유</td>
+        <td th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">날짜</td>
+
+        <td>
+            <a th:if="${report.reportType == 'BOARD'}"
+               th:href="@{'/community/' + ${report.boardId}}" class="view-link">게시글</a>
+            <a th:if="${report.reportType == 'COMMENT'}"
+               th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}" class="view-link">댓글</a>
+        </td>
+
+        <td>
+            <div class="ban-controls">
+                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 7)'" class="ban-btn">7일</button>
+                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 30)'" class="ban-btn">30일</button>
+                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', null)'" class="ban-btn">영구</button>
+                <!-- 정지 해제 버튼만 조건부 출력 -->
+                <button type="button" th:if="${report.suspended}" th:onclick="'unsuspendUser(' + ${report.targetMemberId} + ')'" class="ban-btn">해제</button>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+
+</table>
+
+<!-- pagination fragment -->
+<div id="paginationArea" th:fragment="paginationArea">
+    <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
+        <ul>
+            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a href="#" th:attr="data-page=${i}" th:text="${i + 1}"
+                   th:classappend="${i == currentPage} ? 'active' : ''"></a>
+            </li>
+        </ul>
+    </div>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
+
+<script>
+    function bindPaginationLinks() {
+        document.querySelectorAll(".pagination a").forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                const page = this.getAttribute("data-page");
+
+                Promise.all([
+                    fetch(`/community/report/reports/body?page=${page}`).then(res => res.text()),
+                    fetch(`/community/report/reports/pagination?page=${page}`).then(res => res.text())
+                ])
+                    .then(([bodyHtml, paginationHtml]) => {
+                        document.getElementById("reportBody").innerHTML = bodyHtml;
+                        document.getElementById("paginationArea").innerHTML = paginationHtml;
+                        bindPaginationLinks();
+                    });
+            });
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", bindPaginationLinks);
+
+    function suspendUser(memberId, days) {
+        const formData = new URLSearchParams();
+        formData.append("memberId", memberId);
+        if (days != null) {
+            formData.append("days", days);
+        }
+
+        fetch("/member/suspend", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("회원 정지가 완료되었습니다.");
+                    location.reload();
+                } else {
+                    res.json().then(data => alert(data.message || "정지 실패"));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("요청 중 오류 발생");
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", bindPaginationLinks);
+
+    function unsuspendUser(memberId) {
+        const formData = new URLSearchParams();
+        formData.append("memberId", memberId);
+
+        fetch("/member/unsuspend", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("회원 정지가 해제되었습니다.");
+                    location.reload();
+                } else {
+                    res.json().then(data => alert(data.message || "해제 실패"));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("요청 중 오류 발생");
+            });
+    }
+
+</script>
 </body>
 
 <script>

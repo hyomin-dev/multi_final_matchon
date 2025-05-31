@@ -4,7 +4,9 @@ import com.multi.matchon.chat.domain.*;
 import com.multi.matchon.chat.dto.res.ResChatDto;
 import com.multi.matchon.chat.dto.res.ResMyChatListDto;
 import com.multi.matchon.chat.exception.custom.ChatBlockException;
+
 import com.multi.matchon.chat.exception.custom.NotChatParticipantException;
+
 import com.multi.matchon.chat.repository.*;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.exception.custom.ApiCustomException;
@@ -240,6 +242,7 @@ public class ChatService {
 
         if(!chatParticipantRepository.isRoomParticipantByChatRoomAndMember(chatRoom, sender)){
             throw new NotChatParticipantException("Chat 해당 채팅방에 참여자가 아닙니다.");
+
         }
 //        return false;
     }
@@ -257,6 +260,7 @@ public class ChatService {
         if(chatParticipants.isEmpty())
             throw new CustomException("Chat 해당 채팅방은 존재하지 않습니다.");
 
+
 //        if(chatParticipants.size()!=2)
 //            throw new CustomException("Chat 해당 채팅방은 1대1 채팅방이 아닙니다.");
 
@@ -267,6 +271,7 @@ public class ChatService {
 
         // 한 사람이라도 차단했는지 체크
         if (chatUserBlockRepository.isBlockByTwoMember(chatParticipants.get(0).getMember(),chatParticipants.get(1).getMember())){
+
             throw new ChatBlockException("ChatBlockException 발생");
         }
     }
@@ -283,6 +288,7 @@ public class ChatService {
         log.info("읽음 처리 메시지: {}",count);
 
     }
+
 
     /*
      * 1대1 채팅에서 상대 유저를 차단하는 메서드

@@ -134,6 +134,16 @@
 <div th:replace="~{common/footer::footer}"></div>
 
 <script>
+    function formatDateTime(isoString) {
+        const date = new Date(isoString);
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        const hh = String(date.getHours()).padStart(2, '0');
+        const mi = String(date.getMinutes()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+    }
+
     function deletePost(boardId) {
         if (!confirm("정말 삭제하시겠습니까?")) return;
         fetch(`/community/${boardId}/delete`, {
@@ -181,7 +191,7 @@
                 newComment.classList.add("highlighted");
                 newComment.innerHTML = `
                 <div class="comment-meta">
-                    <small><b>${data.memberName}</b> | ${data.createdDate}</small>
+                    <small><b>${data.memberName}</b> | ${formatDateTime(data.createdDate)}</small>
                     <div class="comment-actions">
                         <button type="button" class="btn-comment-delete" data-comment-id="${data.commentId}" data-board-id="${boardId}">삭제</button>
                     </div>

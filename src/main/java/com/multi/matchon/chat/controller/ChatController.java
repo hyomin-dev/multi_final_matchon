@@ -97,6 +97,7 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
+
     /*
     * 특정 group chat room 페이지 이동
     * */

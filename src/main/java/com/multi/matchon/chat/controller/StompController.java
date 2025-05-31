@@ -63,7 +63,9 @@ public class StompController {
         StompHandler.authContext.set((Authentication) principal);
 
         chatService.checkBlock(roomId);
+
         chatService.checkRoomParticipant(user, roomId);
+
         chatService.saveMessage(roomId, resChatDto);
         messageTemplate.convertAndSend("/topic/"+roomId,resChatDto);
     }
@@ -84,6 +86,7 @@ public class StompController {
 //        return resChatDto;
 //    }
 
+
     @MessageExceptionHandler
     public ResChatDto handleChatBlockException(ChatBlockException e){
         ResChatDto resChatDto = ResChatDto.builder()
@@ -96,6 +99,7 @@ public class StompController {
         return resChatDto;
     }
 
+
     @MessageExceptionHandler
     public ResChatDto handleChatBlockException(NotChatParticipantException e){
         ResChatDto resChatDto = ResChatDto.builder()
@@ -107,5 +111,6 @@ public class StompController {
         log.info("error: {}",e.getMessage());
         return resChatDto;
     }
+
 
 }

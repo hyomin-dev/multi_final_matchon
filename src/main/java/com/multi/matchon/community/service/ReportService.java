@@ -13,7 +13,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +22,9 @@ public class ReportService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
+    /**
+     * 신고 접수 처리
+     */
     public void report(ReportType type, Long targetId, String reason, ReasonType reasonType, Member reporter) {
         boolean alreadyReported = reportRepository
                 .findByReportTypeAndTargetIdAndReporter(type, targetId, reporter)
@@ -43,55 +45,63 @@ public class ReportService {
         reportRepository.save(report);
     }
 
+    /**
+     * 전체 신고 목록 조회 (비페이징)
+     */
     public List<ReportResponse> getAllReports() {
         List<Report> reports = reportRepository.findAll(Sort.by(Sort.Direction.DESC, "createdDate"));
         return reports.stream()
-                .map(report -> {
-                    String targetWriterName = resolveTargetWriterName(report);
-                    return ReportResponse.builder()
-                            .id(report.getId())
-                            .reportType(report.getReportType().name())
-                            .targetId(report.getTargetId())
-                            .targetWriterName(targetWriterName)
-                            .reporterName(report.getReporter().getMemberName())
-                            .reasonType(report.getReasonType().getLabel())
-                            .reason(report.getReason())
-                            .createdDate(report.getCreatedDate())
-                            .boardId(resolveBoardId(report))
-                            .build();
-                }).toList();
+                .map(this::convertToResponse)
+                .toList();
     }
 
+    /**
+     * 페이징된 신고 목록 조회
+     */
     public Page<ReportResponse> getReportsPaged(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
         return reportRepository.findAll(pageable)
-                .map(report -> {
-                    String targetWriterName = null;
-                    if (report.getReportType() == ReportType.BOARD) {
-                        targetWriterName = boardRepository.findById(report.getTargetId())
-                                .map(board -> board.getMember().getMemberName())
-                                .orElse(null);
-                    } else if (report.getReportType() == ReportType.COMMENT) {
-                        targetWriterName = commentRepository.findById(report.getTargetId())
-                                .map(comment -> comment.getMember().getMemberName())
-                                .orElse(null);
-                    }
+                .map(this::convertToResponse);
+    }
 
-                    return ReportResponse.builder()
-                            .id(report.getId())
-                            .reportType(report.getReportType().name())
-                            .targetId(report.getTargetId())
-                            .targetWriterName(targetWriterName)
-                            .reporterName(report.getReporter().getMemberName())
-                            .reasonType(report.getReasonType().getLabel())
-                            .reason(report.getReason())
-                            .createdDate(report.getCreatedDate())
-                            .boardId(resolveBoardId(report))
-                            .build();
-                });
+    /**
+     * Report → ReportResponse 변환
+     */
+    private ReportResponse convertToResponse(Report report) {
+        String targetWriterName = resolveTargetWriterName(report);
+        Long boardId = resolveBoardId(report);
+
+        Member targetMember = null;
+
+        if (report.getReportType() == ReportType.BOARD) {
+            targetMember = boardRepository.findById(report.getTargetId())
+                    .map(board -> board.getMember())
+                    .orElse(null);
+        } else if (report.getReportType() == ReportType.COMMENT) {
+            targetMember = commentRepository.findById(report.getTargetId())
+                    .map(comment -> comment.getMember())
+                    .orElse(null);
+        }
+
+        return ReportResponse.builder()
+                .id(report.getId())
+                .reportType(report.getReportType().name())
+                .targetId(report.getTargetId())
+                .targetWriterName(targetWriterName)
+                .reporterName(report.getReporter().getMemberName())
+                .reasonType(report.getReasonType().getLabel())
+                .reason(report.getReason())
+                .createdDate(report.getCreatedDate())
+                .boardId(boardId)
+                .targetMemberId(targetMember != null ? targetMember.getId() : null)
+                .suspended(targetMember != null && targetMember.isSuspended())
+                .build();
     }
 
 
+    /**
+     * 신고 대상 작성자 이름 조회
+     */
     private String resolveTargetWriterName(Report report) {
         if (report.getReportType() == ReportType.BOARD) {
             return boardRepository.findById(report.getTargetId())
@@ -104,6 +114,11 @@ public class ReportService {
         }
         return null;
     }
+
+
+    /**
+     * 댓글의 경우 해당 댓글이 포함된 게시글 ID 조회
+     */
 
     private Long resolveBoardId(Report report) {
         if (report.getReportType() == ReportType.BOARD) {

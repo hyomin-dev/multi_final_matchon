@@ -72,13 +72,22 @@ public class ReportController {
         return "admin/report";
     }
 
-    @GetMapping("/reports/page")
-    public String getReportsPaged(@RequestParam(defaultValue = "0") int page,
-                                  @RequestParam(defaultValue = "5") int size,
-                                  Model model) {
+    @GetMapping("/reports/body")
+    public String getReportBody(@RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "5") int size,
+                                Model model) {
         addPagingAttributes(model, page, size);
-        return "admin/report :: reportTableArea";
+        return "admin/report :: reportBody";
     }
+
+    @GetMapping("/reports/pagination")
+    public String getPagination(@RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "5") int size,
+                                Model model) {
+        addPagingAttributes(model, page, size);
+        return "admin/report :: paginationArea";
+    }
+
 
 
 }
