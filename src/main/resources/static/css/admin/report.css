@@ -49,14 +49,15 @@ th, td {
     white-space: normal;
 }
 
-th:nth-child(1), td:nth-child(1) { width: 5%; }
-th:nth-child(2), td:nth-child(2) { width: 10%; }
-th:nth-child(3), td:nth-child(3) { width: 15%; }
-th:nth-child(4), td:nth-child(4) { width: 15%; }
-th:nth-child(5), td:nth-child(5) { width: 15%; }
-th:nth-child(6), td:nth-child(6) { width: 30%; }
-th:nth-child(7), td:nth-child(7) { width: 10%; }
-th:nth-child(8), td:nth-child(8) { width: 10%; }
+th:nth-child(1), td:nth-child(1) { width: 5%; }     /* ID */
+th:nth-child(2), td:nth-child(2) { width: 10%; }    /* 유형 */
+th:nth-child(3), td:nth-child(3) { width: 10%; }    /* 신고대상 */
+th:nth-child(4), td:nth-child(4) { width: 10%; }    /* 신고자 */
+th:nth-child(5), td:nth-child(5) { width: 15%; }    /* 신고분류 */
+th:nth-child(6), td:nth-child(6) { width: 30%; }    /* 상세사유 */
+th:nth-child(7), td:nth-child(7) { width: 10%; }    /* 신고일 */
+th:nth-child(8), td:nth-child(8) { width: 10%; }    /* 보기 */
+th:nth-child(9), td:nth-child(9) { width: 10%; }    /* 회원 처리 */
 
 tbody tr:hover {
     background-color: #fffbe6;
@@ -145,3 +146,28 @@ td {
 .pagination a:hover {
     background-color: #ddd;
 }
+
+.ban-controls {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 6px;
+}
+
+.ban-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    background-color: #eabdc2;
+    border: 1px solid #c88c95;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+.ban-btn:hover {
+    background-color: #d78e98;
+}
+
+
+

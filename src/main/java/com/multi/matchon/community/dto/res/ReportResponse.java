@@ -17,5 +17,7 @@ public class ReportResponse {
     private String reason;
     private LocalDateTime createdDate;
     private Long boardId;
+    private Long targetMemberId;
+    private boolean suspended;
 }
 
