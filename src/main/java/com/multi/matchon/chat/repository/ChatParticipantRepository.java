@@ -45,6 +45,16 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             """)
     List<ChatParticipant> findByChatRoomWithMember(@Param("chatRoom") ChatRoom chatRoom);
 
+    @Query("""
+            select t1
+            from ChatParticipant t1
+            join fetch t1.member
+            where t1.chatRoom.id =:chatRoomId
+            
+            """)
+    List<ChatParticipant> findByChatRoomIdWithMember(@Param("chatRoomId") Long chatRoomId);
+
+
 
     @Query("""
             select

@@ -9,13 +9,25 @@ async function getMyChatRooms(){
     });
 
     if(!response.ok){
+        const error = await response.json();
+        console.log(error);
         throw new Error(`HTTP error! Status:${response.status}`)
+
     }
 
     const chatRoomList = document.querySelector(".chat-room-list");
 
     const items = await response.json();
     console.log(items);
+
+    if(items.data.length ===0){
+        chatRoomList.innerHTML = `
+            <div class="no-result">
+                현재 참여 중인 채팅방이 없습니다.
+            </div>
+        `;
+        return;
+    }
 
     items.data.forEach(item =>{
         const card = document.createElement("div");

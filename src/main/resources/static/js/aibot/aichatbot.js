@@ -13,15 +13,15 @@ window.onload = () => {
             if (e.key === "Enter") sendMessage();
         });
     }
-
-
 };
 
-
-// 챗봇 런처 및 모달 처리 (이벤트 위임 방식)
+// 챗봇 런처 및 모달 처리
 document.addEventListener("DOMContentLoaded", () => {
-    // 로그인 확인 → 로그인 안 됐으면 챗봇 요소 제거
+    const launcher = parent.document.getElementById("chatbot-launcher");
+    const modal = parent.document.getElementById("chatbot-modal");
+    const closeBtn = parent.document.getElementById("chatbot-close");
 
+    // 로그인 확인
     fetch("/auth/check", { credentials: "include" })
         .then(res => {
             if (!res.ok) {
@@ -30,20 +30,18 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-
-   
     document.addEventListener("click", function (e) {
         if (e.target.id === "chatbot-launcher") {
             fetch("/auth/check", { credentials: "include" })
                 .then(res => {
-                    if (res.ok) {
+                    if (res.ok && modal) {
                         modal.style.display = "flex";
                     } else {
                         alert("로그인 후 사용 가능합니다.");
                     }
                 });
-        });
-    }
+        }
+    });
 
     if (closeBtn) {
         closeBtn.addEventListener("click", () => {
@@ -52,9 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
 // 챗봇 대화 시작
-
 function initChat() {
     const start = document.getElementById("chat-start");
     const ui = document.getElementById("chat-ui");
@@ -145,6 +141,12 @@ function fetchBotReply(message) {
             const reply = data.reply;
             if (message.includes("종료")) {
                 appendBotMessage("상담을 종료합니다.");
+
+                // 부모 페이지의 모달 닫기
+                setTimeout(() => {
+                    const modal = parent.document.getElementById("chatbot-modal");
+                    if (modal) modal.style.display = "none";
+                }, 1500);
             } else {
                 appendBotMessage(reply);
             }

@@ -178,4 +178,40 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("같은 문자를 연속으로 사용할 수 없습니다.");
         }
     }
+
+    @Override
+    @Transactional
+    public void changePassword(String newPassword, String confirmPassword, Member memberParam) {
+
+        // 1. 사용자 정보 다시 조회 (신뢰 보장)
+        Member member = memberRepository.findById(memberParam.getId())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        // 2. 비밀번호 일치 여부 확인
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. 유효성 검사 (형식)
+        if (!isValidPassword(newPassword)) {
+            throw new IllegalArgumentException("비밀번호는 8자 이상이며 숫자, 대소문자, 특수문자를 포함해야 합니다.");
+        }
+
+        // 4. 기존 비밀번호와 중복 여부 확인 (중복이면 변경 안 됨)
+        if (passwordEncoder.matches(newPassword, member.getMemberPassword())) {
+            throw new IllegalArgumentException("기존에 사용한 비밀번호와 동일합니다.");
+        }
+
+        // 5. 비밀번호 업데이트
+        member.updatePassword(passwordEncoder.encode(newPassword));
+        member.setIsTemporaryPassword(false); // 임시 비밀번호 해제
+        memberRepository.save(member);
+
+        // (선택) 로그 출력
+        System.out.println("새 비밀번호 설정 완료: 사용자 이메일 = " + member.getMemberEmail());
+    }
+
+    private boolean isValidPassword(String password) {
+        return password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()]).{8,}$");
+    }
 }

@@ -14,7 +14,7 @@
     <div class="content-wrapper">
         <div class="team-tabs">
             <a href="#" id="tab-info" class="active">홈/소개</a>
-            <a href="#" id="tab-reviews">후기보기/쓰기</a>
+            <a href="#" id="tab-reviews" th:text="${isTeamLeader} ? '후기 보기/답변' : '후기 보기/쓰기'"></a>
             <a href="#" id="tab-join">팀/가입 신청</a>
             <a href="#" id="tab-chat">채팅</a>
         </div>
