@@ -97,3 +97,10 @@ h1 {
     background-color: #ccc;
     cursor: default;
 }
+
+.truncate {
+    width: 250px;           /* 너비 고정 */
+    white-space: nowrap;    /* 줄바꿈 없음 */
+    overflow: hidden;       /* 넘친 부분 숨김 */
+    text-overflow: ellipsis; /* 말줄임표 (...) 표시 */
+}

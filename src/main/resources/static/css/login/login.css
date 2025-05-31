@@ -1,30 +1,37 @@
+/* 전체 영역 */
 #wrap {
-    max-width: 400px;
+    max-width: 420px;
     margin: 60px auto;
+    padding: 0 20px;
     text-align: center;
     font-family: 'Noto Sans KR', sans-serif;
 }
 
-/* 제목 스타일 */
+/* 타이틀 */
 #wrap h2 {
-    font-size: 20px;
-    font-weight: bold;
-    border-bottom: 2px solid #111;
-    display: inline-block;
-    padding-bottom: 4px;
-    margin-bottom: 25px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
 }
 
-/* 인풋 필드 */
+/* 로그인 입력 필드 */
 #loginForm input[type="email"],
 #loginForm input[type="password"] {
     width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    font-size: 14px;
-    border: 1px solid #aaa;
-    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 14px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
     box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+#loginForm input[type="email"]:focus,
+#loginForm input[type="password"]:focus {
+    border-color: #eabdc2;
+    outline: none;
 }
 
 /* 로그인 버튼 */
@@ -33,12 +40,11 @@
     background-color: #eabdc2;
     border: 1px solid #c88c95;
     color: white;
-    font-weight: bold;
-    padding: 12px;
-    font-size: 15px;
-    border-radius: 6px;
+    font-weight: 600;
+    padding: 13px;
+    font-size: 16px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-top: 15px;
     transition: background-color 0.2s ease;
 }
 
@@ -46,7 +52,104 @@
     background-color: #d78e98;
 }
 
-/* 플레이스홀더 색상 */
+/* placeholder 색 */
 #loginForm input::placeholder {
+
+    color: #bbb;
+}
+
+/* "비밀번호를 잊으셨습니까?" 링크 */
+#openResetPopup {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #666;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* 팝업 오버레이 */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+}
+
+/* 공통 팝업 박스 */
+.popup {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px 24px;
+    max-width: 380px;
+    width: 90%;
+    margin: auto;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    z-index: 1000;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 팝업 제목 */
+.popup h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #222;
+}
+
+/* 팝업 입력창 */
+.popup form input[type="email"],
+.popup form input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    margin-bottom: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+/* 팝업 버튼 */
+.popup form button,
+.popup button[type="button"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #eabdc2;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.popup form button:hover,
+.popup button[type="button"]:hover {
+    background-color: #d78e98;
+}
+
+/* 결과 메시지 */
+#resetResult,
+#changeResult {
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #28a745;
+    text-align: center;
+}
+
+
+
     color: #aaa;
+}
+
+#suspendMessage {
+    color: red;
+    text-align: center;
+    margin-bottom: 1em;
 }

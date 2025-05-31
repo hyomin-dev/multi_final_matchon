@@ -106,4 +106,11 @@ public class MypageController {
         mypageService.withdraw(member);
         return ResponseEntity.ok("탈퇴 완료");
     }
+
+    @DeleteMapping("/deleteProfile")
+    public ResponseEntity<String> deleteProfile(@AuthenticationPrincipal CustomUser user) {
+        Member member = memberService.findForMypage(user.getUsername());
+        mypageService.deleteProfileImage(member);
+        return ResponseEntity.ok("삭제 완료");
+    }
 }

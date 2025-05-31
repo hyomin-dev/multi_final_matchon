@@ -159,3 +159,10 @@ h1 {
     padding: 2rem 0;
 }
 
+.truncate {
+    width: 400px;           /* 너비 고정 */
+    white-space: nowrap;    /* 줄바꿈 없음 */
+    overflow: hidden;       /* 넘친 부분 숨김 */
+    text-overflow: ellipsis; /* 말줄임표 (...) 표시 */
+}
+

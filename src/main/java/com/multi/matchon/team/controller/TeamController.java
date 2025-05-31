@@ -246,6 +246,7 @@ public class TeamController {
 
         List<ResReviewDto> answeredReviews = teamService.getAnsweredReviews(teamId, user);
         return ResponseEntity.ok(ApiResponse.ok(answeredReviews));
+
     }
 }
 
