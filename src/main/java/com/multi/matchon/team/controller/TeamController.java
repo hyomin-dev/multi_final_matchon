@@ -217,6 +217,36 @@ public class TeamController {
         return "redirect:/team"; // or wherever you want to redirect after update
 
     }
+
+    @PostMapping("/team/review/{reviewId}/response")
+    public String writeResponseToReview(
+            @PathVariable Long reviewId,
+            @RequestParam("reviewResponse") String reviewResponse,
+            @AuthenticationPrincipal CustomUser user) {
+
+        teamService.writeReviewResponse(reviewId, reviewResponse, user);
+        return "redirect:/team/team/" + teamService.getTeamIdByReview(reviewId);
+    }
+
+    @GetMapping("/team/{teamId}/all-reviews")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<ResReviewDto>>> getAllReviewsWithResponses(
+            @PathVariable Long teamId,
+            @AuthenticationPrincipal CustomUser user) {
+
+        List<ResReviewDto> allReviews = teamService.getAllReviewsWithResponses(teamId, user);
+        return ResponseEntity.ok(ApiResponse.ok(allReviews));
+    }
+
+    @GetMapping("/team/{teamId}/answered-reviews")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<ResReviewDto>>> getAnsweredReviews(
+            @PathVariable Long teamId,
+            @AuthenticationPrincipal CustomUser user) {
+
+        List<ResReviewDto> answeredReviews = teamService.getAnsweredReviews(teamId, user);
+        return ResponseEntity.ok(ApiResponse.ok(answeredReviews));
+    }
 }
 
 
