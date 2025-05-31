@@ -54,6 +54,7 @@
 
 /* placeholder 색 */
 #loginForm input::placeholder {
+
     color: #bbb;
 }
 
@@ -142,4 +143,14 @@
     text-align: center;
 }
 
+
+
+    color: #aaa;
+}
+
+#suspendMessage {
+    color: red;
+    text-align: center;
+    margin-bottom: 1em;
+}
 

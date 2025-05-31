@@ -1,5 +1,7 @@
 package com.multi.matchon.common.exception;
 
+import com.multi.matchon.common.dto.res.ApiResponse;
+import com.multi.matchon.common.exception.custom.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -33,6 +35,14 @@ public class GlobalExceptionHandler {
     // IllegalArgumentException (서비스에서 수동 throw한 경우)
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        log.info("{}",ex.getMessage());
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<Map<String, String>> CustomException(CustomException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         log.info("{}",ex.getMessage());

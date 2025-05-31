@@ -11,10 +11,14 @@ public class ReportResponse {
     private Long id;
     private String reportType;
     private Long targetId;
-    private String targetWriterName; // 대상 작성자 이름 추가
+    private String targetWriterName;
     private String reporterName;
     private String reasonType;
     private String reason;
     private LocalDateTime createdDate;
+    private Long boardId;
+    private Long targetMemberId;
+    private boolean suspended;
+
 }
 
