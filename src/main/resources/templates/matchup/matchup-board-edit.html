@@ -73,11 +73,11 @@
         </label>
         <label>
             경기장명
-            <input type="text" placeholder="경기장명" th:field="*{sportsFacilityName}" required>
+            <input type="text" placeholder="경기장명" th:field="*{sportsFacilityName}" required maxlength="100">
         </label>
         <label>
             경기장 주소
-            <input type="text" th:field="*{sportsFacilityAddress}" required readonly>
+            <input type="text" th:field="*{sportsFacilityAddress}" required readonly maxlength="100">
             <input type="button" onclick="getAddress()" value="주소 찾기">
         </label>
         <label>

@@ -5,8 +5,10 @@ import com.multi.matchon.chat.dto.res.ResMyChatListDto;
 import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
+import com.multi.matchon.common.exception.custom.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -59,6 +61,7 @@ public class ChatController {
 
 
     @PostMapping("/my/rooms")
+    @ResponseBody
     public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getMyChatRooms(@AuthenticationPrincipal CustomUser user){
         List<ResMyChatListDto> resMyChatListDtos = chatService.findAllMyChatRoom(user);
 
@@ -67,14 +70,30 @@ public class ChatController {
     }
 
     @GetMapping("/history{roomId}")
+    @ResponseBody
     public ResponseEntity<ApiResponse<List<ResChatDto>>> getChatHistory(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
         List<ResChatDto> resChatDtos = chatService.findAllChatHistory(roomId, user);
         return ResponseEntity.ok().body(ApiResponse.ok(resChatDtos));
     }
 
+
+    /*
+    * 로그인한 유저가 지정한 roomId에 채팅 참여자 인지 체크
+    * */
+    @GetMapping("/check/my/rooms")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<?>> checkRoomParticipant(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
+
+        chatService.checkRoomParticipant(user,roomId);
+
+        return ResponseEntity.ok().build();
+    }
+
+
     //수정
 
     @PostMapping("/room/read")
+    @ResponseBody
     public ResponseEntity<?> readAllMessage(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
         chatService.readAllMessage(roomId, user);
         return ResponseEntity.ok().build();

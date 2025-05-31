@@ -49,6 +49,7 @@ th, td {
     white-space: normal;
 }
 
+
 th:nth-child(1), td:nth-child(1) { width: 5%; }     /* ID */
 th:nth-child(2), td:nth-child(2) { width: 10%; }    /* 유형 */
 th:nth-child(3), td:nth-child(3) { width: 10%; }    /* 신고대상 */
@@ -58,6 +59,7 @@ th:nth-child(6), td:nth-child(6) { width: 30%; }    /* 상세사유 */
 th:nth-child(7), td:nth-child(7) { width: 10%; }    /* 신고일 */
 th:nth-child(8), td:nth-child(8) { width: 10%; }    /* 보기 */
 th:nth-child(9), td:nth-child(9) { width: 10%; }    /* 회원 처리 */
+
 
 tbody tr:hover {
     background-color: #fffbe6;
@@ -128,6 +130,7 @@ td {
     margin: 20px 0;
     padding: 0;
 }
+
 .pagination a {
     display: inline-block;
     padding: 8px 14px;
@@ -137,15 +140,18 @@ td {
     border-radius: 4px;
     color: #333;
 }
+
 .pagination a.active {
     background-color: #007bff;
     color: white;
     font-weight: bold;
     pointer-events: none;
 }
+
 .pagination a:hover {
     background-color: #ddd;
 }
+
 
 .ban-controls {
     display: flex;
