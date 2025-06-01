@@ -79,6 +79,7 @@ public class TeamService {
     private final MemberRepository memberRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final TeamJoinRequestRepository teamJoinRequestRepository;
+    private final ResponseRepository responseRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -343,7 +344,10 @@ public class TeamService {
     public List<ResReviewDto> getReviewsForTeam(Long teamId) {
         return reviewRepository.findReviewsByTeamId(teamId)
                 .stream()
-                .map(ResReviewDto::from)
+                .map(review -> {
+                    Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(review);
+                    return ResReviewDto.from(review, response.orElse(null));
+                })
                 .collect(Collectors.toList());
     }
 
@@ -379,7 +383,10 @@ public class TeamService {
     public List<ResReviewDto> getMyReviewsForTeam(Long teamId, String userEmail) {
         return reviewRepository.findReviewsByTeamId(teamId).stream()
                 .filter(r -> r.getMember().getMemberEmail().equals(userEmail))
-                .map(ResReviewDto::from)
+                .map(review -> {
+                    Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(review);
+                    return ResReviewDto.from(review, response.orElse(null));
+                })
                 .collect(Collectors.toList());
     }
 
@@ -571,6 +578,82 @@ public class TeamService {
         if (dto.getTeamImageFile() != null && !dto.getTeamImageFile().isEmpty()) {
             updateFile(dto.getTeamImageFile(), team);
         }
+    }
+    //리뷰 답변 쓰기
+
+    @Transactional
+    public void writeReviewResponse(Long reviewId, String content, CustomUser user) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰가 존재하지 않습니다."));
+
+        Team team = review.getTeam();
+        Member leader = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        if (!teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, leader)) {
+            throw new IllegalArgumentException("팀 리더만 답변을 작성할 수 있습니다.");
+        }
+
+        if (responseRepository.existsByReviewAndIsDeletedFalse(review)) {
+            throw new IllegalArgumentException("이미 답변이 작성된 리뷰입니다.");
+        }
+
+        Response response = Response.builder()
+                .review(review)
+                .reviewResponse(content)
+                .build();
+
+        responseRepository.save(response);
+    }
+
+    //답변 존재여부 상관 없이 모든 리뷰 보기
+    @Transactional(readOnly = true)
+    public List<ResReviewDto> getAllReviewsWithResponses(Long teamId, CustomUser user) {
+        Team team = teamRepository.findByIdNotDeleted(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("팀이 존재하지 않습니다."));
+
+        Member leader = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        if (!teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, leader)) {
+            throw new IllegalArgumentException("팀 리더만 볼 수 있습니다.");
+        }
+
+        List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
+
+        return reviews.stream()
+                .map(r -> {
+                    Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(r);
+                    return ResReviewDto.from(r, response.orElse(null));
+                })
+                .collect(Collectors.toList());
+    }
+
+    //답변 존재하는 리뷰 보기
+    @Transactional(readOnly = true)
+    public List<ResReviewDto> getAnsweredReviews(Long teamId, CustomUser user) {
+        Team team = teamRepository.findByIdNotDeleted(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("팀이 존재하지 않습니다."));
+
+        Member leader = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        if (!teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, leader)) {
+            throw new IllegalArgumentException("팀 리더만 볼 수 있습니다.");
+        }
+
+        return reviewRepository.findReviewsByTeamId(teamId).stream()
+                .map(r -> responseRepository.findByReviewAndIsDeletedFalse(r)
+                        .map(resp -> ResReviewDto.from(r, resp))
+                        .orElse(null))
+                .filter(r -> r != null)
+                .collect(Collectors.toList());
+    }
+
+    public Long getTeamIdByReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+        return review.getTeam().getId();
     }
 }
 

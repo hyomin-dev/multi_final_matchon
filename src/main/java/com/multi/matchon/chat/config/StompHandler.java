@@ -3,7 +3,6 @@ package com.multi.matchon.chat.config;
 import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.auth.service.CustomUserDetailsService;
-import com.multi.matchon.common.exception.custom.CustomException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;

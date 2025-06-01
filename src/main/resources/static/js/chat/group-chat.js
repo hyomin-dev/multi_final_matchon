@@ -8,19 +8,17 @@ let sendBtn = document.getElementById('sendBtn');
 
 document.addEventListener("DOMContentLoaded",async ()=>{
     let roomId = "";
-    const detailDto = document.querySelector("#chat1-1-detail-dto");
+    const detailDto = document.querySelector("#group-chat-detail-dto");
     // if(!detailDto)
     //     return;
     const loginEmail = detailDto.dataset.loginEmail;
-    const receiverId = Number(detailDto.dataset.receiverId);
     roomId = Number(detailDto.dataset.roomId);
-
 
     const token = getJwtToken();
     //console.log(data);
 
-    if(!roomId && receiverId)
-        roomId = Number(await getPrivateChatRoomId(receiverId));
+    // if(!roomId)
+    //     roomId = Number(await getPrivateChatRoomId(receiverId));
 
     // 채팅방 참여자인지 체크
     await checkIsRoomParticipant(roomId);
@@ -148,11 +146,8 @@ function sendMessage(roomId) {
 }
 
 function appendMessage(msg, loginEmail) {
-
     if(msg.exceptionName === "NotChatParticipantException")
         showErrorPage(msg.content);
-
-    console.log(msg);
 
     const isSystemMsg = msg.exceptionName === "ChatBlockException";
     const isDuplicateSystemMsg = isSystemMsg && lastSystemMessage === msg.content;

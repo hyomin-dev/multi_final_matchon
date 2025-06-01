@@ -4,6 +4,7 @@ import com.multi.matchon.chat.config.StompHandler;
 import com.multi.matchon.chat.dto.req.ReqChatDto;
 import com.multi.matchon.chat.dto.res.ResChatDto;
 import com.multi.matchon.chat.exception.custom.ChatBlockException;
+import com.multi.matchon.chat.exception.custom.NotChatParticipantException;
 import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.member.domain.Member;
@@ -62,21 +63,29 @@ public class StompController {
         StompHandler.authContext.set((Authentication) principal);
 
         chatService.checkBlock(roomId);
+
+        chatService.checkRoomParticipant(user, roomId);
+
         chatService.saveMessage(roomId, resChatDto);
         messageTemplate.convertAndSend("/topic/"+roomId,resChatDto);
     }
 
-    @MessageExceptionHandler
-    public ResChatDto test(Exception e){
-        ResChatDto resChatDto = ResChatDto.builder()
-                .senderEmail("system@matchon.com")
-                .senderName("system")
-                .content(e.getMessage())
-                .build();
 
-        log.info("error: {}",e.getMessage());
-        return resChatDto;
-    }
+
+
+
+//    @MessageExceptionHandler
+//    public ResChatDto test(Exception e){
+//        ResChatDto resChatDto = ResChatDto.builder()
+//                .senderEmail("system@matchon.com")
+//                .senderName("system")
+//                .content(e.getMessage())
+//                .build();
+//
+//        log.info("error: {}",e.getMessage());
+//        return resChatDto;
+//    }
+
 
     @MessageExceptionHandler
     public ResChatDto handleChatBlockException(ChatBlockException e){
@@ -89,5 +98,19 @@ public class StompController {
         log.info("error: {}",e.getMessage());
         return resChatDto;
     }
+
+
+    @MessageExceptionHandler
+    public ResChatDto handleChatBlockException(NotChatParticipantException e){
+        ResChatDto resChatDto = ResChatDto.builder()
+                .content(e.getMessage())
+                .exceptionName(e.getClass().getSimpleName())
+                .createdDate(LocalDateTime.now())
+                .build();
+
+        log.info("error: {}",e.getMessage());
+        return resChatDto;
+    }
+
 
 }

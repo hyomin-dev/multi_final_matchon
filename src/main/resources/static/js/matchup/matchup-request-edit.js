@@ -143,7 +143,7 @@ function setParticipantCount(currentParticipantCount, maxParticipants, participa
 
     const participantCountEle = document.querySelector("#participantCount");
 
-    for(let i=0; i<=(maxParticipants-currentParticipantCount);i++){
+    for(let i=1; i<=(maxParticipants-currentParticipantCount);i++){
         const option = document.createElement("option");
         option.value = i;
         option.textContent = i;
@@ -180,8 +180,7 @@ function manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupC
     // 2. 참가 요청 삭제
     else if(
         (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
-        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
-        (matchupStatus===Status.DENIED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true)
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true)
     ){
         statusEle.textContent =  "요청 취소됨";
     }
