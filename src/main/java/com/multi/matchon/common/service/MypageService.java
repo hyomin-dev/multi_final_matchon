@@ -61,11 +61,14 @@ public class MypageService {
 
 
         Optional<Attachment> profileAttachment = attachmentRepository.findLatestAttachment(BoardType.MEMBER, member.getId());
+
+        boolean isDefaultProfile = profileAttachment.isEmpty();
         String imageUrl = profileAttachment
                 .map(att -> awsS3Utils.createPresignedGetUrl(PROFILE_DIR, att.getSavedName()))
-                .orElse("/img/default-profile.jpg");
+                .orElse("/img/default-user.png");
 
         data.put("profileImageUrl", imageUrl);
+        data.put("isDefaultProfile", isDefaultProfile);
 
         return data;
     }
@@ -152,5 +155,15 @@ public class MypageService {
 
         // 탈퇴 처리
         member.markAsDeleted(); // is_deleted = true
+    }
+
+    // 프로필 이미지 삭제
+    public void deleteProfileImage(Member member) {
+        attachmentRepository.findLatestAttachment(BoardType.MEMBER, member.getId())
+                .ifPresent(att -> {
+                    awsS3Utils.deleteFile(att.getSavePath(), att.getSavedName());
+                    att.delete(true); // 소프트 삭제
+                    attachmentRepository.save(att);
+                });
     }
 }

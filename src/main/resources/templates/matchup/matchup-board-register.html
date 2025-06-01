@@ -32,7 +32,7 @@
             </label>
             <label>
                 팀 소개
-                <textarea cols="30" rows="5" placeholder="팀 소개를 입력하세요." th:field="*{teamIntro}" required maxlength="100">
+                <textarea cols="30" rows="5" placeholder="팀 소개를 입력하세요." th:field="*{teamIntro}" required maxlength="300">
                 </textarea>
             </label>
             <label>
@@ -50,7 +50,7 @@
             </label>
             <label>
                 경기 날짜
-                <input type="datetime-local" th:field="*{matchDateTime}" required>
+                <input type="datetime-local" th:field="*{matchDatetime}" required>
             </label>
             <label>
                 경기 진행 시간
@@ -65,7 +65,7 @@
             </label>
             <label>
                 현재 참가 인원
-                <select th:field="*{currentParticipantsCount}" required></select>
+                <select th:field="*{currentParticipantCount}" required></select>
             </label>
             <label>
                 총 모집 인원

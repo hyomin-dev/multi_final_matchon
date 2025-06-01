@@ -35,18 +35,20 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             t1.matchupStatus,
             t1.matchupRequestSubmittedCount,
             t1.matchupCancelSubmittedCount,
+            t2.chatRoom.id,
             t1.isDeleted
             )
             from MatchupRequest t1
             join t1.matchupBoard t2
             join t2.sportsType t3
-            where t1.member.id=:memberId and
+            where t1.member.id=:memberId and t1.member.isDeleted =false and
                     t2.isDeleted = false and
                     (:sportsType is null or t3.sportsTypeName =:sportsType) and
-                    (:matchDate is null or DATE(t2.matchDatetime) >=:matchDate)
+                    (:matchDate is null or DATE(t2.matchDatetime) >=:matchDate) and
+                    (:availableFilter is false or (:availableFilter=true and t2.matchDatetime > CURRENT_TIMESTAMP ))
                     order by t2.matchDatetime DESC
             """)
-    Page<ResMatchupRequestListDto> findAllResMatchupRequestListDtosByMemberIdAndSportsTypeAndMatchDateWithPaging(PageRequest pageRequest, @Param("memberId") Long memberId, @Param("sportsType") SportsTypeName sportsTypeName, @Param("matchDate") LocalDate matchDate);
+    Page<ResMatchupRequestListDto> findAllResMatchupRequestListDtosByMemberIdAndSportsTypeAndMatchDateWithPaging(PageRequest pageRequest, @Param("memberId") Long memberId, @Param("sportsType") SportsTypeName sportsTypeName, @Param("matchDate") LocalDate matchDate, @Param("availableFilter") Boolean availableFilter);
 
 
     @Query("""
@@ -75,8 +77,8 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             join t1.member t2
             join t1.matchupBoard t3
             join t3.sportsType t4
-            join t3.member t5
-            where t1.id=:requestId and t3.isDeleted=false
+            join t3.writer t5
+            where t1.id=:requestId and t3.isDeleted=false and t2.isDeleted=false and t3.writer.isDeleted=false
             """)
     Optional<ResMatchupRequestDto> findResMatchupRequestDtoByRequestId(Long requestId);
 
@@ -125,7 +127,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
              t1
             from MatchupRequest t1
             where  t1.matchupBoard.id=:boardId and t1.matchupBoard.isDeleted=false and
-                    t1.member.id =:applicantId
+                    t1.member.id =:applicantId and t1.member.isDeleted=false
             """)
     Optional<MatchupRequest> findByMatchupBoardIdAndApplicantId(Long boardId, Long applicantId);
 
@@ -133,7 +135,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             select
              t1
             from MatchupRequest t1
-            where  t1.id=:requestId and t1.matchupBoard.isDeleted=false
+            where  t1.id=:requestId and t1.matchupBoard.isDeleted=false and t1.matchupBoard.writer.isDeleted = false
             """)
     Optional<MatchupRequest> findById(Long requestId);
 
@@ -164,7 +166,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             join fetch t1.matchupBoard t2
             join fetch t1.member t3
             where t1.id=:requestId and t2.id=:boardId and t3.id=:applicantId and
-                    t2.isDeleted=false
+                    t2.isDeleted=false and t2.writer.isDeleted=false
             """)
     Optional<MatchupRequest> findMatchupRequestWithMatchupBoardByRequestIdAndBoardIDAndApplicantId(@Param("requestId") Long requestId, @Param("boardId") Long boardId, @Param("applicantId") Long applicantId);
 
@@ -174,9 +176,9 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             t1
             from MatchupRequest  t1
             join fetch t1.matchupBoard t2
-            join fetch t2.member t3
+            join fetch t2.writer t3
             where t1.id=:requestId and t2.id=:boardId and t3.id=:writerId and
-                    t2.isDeleted=false
+                    t2.isDeleted=false and t3.isDeleted=false
             """)
     Optional<MatchupRequest> findMatchupRequestWithMatchupBoardByRequestIdAndBoardIDAndWriterId(@Param("requestId") Long requestId, @Param("boardId") Long boardId, @Param("writerId") Long writerId);
 }

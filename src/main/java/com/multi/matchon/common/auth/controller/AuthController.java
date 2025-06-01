@@ -2,6 +2,7 @@ package com.multi.matchon.common.auth.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.auth.service.AuthService;
+import com.multi.matchon.common.auth.service.MailService;
 import com.multi.matchon.common.jwt.repository.RefreshTokenRepository;
 import com.multi.matchon.common.jwt.service.JwtTokenProvider;
 import com.multi.matchon.member.domain.Member;
@@ -11,6 +12,7 @@ import com.multi.matchon.member.dto.res.TokenResponseDto;
 import com.multi.matchon.member.repository.MemberRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +38,7 @@ public class AuthController {
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
 
 
 
@@ -62,7 +68,8 @@ public class AuthController {
             // 사용자 역할 정보도 함께 전달
             return ResponseEntity.ok(Map.of(
                     "message", "로그인됨",
-                    "role", user.getMember().getMemberRole().name()
+                    "role", user.getMember().getMemberRole().name(),
+                    "isTemporaryPassword", user.getMember().getIsTemporaryPassword()
             ));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
@@ -70,52 +77,33 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto requestDto) {
-        // 사용자 이메일로 조회
-        Member member = memberRepository.findByMemberEmailAndIsDeletedFalse(requestDto.getEmail())
-                .orElse(null);
-
-        // 사용자 없거나 비밀번호 불일치 시
-        if (member == null || !passwordEncoder.matches(requestDto.getPassword(), member.getMemberPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "invalid_credentials"));
-        }
-
-        // 정지된 계정 처리
-        if (member.isSuspended()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of(
-                            "error", "suspended",
-                            "date", member.getSuspendedUntil() != null
-                                    ? member.getSuspendedUntil().toLocalDate().toString()
-                                    : null
-                    ));
-        }
-
-        // 정상 로그인 → 토큰 발급
+    public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto requestDto) {
         TokenResponseDto tokenResponse = authService.login(requestDto);
 
+        // accessToken → HttpOnly 쿠키로 발급 (JS 접근 불가)
         ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", tokenResponse.getAccessToken())
                 .httpOnly(false)
                 .path("/")
                 .maxAge(Duration.ofHours(1))
                 .build();
 
+        // refreshToken HttpOnly 쿠키로 발급
         ResponseCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", tokenResponse.getRefreshToken())
                 .httpOnly(true)
                 .path("/")
                 .maxAge(Duration.ofDays(14))
                 .build();
 
+        // 헤더에 두 쿠키를 같이 실어 보냄
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         headers.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
+        // refreshToken은 body에 보내지 않고, 쿠키에만 담음
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(new TokenResponseDto(tokenResponse.getAccessToken(), null));
+                .body(new TokenResponseDto(tokenResponse.getAccessToken(), null)); // refreshToken은 응답에서 제거
     }
-
 
 
 
@@ -190,5 +178,50 @@ public class AuthController {
         }
 
         return null;
+    }
+
+    // 사용자 이메일로 임시 비밀번호 발송
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> sendTemporaryPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        Optional<Member> optional = memberRepository.findByMemberEmailAndIsDeletedFalse(email);
+
+        if (optional.isEmpty()) {
+            return ResponseEntity.badRequest().body("존재하지 않는 이메일입니다.");
+        }
+
+        String tempPassword = UUID.randomUUID().toString().substring(0, 10);
+        String encoded = passwordEncoder.encode(tempPassword);
+
+        Member member = optional.get();
+        member.updatePassword(encoded);
+        member.setIsTemporaryPassword(true); // 임시 비밀번호 표시
+        memberRepository.save(member);
+
+        mailService.sendTemporaryPassword(email, tempPassword);
+        return ResponseEntity.ok("임시 비밀번호가 이메일로 전송되었습니다.");
+    }
+
+    // 로그인 후 새 비밀번호로 변경
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @AuthenticationPrincipal CustomUser user,
+            @RequestBody Map<String, String> request) {
+
+        try {
+            String newPassword = request.get("newPassword");
+            String confirmPassword = request.get("confirmPassword");
+
+            Member member = user.getMember();
+            authService.changePassword(newPassword, confirmPassword, member);
+
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    private boolean isValidPassword(String password) {
+        return password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()]).{8,}$");
     }
 }

@@ -4,7 +4,7 @@ package com.multi.matchon.team.domain;
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.common.domain.Positions;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+        import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
