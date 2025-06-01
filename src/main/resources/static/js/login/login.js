@@ -22,7 +22,7 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
         .then(() => {
             // 로그인 성공 시 플래그 설정
             localStorage.setItem("showPasswordPopup", "true");
-            window.location.href = "/login";
+            window.location.href = "/main";
         })
         .catch(err => {
             alert("에러: " + err.message);

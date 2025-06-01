@@ -1,8 +1,15 @@
 let myMannerTemperature;
 let sportsType = '';
 let dateFilter = '';
+let availableFilter = false;
+let lastFilterValues = {};
 document.addEventListener("DOMContentLoaded",async ()=>{
 
+    lastFilterValues={
+        "sportsType": sportsType,
+        "dateFilter": dateFilter,
+        "availableFilter": availableFilter
+    }
 
     document.querySelector("#sports-type").addEventListener("change",(e)=>{
         sportsType = e.target.value;
@@ -13,8 +20,28 @@ document.addEventListener("DOMContentLoaded",async ()=>{
         //console.log(dateFilter);
     })
 
+    document.querySelector("#availableOnly").addEventListener("change",(e)=>{
+        availableFilter = e.target.checked;
+        // 체크O: true
+        // 체크x: false
+    })
+
     document.querySelector("#filterBtn").addEventListener("click",()=>{
-        loadItems(1, sportsType, dateFilter);
+        const isSame = lastFilterValues.sportsType === sportsType &&
+            lastFilterValues.dateFilter === dateFilter &&
+            lastFilterValues.availableFilter === availableFilter;
+
+        if(isSame){
+            e.preventDefault();
+            console.log("검색 조건이 변하지 않았습니다.");
+        }else{
+            lastFilterValues.sportsType = sportsType;
+            lastFilterValues.dateFilter = dateFilter;
+            lastFilterValues.availableFilter = availableFilter;
+            loadItems(1, sportsType, dateFilter, availableFilter);
+        }
+
+
     })
 
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
@@ -22,8 +49,8 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
 })
 
-async function loadItems(page, sportsType='', dateFilter=''){
-    const response = await fetch(`/matchup/board/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}`,{
+async function loadItems(page, sportsType='', dateFilter='', availableFilter=false){
+    const response = await fetch(`/matchup/board/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}&availableFilter=${availableFilter}`,{
         method: "GET",
         credentials: "include"
 
@@ -37,7 +64,7 @@ async function loadItems(page, sportsType='', dateFilter=''){
     //console.log(pageInfo);
 
     renderList(items);
-    renderPagination(pageInfo , sportsType, dateFilter);
+    renderPagination(pageInfo , sportsType, dateFilter, availableFilter);
 
 }
 function renderList(items){
@@ -61,9 +88,11 @@ function renderList(items){
         card.className = "matchup-card";
         card.innerHTML = `
              <div class="card-section center">
-                <div><strong>작성자:</strong> ${item.memberName}</div>
+                <div><strong>작성자:</strong> ${item.writerName}</div>
                 <div><strong>팀 이름:</strong> ${item.teamName}</div>
-                
+                <a href="/chat/group/room?roomId=${item.roomId}" target="_blank">
+                    <button class="group-chat">단체 채팅</button>
+                </a>
             </div>
 
             <div class="card-section center">
@@ -95,7 +124,7 @@ function renderList(items){
     })
 }
 
-function renderPagination(pageInfo, sportsType, dateFilter){
+function renderPagination(pageInfo, sportsType, dateFilter, availableFilter){
     // 프론트는 페이지 시작번호 1부터로 헷갈림
     const pageBlockSize = 5;
     // 프론트 측 page 시작 번호 1부터 변경
@@ -115,7 +144,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const firstBtn = document.createElement("button");
         firstBtn.textContent = "<<";
         firstBtn.addEventListener("click",()=>{
-            loadItems(1, sportsType, dateFilter);
+            loadItems(1, sportsType, dateFilter, availableFilter);
         });
         pagingArea.appendChild(firstBtn);
     }
@@ -125,7 +154,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const prevBtn = document.createElement("button");
         prevBtn.textContent = "<";
         prevBtn.addEventListener("click",()=>{
-            loadItems(startPage-1, sportsType, dateFilter);
+            loadItems(startPage-1, sportsType, dateFilter, availableFilter);
         });
         pagingArea.appendChild(prevBtn);
     }
@@ -138,7 +167,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
             btn.disabled = true;
 
         btn.addEventListener("click",()=>{
-            loadItems(i, sportsType, dateFilter);
+            loadItems(i, sportsType, dateFilter, availableFilter);
         })
         pagingArea.appendChild(btn);
     }
@@ -148,7 +177,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const nextBtn = document.createElement("button");
         nextBtn.textContent = ">";
         nextBtn.addEventListener("click",()=>{
-            loadItems(endPage+1, sportsType, dateFilter);
+            loadItems(endPage+1, sportsType, dateFilter, availableFilter);
         })
         pagingArea.appendChild(nextBtn);
     }
@@ -159,7 +188,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const lastBtn = document.createElement("button");
         lastBtn.textContent  = ">>";
         lastBtn.addEventListener("click",()=>{
-            loadItems(pageInfo.totalPages, sportsType, dateFilter);
+            loadItems(pageInfo.totalPages, sportsType, dateFilter, availableFilter);
         })
         pagingArea.appendChild(lastBtn);
 

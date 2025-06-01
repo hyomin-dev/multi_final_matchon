@@ -47,12 +47,15 @@
         </td>
 
         <td>
-            <div class="ban-controls">
+            <div class="ban-controls" th:if="${!report.targetIsAdmin}">
                 <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 7)'" class="ban-btn">7일</button>
                 <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 30)'" class="ban-btn">30일</button>
                 <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', null)'" class="ban-btn">영구</button>
-                <!-- 정지 해제 버튼만 조건부 출력 -->
-                <button type="button" th:if="${report.suspended}" th:onclick="'unsuspendUser(' + ${report.targetMemberId} + ')'" class="ban-btn">해제</button>
+                <button type="button" th:if="${report.suspended}" th:onclick="'unsuspendUser('
+                + ${report.targetMemberId} + ')'" class="ban-btn unban-btn">
+                    해제
+                </button>
+
             </div>
         </td>
     </tr>

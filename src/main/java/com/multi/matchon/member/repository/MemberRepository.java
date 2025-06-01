@@ -18,8 +18,20 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 
     // 팀 전용
-    @Query("select m from Member m join fetch m.team where m.memberEmail =:email")
-    Optional<Member> findByMemberEmailWithTeam(@Param("email") String email);
+    @Query("""
+             select t2.teamName
+             from Member t1
+             join t1.team t2
+             where t1=:loginMember and t1.isDeleted=false
+            """)
+    Optional<String> findTeamNameByMember(@Param("loginMember") Member loginMember);
+
+    @Query("""
+            select t1.myTemperature
+            from Member t1
+            where t1=:loginMember and t1.isDeleted=false
+            """)
+    Optional<Double> findMyTemperatureByMember(@Param("loginMember") Member loginMember);
 
 
     Optional<Member> findByIdAndIsDeletedFalse(Long id);

@@ -7,8 +7,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 async function setContent(){
     const detailDto = document.querySelector("#matchup-board-detail-dto");
 
-    const memberEmail = detailDto.dataset.memberEmail;
-    const memberName = detailDto.dataset.memberName;
+    const writerEmail = detailDto.dataset.writerEmail;
     const sportsFacilityName = detailDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = detailDto.dataset.sportsFacilityAddress;
     const matchDatetime = detailDto.dataset.matchDatetime;
@@ -24,11 +23,10 @@ async function setContent(){
     //console.log(matchDatetime);
     //console.log(loginMemberName);
 
-    setWriter(memberName);
     drawMap(sportsFacilityAddress, sportsFacilityName);
     calTime(matchDatetime, matchDuration);
-    checkStatus(matchDatetime, currentParticipantCount, maxParticipants, memberEmail, loginEmail, minMannerTemperature, myMannerTemperature);
-    setButton(matchDatetime, memberEmail, loginEmail, currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature);
+    checkStatus(matchDatetime, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature);
+    setButton(matchDatetime, writerEmail, loginEmail, currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature);
 
 
     const response = await fetch(`/matchup/attachment/presigned-url?saved-name=${savedName}`,{
@@ -52,16 +50,6 @@ async function setContent(){
 }
 
 
-function setWriter(memberName){ // memberEmail, loginEmail
-
-    const writerEle = document.querySelector("#writer");
-    // if(memberEmail===loginEmail)
-    //     writerEle.innerHTML = "나";
-    // else
-    //     writerEle.innerHTML = memberEmail;
-
-    writerEle.textContent = memberName;
-}
 
 
 function drawMap(address, sportsFacilityName){
@@ -141,7 +129,7 @@ function calTime(matchDatetime, matchDuration){
 
 }
 
-function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, memberEmail, loginEmail, minMannerTemperature, myMannerTemperature){
+function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature){
     const statusEle = document.querySelector("#status");
 
     // console.log(currentParticipantCount)
@@ -152,7 +140,7 @@ function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, me
     const now = new Date();
     if(matchDate<now)
         statusEle.innerHTML = "경기 종료"
-    else if(memberEmail === loginEmail){
+    else if(writerEmail === loginEmail){
         // 경우1: 사용자가 쓴 글
         // 신청 가능 여부: 모집 중, 모집 완료, 경기 종료
 
@@ -172,16 +160,24 @@ function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, me
     }
 }
 
-function setButton(matchDatetime, memberEmail, loginEmail,currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature ){
+function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature ){
     const matchDate = new Date(matchDatetime);
     const now = new Date();
-    if(memberEmail === loginEmail && matchDate<now){ //수정하기 버튼
+
+    if(writerEmail === loginEmail && matchDate<now){ //수정하기 버튼, 삭제하기 버튼
        const modifyBtn = document.querySelector("#modify");
-       modifyBtn.addEventListener("click",(e)=>{
+       const deleteBtn = document.querySelector("#deleteBtn");
+
+        modifyBtn.addEventListener("click",(e)=>{
            alert("경기 시작 시간이 지나 수정할 수 없습니다.");
            e.preventDefault();
        })
-    }else if(memberEmail !==loginEmail){ // 문의하기, 참가요청 버튼
+
+        deleteBtn.addEventListener("click",(e)=>{
+            alert("경기 시작 시간이 지나 삭제할 수 없습니다.");
+            e.preventDefault();
+        })
+    }else if(writerEmail !==loginEmail){ // 문의하기, 참가요청 버튼
         const chatBtn = document.querySelector("#chat1-1Btn");
         const requestBtn = document.querySelector("#requestBtn");
 
@@ -194,13 +190,13 @@ function setButton(matchDatetime, memberEmail, loginEmail,currentParticipantCoun
             })
 
             requestBtn.addEventListener("click",()=>{
-                alert("경기 시작 시간이 지나 1대1 문의를 할 수 없습니다.")
+                alert("경기 시작 시간이 지나 참가 요청을 할 수 없습니다.")
             })
 
         }else if(currentParticipantCount >=maxParticipants){ // 참가 인원 다 찬 경우
             requestBtn.href = "#";
             requestBtn.addEventListener("click",(e)=>{
-                alert("현재 참가 요청 인원이 마감되어 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+                alert("현재 참가 요청 인원이 다 모집되어, 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
                 e.preventDefault();
             })
 
