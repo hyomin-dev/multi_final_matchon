@@ -659,6 +659,7 @@ public class TeamService {
         return review.getTeam().getId();
     }
 
+
     //답변 수정하기
     @Transactional
     public void updateReviewResponse(Long responseId, String updatedText, CustomUser user) {
@@ -685,6 +686,7 @@ public class TeamService {
         // 4. Save (if not using dirty checking)
         responseRepository.save(response);
     }
+
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(

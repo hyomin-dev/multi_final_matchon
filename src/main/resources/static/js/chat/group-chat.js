@@ -8,19 +8,17 @@ let sendBtn = document.getElementById('sendBtn');
 
 document.addEventListener("DOMContentLoaded",async ()=>{
     let roomId = "";
-    const detailDto = document.querySelector("#chat1-1-detail-dto");
+    const detailDto = document.querySelector("#group-chat-detail-dto");
     // if(!detailDto)
     //     return;
     const loginEmail = detailDto.dataset.loginEmail;
-    const receiverId = Number(detailDto.dataset.receiverId);
     roomId = Number(detailDto.dataset.roomId);
-
 
     const token = getJwtToken();
     //console.log(data);
 
-    if(!roomId && receiverId)
-        roomId = Number(await getPrivateChatRoomId(receiverId));
+    // if(!roomId)
+    //     roomId = Number(await getPrivateChatRoomId(receiverId));
 
     // 채팅방 참여자인지 체크
     await checkIsRoomParticipant(roomId);
@@ -53,6 +51,7 @@ function getJwtToken(){
 function setStompClient() {
     const sock = new SockJS(`/connect`);
     stompClient = webstomp.over(sock);
+
 }
 
 function connect(token, roomId, loginEmail) {
@@ -75,6 +74,28 @@ function connect(token, roomId, loginEmail) {
                     //console.error("메시지 처리 중 에러", e);
                 }, { Authorization: `Bearer ${token}` });
                 isSubscribed = true;
+
+                stompClient.subscribe(`/user/${loginEmail}/queue/errors`,(message)=>{
+
+                    const data = new Blob([JSON.stringify({ roomId })], { type: 'application/json' });
+                    navigator.sendBeacon(`/chat/room/read?roomId=${roomId}`, data);
+
+                    if (stompClient && stompClient.connected) {
+                        stompClient.disconnect(); // 이건 백그라운드 전송 못함 → 실패할 수 있음
+                    }
+                    const form  = document.createElement("form");
+                    form.method = "POST";
+                    form.action = "/error/chat";
+
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "error";
+                    input.value = "Chat 더 이상 그룹 채팅할 수 없습니다.";
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+
+                })
                 resolve(); // 성공 시
             },
             (error) => {
@@ -148,11 +169,8 @@ function sendMessage(roomId) {
 }
 
 function appendMessage(msg, loginEmail) {
-
     if(msg.exceptionName === "NotChatParticipantException")
         showErrorPage(msg.content);
-
-    console.log(msg);
 
     const isSystemMsg = msg.exceptionName === "ChatBlockException";
     const isDuplicateSystemMsg = isSystemMsg && lastSystemMessage === msg.content;
@@ -171,7 +189,7 @@ function appendMessage(msg, loginEmail) {
     }
 }
 
-function appendSystemMessage(content){
+function appendSystemMessage(content) {
 
     const msgDiv = document.createElement('div');
     msgDiv.className = 'chat-message system-message';

@@ -42,5 +42,9 @@ public class MatchupRating extends BaseEntity {
     @Column(name="review",nullable = false,columnDefinition = "TEXT")
     private String review;
 
+    @Column(name="is_completed")
+    @Builder.Default
+    private Boolean isCompleted = false;
+
 
 }

@@ -51,6 +51,10 @@ async function getMyChatRooms(){
         if(item.isGroupChat === true){
 
             exitBtn.textContent = "나가기";
+            enterBtn.addEventListener("click",()=>{
+                window.open(`/chat/group/room?roomId=${item.roomId}`,"_black");
+            });
+
         }
 
         else{
@@ -108,7 +112,7 @@ async function getMyChatRooms(){
 
 
 function expressIsGroutChat(isGroupChat){
-    if(isGroupChat === "true")
+    if(isGroupChat === true)
         return "그룹 채팅";
     else
         return "1대1 채팅";

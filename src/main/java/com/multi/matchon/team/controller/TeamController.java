@@ -220,6 +220,7 @@ public class TeamController {
     }
 
     @PostMapping("/team/review/{reviewId}/response")
+
     @ResponseBody
     public ResponseEntity<ApiResponse<Void>> writeResponseToReview(
             @PathVariable Long reviewId,
@@ -229,6 +230,7 @@ public class TeamController {
         String reviewResponse = payload.get("reviewResponse");
         teamService.writeReviewResponse(reviewId, reviewResponse, user);
         return ResponseEntity.ok(ApiResponse.ok(null));
+
     }
 
     @GetMapping("/team/{teamId}/all-reviews")
@@ -252,6 +254,7 @@ public class TeamController {
 
     }
 
+
     @PutMapping("/team/review/response/{responseId}")
     @ResponseBody
     public ResponseEntity<ApiResponse<Void>> updateResponse(
@@ -263,6 +266,7 @@ public class TeamController {
         teamService.updateReviewResponse(responseId, updatedText, user);
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
+
 }
 
 

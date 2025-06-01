@@ -19,20 +19,20 @@ public class MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     }
 
-    // 팀 이름 조회용
-    @Transactional(readOnly = true)
-    public String getTeamNameByMemberEmail(String email) {
-        Member member = memberRepository.findByMemberEmailWithTeam(email).orElseThrow(() -> new IllegalArgumentException("이 email을 가진 회원은 소속팀이 없습니다."));
 
-        return member.getTeam().getTeamName();
+    /*
+    * 팀 이름 조회용
+    * */
+    @Transactional(readOnly = true)
+    public String findTeamNameByMember(Member loginMember) {
+        return memberRepository.findTeamNameByMember(loginMember).orElseThrow(() -> new IllegalArgumentException("현재 소속팀이 없습니다."));
     }
 
     // 마이온도 조회용
     @Transactional(readOnly = true)
-    public Double getTemperatureByMemberEmail(String email) {
-        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new IllegalArgumentException("잘못된 email 입니다."));
+    public Double findMyTemperatureByMember(Member loginMember) {
+        return memberRepository.findMyTemperatureByMember(loginMember).orElseThrow(() -> new IllegalArgumentException("회원의 매너온도가 설정되어 있지 않습니다."));
 
-        return member.getMyTemperature();
     }
 
     //이메일로 회원조회

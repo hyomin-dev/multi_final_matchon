@@ -95,6 +95,7 @@ public class ReportService {
                 .boardId(boardId)
                 .targetMemberId(targetMember != null ? targetMember.getId() : null)
                 .suspended(targetMember != null && targetMember.isSuspended())
+                .targetIsAdmin(targetMember != null && targetMember.getMemberRole().name().equals("ADMIN"))
                 .build();
     }
 
