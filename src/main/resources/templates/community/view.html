@@ -43,6 +43,22 @@
             </tr>
             </thead>
             <tbody>
+            <!-- 공지글 (상단 고정글) -->
+            <tr th:each="board : ${pinnedPosts}" class="pinned-row">
+                <td class="notice-cell">공지</td>
+                <td th:text="${board.category.displayName}"></td>
+                <td>
+                    <a class="board-title-link"
+                       th:href="@{'/community/' + ${board.id}}">
+                        <span class="pinned-icon">📌</span>
+                        <span th:text="${board.title}"></span>
+                    </a>
+                </td>
+                <td th:text="${board.member.memberName}"></td>
+                <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
+            </tr>
+
+            <!-- 일반게시글 -->
             <tr th:each="board, iterStat : ${boardsPage.content}">
                 <td th:text="${boardsPage.totalElements - (boardsPage.number * boardsPage.size + iterStat.index)}"></td>
                 <td th:text="${board.category.displayName}"></td>

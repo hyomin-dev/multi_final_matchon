@@ -20,10 +20,7 @@ import io.awspring.cloud.s3.S3Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -59,42 +56,39 @@ public class BoardController {
                        Model model) {
         Pageable pageable = PageRequest.of(page, 6, Sort.by("createdDate").descending());
         Page<Board> boardsPage = boardService.findByCategory(category, pageable);
+        List<Board> pinnedPosts = boardService.findPinnedByCategory(category);
 
         model.addAttribute("boardsPage", boardsPage);
         model.addAttribute("selectedCategory", category);
         model.addAttribute("categories", Category.values());
-
+        model.addAttribute("pinnedPosts", pinnedPosts);
         return "community/view";
     }
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         Board board = boardService.findById(id);
-
         List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, board.getId());
 
         model.addAttribute("board", board);
-        model.addAttribute("attachments", attachments); // 추가된 부분
+        model.addAttribute("attachments", attachments);
         model.addAttribute("commentRequest", new CommentRequest());
         model.addAttribute("comments", commentService.getCommentsByBoard(board));
         return "community/detail";
     }
 
-
     @GetMapping("/new")
     public String form(Model model, @AuthenticationPrincipal CustomUser user) {
         if (user == null) return "redirect:/login";
-
-        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN; // 역할 기반 분기
+        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN;
 
         model.addAttribute("boardRequest", new BoardRequest());
         model.addAttribute("categories", Category.values());
         model.addAttribute("memberName", user.getMember().getMemberName());
         model.addAttribute("formAction", "/community");
-        model.addAttribute("isAdmin", isAdmin); // 관리자 여부 추가
+        model.addAttribute("isAdmin", isAdmin);
         return FORM_VIEW;
     }
-
 
     @PostMapping
     public String create(@Valid @ModelAttribute("boardRequest") BoardRequest boardRequest,
@@ -113,7 +107,7 @@ public class BoardController {
             model.addAttribute("categories", Category.values());
             model.addAttribute("memberName", user.getMember().getMemberName());
             model.addAttribute("formAction", "/community");
-            model.addAttribute("isAdmin", isAdmin); // 다시 주입
+            model.addAttribute("isAdmin", isAdmin);
             return FORM_VIEW;
         }
 
@@ -124,6 +118,7 @@ public class BoardController {
                 .category(boardRequest.getCategory())
                 .member(member)
                 .boardAttachmentEnabled(false)
+                .pinned(isAdmin && boardRequest.isPinned())
                 .build();
 
         boardService.save(board);
@@ -157,17 +152,16 @@ public class BoardController {
 
         boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN;
 
-        BoardRequest request = new BoardRequest(board.getTitle(), board.getContent(), board.getCategory());
+        BoardRequest request = new BoardRequest(board.getTitle(), board.getContent(), board.getCategory(), board.isPinned());
 
         model.addAttribute("boardRequest", request);
         model.addAttribute("categories", Category.values());
         model.addAttribute("memberName", user.getMember().getMemberName());
         model.addAttribute("formAction", "/community/" + id + "/edit");
         model.addAttribute("boardId", id);
-        model.addAttribute("isAdmin", isAdmin); // 관리자 여부 추가
+        model.addAttribute("isAdmin", isAdmin);
         return FORM_VIEW;
     }
-
 
     @PostMapping("/{id}/edit")
     public String update(@PathVariable Long id,
@@ -200,10 +194,13 @@ public class BoardController {
         board.update(
                 boardRequest.getTitle(),
                 boardRequest.getContent(),
-                boardRequest.getCategory(),
-                null,
-                null
+                boardRequest.getCategory()
+
         );
+
+        if (isAdmin) {
+            board.setPinned(boardRequest.isPinned());
+        }
 
         board.setBoardAttachmentEnabled(false);
 
@@ -231,12 +228,10 @@ public class BoardController {
     @GetMapping("/download-force/{filename}")
     public ResponseEntity<Resource> forceDownload(@PathVariable String filename) throws IOException {
         Optional<Attachment> optional = attachmentRepository.findCommunityAttachmentBySavedName(filename);
-
         if (optional.isEmpty()) return ResponseEntity.notFound().build();
 
         Attachment attachment = optional.get();
         S3Resource resource = awsS3Utils.downloadFileWithFullName(attachment.getSavePath());
-
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
@@ -244,7 +239,6 @@ public class BoardController {
                 .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
                 .body(resource);
     }
-
 
     @PostMapping("/image-upload")
     @ResponseBody
