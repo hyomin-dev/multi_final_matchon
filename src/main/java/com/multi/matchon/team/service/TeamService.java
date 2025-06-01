@@ -687,6 +687,7 @@ public class TeamService {
         responseRepository.save(response);
     }
 
+
     //답변 삭제
     @Transactional
     public void deleteResponse(Long responseId, CustomUser user) {
@@ -712,6 +713,7 @@ public class TeamService {
         // 5. Perform deletion
         responseRepository.delete(response);
     }
+
 
 }
 

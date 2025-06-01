@@ -69,7 +69,9 @@
                         <button id="myReviewsBtn" class="btn-secondary">내가 쓴 후기 보기</button>
                     </div>
 
+
                     <div class="review-actions" th:if="${isTeamLeader}">
+
                         <button id="myResponsesBtn" class="btn-secondary">내가 쓴 답변 보기</button>
                         <button id="backToAllReviewsBtn" class="btn-cancel" style="display:none;">뒤로가기</button>
                     </div>
@@ -155,6 +157,7 @@
                         reviewWriteView.style.display = 'none';
                         backToAllReviewsBtn.style.display = 'inline-block';
 
+
                         if (!reviews.length) {
                             reviewList.innerHTML = '<p class="no-reviews">아직 작성한 답변이 없습니다.</p>';
                             return;
@@ -231,7 +234,9 @@
                         <p class="response-date">${review.respondedAt?.split('T')[0] || ''}</p>
 
                         <button class="btn-edit-response">수정</button>
+
                         <button class="btn-delete-response">삭제</button>
+
 
                         <div class="response-edit-form" style="display: none;">
                             <textarea class="edit-response-text">${review.response}</textarea>
@@ -286,6 +291,7 @@
                         }
                     });
                 });
+
                 // ✅ “삭제” 버튼 클릭 시 서버에 삭제 요청
                 document.querySelectorAll('.btn-delete-response').forEach(btn => {
                     btn.addEventListener('click', async () => {
@@ -305,6 +311,7 @@
                         }
                     });
                 });
+
             }
         }
         const stars = document.querySelectorAll('.star');
@@ -345,6 +352,8 @@
             ratingText.textContent = '';
             highlightStars(0);
         }
+
+
 
 
         const joinTeamForm = document.getElementById('joinTeamForm');
@@ -480,8 +489,10 @@
                 const rating = reviewBox.querySelector('.review-rating').textContent.length;
 
                 document.getElementById('reviewContent').value = content;
+
                 document.getElementById('ratingInput').value = rating;
                 highlightStars(rating);
+
                 reviewWriteView.style.display = 'block';
                 reviewListView.style.display = 'none';
 
