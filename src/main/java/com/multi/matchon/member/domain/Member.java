@@ -65,25 +65,6 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
-//    @Column(name = "suspended_until")
-//    private LocalDateTime suspendedUntil;  // 정지 기한. null이면 정지 아님.
-//
-//    public boolean isSuspended() {
-//        return suspendedUntil != null && LocalDateTime.now().isBefore(suspendedUntil);
-//    }
-//
-//    public void suspend(int days) {
-//        this.suspendedUntil = LocalDateTime.now().plusDays(days);
-//    }
-//
-//    public void suspendPermanently() {
-//        this.suspendedUntil = LocalDateTime.of(9999, 12, 31, 23, 59);
-//    }
-//
-//    public void unsuspend() {
-//        this.suspendedUntil = null;
-//    }
-
 
     // 임시비밀번호용
     @Column(name = "is_temporary_password", nullable = false)
