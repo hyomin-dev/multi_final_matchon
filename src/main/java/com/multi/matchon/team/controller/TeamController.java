@@ -6,6 +6,7 @@ import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.team.dto.req.ReqReviewDto;
 import com.multi.matchon.team.dto.req.ReqTeamDto;
 import com.multi.matchon.team.dto.req.ReqTeamJoinDto;
+import com.multi.matchon.team.dto.res.ResJoinRequestDetailDto;
 import com.multi.matchon.team.dto.res.ResJoinRequestDto;
 import com.multi.matchon.team.dto.res.ResReviewDto;
 import com.multi.matchon.team.dto.res.ResTeamDto;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/team")
@@ -219,13 +221,17 @@ public class TeamController {
     }
 
     @PostMapping("/team/review/{reviewId}/response")
-    public String writeResponseToReview(
+
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> writeResponseToReview(
             @PathVariable Long reviewId,
-            @RequestParam("reviewResponse") String reviewResponse,
+            @RequestBody Map<String, String> payload,
             @AuthenticationPrincipal CustomUser user) {
 
+        String reviewResponse = payload.get("reviewResponse");
         teamService.writeReviewResponse(reviewId, reviewResponse, user);
-        return "redirect:/team/team/" + teamService.getTeamIdByReview(reviewId);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+
     }
 
     @GetMapping("/team/{teamId}/all-reviews")
@@ -248,6 +254,39 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok(answeredReviews));
 
     }
+
+
+    @PutMapping("/team/review/response/{responseId}")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> updateResponse(
+            @PathVariable Long responseId,
+            @RequestBody Map<String, String> payload,
+            @AuthenticationPrincipal CustomUser user) {
+
+        String updatedText = payload.get("updatedText");
+        teamService.updateReviewResponse(responseId, updatedText, user);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+
+    @DeleteMapping("/team/review/response/{responseId}")
+    public ResponseEntity<ApiResponse<?>> deleteResponse(@PathVariable Long responseId, @AuthenticationPrincipal CustomUser user) {
+        teamService.deleteResponse(responseId, user);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+
+    @GetMapping("/team/join-request/{requestId}")
+    public ModelAndView viewJoinRequestDetail(@PathVariable Long requestId,
+                                              @AuthenticationPrincipal CustomUser user) {
+        ModelAndView mv = new ModelAndView("team/join-request-detail");
+
+        ResJoinRequestDetailDto joinRequestDto = teamService.getJoinRequestDetail(requestId, user);
+        mv.addObject("joinRequest", joinRequestDto);
+
+        return mv;
+    }
+
 }
 
 

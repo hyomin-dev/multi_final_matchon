@@ -107,23 +107,30 @@ function submitCheck(e){
 * 현재 로그인한 사용자가 소속된 팀 이름을 가져옴
 * */
 async function getTeam(){
-    const team = document.querySelector("#teamName");
+    const teamName = document.querySelector("#teamName");
+    const teamIntro = document.querySelector("#teamIntro");
     const response = await fetch(`/member/search/team-name`,{
         method: "GET",
         credentials: "include"
     });
     if(!response.ok){
         //throw new Error(`HTTP error! Status:${response.status}`)
-        alert("MATCHUP 글 작성은 소속팀이 있어야 합니다.")
-        window.history.back();
+        //alert("MATCHUP 글 작성은 소속팀이 있어야 합니다.")
+        let reply = confirm("Matchup 게시글에 글 작성을 하기 위해서는 소속팀이 있어야 합니다. 팀 등록을 하시겠습니까?");
+        if(reply)
+            window.location.href = "/team/team/register";
+        else
+            window.history.back();
     }
 
     const data = await response.json();
     // if(data.data.trim()==='' || data.data===null){
     //
     // }
-    team.value=data.data;
-    team.textContent = data.data;
+    //team.value=data.data.teamName;
+    //console.log(data.data.teamName);
+    teamName.value = data.data.teamName;
+    teamIntro.value = data.data.teamIntro;
 
 }
 

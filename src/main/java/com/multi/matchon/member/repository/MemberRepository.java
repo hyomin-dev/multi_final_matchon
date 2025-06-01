@@ -1,6 +1,7 @@
 package com.multi.matchon.member.repository;
 
 import com.multi.matchon.member.domain.Member;
+import com.multi.matchon.member.dto.res.ResTeamInfoDto;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,12 +20,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // 팀 전용
     @Query("""
-             select t2.teamName
+             select
+                new com.multi.matchon.member.dto.res.ResTeamInfoDto(
+                    t2.teamName,
+                    t2.teamIntroduction
+                )
              from Member t1
              join t1.team t2
              where t1=:loginMember and t1.isDeleted=false
             """)
-    Optional<String> findTeamNameByMember(@Param("loginMember") Member loginMember);
+    Optional<ResTeamInfoDto> findResTeamInfoByMember(@Param("loginMember") Member loginMember);
 
     @Query("""
             select t1.myTemperature

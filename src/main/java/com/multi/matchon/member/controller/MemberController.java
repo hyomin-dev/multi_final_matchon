@@ -2,6 +2,7 @@ package com.multi.matchon.member.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
+import com.multi.matchon.member.dto.res.ResTeamInfoDto;
 import com.multi.matchon.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,9 @@ public class MemberController {
 
     @ResponseBody
     @GetMapping("/search/team-name")
-    public ResponseEntity<ApiResponse<String>> getTeamNameByMember(@AuthenticationPrincipal CustomUser user){
-        String teamName = memberService.findTeamNameByMember(user.getMember());
-        return ResponseEntity.ok().body(ApiResponse.ok(teamName));
+    public ResponseEntity<ApiResponse<ResTeamInfoDto>> getResTeamInfoByMember(@AuthenticationPrincipal CustomUser user){
+        ResTeamInfoDto resTeamInfoDto = memberService.findResTeamInfoByMember(user.getMember());
+        return ResponseEntity.ok().body(ApiResponse.ok(resTeamInfoDto));
     }
 
 
