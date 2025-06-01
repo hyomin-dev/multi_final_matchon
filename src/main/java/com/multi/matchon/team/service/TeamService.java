@@ -1,6 +1,7 @@
 package com.multi.matchon.team.service;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
+import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.team.domain.Review;
 import com.multi.matchon.team.dto.res.ResJoinRequestDto;
 import com.multi.matchon.team.repository.*;
@@ -37,11 +38,13 @@ import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.connection.RedisListCommands;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -654,6 +657,33 @@ public class TeamService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
         return review.getTeam().getId();
+    }
+
+    //답변 수정하기
+    @Transactional
+    public void updateReviewResponse(Long responseId, String updatedText, CustomUser user) {
+        // 1. Fetch the response
+        Response response = responseRepository.findById(responseId)
+                .orElseThrow(() -> new CustomException("답변을 찾을 수 없습니다."));
+
+        // 2. Check that the user is the leader of the team related to the review
+        Review review = response.getReview();
+        Team team = review.getTeam();
+
+        // Fetch the TeamMember entry for this user and team
+        TeamMember teamMember = teamMemberRepository.findByMember_IdAndTeam_Id(
+                user.getMember().getId(), team.getId()
+        ).orElseThrow(() -> new CustomException("팀 멤버 정보를 찾을 수 없습니다."));
+
+        if (!teamMember.getTeamLeaderStatus()) {
+            throw new AccessDeniedException("팀장이 아니므로 답변을 수정할 권한이 없습니다.");
+        }
+
+        // 3. Update the content and timestamp
+        response.updateContent(updatedText);
+
+        // 4. Save (if not using dirty checking)
+        responseRepository.save(response);
     }
 }
 

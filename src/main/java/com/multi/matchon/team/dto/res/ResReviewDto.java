@@ -17,6 +17,8 @@ public class ResReviewDto {
     private LocalDateTime createdDate;
     private String response;
     private LocalDateTime respondedAt;
+    private Long responseId;
+
 
     public static ResReviewDto from(Review review, Response response) {
         return ResReviewDto.builder()
@@ -27,6 +29,7 @@ public class ResReviewDto {
                 .createdDate(review.getCreatedDate())
                 .response(response != null ? response.getReviewResponse() : null)
                 .respondedAt(response != null ? response.getCreatedDate() : null)
+                .responseId(response != null ? response.getId() : null) // ✅ ADD THIS
                 .build();
     }
 }
