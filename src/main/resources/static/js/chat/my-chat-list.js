@@ -52,7 +52,7 @@ async function getMyChatRooms(){
 
             exitBtn.textContent = "나가기";
             enterBtn.addEventListener("click",()=>{
-                window.open(`/chat/my/room?roomId=${item.roomId}`,"_black");
+                window.open(`/chat/group/room?roomId=${item.roomId}`,"_black");
             });
 
         }

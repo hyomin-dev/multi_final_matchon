@@ -171,7 +171,7 @@ function appendMessage(msg, loginEmail) {
     }
 }
 
-function appendSystemMessage(content) {
+function appendSystemMessage(content){
 
     const msgDiv = document.createElement('div');
     msgDiv.className = 'chat-message system-message';
