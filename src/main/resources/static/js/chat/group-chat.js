@@ -50,7 +50,8 @@ function getJwtToken(){
 
 function setStompClient() {
     const sock = new SockJS(`/connect`);
-    stompClient = webstomp.over(sock, { debug: console.log });
+    stompClient = webstomp.over(sock);
+
 }
 
 function connect(token, roomId, loginEmail) {
@@ -76,8 +77,6 @@ function connect(token, roomId, loginEmail) {
 
                 stompClient.subscribe(`/user/${loginEmail}/queue/errors`,(message)=>{
 
-
-
                     const data = new Blob([JSON.stringify({ roomId })], { type: 'application/json' });
                     navigator.sendBeacon(`/chat/room/read?roomId=${roomId}`, data);
 
@@ -97,12 +96,10 @@ function connect(token, roomId, loginEmail) {
                     form.submit();
 
                 })
-
                 resolve(); // 성공 시
             },
             (error) => {
                 console.error("STOMP 연결 실패");
-                alert("여기다!!");
                 showErrorPage(error?.headers?.message || "Chat STOMP 연결 실패");
                 reject(error); // 실패 시
             }

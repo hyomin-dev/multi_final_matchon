@@ -43,8 +43,6 @@ public class MatchupRequestService {
     private final ChatService chatService;
     private final SimpMessageSendingOperations messageTemplate;
 
-
-
     // 등록
 
     @Transactional
@@ -410,7 +408,6 @@ public class MatchupRequestService {
             chatService.removeParticipantToGroupChat(findMatchupRequest.getMatchupBoard().getChatRoom(), findMatchupRequest.getMember());
 
             messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
-
 
         } else{
             throw new CustomException("Matchup 현재 승인이 불가능합니다. 요청 목록을 참고해주세요.");
