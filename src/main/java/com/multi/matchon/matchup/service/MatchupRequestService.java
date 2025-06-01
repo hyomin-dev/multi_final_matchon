@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,8 @@ public class MatchupRequestService {
     private final MatchupRequestRepository matchupRequestRepository;
     private final MemberRepository memberRepository;
     private final ChatService chatService;
+    private final SimpMessageSendingOperations messageTemplate;
+
 
 
     // 등록
@@ -395,6 +398,8 @@ public class MatchupRequestService {
 
                 chatService.removeParticipantToGroupChat(findMatchupRequest.getMatchupBoard().getChatRoom(), findMatchupRequest.getMember());
 
+                messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+
         // 최초 요청 → 승인 → 승인 취소 요청 → 승인
         } else if(findMatchupRequest.getMatchupStatus()==Status.CANCELREQUESTED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==1 && !findMatchupRequest.getIsDeleted()){
 
@@ -403,6 +408,9 @@ public class MatchupRequestService {
             findMatchupRequest.getMatchupBoard().decreaseCurrentParticipantCount(findMatchupRequest.getParticipantCount());
 
             chatService.removeParticipantToGroupChat(findMatchupRequest.getMatchupBoard().getChatRoom(), findMatchupRequest.getMember());
+
+            messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+
 
         } else{
             throw new CustomException("Matchup 현재 승인이 불가능합니다. 요청 목록을 참고해주세요.");

@@ -101,7 +101,7 @@ public class StompController {
 
 
     @MessageExceptionHandler
-    public ResChatDto handleChatBlockException(NotChatParticipantException e){
+    public void handleChatBlockException(NotChatParticipantException e, Principal principal){
         ResChatDto resChatDto = ResChatDto.builder()
                 .content(e.getMessage())
                 .exceptionName(e.getClass().getSimpleName())
@@ -109,7 +109,9 @@ public class StompController {
                 .build();
 
         log.info("error: {}",e.getMessage());
-        return resChatDto;
+        //return resChatDto;
+
+        messageTemplate.convertAndSendToUser(principal.getName(),"/queue/errors",resChatDto);
     }
 
 
