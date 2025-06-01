@@ -267,6 +267,13 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
+
+    @DeleteMapping("/team/review/response/{responseId}")
+    public ResponseEntity<ApiResponse<?>> deleteResponse(@PathVariable Long responseId, @AuthenticationPrincipal CustomUser user) {
+        teamService.deleteResponse(responseId, user);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
 }
 
 

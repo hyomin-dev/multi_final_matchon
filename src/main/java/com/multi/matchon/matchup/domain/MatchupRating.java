@@ -22,8 +22,8 @@ public class MatchupRating extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="request_id",nullable = false)
-    private MatchupRequest matchupRequest;
+    @JoinColumn(name="matchup_board_id",nullable = false)
+    private MatchupBoard matchupBoard;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="evaluator_id",nullable = false)
