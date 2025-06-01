@@ -715,6 +715,7 @@ public class TeamService {
         // 5. Perform deletion
         responseRepository.delete(response);
     }
+
     public ResJoinRequestDetailDto getJoinRequestDetail(Long requestId, CustomUser user) {
         TeamJoinRequest joinRequest = teamJoinRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NoSuchElementException("가입 요청을 찾을 수 없습니다."));
@@ -779,6 +780,7 @@ public class TeamService {
             case WEEKEND_EVENING -> "주말 저녁";
         };
     }
+
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(

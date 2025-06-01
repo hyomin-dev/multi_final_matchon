@@ -275,6 +275,7 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
+
     @GetMapping("/team/join-request/{requestId}")
     public ModelAndView viewJoinRequestDetail(@PathVariable Long requestId,
                                               @AuthenticationPrincipal CustomUser user) {
@@ -285,6 +286,7 @@ public class TeamController {
 
         return mv;
     }
+
 }
 
 
