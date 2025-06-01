@@ -35,10 +35,9 @@
     const date = urlParams.get('date');
 
     if (error === 'suspended') {
-        const message = date
+        document.getElementById('suspendMessage').textContent = date
             ? `계정이 정지되었습니다. 복구일: ${date}`
             : `계정이 정지되었습니다.`;
-        document.getElementById('suspendMessage').textContent = message;
     }
 </script>
 </html>

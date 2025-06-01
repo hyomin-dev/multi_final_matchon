@@ -15,13 +15,20 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
         .then(res => {
             if (!res.ok) {
                 return res.json().then(data => {
-                    throw new Error(data.error || "로그인 실패");
+                    // ✅ [수정된 부분 시작]
+                    // 정지된 계정인 경우 → login 페이지로 리다이렉트
+                    if (data.error === "suspended") {
+                        const date = encodeURIComponent(data.date || "");
+                        window.location.href = `/login?error=suspended&date=${date}`;
+                    } else {
+                        throw new Error(data.error || "로그인 실패");
+                    }
+                    // ✅ [수정된 부분 끝]
                 });
             }
             return res.json();
         })
         .then(data => {
-            // 쿠키에 토큰 자동 저장됨 → localStorage에 저장할 필요 없음
             // 로그인 성공 후 사용자 권한 확인
             fetch("/auth/check", {
                 method: "GET",
@@ -39,6 +46,7 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
                 });
         })
         .catch(err => {
+            // 일반 로그인 오류
             alert("에러: " + err.message);
         });
 });

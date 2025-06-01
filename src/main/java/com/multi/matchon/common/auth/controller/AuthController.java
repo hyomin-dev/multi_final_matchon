@@ -11,13 +11,13 @@ import com.multi.matchon.member.dto.res.TokenResponseDto;
 import com.multi.matchon.member.repository.MemberRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -32,6 +32,8 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
 
     @PostMapping("/signup/user")
@@ -68,33 +70,52 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto requestDto) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto requestDto) {
+        // 사용자 이메일로 조회
+        Member member = memberRepository.findByMemberEmailAndIsDeletedFalse(requestDto.getEmail())
+                .orElse(null);
+
+        // 사용자 없거나 비밀번호 불일치 시
+        if (member == null || !passwordEncoder.matches(requestDto.getPassword(), member.getMemberPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "invalid_credentials"));
+        }
+
+        // 정지된 계정 처리
+        if (member.isSuspended()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                            "error", "suspended",
+                            "date", member.getSuspendedUntil() != null
+                                    ? member.getSuspendedUntil().toLocalDate().toString()
+                                    : null
+                    ));
+        }
+
+        // 정상 로그인 → 토큰 발급
         TokenResponseDto tokenResponse = authService.login(requestDto);
 
-        // accessToken → HttpOnly 쿠키로 발급 (JS 접근 불가)
         ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", tokenResponse.getAccessToken())
                 .httpOnly(false)
                 .path("/")
                 .maxAge(Duration.ofHours(1))
                 .build();
 
-        // refreshToken HttpOnly 쿠키로 발급
         ResponseCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", tokenResponse.getRefreshToken())
                 .httpOnly(true)
                 .path("/")
                 .maxAge(Duration.ofDays(14))
                 .build();
 
-        // 헤더에 두 쿠키를 같이 실어 보냄
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         headers.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-        // refreshToken은 body에 보내지 않고, 쿠키에만 담음
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(new TokenResponseDto(tokenResponse.getAccessToken(), null)); // refreshToken은 응답에서 제거
+                .body(new TokenResponseDto(tokenResponse.getAccessToken(), null));
     }
+
 
 
 
