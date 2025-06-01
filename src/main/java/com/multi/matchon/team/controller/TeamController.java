@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/team")
@@ -219,13 +220,17 @@ public class TeamController {
     }
 
     @PostMapping("/team/review/{reviewId}/response")
-    public String writeResponseToReview(
+
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> writeResponseToReview(
             @PathVariable Long reviewId,
-            @RequestParam("reviewResponse") String reviewResponse,
+            @RequestBody Map<String, String> payload,
             @AuthenticationPrincipal CustomUser user) {
 
+        String reviewResponse = payload.get("reviewResponse");
         teamService.writeReviewResponse(reviewId, reviewResponse, user);
-        return "redirect:/team/team/" + teamService.getTeamIdByReview(reviewId);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+
     }
 
     @GetMapping("/team/{teamId}/all-reviews")
@@ -248,6 +253,20 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok(answeredReviews));
 
     }
+
+
+    @PutMapping("/team/review/response/{responseId}")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> updateResponse(
+            @PathVariable Long responseId,
+            @RequestBody Map<String, String> payload,
+            @AuthenticationPrincipal CustomUser user) {
+
+        String updatedText = payload.get("updatedText");
+        teamService.updateReviewResponse(responseId, updatedText, user);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
 }
 
 
