@@ -3,6 +3,7 @@ package com.multi.matchon.team.service;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.team.domain.Review;
+import com.multi.matchon.team.dto.res.ResJoinRequestDetailDto;
 import com.multi.matchon.team.dto.res.ResJoinRequestDto;
 import com.multi.matchon.team.repository.*;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,6 +48,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -713,8 +715,70 @@ public class TeamService {
         // 5. Perform deletion
         responseRepository.delete(response);
     }
+    public ResJoinRequestDetailDto getJoinRequestDetail(Long requestId, CustomUser user) {
+        TeamJoinRequest joinRequest = teamJoinRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NoSuchElementException("가입 요청을 찾을 수 없습니다."));
+
+        Team team = joinRequest.getTeam();
+        Member currentUser = memberRepository.findByMemberEmailAndIsDeletedFalse(user.getUsername())
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+
+        // ✅ Check if the user is the leader using existing method
+        boolean isLeader = teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, currentUser);
+        if (!isLeader) {
+            throw new AccessDeniedException("팀 리더만 가입 요청 상세를 볼 수 있습니다.");
+        }
+
+        Member requester = joinRequest.getMember();
 
 
+        return ResJoinRequestDetailDto.builder()
+                .requestId(joinRequest.getId())
+                .nickname(requester.getMemberName())
+                .position(
+                        requester.getPositions() != null
+                                ? translatePosition(requester.getPositions().getPositionName())
+                                : "미정"
+                )
+                .temperature(requester.getMyTemperature())
+                .preferredTime(
+                        requester.getTimeType() != null
+                                ? translateTimeType(requester.getTimeType())
+                                : "미정"
+                )
+                .introduction(joinRequest.getIntroduction())
+                .build();
+    }
+
+    private String translatePosition(PositionName positionName) {
+        if (positionName == null) return "미정";
+        return switch (positionName) {
+            case GOALKEEPER -> "골키퍼";
+            case CENTER_BACK -> "센터백";
+            case LEFT_RIGHT_BACK -> "좌/우 풀백";
+            case LEFT_RIGHT_WING_BACK -> "좌/우 윙백";
+            case CENTRAL_DEFENSIVE_MIDFIELDER -> "수비형 미드필더";
+            case CENTRAL_MIDFIELDER -> "중앙 미드필더";
+            case CENTRAL_ATTACKING_MIDFIELDER -> "공격형 미드필더";
+            case LEFT_RIGHT_WING -> "좌/우 윙";
+            case STRIKER_CENTER_FORWARD -> "스트라이커";
+            case SECOND_STRIKER -> "세컨드 스트라이커";
+            case LEFT_RIGHT_WINGER -> "좌/우 윙어";
+        };
+    }
+
+
+    private String translateTimeType(TimeType timeType) {
+        if (timeType == null) return "미정";
+        return switch (timeType) {
+            case WEEKDAY_MORNING -> "평일 오전";
+            case WEEKDAY_AFTERNOON -> "평일 오후";
+            case WEEKDAY_EVENING -> "평일 저녁";
+            case WEEKEND_MORNING -> "주말 오전";
+            case WEEKEND_AFTERNOON -> "주말 오후";
+            case WEEKEND_EVENING -> "주말 저녁";
+        };
+    }
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(
