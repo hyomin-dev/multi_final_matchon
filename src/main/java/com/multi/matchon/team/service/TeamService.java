@@ -687,6 +687,32 @@ public class TeamService {
         responseRepository.save(response);
     }
 
+    //답변 삭제
+    @Transactional
+    public void deleteResponse(Long responseId, CustomUser user) {
+        // 1. Find the response entity
+        Response response = responseRepository.findById(responseId)
+                .orElseThrow(() -> new CustomException("답변을 찾을 수 없습니다."));
+
+        // 2. Get the associated team from the review linked to this response
+        Review review = response.getReview();
+        Team team = review.getTeam();
+
+        // 3. Get member info from CustomUser
+        Member member = user.getMember();
+
+        // 4. Check if this member is the team leader
+        TeamMember teamMember = teamMemberRepository.findByMember_IdAndTeam_Id(member.getId(), team.getId())
+                .orElseThrow(() -> new CustomException("팀 멤버 정보를 찾을 수 없습니다."));
+
+        if (!Boolean.TRUE.equals(teamMember.getTeamLeaderStatus())) {
+            throw new AccessDeniedException("팀 리더만 답변을 삭제할 수 있습니다.");
+        }
+
+        // 5. Perform deletion
+        responseRepository.delete(response);
+    }
+
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(
