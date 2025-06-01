@@ -1,6 +1,7 @@
 package com.multi.matchon.member.service;
 
 import com.multi.matchon.member.domain.Member;
+import com.multi.matchon.member.dto.res.ResTeamInfoDto;
 import com.multi.matchon.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,8 +25,8 @@ public class MemberService {
     * 팀 이름 조회용
     * */
     @Transactional(readOnly = true)
-    public String findTeamNameByMember(Member loginMember) {
-        return memberRepository.findTeamNameByMember(loginMember).orElseThrow(() -> new IllegalArgumentException("현재 소속팀이 없습니다."));
+    public ResTeamInfoDto findResTeamInfoByMember(Member loginMember) {
+        return memberRepository.findResTeamInfoByMember(loginMember).orElseThrow(() -> new IllegalArgumentException("현재 소속팀이 없습니다."));
     }
 
     // 마이온도 조회용

@@ -30,7 +30,9 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         registry.setApplicationDestinationPrefixes("/publish");
 
-        registry.enableSimpleBroker("/topic");
+        registry.enableSimpleBroker("/topic","/queue","/user");
+
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override

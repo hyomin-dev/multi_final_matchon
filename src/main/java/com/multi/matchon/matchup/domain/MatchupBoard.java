@@ -71,6 +71,10 @@ public class MatchupBoard extends BaseEntity {
     @JoinColumn(name="chat_room_id",nullable = false)
     private ChatRoom chatRoom;
 
+    @Column(name="is_rating_initialized")
+    @Builder.Default
+    private Boolean isRatingInitialized = false;
+
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
