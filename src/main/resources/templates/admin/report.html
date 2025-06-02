@@ -83,7 +83,7 @@
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
-
+</body>
 <script>
     function bindPaginationLinks() {
         document.querySelectorAll(".pagination a").forEach(link => {
@@ -161,10 +161,6 @@
             });
     }
 
-</script>
-</body>
-
-<script>
     function bindPaginationLinks() {
         document.querySelectorAll(".pagination a").forEach(link => {
             link.addEventListener("click", function (e) {
