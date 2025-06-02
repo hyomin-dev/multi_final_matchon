@@ -88,9 +88,9 @@
 }
 
 .pagination a.active {
-    background-color: #3498db;
+    background-color: dodgerblue;
     color: white;
-    border-color: #3498db;
+    border-color: dodgerblue;
 }
 
 .pagination a:hover {
