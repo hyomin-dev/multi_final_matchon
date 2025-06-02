@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -276,7 +277,7 @@ public class TeamController {
     }
 
 
-    @GetMapping("/team/join-request/{requestId}")
+    @GetMapping("/team/{teamId}/join-request/{requestId}")
     public ModelAndView viewJoinRequestDetail(@PathVariable Long requestId,
                                               @AuthenticationPrincipal CustomUser user) {
         ModelAndView mv = new ModelAndView("team/join-request-detail");
@@ -287,6 +288,15 @@ public class TeamController {
         return mv;
     }
 
+    @GetMapping("/team/my-team-info")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<ResTeamDto>> getMyTeamInfo(@AuthenticationPrincipal CustomUser user) {
+        ResTeamDto myTeam = teamService.findMyTeam(user);
+        if (myTeam == null) {
+            return ResponseEntity.ok(ApiResponse.ok(null));
+        }
+        return ResponseEntity.ok(ApiResponse.ok(myTeam));
+    }
 }
 
 

@@ -14,6 +14,7 @@ public class ResJoinRequestDetailDto {
     private String preferredTime;
     private String introduction;
     // Optionally: private String profileImageUrl;
+    private String profileImageUrl;
 
 
 
