@@ -7,28 +7,36 @@ import com.multi.matchon.community.dto.res.ReportResponse;
 import com.multi.matchon.community.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/community/report")
+@RequestMapping
 @RequiredArgsConstructor
 public class ReportController {
 
     private final ReportService reportService;
 
-    // 1. 신고 접수
-    @PostMapping
-    public ResponseEntity<?> reportContent(@RequestParam ReportType type,
-                                           @RequestParam Long targetId,
-                                           @RequestParam String reason,
-                                           @RequestParam ReasonType reasonType,
-                                           @AuthenticationPrincipal CustomUser user) {
+    // ✅ 신고 접수 - 일반 사용자용 (POST /community/reports)
+    @PostMapping("/community/reports")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> reportContent(
+            @RequestParam ReportType type,
+            @RequestParam Long targetId,
+            @RequestParam String reason,
+            @RequestParam ReasonType reasonType,
+            @AuthenticationPrincipal CustomUser user
+    ) {
         if (user == null) {
             return ResponseEntity.status(401).body("로그인이 필요합니다.");
         }
@@ -41,53 +49,30 @@ public class ReportController {
         }
     }
 
-    // 2. 전체 신고 목록 조회 (관리자용)
-    @GetMapping("/all")
-    public ResponseEntity<List<ReportResponse>> getAllReports() {
-        List<ReportResponse> reports = reportService.getAllReports();
-        return ResponseEntity.ok(reports);
-    }
+    // ✅ 관리자용 신고 목록 페이지 (GET /admin/reports/page)
+    @GetMapping("/admin/reports/page")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String reportManagePage(@RequestParam(defaultValue = "0") int page, Model model) {
+        Pageable pageable = PageRequest.of(page, 5, Sort.by("createdDate").descending());
+        Page<ReportResponse> reportPage = reportService.getPagedReports(pageable);
 
-    // 3. 페이징된 신고 목록 조회
-    @GetMapping("/page")
-    public ResponseEntity<Page<ReportResponse>> getPagedReports(@RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "5") int size) {
-        Page<ReportResponse> pagedReports = reportService.getReportsPaged(page, size);
-        return ResponseEntity.ok(pagedReports);
-    }
-
-    private void addPagingAttributes(Model model, int page, int size) {
-        Page<ReportResponse> pagedReports = reportService.getReportsPaged(page, size);
-        model.addAttribute("reports", pagedReports.getContent());
+        model.addAttribute("reportPage", reportPage);
+        model.addAttribute("reports", reportPage.getContent());
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", pagedReports.getTotalPages());
-    }
-
-
-    @GetMapping("/reports")
-    public String reportPage(@RequestParam(defaultValue = "0") int page,
-                             @RequestParam(defaultValue = "5") int size,
-                             Model model) {
-        addPagingAttributes(model, page, size);
         return "admin/report";
     }
 
-    @GetMapping("/reports/body")
-    public String getReportBody(@RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "5") int size,
-                                Model model) {
-        addPagingAttributes(model, page, size);
-        return "admin/report :: reportBody";
+    // ✅ fragment 요청 (GET /admin/reports/reportBody)
+    @GetMapping("/admin/reports/reportBody")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String getReportBodyFragment(@RequestParam(defaultValue = "0") int page, Model model) {
+        Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Page<ReportResponse> reportPage = reportService.getPagedReports(pageable);
+
+        model.addAttribute("reportPage", reportPage);
+        model.addAttribute("reports", reportPage.getContent());
+        model.addAttribute("currentPage", page);
+
+        return "admin/report :: reportBody, pagination";
     }
-
-    @GetMapping("/reports/pagination")
-    public String getPagination(@RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "5") int size,
-                                Model model) {
-        addPagingAttributes(model, page, size);
-        return "admin/report :: paginationArea";
-    }
-
-
-
 }

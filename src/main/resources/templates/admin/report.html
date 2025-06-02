@@ -26,8 +26,7 @@
         <th>회원 처리</th>
     </tr>
     </thead>
-
-    <tbody id="reportBody" th:fragment="reportBody">
+    <tbody>
     <tr th:each="report, stat : ${reports}">
         <td th:text="${(currentPage != null ? currentPage : 0) * 5 + stat.index + 1}">1</td>
         <td th:text="${report.reportType}">BOARD</td>
@@ -36,7 +35,6 @@
         <td th:text="${report.reasonType}">욕설/비방</td>
         <td th:text="${report.reason}">사유</td>
         <td th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">날짜</td>
-
         <td>
             <a th:if="${report.reportType == 'BOARD'}"
                th:href="@{'/community/' + ${report.boardId}}" class="view-link">게시글</a>
@@ -44,7 +42,6 @@
                th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}"
                class="view-link">댓글</a>
         </td>
-
         <td>
             <div class="ban-controls" th:if="${!report.targetIsAdmin}">
                 <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 7)'" class="ban-btn">7일</button>
@@ -57,41 +54,27 @@
     </tbody>
 </table>
 
-<div id="paginationArea" th:fragment="paginationArea">
-    <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
-        <ul>
-            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                <a href="#" th:attr="data-page=${i}" th:text="${i + 1}"
-                   th:classappend="${i == currentPage} ? 'active' : ''"></a>
-            </li>
-        </ul>
-    </div>
+<!-- 페이지네이션 -->
+<div class="pagination" th:if="${reportPage.totalPages > 1}">
+    <a class="page-link"
+       th:if="${reportPage.hasPrevious()}"
+       th:href="@{/admin/reports/page(page=${reportPage.number - 1})}">이전</a>
+
+    <a class="page-link"
+       th:each="i : ${#numbers.sequence(0, reportPage.totalPages - 1)}"
+       th:href="@{/admin/reports/page(page=${i})}"
+       th:text="${i + 1}"
+       th:classappend="${i == reportPage.number} ? 'active' : ''">
+    </a>
+
+    <a class="page-link"
+       th:if="${reportPage.hasNext()}"
+       th:href="@{/admin/reports/page(page=${reportPage.number + 1})}">다음</a>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
 
 <script>
-    function bindPaginationLinks() {
-        document.querySelectorAll(".pagination a").forEach(link => {
-            link.addEventListener("click", function (e) {
-                e.preventDefault();
-                const page = this.getAttribute("data-page");
-
-                Promise.all([
-                    fetch(`/community/report/reports/body?page=${page}`).then(res => res.text()),
-                    fetch(`/community/report/reports/pagination?page=${page}`).then(res => res.text())
-                ])
-                    .then(([bodyHtml, paginationHtml]) => {
-                        document.getElementById("reportBody").innerHTML = bodyHtml;
-                        document.getElementById("paginationArea").innerHTML = paginationHtml;
-                        bindPaginationLinks();
-                    });
-            });
-        });
-    }
-
-    document.addEventListener("DOMContentLoaded", bindPaginationLinks);
-
     function suspendUser(memberId, days) {
         if (!confirm("정말로 회원 계정을 정지하시겠습니까?")) return;
 

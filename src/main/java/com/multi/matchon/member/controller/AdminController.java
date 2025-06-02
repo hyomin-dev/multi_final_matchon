@@ -166,9 +166,8 @@ public class AdminController {
     }
 
     @GetMapping("/reports")
-    public String listAllReports(Model model) {
-        List<ReportResponse> reports = reportService.getAllReports();
-        model.addAttribute("reports", reports);
-        return "admin/report";
+    public String redirectToReportsPage() {
+        return "redirect:/admin/reports/page";
     }
+
 }
