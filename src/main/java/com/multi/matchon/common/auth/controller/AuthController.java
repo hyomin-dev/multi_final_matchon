@@ -69,7 +69,7 @@ public class AuthController {
             return ResponseEntity.ok(Map.of(
                     "message", "로그인됨",
                     "role", user.getMember().getMemberRole().name(),
-                    "isTemporaryPassword", user.getMember().getIsTemporaryPassword()
+                    "isTemporaryPassword", user.isTemporaryPassword()
             ));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
@@ -102,7 +102,7 @@ public class AuthController {
         // refreshToken은 body에 보내지 않고, 쿠키에만 담음
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(new TokenResponseDto(tokenResponse.getAccessToken(), null)); // refreshToken은 응답에서 제거
+                .body(new TokenResponseDto(tokenResponse.getAccessToken(), null, tokenResponse.isTemporaryPassword())); // refreshToken은 응답에서 제거
     }
 
 
@@ -194,8 +194,8 @@ public class AuthController {
         String encoded = passwordEncoder.encode(tempPassword);
 
         Member member = optional.get();
-        member.updatePassword(encoded);
-        member.setIsTemporaryPassword(true); // 임시 비밀번호 표시
+        member.setTemporaryPassword(encoded);     // 기존 비밀번호는 유지
+        member.setIsTemporaryPassword(true);      // 플래그 ON
         memberRepository.save(member);
 
         mailService.sendTemporaryPassword(email, tempPassword);

@@ -24,55 +24,61 @@ import java.util.Objects;
 public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="member_id")
+    @Column(name = "member_id")
     private Long id;
 
-    @Column(name="member_email",nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name = "member_email", nullable = false, columnDefinition = "VARCHAR(100)")
     private String memberEmail;
 
-    @Column(name="member_password",nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name = "member_password", nullable = false, columnDefinition = "VARCHAR(100)")
     private String memberPassword;
 
-    @Column(name="member_name", nullable = false, columnDefinition = "VARCHAR(50)")
+    @Column(name = "member_name", nullable = false, columnDefinition = "VARCHAR(50)")
     private String memberName;
 
-    @Column(name="member_role", nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Column(name = "member_role", nullable = false)
+    @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="position_id")
+    @JoinColumn(name = "position_id")
     private Positions positions;
 
     @Setter
-    @Column(name="preferred_time")
-    @Enumerated(value = EnumType.STRING)
+    @Column(name = "preferred_time")
+    @Enumerated(EnumType.STRING)
     private TimeType timeType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="team_id")
+    @JoinColumn(name = "team_id")
     private Team team;
 
     @Setter
-    @Column(name="my_temperature")
-    private Double myTemperature; // nullable: 사용자만 사용
+    @Column(name = "my_temperature")
+    private Double myTemperature;
 
     @Column(name = "picture_attachment_enabled")
-    private Boolean pictureAttachmentEnabled; // nullable : 관리자는 null 가능, 사용자는 회원가입 시 true로 설정
+    private Boolean pictureAttachmentEnabled;
 
-    @Column(name="is_deleted", nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     @Builder.Default
-    private Boolean isDeleted=false;
+    private Boolean isDeleted = false;
 
-    // 임시비밀번호용
+    @Column(name = "previous_password", columnDefinition = "VARCHAR(100)")
+    private String previousPassword;
+
+    @Column(name = "temporary_password", columnDefinition = "VARCHAR(100)")
+    private String temporaryPassword;
+
     @Column(name = "is_temporary_password", nullable = false)
     @Builder.Default
     private Boolean isTemporaryPassword = false;
 
     @Column(name = "suspended_until")
-    private LocalDateTime suspendedUntil;  // 정지 기한. null이면 정지 아님.
+    private LocalDateTime suspendedUntil;
 
+    // ==== 상태 관련 메서드 ====
     public boolean isSuspended() {
         return suspendedUntil != null && LocalDateTime.now().isBefore(suspendedUntil);
     }
@@ -89,36 +95,51 @@ public class Member extends BaseTimeEntity {
         this.suspendedUntil = null;
     }
 
-
-
-    // 삭제
     public void markAsDeleted() {
         this.isDeleted = true;
     }
 
-    // 복원
     public void unmarkAsDeleted() {
         this.isDeleted = false;
     }
 
+    // ==== 복원/비밀번호 관련 메서드 ====
     public void restoreAsUser(String encodedPassword, String name) {
-        this.unmarkAsDeleted();
+        unmarkAsDeleted();
         this.memberPassword = encodedPassword;
         this.memberName = name;
         this.memberRole = MemberRole.USER;
         this.pictureAttachmentEnabled = true;
         this.myTemperature = 36.5;
-
         this.positions = null;
         this.timeType = null;
     }
 
     public void restoreAsHost(String encodedPassword, String name) {
-        this.unmarkAsDeleted();
+        unmarkAsDeleted();
         this.memberPassword = encodedPassword;
         this.memberName = name;
         this.memberRole = MemberRole.HOST;
         this.pictureAttachmentEnabled = true;
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.previousPassword = this.memberPassword;
+        this.memberPassword = encodedPassword;
+    }
+
+    public void updatePasswordWithHistory(String newEncodedPassword) {
+        this.previousPassword = this.memberPassword;
+        this.memberPassword = newEncodedPassword;
+    }
+
+    // ==== 세터 메서드 ====
+    public void setIsTemporaryPassword(boolean isTemporaryPassword) {
+        this.isTemporaryPassword = isTemporaryPassword;
+    }
+
+    public void setTemporaryPassword(String encodedTempPassword) {
+        this.temporaryPassword = encodedTempPassword;
     }
 
     public void clearPersonalInfo() {
@@ -128,12 +149,7 @@ public class Member extends BaseTimeEntity {
         this.pictureAttachmentEnabled = null;
     }
 
-    public void updatePassword(String encodedPassword) {
-        this.memberPassword = encodedPassword;
+    public void clearTemporaryPassword() {
+        this.temporaryPassword = null;
     }
-
-    public void setIsTemporaryPassword(boolean isTemporaryPassword) {
-        this.isTemporaryPassword = isTemporaryPassword;
-    }
-
 }
