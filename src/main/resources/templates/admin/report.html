@@ -27,8 +27,6 @@
     </tr>
     </thead>
 
-
-    <!-- tbody fragment -->
     <tbody id="reportBody" th:fragment="reportBody">
     <tr th:each="report, stat : ${reports}">
         <td th:text="${(currentPage != null ? currentPage : 0) * 5 + stat.index + 1}">1</td>
@@ -49,28 +47,16 @@
 
         <td>
             <div class="ban-controls" th:if="${!report.targetIsAdmin}">
-                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 7)'" class="ban-btn">
-                    7일
-                </button>
-                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 30)'" class="ban-btn">
-                    30일
-                </button>
-                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', null)'"
-                        class="ban-btn">영구
-                </button>
-                <button type="button" th:if="${report.suspended}" th:onclick="'unsuspendUser('
-                + ${report.targetMemberId} + ')'" class="ban-btn unban-btn">
-                    해제
-                </button>
-
+                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 7)'" class="ban-btn">7일</button>
+                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 30)'" class="ban-btn">30일</button>
+                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', null)'" class="ban-btn">영구</button>
+                <button type="button" th:if="${report.suspended}" th:onclick="'unsuspendUser(' + ${report.targetMemberId} + ')'" class="ban-btn unban-btn">해제</button>
             </div>
         </td>
     </tr>
     </tbody>
-
 </table>
 
-<!-- pagination fragment -->
 <div id="paginationArea" th:fragment="paginationArea">
     <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
         <ul>
@@ -83,7 +69,7 @@
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
-</body>
+
 <script>
     function bindPaginationLinks() {
         document.querySelectorAll(".pagination a").forEach(link => {
@@ -136,9 +122,9 @@
             });
     }
 
-    document.addEventListener("DOMContentLoaded", bindPaginationLinks);
-
     function unsuspendUser(memberId) {
+        if (!confirm("정말로 정지를 해제하시겠습니까?")) return;
+
         const formData = new URLSearchParams();
         formData.append("memberId", memberId);
 
@@ -162,24 +148,6 @@
                 alert("요청 중 오류 발생");
             });
     }
-
-    function bindPaginationLinks() {
-        document.querySelectorAll(".pagination a").forEach(link => {
-            link.addEventListener("click", function (e) {
-                e.preventDefault();
-                const page = this.getAttribute("data-page");
-
-                fetch(`/community/report/reports/page?page=${page}`)
-                    .then(res => res.text())
-                    .then(html => {
-                        document.getElementById("reportTableArea").innerHTML = html;
-                        bindPaginationLinks(); // 비동기로 로드된 영역에 이벤트 재바인딩
-                    });
-            });
-        });
-    }
-
-    // 최초 바인딩
-    document.addEventListener("DOMContentLoaded", bindPaginationLinks);
 </script>
+</body>
 </html>
