@@ -107,6 +107,8 @@
     document.addEventListener("DOMContentLoaded", bindPaginationLinks);
 
     function suspendUser(memberId, days) {
+        if (!confirm("정말로 회원 계정을 정지하시겠습니까?")) return;
+
         const formData = new URLSearchParams();
         formData.append("memberId", memberId);
         if (days != null) {
