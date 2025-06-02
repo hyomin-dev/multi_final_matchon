@@ -135,8 +135,8 @@ table.board-table .notice-cell { color: red; }
 }
 
 .comment-count {
-    margin-left: 5px;
-    color: forestgreen;
+    margin-left: 4px;
+    color: mediumseagreen;
     font-size: 0.9em;
 }
 

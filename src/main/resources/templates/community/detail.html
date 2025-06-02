@@ -195,7 +195,7 @@
                 newComment.classList.add("highlighted");
                 newComment.innerHTML = `
                 <div class="comment-meta">
-                    <small><b>${data.memberName}</b> | ${formatDateTime(data.createdDate)}</small>
+                    <small> ${data.memberName} | ${formatDateTime(data.createdDate)}</small>
                     <div class="comment-actions">
                         <button type="button" class="btn-comment-delete" data-comment-id="${data.commentId}" data-board-id="${boardId}">삭제</button>
                     </div>
