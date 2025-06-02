@@ -183,6 +183,9 @@
     color: #222;
     margin: 4px 0 0 0;
     line-height: 1.6;
+
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 
