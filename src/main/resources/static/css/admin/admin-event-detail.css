@@ -13,6 +13,10 @@ h2 {
     font-size: 26px;
     font-weight: bold;
     margin-bottom: 24px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    white-space: normal;
 }
 .info-box {
     margin-bottom: 14px;
@@ -33,16 +37,11 @@ label {
 .btn-wrap {
     display: flex;
     justify-content: center;
+    min-width: 100px;
     gap: 12px;
     margin-top: 30px;
 }
-.btn {
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-}
+
 .back-btn {
     background-color: #555;
     color: white;
@@ -55,3 +54,14 @@ label {
     background-color: #f44336;
     color: white;
 }
+
+.info-box {
+    margin-bottom: 14px;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    word-break: break-word;
+}
+
+
+

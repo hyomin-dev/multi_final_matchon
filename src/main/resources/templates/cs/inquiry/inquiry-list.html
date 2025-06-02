@@ -13,7 +13,7 @@
             background-color: #fff;
         }
         #wrap {
-            max-width: 1100px;
+            max-width: 1400px;
             margin: 60px auto;
             padding: 20px;
             text-align: center;
@@ -73,8 +73,8 @@
         }
         th:nth-child(1), td:nth-child(1) { width: 30px; }
         th:nth-child(2), td:nth-child(2) { width: 80px; }
-        th:nth-child(3), td:nth-child(3) { width: 400px; }
-        th:nth-child(4), td:nth-child(4) { width: 100px; }
+        th:nth-child(3), td:nth-child(3) { width: 500px; }
+        th:nth-child(4), td:nth-child(4) { width: 120px; }
         th:nth-child(5), td:nth-child(5) {
             width: 50px;
         }
@@ -128,16 +128,24 @@
             border-color: #eee;
         }
 
-        .ellipsis-multiline {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2; /* 최대 2줄 표시 */
+
+        td.title-cell {
+            text-align: left;
+        }
+
+
+        .title-link {
+            display: inline-block;
+            max-width: 100%;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            word-break: break-word;
-            white-space: normal;
-            line-height: 1.4em;
-            max-height: 2.8em;
+            vertical-align: middle;
+            text-decoration: none;
+            color: #000;
+        }
+        .title-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -185,8 +193,8 @@
                 <tr th:each="inquiry, stat : ${inquiries.content}">
                     <td th:text="${stat.index + 1 + inquiries.number * inquiries.size}">1</td>
                     <td th:text="${inquiry.categoryLabel}">카테고리</td>
-                    <td>
-                        <a class="title-link ellipsis-multiline"
+                    <td class="title-cell">
+                        <a class="title-link"
                            th:href="@{'/inquiry/' + ${inquiry.id}}"
                            th:text="${inquiry.inquiryTitle}">제목</a>
                     </td>
@@ -223,7 +231,6 @@
 
 <script>
 
-
     document.addEventListener('DOMContentLoaded', function () {
         const contentArea = document.getElementById('inquiryContentArea');
         const searchForm = document.getElementById('searchForm');
@@ -234,44 +241,6 @@
                 alert("검색은 최대 20자까지 입력 가능합니다.");
             }
         });
-
-        searchForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            loadPage(0);
-        });
-
-        document.addEventListener('click', function (e) {
-            const link = e.target.closest('.pagination a');
-            if (link && !link.classList.contains('disabled') && link.hasAttribute('data-page')) {
-                e.preventDefault();
-                const page = link.getAttribute('data-page');
-                loadPage(page);
-            }
-        });
-
-        function loadPage(page) {
-            const formData = new FormData(searchForm);
-            const params = new URLSearchParams(formData);
-            params.append('page', page);
-
-            fetch('/inquiry?' + params.toString(), {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-                .then(res => res.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newContent = doc.getElementById('inquiryContentArea');
-                    if (newContent) {
-                        contentArea.innerHTML = newContent.innerHTML;
-                    }
-                });
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const contentArea = document.getElementById('inquiryContentArea');
-        const searchForm = document.getElementById('searchForm');
 
         searchForm.addEventListener('submit', function (e) {
             e.preventDefault();

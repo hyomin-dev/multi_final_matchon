@@ -277,7 +277,9 @@ public class TeamController {
     }
 
 
+
     @GetMapping("/team/{teamId}/join-request/{requestId}")
+
     public ModelAndView viewJoinRequestDetail(@PathVariable Long requestId,
                                               @AuthenticationPrincipal CustomUser user) {
         ModelAndView mv = new ModelAndView("team/join-request-detail");
@@ -288,6 +290,7 @@ public class TeamController {
         return mv;
     }
 
+
     @GetMapping("/team/my-team-info")
     @ResponseBody
     public ResponseEntity<ApiResponse<ResTeamDto>> getMyTeamInfo(@AuthenticationPrincipal CustomUser user) {
@@ -297,6 +300,7 @@ public class TeamController {
         }
         return ResponseEntity.ok(ApiResponse.ok(myTeam));
     }
+
 }
 
 

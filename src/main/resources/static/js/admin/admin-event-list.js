@@ -37,7 +37,11 @@ function loadEventPage(page) {
                 tableHtml += `
                         <tr>
                             <td>${index + 1 + (data.number * data.size)}</td>
-                            <td><a href="/admin/event/${event.id}" class="detail-link">${event.eventTitle}</a></td>
+                            <td class="title-cell">
+                                <a href="/admin/event/${event.id}" class="detail-link event-title-ellipsis">
+                                    ${event.eventTitle}
+                                </a>
+                            </td>
                             <td>${event.memberName}</td>
                             <td>${event.createdDate.replace("T", " ")}</td>
                             <td><span class="${statusClass}">${event.statusLabel}</span></td>

@@ -21,14 +21,19 @@ public class BoardRequest {
     @NotNull(message = "카테고리를 선택해주세요.")
     private Category category;
 
-    public BoardRequest(String title, String content, Category category) {
+    private boolean pinned = false; // 관리자만 설정 가능
+
+    public BoardRequest(String title, String content, Category category, boolean pinned) {
         this.title = title;
         this.content = content;
         this.category = category;
+        this.pinned = pinned;
+    }
+
+    public BoardRequest(String title, String content, Category category) {
+        this(title, content, category, false);
     }
 
     public BoardRequest() {
-
     }
 }
-

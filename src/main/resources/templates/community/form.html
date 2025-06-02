@@ -9,8 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/community/common.css}">
     <link rel="stylesheet" th:href="@{/css/community/board-form.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
-    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"/>
 </head>
 <body class="flex-layout">
 <div class="page-wrapper">
@@ -24,7 +23,7 @@
 
             <div class="form-group">
                 <label>제목</label>
-                <input type="text" th:field="*{title}" required />
+                <input type="text" th:field="*{title}" required/>
                 <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
             </div>
 
@@ -46,16 +45,24 @@
                 <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
             </div>
 
+            <!-- ✅ 관리자만 상단 고정 가능 -->
+            <div class="form-group" th:if="${isAdmin}">
+                <label>
+                    <input type="checkbox" th:field="*{pinned}"/>
+                    상단 고정
+                </label>
+            </div>
+
             <div class="form-group-editor">
                 <label for="editor">내용</label>
                 <div id="editor" class="toast-editor-container"></div>
-                <input type="hidden" th:field="*{content}" id="hiddenContent" />
+                <input type="hidden" th:field="*{content}" id="hiddenContent"/>
                 <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
             </div>
 
             <div class="form-group">
                 <label>파일 첨부</label>
-                <input type="file" name="files" id="fileInput" multiple />
+                <input type="file" name="files" id="fileInput" multiple/>
                 <div id="filePreview" class="file-preview"></div>
             </div>
 
@@ -125,8 +132,17 @@
                 editor.setHTML(hiddenContent.value);
             }
 
-            form.addEventListener('submit', function () {
-                hiddenContent.value = editor.getHTML();
+            form.addEventListener('submit', function (e) {
+                const htmlContent = editor.getHTML().trim();
+                const plainText = editor.getMarkdown().replace(/[\n\r]/g, '').trim();
+
+                if (!plainText) {
+                    alert("내용은 필수입니다.");
+                    e.preventDefault();
+                    return;
+                }
+
+                hiddenContent.value = htmlContent;
             });
         }
     });
@@ -176,7 +192,6 @@
         fileInput.files = dataTransfer.files;
     }
 </script>
+
 </body>
 </html>
-
-

@@ -21,11 +21,14 @@
                 <a th:href="@{/community}" class="back-link">← 목록으로</a>
                 <div class="post-action-right">
                     <div th:if="${board.member.id == #authentication.principal.member.id}">
-                        <button type="button" class="board-delete-button" th:onclick="'deletePost(' + ${board.id} + ')'">✖ 삭제</button>
+                        <button type="button" class="board-delete-button"
+                                th:onclick="'deletePost(' + ${board.id} + ')'">✖ 삭제
+                        </button>
                     </div>
                     <div th:if="${board.member.id != #authentication.principal.member.id}">
                         <button type="button" class="report-button"
-                                th:onclick="'openReportModal(\'BOARD\', ' + ${board.id} + ')'">⚠ 게시글 신고</button>
+                                th:onclick="'openReportModal(\'BOARD\', ' + ${board.id} + ')'">⚠ 게시글 신고
+                        </button>
                     </div>
                 </div>
             </div>
@@ -35,7 +38,8 @@
             <div class="post-meta meta-horizontal">
                 <span><strong>작성자:</strong> <span th:text="${board.member.memberName}"></span></span>
                 <span><strong>카테고리:</strong> <span th:text="${board.category.displayName}"></span></span>
-                <span><strong>작성일:</strong> <span th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></span></span>
+                <span><strong>작성일:</strong> <span
+                        th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></span></span>
             </div>
         </div>
 
@@ -120,7 +124,7 @@
         <div class="form-group">
             <label for="reportReasonDetail">상세 사유</label>
             <textarea id="reportReasonDetail" rows="4" maxlength="500"
-                      placeholder="신고 상세 사유를 입력하세요. (1000자 이내)" required></textarea>
+                      placeholder="신고 상세 사유를 입력하세요. (300자 이내)" required></textarea>
 
         </div>
 
@@ -148,7 +152,7 @@
         if (!confirm("정말 삭제하시겠습니까?")) return;
         fetch(`/community/${boardId}/delete`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             credentials: 'include'
         }).then(response => {
             if (response.status === 401) {
@@ -182,7 +186,7 @@
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + token
             },
-            body: JSON.stringify({ content: content })
+            body: JSON.stringify({content: content})
         })
             .then(res => res.json())
             .then(data => {
@@ -191,7 +195,7 @@
                 newComment.classList.add("highlighted");
                 newComment.innerHTML = `
                 <div class="comment-meta">
-                    <small><b>${data.memberName}</b> | ${formatDateTime(data.createdDate)}</small>
+                    <small> ${data.memberName} | ${formatDateTime(data.createdDate)}</small>
                     <div class="comment-actions">
                         <button type="button" class="btn-comment-delete" data-comment-id="${data.commentId}" data-board-id="${boardId}">삭제</button>
                     </div>
@@ -213,7 +217,7 @@
             if (!confirm("댓글을 삭제하시겠습니까?")) return;
             fetch(`/community/${boardId}/comments/${commentId}`, {
                 method: "DELETE",
-                headers: { 'Authorization': 'Bearer ' + token }
+                headers: {'Authorization': 'Bearer ' + token}
             }).then(res => {
                 if (res.ok) {
                     e.target.closest("li").remove();
@@ -252,7 +256,7 @@
         }
 
         const token = localStorage.getItem("accessToken");
-        fetch("/community/report", {
+        fetch("/community/reports", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -278,7 +282,7 @@
         if (highlightId) {
             const el = document.getElementById("comment-" + highlightId);
             if (el) {
-                el.scrollIntoView({ behavior: "smooth", block: "center" });
+                el.scrollIntoView({behavior: "smooth", block: "center"});
                 el.classList.add("highlight");
             }
         }

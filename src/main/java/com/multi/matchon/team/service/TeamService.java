@@ -741,6 +741,7 @@ public class TeamService {
 
         Member requester = joinRequest.getMember();
 
+
         Attachment attachment = em.createQuery(
                         "SELECT a FROM Attachment a WHERE a.boardType = :boardType AND a.boardNumber = :boardNumber AND a.isDeleted = false ORDER BY a.fileOrder ASC",
                         Attachment.class)
@@ -754,6 +755,7 @@ public class TeamService {
         String profileImageUrl = attachment != null
                 ? awsS3Utils.createPresignedGetUrl(attachment.getSavePath(), attachment.getSavedName())
                 : "/img/default-avatar.png";
+
 
         return ResJoinRequestDetailDto.builder()
                 .requestId(joinRequest.getId())
@@ -770,7 +772,9 @@ public class TeamService {
                                 : "미정"
                 )
                 .introduction(joinRequest.getIntroduction())
+
                 .profileImageUrl(profileImageUrl) // ✅ Make sure this exists!
+
                 .build();
     }
 
@@ -804,6 +808,7 @@ public class TeamService {
         };
     }
 
+
     public ResTeamDto findMyTeam(CustomUser user) {
         Member member = memberRepository.findByMemberEmail(user.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
@@ -817,6 +822,7 @@ public class TeamService {
 
         return ResTeamDto.from(team, imageUrl);
     }
+
 
 }
 
