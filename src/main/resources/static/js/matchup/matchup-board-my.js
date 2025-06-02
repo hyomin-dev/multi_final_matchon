@@ -93,6 +93,9 @@ function renderList(items){
                 <a href="/chat/group/room?roomId=${item.roomId}" target="_blank">
                     <button class="group-chat">단체 채팅</button>
                 </a>
+                
+                <button class="rating-setting disabled">평가 세팅</button>
+               
             </div>
 
             <div class="card-section center">
@@ -119,7 +122,11 @@ function renderList(items){
                 </div>
             </div>    
                 `;
+
+        setRatingSettingButton(card, item);
+
         boardArea.appendChild(card);
+
 
     })
 }
@@ -230,6 +237,31 @@ function checkStatus(item){
         return "모집 완료";
     else
         return "모집 가능"
+}
+
+function setRatingSettingButton(card, item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+
+
+    if(matchDate<now &&  !item.isRatingInitialized) {
+        card.querySelector(".rating-setting").classList.remove("disabled");
+        card.querySelector(".rating-setting").addEventListener("click",async ()=>{
+            const response = await fetch(`/matchup/rating/setting?boardId=${item.boardId}`,{
+                method: "GET",
+                credentials: "include"
+            })
+            if(!response.ok)
+                throw new Error(`HTTP error! Status:${response.status}`)
+            else{
+                alert("평가 세팅이 완료되었습니다.");
+            }
+
+
+        })
+    }
+
+
 }
 
 

@@ -1,0 +1,183 @@
+
+let boardId = '';
+document.addEventListener("DOMContentLoaded",()=>{
+    const detailDto = document.querySelector("#matchup-rating-detail-dto");
+    boardId = Number(detailDto.dataset.boardId);
+
+    loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
+
+
+
+})
+
+async function loadItems(page){
+    const response = await fetch(`/matchup/rating/list?page=${page-1}&boardId=${boardId}`,{
+
+        method: "GET",
+        credentials: "include"
+    });
+    if(!response.ok)
+        throw new Error(`HTTP error! Status:${response.status}`)
+    const data = await response.json();
+    //console.log(data);
+    const items = data.data.items;
+    const pageInfo = data.data.pageInfo;
+    //console.log(pageInfo);
+
+    renderList(items);
+    renderPagination(pageInfo);
+
+
+}
+function renderList(items){
+
+
+    const boardArea = document.querySelector("#request-container");
+    boardArea.innerHTML = '';
+
+    items.forEach((item, index)=>{
+
+        const card = document.createElement("div");
+        card.className = "matchup-card";
+        card.innerHTML = `
+            <div class="card-content">
+                <div class="left-info">
+                    <div><strong>평가 대상: </strong>${item.targetName}</div>          
+                </div>         
+                <div class="button-wrap">
+                    <div><strong>후기 보냄: </strong>${setIsCompletedSend(item.isCompletedSend)}</div>
+                    <button class="send-btn"></button>
+                </div>
+                <div class="button-wrap">
+                    <div><strong>후기 받음: </strong>${setIsCompletedSend(item.isCompletedReceive)}</div>
+                    <button class="receive-btn">받은 후기</button>        
+                </div>
+            </div>    
+                                            
+                `;
+        setSendBtn(card,item);
+        setReceiveBtn(card, item);
+        boardArea.appendChild(card);
+
+    })
+}
+
+function renderPagination(pageInfo){
+
+    // 프론트는 페이지 시작번호 1부터로 헷갈림
+    const pageBlockSize = 5;
+    // 프론트 측 page 시작 번호 1부터 변경
+    const curPage = pageInfo.page + 1;
+
+
+    const pagingArea = document.querySelector("#paging-container");
+    pagingArea.innerHTML = '';
+
+
+    const currentBlock = Math.floor((curPage-1)/pageBlockSize);
+    const startPage = currentBlock * pageBlockSize+1;
+    const endPage = Math.min(startPage + pageBlockSize-1,pageInfo.totalPages);
+
+    // 첫 번째 블록으로 이동
+    if (startPage > 1){
+        const firstBtn = document.createElement("button");
+        firstBtn.textContent = "<<";
+        firstBtn.addEventListener("click",()=>{
+            loadItems(1);
+
+        });
+        pagingArea.appendChild(firstBtn);
+    }
+
+    // 이전 블록으로 이동
+    if (startPage > 1){
+        const prevBtn = document.createElement("button");
+        prevBtn.textContent = "<";
+        prevBtn.addEventListener("click",()=>{
+            loadItems(startPage-1);
+
+        });
+        pagingArea.appendChild(prevBtn);
+    }
+
+    // 현재 블록의 페이지 번호 버튼들
+    for(let i=startPage; i<=endPage;i++){
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if( i=== curPage)
+            btn.disabled = true;
+
+        btn.addEventListener("click",()=>{
+            loadItems(i);
+        })
+        pagingArea.appendChild(btn);
+    }
+
+    // 다음 블록으로 이동
+    if(endPage < pageInfo.totalPages){
+        const nextBtn = document.createElement("button");
+        nextBtn.textContent = ">";
+        nextBtn.addEventListener("click",()=>{
+            loadItems(endPage+1);
+
+        })
+        pagingArea.appendChild(nextBtn);
+    }
+
+    // 마지막 블록으로 이동
+
+    if(endPage<pageInfo.totalPages){
+        const lastBtn = document.createElement("button");
+        lastBtn.textContent  = ">>";
+        lastBtn.addEventListener("click",()=>{
+            loadItems(pageInfo.totalPages);
+        })
+        pagingArea.appendChild(lastBtn);
+
+
+    }
+
+}
+
+function setIsCompletedSend(booleanVal){
+    if(booleanVal)
+        return "Y"
+    else
+        return "N"
+}
+
+function setSendBtn(card, item){
+
+    const sendBtn = card.querySelector(".send-btn");
+
+    // 내가 후기 작성을 한 경우
+    if(item.isCompletedSend){
+        sendBtn.textContent = "보낸 후기";
+        sendBtn.addEventListener("click",()=>{
+            window.location.href = `/matchup/rating/detail?boardId=${item.boardId}&evalId=${item.sendedEvalId}&targetId=${item.sendedTargetId}`;
+        })
+    }else{
+        sendBtn.textContent = "후기 쓰기";
+        sendBtn.addEventListener("click",()=>{
+            window.location.href = `/matchup/rating/register?boardId=${item.boardId}&evalId=${item.sendedEvalId}&targetId=${item.sendedTargetId}`;
+        })
+
+    }
+}
+
+function setReceiveBtn(card, item){
+    const receiveBtn = card.querySelector(".receive-btn");
+
+    // 상대방이 후기 작성을 한 경우:
+    if(item.isCompletedReceive){
+        receiveBtn.addEventListener("click",()=>{
+            window.location.href = `/matchup/rating/detail?boardId=${item.boardId}&evalId=${item.receivedEvalId}&targetId=${item.receivedTargetId}`;
+        });
+    }else{
+        receiveBtn.addEventListener("click",()=>{
+            alert("아직 상대방이 후기 작성을 안했습니다.");
+        });
+
+    }
+}
+

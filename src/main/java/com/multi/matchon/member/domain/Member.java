@@ -136,4 +136,7 @@ public class Member extends BaseTimeEntity {
         this.isTemporaryPassword = isTemporaryPassword;
     }
 
+    public void updateMyTemperature(Double myTemperature){
+        this.myTemperature += myTemperature;
+    }
 }
