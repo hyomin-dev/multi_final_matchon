@@ -21,6 +21,10 @@ public class CustomUser implements UserDetails {
         return this.member;
     }
 
+    public boolean isTemporaryPassword() {
+        return member.getIsTemporaryPassword();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(() -> "ROLE_" + member.getMemberRole().name());

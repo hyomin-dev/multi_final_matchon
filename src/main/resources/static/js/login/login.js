@@ -19,10 +19,16 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
             }
             return res.json();
         })
-        .then(() => {
-            // 로그인 성공 시 플래그 설정
-            localStorage.setItem("showPasswordPopup", "true");
+        .then(data => {
+            if (data.isTemporaryPassword) {
+                localStorage.setItem("showPasswordPopup", "true");
+            } else {
+                localStorage.removeItem("showPasswordPopup");
+            }
+
+            alert("로그인 성공!");
             window.location.href = "/main";
+
         })
         .catch(err => {
             alert("에러: " + err.message);
@@ -123,10 +129,10 @@ document.getElementById("changePasswordForm").addEventListener("submit", functio
         .then(res => {
             if (!res.ok) {
                 return res.text().then(msg => {
-                    console.error("서버 응답 에러 메시지:", msg); // ← 콘솔에 먼저 찍어보기
+                    console.error("서버 응답 에러 메시지:", msg);
                     document.getElementById("changeResult").innerText = msg;
                     document.getElementById("changeResult").style.color = "red";
-                    throw new Error(msg); // catch로 전달
+                    throw new Error(msg);
                 });
             }
             return res.text();

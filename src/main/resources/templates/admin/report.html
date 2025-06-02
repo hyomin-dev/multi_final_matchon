@@ -43,14 +43,21 @@
             <a th:if="${report.reportType == 'BOARD'}"
                th:href="@{'/community/' + ${report.boardId}}" class="view-link">게시글</a>
             <a th:if="${report.reportType == 'COMMENT'}"
-               th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}" class="view-link">댓글</a>
+               th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}"
+               class="view-link">댓글</a>
         </td>
 
         <td>
             <div class="ban-controls" th:if="${!report.targetIsAdmin}">
-                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 7)'" class="ban-btn">7일</button>
-                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 30)'" class="ban-btn">30일</button>
-                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', null)'" class="ban-btn">영구</button>
+                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 7)'" class="ban-btn">
+                    7일
+                </button>
+                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 30)'" class="ban-btn">
+                    30일
+                </button>
+                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', null)'"
+                        class="ban-btn">영구
+                </button>
                 <button type="button" th:if="${report.suspended}" th:onclick="'unsuspendUser('
                 + ${report.targetMemberId} + ')'" class="ban-btn unban-btn">
                     해제

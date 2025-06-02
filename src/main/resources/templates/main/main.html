@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <title>Matchon - Main</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/login/login.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
-
 </head>
 
 <body>
 <div class="hero">
-    <!-- ===== NAVIGATION ===== -->
+
     <div class="navbar">
         <div>
             <img src="/img/matchon_logo.png" alt="Matchon Logo" class="logo">
@@ -19,7 +19,6 @@
         <div class="center">
             <a th:href="@{/introduction}">INTRODUCTION</a>
             <a th:href="@{/matchup/board}">MATCHUP</a>
-<!--            <a th:href="@{/guest}">GUEST</a>-->
             <a th:href="@{/stadium}">STADIUM</a>
             <a th:href="@{/community}">COMMUNITY</a>
             <a th:href="@{/schedule}">SCHEDULE</a>
@@ -39,7 +38,7 @@
         </div>
     </div>
 
-    <!-- ===== HERO TEXT ===== -->
+
     <div class="hero-text">
         <h1>Wanna Match?</h1>
         <h1>You're On!</h1>
@@ -63,26 +62,34 @@
     </sec:authorize>
 
 
-    <!-- ===== FOOTER ===== -->
+    <div id="popupOverlay" class="popup-overlay" style="display: none;
+     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+     background: rgba(0,0,0,0.3); z-index: 9999;"></div>
+
+    <div id="changePasswordPopup" class="popup" style="display: none;
+     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+     background: white; padding: 25px; border-radius: 12px;
+     box-shadow: 0 0 12px rgba(0,0,0,0.25); z-index: 10000; width: 320px;">
+        <h3 style="margin-bottom: 15px;">새 비밀번호 설정</h3>
+        <form id="changePasswordForm">
+            <input type="password" id="newPassword" placeholder="새 비밀번호" required style="width: 100%; padding: 8px; margin-bottom: 10px;" />
+            <input type="password" id="confirmPassword" placeholder="비밀번호 확인" required style="width: 100%; padding: 8px; margin-bottom: 10px;" />
+            <button type="submit" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px;">비밀번호 변경</button>
+        </form>
+        <div id="changeResult" class="success-msg" style="color: red; margin-top: 10px;"></div>
+        <button type="button" onclick="closeChangePopup()" style="margin-top: 10px; width: 100%; padding: 8px;">닫기</button>
+    </div>
+
+
     <footer class="footer">
         team@matchon.com | 02-123-123
     </footer>
 </div>
 
-<!-- ===== SCRIPT ===== -->
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-
-        // 로그인 상태 확인 후 버튼 표시
-
-        const chatImg = document.querySelector("#chat-icon");
-
-        if (chatImg) {
-            chatImg.addEventListener("click", () => {
-                window.location.href = "/chat/my/rooms"; // 새 창에서 열기
-            });
-        }
-
+        // 로그인 상태에 따른 버튼 표시
         fetch('/auth/check', {
             method: 'GET',
             credentials: 'include'
@@ -107,6 +114,10 @@
                     myBtn.style.display = "inline-block";
                     logoutBtn.style.display = "inline-block";
                 }
+
+                if (data.isTemporaryPassword) {
+                    openChangePasswordPopup();
+                }
             }).catch(() => {
             document.getElementById("btn-login").style.display = "inline-block";
             document.getElementById("btn-signup").style.display = "inline-block";
@@ -115,15 +126,79 @@
             document.getElementById("btn-logout").style.display = "none";
         });
 
+        // 임시 비밀번호 팝업 조건 확인
+        const shouldShowPopup = localStorage.getItem("showPasswordPopup") === "true";
+        if (shouldShowPopup) {
+            fetch("/auth/check", {
+                method: "GET",
+                credentials: "include"
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("인증 실패");
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.isTemporaryPassword) {
+                        openChangePasswordPopup();
+                    }
+                    localStorage.removeItem("showPasswordPopup");
+                })
+                .catch(() => {
+                    localStorage.removeItem("showPasswordPopup");
+                });
+        }
 
-        // 챗봇 열기/닫기 로직
+        // 비밀번호 변경 폼 전송 처리
+        const form = document.getElementById("changePasswordForm");
+        if (form) {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const newPassword = document.getElementById("newPassword").value;
+                const confirmPassword = document.getElementById("confirmPassword").value;
+
+                fetch("/auth/change-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ newPassword, confirmPassword })
+                })
+                    .then(res => {
+                        if (!res.ok) {
+                            return res.text().then(msg => {
+                                document.getElementById("changeResult").innerText = msg;
+                                document.getElementById("changeResult").style.color = "red";
+                                throw new Error(msg);
+                            });
+                        }
+                        return res.text();
+                    })
+                    .then(msg => {
+                        document.getElementById("changeResult").innerText = msg;
+                        document.getElementById("changeResult").style.color = "#28a745";
+                        setTimeout(() => {
+                            closeChangePopup();
+                            window.location.reload();
+                        }, 1500);
+                    })
+                    .catch(err => {
+                        console.warn("비밀번호 변경 실패:", err.message);
+                    });
+            });
+        }
+
+        // 챗봇 기능
+        const chatImg = document.querySelector("#chat-icon");
+        if (chatImg) {
+            chatImg.addEventListener("click", () => {
+                window.location.href = "/chat/my/rooms";
+            });
+        }
+
         const launcher = document.getElementById("chatbot-launcher");
         const modal = document.getElementById("chatbot-modal");
         const closeBtn = document.getElementById("chatbot-close");
 
-        fetch('/auth/check', {
-            credentials: 'include'
-        }).then(res => {
+        fetch('/auth/check', { credentials: 'include' }).then(res => {
             if (!res.ok) {
                 if (launcher) launcher.remove();
                 if (modal) modal.remove();
@@ -149,7 +224,6 @@
                 modal.style.display = "none";
             });
         }
-
     });
 
     function logout() {
@@ -165,7 +239,18 @@
         });
     }
 
+    function openChangePasswordPopup() {
+        document.getElementById("changePasswordPopup").style.display = "block";
+        document.getElementById("popupOverlay").style.display = "block";
+    }
+
+    function closeChangePopup() {
+        document.getElementById("changePasswordPopup").style.display = "none";
+        document.getElementById("popupOverlay").style.display = "none";
+        document.getElementById("changeResult").innerText = "";
+    }
 </script>
 <script th:src="@{/js/aibot/aichatbot.js}"></script>
+
 </body>
 </html>
