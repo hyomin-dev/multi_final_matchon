@@ -8,7 +8,6 @@
     <link rel="stylesheet" th:href="@{/css/community/common.css}">
     <link rel="stylesheet" th:href="@{/css/community/board-list.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
-
 </head>
 <body class="flex-layout">
 <div class="page-wrapper">
@@ -46,33 +45,39 @@
             <!-- 공지글 (상단 고정글) -->
             <tr th:each="board : ${pinnedPosts}" class="pinned-row">
                 <td class="notice-cell">공지</td>
-                <td th:text="${board.category.displayName}"></td>
+                <td th:text="${board.categoryName}"></td>
                 <td>
                     <a class="board-title-link"
                        th:href="@{'/community/' + ${board.id}}">
                         <span class="pinned-icon">📌</span>
                         <span th:text="${board.title}"></span>
+                        <span class="comment-count"
+                              th:if="${board.commentCount > 0}"
+                              th:text="' [' + ${board.commentCount} + ']'"></span>
                     </a>
                 </td>
-                <td th:text="${board.member.memberName}"></td>
+                <td th:text="${board.authorName}"></td>
                 <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
             </tr>
 
             <!-- 일반게시글 -->
             <tr th:each="board, iterStat : ${boardsPage.content}">
                 <td th:text="${boardsPage.totalElements - (boardsPage.number * boardsPage.size + iterStat.index)}"></td>
-                <td th:text="${board.category.displayName}"></td>
+                <td th:text="${board.categoryName}"></td>
                 <td>
                     <a class="board-title-link"
-                       th:href="@{'/community/' + ${board.id}}"
-                       th:text="${board.title}"></a>
+                       th:href="@{'/community/' + ${board.id}}">
+                        <span th:text="${board.title}"></span>
+                        <span class="comment-count"
+                              th:if="${board.commentCount > 0}"
+                              th:text="' [' + ${board.commentCount} + ']'"></span>
+                    </a>
                 </td>
-                <td th:text="${board.member.memberName}"></td>
+                <td th:text="${board.authorName}"></td>
                 <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
             </tr>
             </tbody>
         </table>
-
 
         <div class="pagination">
             <a class="page-link"
@@ -121,10 +126,10 @@
             });
     }
 
-    // 카테고리 변경 이벤트 (중복 제거 후 이 한 줄만 유지)
+    // 카테고리 변경 이벤트
     document.querySelector('.category-select')?.addEventListener('change', () => reloadBoardList(0));
 
-    // 페이지 번호 클릭 이벤트 연결 함수
+    // 페이지 번호 클릭 이벤트 연결
     function attachPaginationEvents() {
         document.querySelectorAll('.page-link').forEach(link => {
             link.addEventListener('click', function (e) {
@@ -137,7 +142,6 @@
         });
     }
 
-    // 초기 페이지 로드시 이벤트 연결
     attachPaginationEvents();
 </script>
 </body>

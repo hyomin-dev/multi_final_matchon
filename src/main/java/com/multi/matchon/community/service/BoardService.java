@@ -2,7 +2,9 @@ package com.multi.matchon.community.service;
 
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
+import com.multi.matchon.community.dto.res.BoardListResponse;
 import com.multi.matchon.community.repository.BoardRepository;
+import com.multi.matchon.community.repository.CommentRepository;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.common.domain.Attachment;
 import com.multi.matchon.common.domain.BoardType;
@@ -22,6 +24,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final CommentService commentService;
+    private final CommentRepository commentRepository;
     private final AttachmentRepository attachmentRepository; // 첨부파일 repository 주입
 
     public List<Board> findAll() {
@@ -73,6 +76,23 @@ public class BoardService {
         for (Attachment att : attachments) {
             att.delete(true);
         }
+    }
+
+    //댓글 수 포함 목록 DTO 반환 메서드
+    public Page<BoardListResponse> findBoardsWithCommentCount(Category category, Pageable pageable) {
+        Page<Board> boardsPage = (category == null)
+                ? boardRepository.findAll(pageable)
+                : boardRepository.findByCategory(category, pageable);
+
+        return boardsPage.map(board -> new BoardListResponse(
+                board.getId(),
+                board.getTitle(),
+                board.getCategory().getDisplayName(),
+                board.getMember().getMemberName(),
+                board.getCreatedDate(),
+                commentRepository.countByBoardIdAndIsDeletedFalse(board.getId()),
+                board.isPinned()
+        ));
     }
 
 }

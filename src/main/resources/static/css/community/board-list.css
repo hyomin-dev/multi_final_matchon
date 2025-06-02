@@ -134,4 +134,10 @@ table.board-table .notice-cell { color: red; }
     margin-right: 4px;
 }
 
+.comment-count {
+    margin-left: 5px;
+    color: forestgreen;
+    font-size: 0.9em;
+}
+
 

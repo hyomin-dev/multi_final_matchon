@@ -11,6 +11,7 @@ import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
 import com.multi.matchon.community.dto.req.BoardRequest;
 import com.multi.matchon.community.dto.req.CommentRequest;
+import com.multi.matchon.community.dto.res.BoardListResponse;
 import com.multi.matchon.community.service.BoardService;
 import com.multi.matchon.community.service.CommentService;
 import com.multi.matchon.community.service.ReportService;
@@ -55,8 +56,20 @@ public class BoardController {
                        @RequestParam(defaultValue = "0") int page,
                        Model model) {
         Pageable pageable = PageRequest.of(page, 6, Sort.by("createdDate").descending());
-        Page<Board> boardsPage = boardService.findByCategory(category, pageable);
-        List<Board> pinnedPosts = boardService.findPinnedByCategory(category);
+
+        Page<BoardListResponse> boardsPage = boardService.findBoardsWithCommentCount(category, pageable);
+
+        List<BoardListResponse> pinnedPosts = boardService.findPinnedByCategory(category).stream()
+                .map(board -> new BoardListResponse(
+                        board.getId(),
+                        board.getTitle(),
+                        board.getCategory().getDisplayName(),
+                        board.getMember().getMemberName(),
+                        board.getCreatedDate(),
+                        commentService.getCommentsByBoard(board).size(), // 또는 commentRepository.countByBoardIdAndIsDeletedFalse()
+                        board.isPinned()
+                ))
+                .toList();
 
         model.addAttribute("boardsPage", boardsPage);
         model.addAttribute("selectedCategory", category);
