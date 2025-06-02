@@ -27,7 +27,7 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    // ✅ 신고 접수 - 일반 사용자용 (POST /community/reports)
+    // 신고 접수 - 일반 사용자용 (POST /community/reports)
     @PostMapping("/community/reports")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> reportContent(
@@ -49,7 +49,7 @@ public class ReportController {
         }
     }
 
-    // ✅ 관리자용 신고 목록 페이지 (GET /admin/reports/page)
+    // 관리자용 신고 목록 페이지 (GET /admin/reports/page)
     @GetMapping("/admin/reports/page")
     @PreAuthorize("hasRole('ADMIN')")
     public String reportManagePage(@RequestParam(defaultValue = "0") int page, Model model) {
@@ -62,7 +62,7 @@ public class ReportController {
         return "admin/report";
     }
 
-    // ✅ fragment 요청 (GET /admin/reports/reportBody)
+    // fragment 요청 (GET /admin/reports/reportBody)
     @GetMapping("/admin/reports/reportBody")
     @PreAuthorize("hasRole('ADMIN')")
     public String getReportBodyFragment(@RequestParam(defaultValue = "0") int page, Model model) {
