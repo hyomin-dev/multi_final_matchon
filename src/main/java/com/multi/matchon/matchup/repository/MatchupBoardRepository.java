@@ -3,6 +3,7 @@ package com.multi.matchon.matchup.repository;
 
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.matchup.domain.MatchupBoard;
+import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardOverviewDto;
@@ -68,7 +69,8 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             t1.currentParticipantCount,
             t1.maxParticipants,
             t1.minMannerTemperature,
-            t1.chatRoom.id
+            t1.chatRoom.id,
+            t1.isRatingInitialized
             )
             from MatchupBoard t1
             join t1.writer t2
@@ -99,7 +101,8 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             t1.currentParticipantCount,
             t1.maxParticipants,
             t1.minMannerTemperature,
-            t1.chatRoom.id
+            t1.chatRoom.id,
+            t1.isRatingInitialized
             )
             from MatchupBoard t1
             join t1.writer t2
@@ -176,6 +179,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     Long countTodayMatchupBoards(@Param("memberId") Long memberId, @Param("before24") LocalDateTime before24);
 
 
+
 //    @Query("""
 //        select case
 //            when t1.isDeleted=true then false
@@ -236,6 +240,29 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
 //            """)
 //    Page<ResMatchupBoardListDto> findBoardListTest2(Pageable pageable);
 
+//    @Query("""
+//            select t2
+//            from MatchupBoard t1
+//            join fetch t1.matchupRequests t2
+//            where t1.isDeleted=false and t1.id=:boardId and t1.matchDatetime < CURRENT_TIMESTAMP and t1.writer=:loginMember and
+//            (
+//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t2.matchupRequestSubmittedCount=1 and t2.matchupCancelSubmittedCount=0 and t2.isDeleted=false) or
+//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t2.matchupRequestSubmittedCount=2 and t2.matchupCancelSubmittedCount=0 and t2.isDeleted=false) or
+//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t2.matchupRequestSubmittedCount=1 and t2.matchupCancelSubmittedCount=1 and t2.isDeleted=false) or
+//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t2.matchupRequestSubmittedCount=2 and t2.matchupCancelSubmittedCount=1 and t2.isDeleted=false) or
+//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t2.matchupRequestSubmittedCount=1 and t2.matchupCancelSubmittedCount=1 and t2.isDeleted=false) or
+//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t2.matchupRequestSubmittedCount=2 and t2.matchupCancelSubmittedCount=1 and t2.isDeleted=false)
+//            )
+//
+//            """)
+//    List<MatchupRequest> findByBoardIdAndMemberAndGameParticipantCondition(@Param("boardId") Long boardId, @Param("loginMember") Member loginMember);
 
 
+    @Query("""
+            select
+               t1
+            from MatchupBoard t1
+            where t1.isDeleted =false and t1.writer=:loginMember and t1.id=:boardId and t1.matchDatetime<CURRENT_TIMESTAMP and t1.isRatingInitialized=false
+            """)
+    Optional<MatchupBoard> findByBoardIDAndMemberAndIsRatingInitializedFalse(@Param("boardId") Long boardId,@Param("loginMember") Member loginMember);
 }

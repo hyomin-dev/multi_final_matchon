@@ -33,7 +33,7 @@ h1 {
 }
 
 /* 버튼 스타일 */
-.detail, .request, .group-chat {
+.detail, .request, .group-chat, .rating-setting {
     padding: 6px 12px;
     margin: 3px;
     border: none;
@@ -54,6 +54,10 @@ h1 {
     background-color: #007bff;
 }
 
+.rating-setting{
+    background-color: #e67e22; /* 주황 */
+}
+
 .detail:hover {
     background-color: #003060;
 }
@@ -64,6 +68,19 @@ h1 {
 .group-chat:hover{
     background-color: #0056b3;
 }
+
+.rating-setting:hover {
+    background-color: #cf711c; /* 더 진한 주황 */
+}
+
+.disabled {
+    background-color: #bcbcbc;  /* 밝은 회색 */
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+
+
 
 /* 페이징 버튼 */
 #paging-container button {

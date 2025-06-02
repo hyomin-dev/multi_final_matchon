@@ -46,5 +46,11 @@ public class MatchupRating extends BaseEntity {
     @Builder.Default
     private Boolean isCompleted = false;
 
+    public void rating(Integer mannerScore, Integer skillScore, String review, Boolean isCompleted){
+        this.mannerScore = mannerScore;
+        this.skillScore = skillScore;
+        this.review = review;
+        this.isCompleted = isCompleted;
+    }
 
 }
