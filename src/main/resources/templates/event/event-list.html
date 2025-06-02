@@ -31,8 +31,11 @@
             <tbody>
             <tr th:each="event, iterStat : ${myEvents.content}">
                 <td th:text="${iterStat.index + 1 + (myEvents.number * myEvents.size)}"></td>
-                <td>
-                    <a th:href="@{'/event/' + ${event.id}}" th:text="${event.eventTitle}" class="detail-link"></a>
+                <td class="title-cell">
+                    <a th:href="@{'/event/' + ${event.id}}"
+                       th:text="${event.eventTitle}"
+                       class="detail-link event-title-ellipsis">
+                    </a>
                 </td>
                 <td th:text="${event.memberName}"></td>
                 <td th:text="${#temporals.format(event.createdDate, 'yyyy-MM-dd HH:mm')}"></td>

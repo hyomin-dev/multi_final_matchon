@@ -15,7 +15,7 @@
         <div class="team-tabs">
             <a href="#" id="tab-info" class="active">홈/소개</a>
             <a href="#" id="tab-reviews" th:text="${isTeamLeader} ? '후기 보기/답변' : '후기 보기/쓰기'"></a>
-            <a href="#" id="tab-join">팀/가입 신청</a>
+            <a href="#" id="tab-join" th:text="${isTeamLeader} ? '가입 신청 관리' : '팀/가입 신청'"></a>
             <a href="#" id="tab-chat">채팅</a>
         </div>
 
@@ -120,6 +120,13 @@
                     </div>
                 </form>
             </div>
+            <!-- 팀장 전용: 가입 요청 리스트 -->
+            <div id="joinRequestListSection" style="display: none;">
+                <h2>가입 요청 목록</h2>
+                <div id="joinRequestsContainer">
+                    <!-- 요청들이 여기에 렌더링될 예정 -->
+                </div>
+            </div>
         </div>
     </div> <!-- End of .team-content -->
 </div> <!-- End of .content-wrapper -->
@@ -203,6 +210,38 @@
         const tabReviews = document.getElementById('tab-reviews');
         const tabJoin = document.getElementById('tab-join');
         const joinRequestSection = document.getElementById('joinRequestSection');
+        const joinRequestListSection = document.getElementById('joinRequestListSection');
+
+
+        function loadJoinRequests() {
+            fetch(`/team/team/${teamId}/join-requests`)
+                .then(res => res.json())
+                .then(data => {
+                    const requests = data.data;
+                    if (!requests.length) {
+                        joinRequestListSection.innerHTML = '<p>아직 가입 신청이 없습니다.</p>';
+                        return;
+                    }
+
+                    joinRequestListSection.innerHTML = requests.map(r => `
+                <div class="request-item">
+                    <p><strong>${r.applicantName}</strong> (${r.applicantEmail})</p>
+                    <p>${r.introduction}</p>
+                    <button class="view-detail-btn" data-id="${r.requestId}">자세히 보기</button>
+                </div>
+            `).join('');
+
+                    document.querySelectorAll('.view-detail-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const requestId = btn.dataset.id;
+                            window.location.href = `/team/team/${teamId}/join-request/${requestId}`;
+                        });
+                    });
+                })
+                .catch(() => {
+                    joinRequestListSection.innerHTML = '<p>가입 요청을 불러오는 데 실패했습니다.</p>';
+                });
+        }
 
         function loadMyResponses() {
             fetch(`/team/team/${teamId}/answered-reviews`)
@@ -256,7 +295,12 @@
                         const box = btn.closest('.response-box');
                         box.querySelector('.response-text').style.display = 'none';
                         btn.style.display = 'none';
+                        const deleteBtn = box.querySelector('.btn-delete-response');
+                        if (deleteBtn) deleteBtn.style.display = 'none'; // ✅ hide 삭제
+
                         box.querySelector('.response-edit-form').style.display = 'block';
+
+
                     });
                 });
 
@@ -376,33 +420,32 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-
-                        body: JSON.stringify({introduction})
+                        body: JSON.stringify({ introduction })
                     });
 
-                    let data = {};
-                    try {
-                        data = await response.json();
-                    } catch (jsonErr) {
-                        console.warn('⚠️ JSON 파싱 실패. 응답은:', await response.text());
-                        throw new Error('JSON 파싱 오류');
-                    }
-
-                    if (response.ok && data.success) {
-                        alert('팀 가입 신청이 완료되었습니다.');
-                        joinFormContainer.style.display = 'none';
-                        joinTeamForm.reset();
-                    } else {
-                        if (data.message?.includes('이미 요청한 팀')) {
-                            alert('이미 이 팀에 가입 신청을 했습니다.');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            alert('팀 가입 신청이 완료되었습니다.');
+                            joinRequestSection.style.display = 'none';
+                            joinTeamForm.reset();
                         } else {
-                            console.warn('서버 응답 메시지 없음 또는 미확인 오류:', data);
-                            alert(data.message || '팀 가입 신청에 실패했습니다. 다시 시도해주세요.');
+                            alert(data.message || '팀 가입 신청에 실패했습니다.');
                         }
+                    } else {
+                        let errorMessage = '팀 가입 신청에 실패했습니다.';
+                        try {
+                            const errorData = await response.json();
+                            // 🔥 Match backend format: { error: "..." }
+                            errorMessage = errorData.error || errorMessage;
+                        } catch {
+                            const errorText = await response.text();
+                            errorMessage = errorText || errorMessage;
+                        }
+                        alert(errorMessage);
                     }
                 } catch (error) {
                     console.error('❌ 에러 발생:', error);
-
                     alert('팀 가입 신청 중 오류가 발생했습니다.');
                 }
             });
@@ -622,6 +665,7 @@
             infoSection.style.display = 'none';
             reviewSection.style.display = 'none';
             joinRequestSection.style.display = 'none';
+            joinRequestListSection.style.display = 'none'; // ✅ new
         }
 
         tabInfo.addEventListener('click', (e) => {
@@ -648,8 +692,14 @@
         tabJoin.addEventListener('click', (e) => {
             e.preventDefault();
             clearTabs();
-            joinRequestSection.style.display = 'block';
             tabJoin.classList.add('active');
+
+            if (isTeamLeader) {
+                joinRequestListSection.style.display = 'block';
+                loadJoinRequests(); // 👈 load requests list for team leader
+            } else {
+                joinRequestSection.style.display = 'block'; // normal user sees the form
+            }
         });
 
 

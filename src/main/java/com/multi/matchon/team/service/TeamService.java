@@ -3,6 +3,7 @@ package com.multi.matchon.team.service;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.team.domain.Review;
+import com.multi.matchon.team.dto.res.ResJoinRequestDetailDto;
 import com.multi.matchon.team.dto.res.ResJoinRequestDto;
 import com.multi.matchon.team.repository.*;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,6 +48,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -402,7 +404,7 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
 
         if (member.getTeam() != null) {
-            throw new IllegalArgumentException("이미 다른 팀에 소속되어 있습니다.");
+            throw new IllegalArgumentException("이미 소속된 팀이 있습니다.");
         }
 
         // ✅ Word count check
@@ -455,6 +457,10 @@ public class TeamService {
 
         request.approved();
 
+        Member member = request.getMember(); // 가입 신청한 사용자
+        Team team = request.getTeam();       // 해당 팀
+
+
         TeamMember newMember = TeamMember.builder()
                 .member(request.getMember())
                 .team(request.getTeam())
@@ -463,6 +469,11 @@ public class TeamService {
                 .build();
 
         teamMemberRepository.save(newMember);
+
+        // ✅ member 테이블에 team_id 업데이트
+        member.setTeam(team);
+        memberRepository.save(member); // 명시적으로 저장 (선택사항이지만 안전)
+
     }
 
     @Transactional
@@ -712,6 +723,104 @@ public class TeamService {
 
         // 5. Perform deletion
         responseRepository.delete(response);
+    }
+
+    public ResJoinRequestDetailDto getJoinRequestDetail(Long requestId, CustomUser user) {
+        TeamJoinRequest joinRequest = teamJoinRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NoSuchElementException("가입 요청을 찾을 수 없습니다."));
+
+        Team team = joinRequest.getTeam();
+        Member currentUser = memberRepository.findByMemberEmailAndIsDeletedFalse(user.getUsername())
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+
+        // ✅ Check if the user is the leader using existing method
+        boolean isLeader = teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, currentUser);
+        if (!isLeader) {
+            throw new AccessDeniedException("팀 리더만 가입 요청 상세를 볼 수 있습니다.");
+        }
+
+        Member requester = joinRequest.getMember();
+
+
+        Attachment attachment = em.createQuery(
+                        "SELECT a FROM Attachment a WHERE a.boardType = :boardType AND a.boardNumber = :boardNumber AND a.isDeleted = false ORDER BY a.fileOrder ASC",
+                        Attachment.class)
+                .setParameter("boardType", BoardType.MEMBER)
+                .setParameter("boardNumber", requester.getId())
+                .setMaxResults(1)
+                .getResultStream() // avoids NoResultException
+                .findFirst()
+                .orElse(null);
+
+        String profileImageUrl = attachment != null
+                ? awsS3Utils.createPresignedGetUrl(attachment.getSavePath(), attachment.getSavedName())
+                : "/img/default-avatar.png";
+
+
+        return ResJoinRequestDetailDto.builder()
+                .requestId(joinRequest.getId())
+                .nickname(requester.getMemberName())
+                .position(
+                        requester.getPositions() != null
+                                ? translatePosition(requester.getPositions().getPositionName())
+                                : "미정"
+                )
+                .temperature(requester.getMyTemperature())
+                .preferredTime(
+                        requester.getTimeType() != null
+                                ? translateTimeType(requester.getTimeType())
+                                : "미정"
+                )
+                .introduction(joinRequest.getIntroduction())
+
+                .profileImageUrl(profileImageUrl) // ✅ Make sure this exists!
+
+                .build();
+    }
+
+    private String translatePosition(PositionName positionName) {
+        if (positionName == null) return "미정";
+        return switch (positionName) {
+            case GOALKEEPER -> "골키퍼";
+            case CENTER_BACK -> "센터백";
+            case LEFT_RIGHT_BACK -> "좌/우 풀백";
+            case LEFT_RIGHT_WING_BACK -> "좌/우 윙백";
+            case CENTRAL_DEFENSIVE_MIDFIELDER -> "수비형 미드필더";
+            case CENTRAL_MIDFIELDER -> "중앙 미드필더";
+            case CENTRAL_ATTACKING_MIDFIELDER -> "공격형 미드필더";
+            case LEFT_RIGHT_WING -> "좌/우 윙";
+            case STRIKER_CENTER_FORWARD -> "스트라이커";
+            case SECOND_STRIKER -> "세컨드 스트라이커";
+            case LEFT_RIGHT_WINGER -> "좌/우 윙어";
+        };
+    }
+
+
+    private String translateTimeType(TimeType timeType) {
+        if (timeType == null) return "미정";
+        return switch (timeType) {
+            case WEEKDAY_MORNING -> "평일 오전";
+            case WEEKDAY_AFTERNOON -> "평일 오후";
+            case WEEKDAY_EVENING -> "평일 저녁";
+            case WEEKEND_MORNING -> "주말 오전";
+            case WEEKEND_AFTERNOON -> "주말 오후";
+            case WEEKEND_EVENING -> "주말 저녁";
+        };
+    }
+
+
+    public ResTeamDto findMyTeam(CustomUser user) {
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        Team team = member.getTeam();
+        Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
+
+        String imageUrl = attachment
+                .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
+                .orElse("/img/default-team.png"); // fallback if no image
+
+        return ResTeamDto.from(team, imageUrl);
     }
 
 

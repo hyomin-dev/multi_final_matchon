@@ -13,6 +13,10 @@ h2 {
     font-size: 26px;
     font-weight: bold;
     margin-bottom: 24px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    white-space: normal;
 }
 .info-box {
     margin-bottom: 14px;

@@ -1,5 +1,5 @@
 #wrap {
-    max-width: 1000px;
+    max-width: 1400px;
     margin: 60px auto;
     padding: 20px;
     font-family: 'Noto Sans KR', sans-serif;
@@ -19,20 +19,38 @@ h2 {
 table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 th, td {
     border: 1px solid #ccc;
     padding: 10px;
     text-align: center;
+    vertical-align: middle;
+    word-break: break-word;
 }
+
+
 th {
     background-color: #f3f3f3;
+}
+
+
+.title-cell {
+    text-align: left;
+}
+
+.event-title-ellipsis {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .status-pending {
     background-color: #ddd;
     color: #555;
     padding: 5px 10px;
-    border-radius: 20px; /* 동그란 형태 */
+    border-radius: 20px;
     font-size: 13px;
     display: inline-block;
 }
@@ -55,10 +73,29 @@ th {
     display: inline-block;
 }
 
-
+table th:nth-child(1),
+table td:nth-child(1) {
+    width: 20px;
+}
+table th:nth-child(2),
+table td:nth-child(2) {
+    width: 400px;
+}
+table th:nth-child(3),
+table td:nth-child(4) {
+    width: 120px;
+}
+table th:nth-child(4),
+table td:nth-child(4) {
+    width: 120px;
+}
 table th:nth-child(5),
 table td:nth-child(5) {
-    width: 100px;
+    width: 30px;
+}
+
+th:nth-child(4), td:nth-child(4) {
+    width: 160px;
 }
 
 .detail-link {
