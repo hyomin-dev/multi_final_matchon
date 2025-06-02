@@ -1,78 +1,144 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
+    <meta charset="UTF-8">
     <title>게시판 목록</title>
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-    <link rel="stylesheet" th:href="@{/css/community.css}">
+    <link rel="stylesheet" th:href="@{/css/community/common.css}">
+    <link rel="stylesheet" th:href="@{/css/community/board-list.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+
 </head>
 <body class="flex-layout">
 <div class="page-wrapper">
     <div th:replace="~{common/header::header}"></div>
 
     <h2 class="page-title" th:text="${selectedCategory != null} ? ${selectedCategory.displayName} : '자유게시판'">자유게시판</h2>
-    <div style="text-align: right; width: 90%; margin: auto;">
-        <a th:href="@{/community/new}" class="button">게시글 작성</a>
-    </div>
 
-    <div class="category-select-box">
-        <select class="category-select">
-            <option th:each="cat : ${categories}"
-                    th:value="${cat}"
-                    th:text="${cat.displayName}"
-                    th:selected="${cat} == ${selectedCategory}">
-            </option>
-        </select>
+    <div class="board-top-bar">
+        <div class="category-select-box">
+            <label>
+                <select class="category-select">
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat}"
+                            th:text="${cat.displayName}"
+                            th:selected="${cat} == ${selectedCategory}">
+                    </option>
+                </select>
+            </label>
+        </div>
+        <a th:href="@{/community/new}" class="button write-button">게시글 작성</a>
     </div>
 
     <div id="board-list">
-        <table>
+        <table class="board-table">
+            <thead>
             <tr>
-                <th>작성자</th>
-                <th>제목</th>
-                <th>카테고리</th>
-                <th>작성일</th>
+                <th class="col-no">NO.</th>
+                <th class="col-category">카테고리</th>
+                <th class="col-title">제목</th>
+                <th class="col-author">작성자</th>
+                <th class="col-date">작성일</th>
             </tr>
-            <tr th:each="board : ${boardsPage.content}">
-                <td th:text="${board.member.memberName}"></td>
-                <td><a th:href="@{'/community/' + ${board.id}}" th:text="${board.title}"></a></td>
+            </thead>
+            <tbody>
+            <!-- 공지글 (상단 고정글) -->
+            <tr th:each="board : ${pinnedPosts}" class="pinned-row">
+                <td class="notice-cell">공지</td>
                 <td th:text="${board.category.displayName}"></td>
+                <td>
+                    <a class="board-title-link"
+                       th:href="@{'/community/' + ${board.id}}">
+                        <span class="pinned-icon">📌</span>
+                        <span th:text="${board.title}"></span>
+                    </a>
+                </td>
+                <td th:text="${board.member.memberName}"></td>
                 <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
             </tr>
+
+            <!-- 일반게시글 -->
+            <tr th:each="board, iterStat : ${boardsPage.content}">
+                <td th:text="${boardsPage.totalElements - (boardsPage.number * boardsPage.size + iterStat.index)}"></td>
+                <td th:text="${board.category.displayName}"></td>
+                <td>
+                    <a class="board-title-link"
+                       th:href="@{'/community/' + ${board.id}}"
+                       th:text="${board.title}"></a>
+                </td>
+                <td th:text="${board.member.memberName}"></td>
+                <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
+            </tr>
+            </tbody>
         </table>
 
+
         <div class="pagination">
-            <a th:if="${boardsPage.hasPrevious()}" th:href="@{/community(page=${boardsPage.number - 1}, category=${selectedCategory})}">이전</a>
+            <a class="page-link"
+               th:if="${boardsPage.hasPrevious()}"
+               th:data-page="${boardsPage.number - 1}"
+               href="#">이전</a>
 
-            <a th:each="i : ${#numbers.sequence(0, boardsPage.totalPages - 1)}"
-               th:href="@{/community(page=${i}, category=${selectedCategory})}"
+            <a class="page-link"
+               th:each="i : ${#numbers.sequence(0, boardsPage.totalPages - 1)}"
+               th:data-page="${i}"
                th:text="${i + 1}"
-               th:classappend="${i == boardsPage.number} ? 'active' : ''"></a>
+               th:classappend="${i == boardsPage.number} ? 'active' : ''"
+               href="#"></a>
 
-            <a th:if="${boardsPage.hasNext()}" th:href="@{/community(page=${boardsPage.number + 1}, category=${selectedCategory})}">다음</a>
+            <a class="page-link"
+               th:if="${boardsPage.hasNext()}"
+               th:data-page="${boardsPage.number + 1}"
+               href="#">다음</a>
         </div>
     </div>
-
 </div>
+
 <div th:replace="~{common/footer::footer}"></div>
 
 <script>
-    document.querySelector('.category-select').addEventListener('change', function () {
-        const selectedCategory = this.value;
-
-        fetch(`/community?category=${selectedCategory}`)
+    function reloadBoardList(page = 0, category = document.querySelector('.category-select')?.value) {
+        fetch(`/community?category=${category}&page=${page}`)
             .then(response => response.text())
             .then(html => {
                 const tempDom = document.createElement('div');
                 tempDom.innerHTML = html;
 
                 const newBoardList = tempDom.querySelector('#board-list');
-                document.querySelector('#board-list').replaceWith(newBoardList);
+                const currentBoardList = document.querySelector('#board-list');
+                if (newBoardList && currentBoardList) {
+                    currentBoardList.replaceWith(newBoardList);
+                }
 
                 const newTitle = tempDom.querySelector('.page-title');
-                document.querySelector('.page-title').textContent = newTitle.textContent;
+                const currentTitle = document.querySelector('.page-title');
+                if (newTitle && currentTitle) {
+                    currentTitle.textContent = newTitle.textContent;
+                }
+
+                attachPaginationEvents(); // 새 pagination에 이벤트 다시 연결
             });
-    });
+    }
+
+    // 카테고리 변경 이벤트 (중복 제거 후 이 한 줄만 유지)
+    document.querySelector('.category-select')?.addEventListener('change', () => reloadBoardList(0));
+
+    // 페이지 번호 클릭 이벤트 연결 함수
+    function attachPaginationEvents() {
+        document.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const page = this.dataset.page;
+                if (page !== undefined) {
+                    reloadBoardList(page);
+                }
+            });
+        });
+    }
+
+    // 초기 페이지 로드시 이벤트 연결
+    attachPaginationEvents();
 </script>
 </body>
 </html>

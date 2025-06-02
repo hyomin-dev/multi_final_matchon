@@ -48,6 +48,7 @@ function loadTeamPage(page) {
         <p>별점: ${team.teamRatingAverage ? team.teamRatingAverage.toFixed(1) : 'N/A'} ★</p>
         <p>포지션: ${team.recruitingPositions ? team.recruitingPositions.join(', ') : 'N/A'}</p>
         <p>${team.recruitmentStatus ? '모집 중' : '모집 완료'}</p>
+        <p>작성자: ${team.createdBy || 'N/A'}</p>
       </div>
     </div>
   </a>

@@ -2,9 +2,17 @@ let myMannerTemperature;
 let sportsType = '';
 let region = '';
 let dateFilter = '';
+let availableFilter = false;
+let lastFilterValues = {};
+
 document.addEventListener("DOMContentLoaded",async ()=>{
     myMannerTemperature = await getMyMannerTemperature();
-
+    lastFilterValues={
+        "sportsType": sportsType,
+        "region": region,
+        "dateFilter": dateFilter,
+        "availableFilter": availableFilter
+    }
 
 
     document.querySelector("#sports-type").addEventListener("change",(e)=>{
@@ -20,16 +28,37 @@ document.addEventListener("DOMContentLoaded",async ()=>{
         //console.log(dateFilter);
     })
 
-    document.querySelector("#filterBtn").addEventListener("click",()=>{
-        loadItems(1, sportsType, region, dateFilter);
+    document.querySelector("#availableOnly").addEventListener("change",(e)=>{
+        availableFilter = e.target.checked;
+        // 체크O: true
+        // 체크x: false
+    })
+
+    document.querySelector("#filterBtn").addEventListener("click",(e)=>{
+        const isSame = lastFilterValues.sportsType === sportsType &&
+                                        lastFilterValues.region === region &&
+                                        lastFilterValues.dateFilter === dateFilter &&
+                                        lastFilterValues.availableFilter === availableFilter;
+        //console.log(isSame);
+        //console.log(availableFilter);
+        if(isSame){
+            e.preventDefault();
+            console.log("검색 조건이 변하지 않았습니다.");
+        }else{
+            lastFilterValues.sportsType = sportsType;
+            lastFilterValues.region = region;
+            lastFilterValues.dateFilter = dateFilter;
+            lastFilterValues.availableFilter = availableFilter;
+            loadItems(1, sportsType, region, dateFilter, availableFilter);
+        }
     })
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
 
 
 })
 
-async function loadItems(page, sportsType='', region='', dateFilter=''){
-    const response = await fetch(`/matchup/board/list?page=${page-1}&sportsType=${sportsType}&region=${region}&date=${dateFilter}`,{
+async function loadItems(page, sportsType='', region='', dateFilter='', availableFilter=false){
+    const response = await fetch(`/matchup/board/list?page=${page-1}&sportsType=${sportsType}&region=${region}&date=${dateFilter}&availableFilter=${availableFilter}`,{
 
         method: "GET",
         credentials: "include"
@@ -41,15 +70,26 @@ async function loadItems(page, sportsType='', region='', dateFilter=''){
     const items = data.data.items;
     const pageInfo = data.data.pageInfo;
     //console.log(pageInfo);
+    console.log(items);
 
     renderList(items);
-    renderPagination(pageInfo,sportsType, region, dateFilter);
+    renderPagination(pageInfo,sportsType, region, dateFilter, availableFilter);
 
 
 }
 function renderList(items){
     const boardArea = document.querySelector("#board-container");
     boardArea.innerHTML = '';
+
+    if(items.length ===0){
+        boardArea.innerHTML = `
+            <div class="no-result">
+                현재 작성된 게시글이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
 
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
@@ -59,7 +99,7 @@ function renderList(items){
         card.innerHTML = `
                                  
            <div class="card-section">
-                <div><strong>작성자:</strong> ${item.memberName}</div>
+                <div><strong>작성자:</strong> ${item.writerName}</div>
                 <div><strong>팀 이름:</strong> ${item.teamName}</div>
                 <div>
                     <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
@@ -70,8 +110,8 @@ function renderList(items){
             
             <div class="card-section">
                 <div><strong>종목:</strong> ${item.sportsTypeName}</div>
-                <div><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                <div><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
+                <div class="truncate"><strong>경기장:</strong> ${item.sportsFacilityName}</div>
+                <div class="truncate"><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
                 <div>
                     📅 날짜: ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
                     ${calTime(item, date.getHours(), date.getMinutes())}
@@ -90,7 +130,7 @@ function renderList(items){
     })
 }
 
-function renderPagination(pageInfo, sportsType, region, dateFilter){
+function renderPagination(pageInfo, sportsType, region, dateFilter, availableFilter){
 
     // 프론트는 페이지 시작번호 1부터로 헷갈림
     const pageBlockSize = 5;
@@ -111,7 +151,7 @@ function renderPagination(pageInfo, sportsType, region, dateFilter){
         const firstBtn = document.createElement("button");
         firstBtn.textContent = "<<";
         firstBtn.addEventListener("click",()=>{
-            loadItems(1, sportsType, region, dateFilter);
+            loadItems(1, sportsType, region, dateFilter, availableFilter);
 
         });
         pagingArea.appendChild(firstBtn);
@@ -122,7 +162,7 @@ function renderPagination(pageInfo, sportsType, region, dateFilter){
         const prevBtn = document.createElement("button");
         prevBtn.textContent = "<";
         prevBtn.addEventListener("click",()=>{
-            loadItems(startPage-1, sportsType, region, dateFilter);
+            loadItems(startPage-1, sportsType, region, dateFilter, availableFilter);
 
         });
         pagingArea.appendChild(prevBtn);
@@ -136,7 +176,7 @@ function renderPagination(pageInfo, sportsType, region, dateFilter){
             btn.disabled = true;
 
         btn.addEventListener("click",()=>{
-            loadItems(i,sportsType, region, dateFilter);
+            loadItems(i,sportsType, region, dateFilter, availableFilter);
         })
         pagingArea.appendChild(btn);
     }
@@ -146,7 +186,7 @@ function renderPagination(pageInfo, sportsType, region, dateFilter){
         const nextBtn = document.createElement("button");
         nextBtn.textContent = ">";
         nextBtn.addEventListener("click",()=>{
-            loadItems(endPage+1, sportsType, region, dateFilter);
+            loadItems(endPage+1, sportsType, region, dateFilter, availableFilter);
 
         })
         pagingArea.appendChild(nextBtn);
@@ -158,7 +198,7 @@ function renderPagination(pageInfo, sportsType, region, dateFilter){
         const lastBtn = document.createElement("button");
         lastBtn.textContent  = ">>";
         lastBtn.addEventListener("click",()=>{
-            loadItems(pageInfo.totalPages, sportsType, region, dateFilter);
+            loadItems(pageInfo.totalPages, sportsType, region, dateFilter, availableFilter);
         })
         pagingArea.appendChild(lastBtn);
 
@@ -207,7 +247,7 @@ function checkStatus(item){
 
 async function getMyMannerTemperature(){
 
-    const response  = await fetch(`/member/search/manner-temperature`,{
+    const response  = await fetch(`/member/search/my-temperature`,{
         method: "GET",
         credentials: "include"
     })

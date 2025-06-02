@@ -2,11 +2,10 @@ package com.multi.matchon.matchup.repository;
 
 
 import com.multi.matchon.common.domain.SportsTypeName;
-import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.matchup.domain.MatchupRequest;
-import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
+import com.multi.matchon.matchup.dto.res.ResMatchupRequestOverviewListDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,19 +29,26 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             t2.sportsFacilityAddress,
             t2.matchDatetime,
             t2.matchDuration,
+            t2.currentParticipantCount,
+            t2.maxParticipants,
             t1.participantCount,
-            t1.matchupStatus
+            t1.matchupStatus,
+            t1.matchupRequestSubmittedCount,
+            t1.matchupCancelSubmittedCount,
+            t2.chatRoom.id,
+            t1.isDeleted
             )
             from MatchupRequest t1
             join t1.matchupBoard t2
             join t2.sportsType t3
-            where t1.member.id=:memberId and
+            where t1.member.id=:memberId and t1.member.isDeleted =false and
+                    t2.isDeleted = false and
                     (:sportsType is null or t3.sportsTypeName =:sportsType) and
                     (:matchDate is null or DATE(t2.matchDatetime) >=:matchDate) and
-                    (t1.isDeleted=false)
-            order by t2.matchDatetime DESC
+                    (:availableFilter is false or (:availableFilter=true and t2.matchDatetime > CURRENT_TIMESTAMP ))
+                    order by t2.matchDatetime DESC
             """)
-    Page<ResMatchupRequestListDto> findAllResMatchupRequestListDtosByMemberIdAndSportsTypeAndMatchDateWithPaging(PageRequest pageRequest, @Param("memberId") Long memberId, @Param("sportsType") SportsTypeName sportsTypeName, @Param("matchDate") LocalDate matchDate);
+    Page<ResMatchupRequestListDto> findAllResMatchupRequestListDtosByMemberIdAndSportsTypeAndMatchDateWithPaging(PageRequest pageRequest, @Param("memberId") Long memberId, @Param("sportsType") SportsTypeName sportsTypeName, @Param("matchDate") LocalDate matchDate, @Param("availableFilter") Boolean availableFilter);
 
 
     @Query("""
@@ -58,46 +64,121 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             t3.sportsFacilityAddress,
             t3.matchDatetime,
             t3.matchDuration,
+            t3.currentParticipantCount,
+            t3.maxParticipants,
             t1.participantCount,
+            t1.selfIntro,
             t1.matchupStatus,
-            t1.selfIntro
+            t1.matchupRequestSubmittedCount,
+            t1.matchupCancelSubmittedCount,
+            t1.isDeleted
             )
             from MatchupRequest t1
             join t1.member t2
             join t1.matchupBoard t3
             join t3.sportsType t4
-            join t3.member t5
-            where t1.id=:requestId and t1.isDeleted=false
+            join t3.writer t5
+            where t1.id=:requestId and t3.isDeleted=false and t2.isDeleted=false and t3.writer.isDeleted=false
             """)
     Optional<ResMatchupRequestDto> findResMatchupRequestDtoByRequestId(Long requestId);
 
+
+//    @Query("""
+//            select case
+//                    when count(t1)>0 then true
+//                    else false
+//                end
+//                from MatchupRequest t1
+//                where t1.matchupBoard.id =:boardId and t1.member.id =:memberId and t1.isDeleted=true and
+//                t1.matchupRequestSubmittedCount >=2
+//            """)
+//    Boolean hasCanceledMatchRequestMoreThanOnce(@Param("boardId") Long boardId, @Param("memberId") Long memberId);
+//
+//
+//    @Query("""
+//        select case
+//                when count(t1) > 0 then true
+//                else false
+//           end
+//        from MatchupRequest t1
+//        where (t1.matchupBoard.id =:boardId and t1.member.id=:memberId and t1.isDeleted=false) and
+//                  t1.matchupStatus in (
+//                    com.multi.matchon.common.domain.Status.PENDING,
+//                    com.multi.matchon.common.domain.Status.APPROVED,
+//                    com.multi.matchon.common.domain.Status.CANCELREQUESTED
+//                )
+//        """)
+//    Boolean isAlreadyMatchupRequestedByBoardIdAndMemberId(@Param("boardId") Long boardId,@Param("memberId") Long memberId); // true: 중복된 요청이 존재, false: 중복된 요청이 없음
+//
+//    @Query("""
+//            select case
+//                    when count(t1) >0 then true
+//                    else false
+//                end
+//            from MatchupRequest t1
+//            where t1.matchupBoard.id =:boardId and t1.member.id =:memberId and t1.isDeleted=false and
+//                t1.matchupStatus =com.multi.matchon.common.domain.Status.DENIED and
+//                t1.matchupRequestSubmittedCount>=1
+//            """)
+//    Boolean hasExceededTwoMatchupRequestsByBoardIdAndMemberId(@Param("boardId") Long boardId, @Param("memberId") Long memberId);
+
     @Query("""
-            select new com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto(
-            t1.id,
-            t2.sportsTypeName,
-            t1.sportsFacilityName,
-            t1.sportsFacilityAddress,
-            t1.matchDatetime,
-            t1.matchDuration,
-            t1.currentParticipantCount,
-            t1.maxParticipants)
-            from MatchupBoard t1 join t1.sportsType t2
-            where t1.id =:boardId and t1.isDeleted=false
+            select
+             t1
+            from MatchupRequest t1
+            where  t1.matchupBoard.id=:boardId and t1.matchupBoard.isDeleted=false and
+                    t1.member.id =:applicantId and t1.member.isDeleted=false
             """)
-    Optional<ReqMatchupRequestDto> findReqMatchupRequestDtoByBoardId(@Param("boardId") Long boardId);
+    Optional<MatchupRequest> findByMatchupBoardIdAndApplicantId(Long boardId, Long applicantId);
 
     @Query("""
-        select case
-           when count(t1) > 0 then true 
-           else false 
-           end
-        from MatchupRequest t1             
-        where (t1.matchupBoard.id =:boardId and t1.member.id=:memberId and t1.isDeleted=false) and                
-                  t1.matchupStatus in (
-                    com.multi.matchon.common.domain.Status.PENDING,
-                    com.multi.matchon.common.domain.Status.APPROVED
-                )
-        """)
-    Boolean isAlreadyRequestedByBoardIdAndMemberId(@Param("boardId") Long boardId,@Param("memberId") Long memberId); // true: 중복된 요청이 존재, false: 중복된 요청이 없음
+            select
+             t1
+            from MatchupRequest t1
+            where  t1.id=:requestId and t1.matchupBoard.isDeleted=false and t1.matchupBoard.writer.isDeleted = false
+            """)
+    Optional<MatchupRequest> findById(Long requestId);
 
+    @Query("""
+            
+            select new com.multi.matchon.matchup.dto.res.ResMatchupRequestOverviewListDto(
+            t3.memberName,
+            t1.id,
+            t1.participantCount,
+            t1.matchupStatus,
+            t1.matchupRequestSubmittedCount,
+            t1.matchupCancelSubmittedCount,
+            t1.isDeleted
+            )
+            from MatchupRequest t1
+            join t1.matchupBoard t2
+            join t1.member t3
+            where t1.matchupBoard.id=:boardId and
+                    t2.isDeleted = false
+                    order by t1.modifiedDate DESC
+            """)
+    Page<ResMatchupRequestOverviewListDto> findAllResMatchupRequestOverviewListDtoByBoardIdAndSportsTypeWithPaging(PageRequest pageRequest,@Param("boardId") Long boardId);
+
+    @Query("""
+            select
+            t1
+            from MatchupRequest  t1
+            join fetch t1.matchupBoard t2
+            join fetch t1.member t3
+            where t1.id=:requestId and t2.id=:boardId and t3.id=:applicantId and
+                    t2.isDeleted=false and t2.writer.isDeleted=false
+            """)
+    Optional<MatchupRequest> findMatchupRequestWithMatchupBoardByRequestIdAndBoardIDAndApplicantId(@Param("requestId") Long requestId, @Param("boardId") Long boardId, @Param("applicantId") Long applicantId);
+
+
+    @Query("""
+            select
+            t1
+            from MatchupRequest  t1
+            join fetch t1.matchupBoard t2
+            join fetch t2.writer t3
+            where t1.id=:requestId and t2.id=:boardId and t3.id=:writerId and
+                    t2.isDeleted=false and t3.isDeleted=false
+            """)
+    Optional<MatchupRequest> findMatchupRequestWithMatchupBoardByRequestIdAndBoardIDAndWriterId(@Param("requestId") Long requestId, @Param("boardId") Long boardId, @Param("writerId") Long writerId);
 }

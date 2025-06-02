@@ -1,6 +1,4 @@
-#wrap {
-    text-align: center;
-}
+
 
 /* 제목 */
 h1 {
@@ -8,21 +6,35 @@ h1 {
     margin-bottom: 2rem;
 }
 
+/* 전체 감싸는 wrapper */
+.filter-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: nowrap; /* ❗ 줄바꿈 방지 */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
 /* 필터 영역 */
 #filter {
     display: flex;
     gap: 1rem;
     align-items: center;
-    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 #filter select,
 #filter input[type="date"] {
-    padding: 6px;
+    padding: 6px 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
+    font-size: 0.95rem;
 }
 
+/* 검색 버튼 */
 #filterBtn {
     padding: 6px 14px;
     background-color: #007a00;
@@ -30,55 +42,113 @@ h1 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
 }
 
 #filterBtn:hover {
     background-color: #005a00;
 }
 
-/* 카드 레이아웃 */
-.matchup-card {
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.card-content {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.left-info,
-.right-info {
-    flex: 1 1 45%;
-    min-width: 240px;
-}
-
-/* 버튼 그룹 */
-.button-group {
-    margin-top: 0.5rem;
-    display: flex;
-    gap: 0.5rem;
-}
-
-.button-group a > button {
-    padding: 6px 12px;
-    font-size: 0.95rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #004080;
+/* 뒤로가기 버튼 */
+.back-btn {
+    padding: 8px 14px;
+    background-color: #888;
     color: white;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+.back-btn:hover {
+    background-color: #666;
+    transform: translateY(-2px);
+}
+
+
+.card-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3등분 */
+    gap: 1.5rem;
+    padding: 1.2rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    margin-bottom: 1rem;
+    align-items: center; /* ← 이거 중요 */
+
+}
+
+/* 버튼 세로 정렬 */
+.button-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* 버튼 공통 스타일 */
+.board-button,
+.request-button,
+.group-chat,
+.group-chat.disabled {
+    display: inline-block;
+    width: 160px;
+    height: 44px;
+    line-height: 44px;
+    padding: 0 16px;
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease;
     cursor: pointer;
 }
 
-.button-group a > button:hover {
+/* 게시글 버튼 */
+.board-button {
+    background-color: #004080;
+    color: white;
+}
+.board-button:hover {
     background-color: #003060;
 }
+
+/* 요청 버튼 */
+.request-button {
+    background-color: #007a00;
+    color: white;
+}
+.request-button:hover {
+    background-color: #005a00;
+}
+
+/* 단체 채팅 버튼 (활성 상태용) */
+.group-chat {
+    background-color: #007bff;
+    color: white;
+}
+.group-chat:hover {
+    background-color: #0056b3;
+}
+
+/* 단체 채팅 비활성화 */
+.group-chat.disabled {
+    background-color: #dddddd !important;
+    color: #aaaaaa !important;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+
 
 /* 페이징 */
 #paging-container button {
@@ -93,4 +163,27 @@ h1 {
 #paging-container button:disabled {
     background-color: #d0d0d0;
     cursor: not-allowed;
+}
+
+/* 페이징 영역 가운데 정렬 */
+#paging-container {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.no-result {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #777;
+    padding: 2rem 0;
+}
+
+
+.truncate {
+    width: 400px;           /* 너비 고정 */
+    white-space: nowrap;    /* 줄바꿈 없음 */
+    overflow: hidden;       /* 넘친 부분 숨김 */
+    text-overflow: ellipsis; /* 말줄임표 (...) 표시 */
 }

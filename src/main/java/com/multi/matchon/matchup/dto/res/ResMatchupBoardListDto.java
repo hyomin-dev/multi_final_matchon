@@ -13,9 +13,11 @@ public class ResMatchupBoardListDto {
 
     private Long boardId;
 
-    private String memberEmail;
+    private Long writerId;
 
-    private String memberName;
+    private String writerEmail;
+
+    private String writerName;
 
     private String teamName;
 
@@ -35,8 +37,11 @@ public class ResMatchupBoardListDto {
 
     private Double minMannerTemperature;
 
-    public ResMatchupBoardListDto(Long boardId, String memberEmail, String memberName, String teamName, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants, Double minMannerTemperature ) {
+    private Long roomId;
+
+    public ResMatchupBoardListDto(Long boardId, Long writerId, String writerEmail, String writerName, String teamName, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants, Double minMannerTemperature, Long roomId) {
         this.boardId = boardId;
+        this.writerId = writerId;
         this.currentParticipantCount = currentParticipantCount;
         this.matchDatetime = matchDatetime;
         this.matchDuration = matchDuration;
@@ -46,7 +51,8 @@ public class ResMatchupBoardListDto {
         this.sportsFacilityAddress = sportsFacilityAddress;
         this.sportsTypeName = sportsTypeName;
         this.teamName = teamName;
-        this.memberEmail = memberEmail;
-        this.memberName = memberName;
+        this.writerEmail = writerEmail;
+        this.writerName = writerName;
+        this.roomId = roomId;
     }
 }

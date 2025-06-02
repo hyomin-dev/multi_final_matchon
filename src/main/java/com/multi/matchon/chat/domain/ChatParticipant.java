@@ -29,7 +29,27 @@ public class ChatParticipant extends BaseEntity {
     @JoinColumn(name="member_id",nullable = false)
     private Member member;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="chat_role")
+    @Builder.Default
+    private ChatRole chatRole = ChatRole.MEMBER;
+
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
+
+    public void deleteParticipant(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public void changeChatRoom(ChatRoom chatRoom){
+        if(this.chatRoom!=null)
+            this.chatRoom.getChatParticipants().remove(this);
+
+        this.chatRoom = chatRoom;
+
+        if(!chatRoom.getChatParticipants().contains(this))
+            chatRoom.getChatParticipants().add(this);
+
+    }
 }

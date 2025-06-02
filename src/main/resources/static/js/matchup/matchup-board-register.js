@@ -3,7 +3,7 @@ let myMannerTemperature;
 document.addEventListener("DOMContentLoaded",async ()=>{
     //getSportsType(); // 종목 가져옴
     getTeam(); // 현재 사용자의 팀 정보를 가져옴
-    setCurrentParticipants();
+    setCurrentParticipant();
     setMannerTemperature();
 
     const cancelBtn = document.querySelector(".cancel-btn");
@@ -35,12 +35,12 @@ function submitCheck(e){
     //document.querySelector("#teamName").disabled=false;
     const sportsFacilityAddress = document.querySelector("#sportsFacilityAddress");
 
-    const matchDateTimeEle = document.querySelector("#matchDateTime");
-    //console.log(matchDateTimeEle.value);
+    const matchDatetimeEle = document.querySelector("#matchDatetime");
+    //console.log(matchDatetimeEle.value);
 
     const matchDurationEle = document.querySelector("#matchDuration");
 
-    const currentParticipantsCountEle = document.querySelector("#currentParticipantsCount");
+    const currentParticipantCountEle = document.querySelector("#currentParticipantCount");
     //console.log(currentParticipantsCountEle.value);
 
     const maxParticipantsEle = document.querySelector("#maxParticipants");
@@ -52,10 +52,6 @@ function submitCheck(e){
     //console.log(myMannerTemperature);
 
     const matchDescriptionEle = document.querySelector("#matchDescription");
-
-
-    const matchDate = new Date(matchDateTimeEle.value);
-    const now = new Date();
 
     if(sportsTypeNameEle.value ===""){
         alert("종목을 선택하세요.");
@@ -75,19 +71,22 @@ function submitCheck(e){
     } else if(sportsFacilityAddress.value ===""){
         alert("경기장 주소를 입력하세요.");
         e.preventDefault();
-    } else if(matchDate<now){
-        alert(`경기 시작 시간은 현재 시간(${now})이후만 가능합니다. 다시 작성해주세요.`)
+    } else if(matchDatetimeEle.value === ""){
+        alert("경기 시작 시간을 입력하세요.");
+        e.preventDefault();
+    } else if(new Date(matchDatetimeEle.value)< new Date()){
+        alert(`경기 시작 시간은 현재 시간 이후만 가능합니다. 다시 작성해주세요.`)
         e.preventDefault();
     } else if(matchDurationEle.value ===""){
         alert("경기 진행 시간을 입력하세요.");
         e.preventDefault();
-    } else if(currentParticipantsCountEle.value ===""){
+    } else if(currentParticipantCountEle.value ===""){
         alert("현재 참가 인원을 입력하세요");
         e.preventDefault();
     } else if(maxParticipantsEle.value ===""){
         alert("총 모집 인원을 입력하세요");
         e.preventDefault();
-    } else if(Number(currentParticipantsCountEle.value) >Number(maxParticipantsEle.value)){
+    } else if(Number(currentParticipantCountEle.value) >=Number(maxParticipantsEle.value)){
         alert(`현재 참가 인원은 총 모집 인원보다 적어야 합니다.`)
         e.preventDefault();
     } else if(minMannerTemperatureEle.value ===""){
@@ -96,53 +95,42 @@ function submitCheck(e){
     } else if(Number(minMannerTemperatureEle.value) > Number(myMannerTemperature)){
         alert(`하한 매너 온도는 작성자의 매너온도(${myMannerTemperature})이하로 지정해주세요.`)
         e.preventDefault();
-    } else if(matchDescriptionEle ===""){
+    } else if(matchDescriptionEle.value ===""){
         alert("경기 방식 소개를 입력하세요");
+        e.preventDefault();
     } else{
         alert("submit");
     }
 }
 
-// async function getSportsType(){
-//     const response = await fetch("/sports-types",{
-//         method: "GET",
-//         credentials: "include"
-//     })
-//     if(!response.ok)
-//         throw new Error(`HTTP error! Status:${response.status}`)
-//     const data = await response.json();
-//     //console.log(data); // data 확인
-//     //console.log(data.length); // data 길이 확인
-//
-//     const selectBtn = document.querySelector("#sportsTypeName");
-//
-//     for(let i=0;i<data.length;i++){
-//         const option = document.createElement("option")
-//         option.value = data[i].sportsTypeName;
-//         option.textContent = data[i].sportsTypeName;
-//         selectBtn.appendChild(option);
-//     }
-// }
-
-
+/*
+* 현재 로그인한 사용자가 소속된 팀 이름을 가져옴
+* */
 async function getTeam(){
-    const team = document.querySelector("#teamName");
-    const response = await fetch(`/member/search/teamname`,{
+    const teamName = document.querySelector("#teamName");
+    const teamIntro = document.querySelector("#teamIntro");
+    const response = await fetch(`/member/search/team-name`,{
         method: "GET",
         credentials: "include"
     });
     if(!response.ok){
         //throw new Error(`HTTP error! Status:${response.status}`)
-        alert("MATCHUP 글 작성은 소속팀이 있어야 합니다.")
-        window.history.back();
+        //alert("MATCHUP 글 작성은 소속팀이 있어야 합니다.")
+        let reply = confirm("Matchup 게시글에 글 작성을 하기 위해서는 소속팀이 있어야 합니다. 팀 등록을 하시겠습니까?");
+        if(reply)
+            window.location.href = "/team/team/register";
+        else
+            window.history.back();
     }
 
     const data = await response.json();
     // if(data.data.trim()==='' || data.data===null){
     //
     // }
-    team.value=data.data;
-    team.textContent = data.data;
+    //team.value=data.data.teamName;
+    //console.log(data.data.teamName);
+    teamName.value = data.data.teamName;
+    teamIntro.value = data.data.teamIntro;
 
 }
 
@@ -170,9 +158,9 @@ function getAddress() {
     }).open();
 }
 
-function setCurrentParticipants(){
+function setCurrentParticipant(){
 
-    const selectCur = document.querySelector("#currentParticipantsCount");
+    const selectCur = document.querySelector("#currentParticipantCount");
     const selectMax = document.querySelector("#maxParticipants");
 
     for(let i=1; i<=30;i++){
@@ -181,8 +169,8 @@ function setCurrentParticipants(){
         option1.value = i;
         option1.textContent = i;
         selectCur.appendChild(option1);
-        option2.value = i;
-        option2.textContent = i;
+        option2.value = i+1;
+        option2.textContent = i+1;
         selectMax.appendChild(option2);
     }
 }
@@ -199,7 +187,7 @@ function setMannerTemperature(){
 }
 
 async function getMyMannerTemperature(){
-    const response  = await fetch(`/member/search/manner-temperature`,{
+    const response  = await fetch(`/member/search/my-temperature`,{
         method: "GET",
         credentials: "include"
     })

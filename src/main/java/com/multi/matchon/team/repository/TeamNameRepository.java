@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TeamNameRepository extends JpaRepository <Team, Long> {
     List<Team> findAll();
@@ -19,7 +20,8 @@ public interface TeamNameRepository extends JpaRepository <Team, Long> {
     SELECT DISTINCT t FROM Team t
     LEFT JOIN t.recruitingPositions rp
     LEFT JOIN rp.positions p
-    WHERE (:positionName IS NULL OR p.positionName = :positionName)
+    WHERE t.isDeleted = false
+    AND (:positionName IS NULL OR p.positionName = :positionName)
     AND (:region IS NULL OR t.teamRegion = :region)
     AND (t.teamRatingAverage IS NOT NULL AND t.teamRatingAverage >= :rating)
 """)
@@ -34,17 +36,25 @@ public interface TeamNameRepository extends JpaRepository <Team, Long> {
     SELECT DISTINCT t FROM Team t
     LEFT JOIN t.recruitingPositions rp
     LEFT JOIN rp.positions p
-    WHERE (
+    WHERE t.isDeleted = false AND (
         (:positionName IS NULL OR p.positionName = :positionName)
         AND (:region IS NULL OR t.teamRegion = :region)
     )
-    OR (:positionName IS NULL AND :region IS NULL)
 """)
     Page<Team> findWithoutRatingFilter(
             @Param("positionName") PositionName positionName,
             @Param("region") RegionType region,
             Pageable pageable
     );
+
+    boolean existsByCreatedPersonAndIsDeletedFalse(String createdPerson);
+
+    @Query("SELECT t FROM Team t WHERE t.id = :id AND t.isDeleted = false")
+    Optional<Team> findByIdNotDeleted(@Param("id") Long id);
+
+    @Query("SELECT t FROM Team t WHERE t.isDeleted = false")
+    List<Team> findAllNotDeleted();
 }
+
 
 //    research needed!!

@@ -41,8 +41,27 @@ public class MatchupRequest extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status matchupStatus = Status.PENDING;
 
+    @Column(name="request_submitted_count")
+    @Builder.Default
+    private Integer matchupRequestSubmittedCount = 1;
+
+    @Column(name="cancel_submitted_count")
+    @Builder.Default
+    private Integer matchupCancelSubmittedCount = 0;
+
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
 
+    public void update(String selfIntro, Integer participantCount) {
+        this.selfIntro = selfIntro;
+        this.participantCount = participantCount;
+    }
+
+    public void updateRequestMangementInfo(Status matchupStatus, Integer matchupRequestSubmittedCount, Integer matchupCancelSubmittedCount, Boolean isDeleted) {
+        this.matchupStatus = matchupStatus;
+        this.matchupRequestSubmittedCount = matchupRequestSubmittedCount;
+        this.matchupCancelSubmittedCount = matchupCancelSubmittedCount;
+        this.isDeleted = isDeleted;
+    }
 }

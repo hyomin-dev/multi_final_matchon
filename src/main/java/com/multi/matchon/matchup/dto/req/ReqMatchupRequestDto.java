@@ -1,6 +1,8 @@
 package com.multi.matchon.matchup.dto.req;
 
 import com.multi.matchon.common.domain.SportsTypeName;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,24 +15,34 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class ReqMatchupRequestDto {
 
+    @NotNull(message = "Matchup Board ")
     private Long boardId;
+
 
     private SportsTypeName sportsTypeName;
 
+
     private String sportsFacilityName;
+
 
     private String sportsFacilityAddress;
 
+
     private LocalDateTime matchDatetime;
+
 
     private LocalTime matchDuration;
 
+
     private Integer currentParticipantCount;
+
 
     private Integer maxParticipants;
 
+    @NotBlank
     private String selfIntro;
 
+    @NotNull
     private Integer participantCount;
 
     public ReqMatchupRequestDto(Long boardId, SportsTypeName sportsTypeName, String sportsFacilityName,  String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount,  Integer maxParticipants){

@@ -2,6 +2,7 @@ package com.multi.matchon.common.auth.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.auth.service.AuthService;
+import com.multi.matchon.common.auth.service.MailService;
 import com.multi.matchon.common.jwt.repository.RefreshTokenRepository;
 import com.multi.matchon.common.jwt.service.JwtTokenProvider;
 import com.multi.matchon.member.domain.Member;
@@ -18,10 +19,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +37,9 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+
 
 
     @PostMapping("/signup/user")
@@ -46,6 +54,13 @@ public class AuthController {
         return ResponseEntity.ok("주최자 회원가입 성공");
     }
 
+    @GetMapping("/check-email")
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
+        // 삭제되지 않은 계정 기준으로 체크
+        boolean exists = memberRepository.findByMemberEmailAndIsDeletedFalse(email).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
     // 현재 로그인 상태 확인 API (main.html 에서 fetch로 확인)
     @GetMapping("/check")
     public ResponseEntity<?> checkLogin(@AuthenticationPrincipal CustomUser user) {
@@ -53,7 +68,8 @@ public class AuthController {
             // 사용자 역할 정보도 함께 전달
             return ResponseEntity.ok(Map.of(
                     "message", "로그인됨",
-                    "role", user.getMember().getMemberRole().name()
+                    "role", user.getMember().getMemberRole().name(),
+                    "isTemporaryPassword", user.getMember().getIsTemporaryPassword()
             ));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
@@ -162,5 +178,50 @@ public class AuthController {
         }
 
         return null;
+    }
+
+    // 사용자 이메일로 임시 비밀번호 발송
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> sendTemporaryPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        Optional<Member> optional = memberRepository.findByMemberEmailAndIsDeletedFalse(email);
+
+        if (optional.isEmpty()) {
+            return ResponseEntity.badRequest().body("존재하지 않는 이메일입니다.");
+        }
+
+        String tempPassword = UUID.randomUUID().toString().substring(0, 10);
+        String encoded = passwordEncoder.encode(tempPassword);
+
+        Member member = optional.get();
+        member.updatePassword(encoded);
+        member.setIsTemporaryPassword(true); // 임시 비밀번호 표시
+        memberRepository.save(member);
+
+        mailService.sendTemporaryPassword(email, tempPassword);
+        return ResponseEntity.ok("임시 비밀번호가 이메일로 전송되었습니다.");
+    }
+
+    // 로그인 후 새 비밀번호로 변경
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @AuthenticationPrincipal CustomUser user,
+            @RequestBody Map<String, String> request) {
+
+        try {
+            String newPassword = request.get("newPassword");
+            String confirmPassword = request.get("confirmPassword");
+
+            Member member = user.getMember();
+            authService.changePassword(newPassword, confirmPassword, member);
+
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    private boolean isValidPassword(String password) {
+        return password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()]).{8,}$");
     }
 }

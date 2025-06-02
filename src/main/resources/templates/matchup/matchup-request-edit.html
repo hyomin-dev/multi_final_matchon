@@ -4,6 +4,11 @@
     <title>MATCHON</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
+    <script th:src="@{/js/matchup/matchup-request-edit.js}" defer></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-request-edit.css}">
+
     <style>
         a {
             display:block;
@@ -15,22 +20,102 @@
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
     <h1>MATCHUP 참가 요청 수정</h1>
-    <form th:action="@{/matchup/request/edit}" method="post" enctype="multipart/form-data" >
-        <button type="submit">수정하기</button>
-        <button type="button" class="cancel-btn">취소하기</button>
-    </form>
-    <a th:href="@{/matchup/request/delete}">삭제하기</a>
+    <div id="matchup-request-register-dto"
+         th:data-sports-type-name="${resMatchupRequestDto.sportsTypeName}"
+         th:data-sports-facility-name = "${resMatchupRequestDto.sportsFacilityName}"
+         th:data-sports-facility-address="${resMatchupRequestDto.sportsFacilityAddress}"
+         th:data-match-datetime="${resMatchupRequestDto.matchDatetime}"
+         th:data-match-duration="${resMatchupRequestDto.matchDuration}"
+         th:data-current-participant-count="${resMatchupRequestDto.currentParticipantCount}"
+         th:data-max-participants="${resMatchupRequestDto.maxParticipants}"
+         th:data-participant-count="${resMatchupRequestDto.participantCount}"
+         th:data-matchup-status="${resMatchupRequestDto.matchupStatus}"
+         th:data-matchup-request-submitted-count="${resMatchupRequestDto.matchupRequestSubmittedCount}"
+         th:data-matchup-cancel-submitted-count="${resMatchupRequestDto.matchupCancelSubmittedCount}"
+         th:data-is-deleted="${resMatchupRequestDto.isDeleted}"
+    >
+    </div>
+    <table>
+        <tr>
+            <th>종목 </th>
+            <td th:text="${resMatchupRequestDto.sportsTypeName}"></td>
+        </tr>
+        <tr>
+            <th>경기장명</th>
+            <td th:text="${resMatchupRequestDto.sportsFacilityName}"></td>
+        </tr>
+        <tr>
+            <th>경기장 주소</th>
+            <td th:text="${resMatchupRequestDto.sportsFacilityAddress}"></td>
+        </tr>
+        <tr>
+            <th>경기장 위치</th>
+            <td>
+                <div id="map" style="width:100%;height:350px;"></div>
+            </td>
+        </tr>
+        <tr>
+            <th>경기 날짜</th>
+            <td id="match-date"></td>
+        </tr>
+        <tr>
+            <th>현재 정원</th>
+            <td th:text="${'('+ resMatchupRequestDto.currentParticipantCount + ' / '+resMatchupRequestDto.maxParticipants + ')'}"></td>
+        </tr>
+        <tr>
+            <th>요청 상태</th>
+            <td th:text="${resMatchupRequestDto.matchupStatus}" th:id="status"></td>
+        </tr>
+        <tr>
+            <th>참가 요청 횟수(최대 2번)</th>
+            <td th:text="${resMatchupRequestDto.matchupRequestSubmittedCount}"></td>
+        </tr>
+        <tr>
+            <th>승인 취소 요청 횟수(최대 1번)</th>
+            <td th:text="${resMatchupRequestDto.matchupCancelSubmittedCount}"></td>
+        </tr>
+    </table>
 
+    <form th:object="${resMatchupRequestDto}" th:action="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}" method="post" >
+        <input type="hidden" th:field="*{requestId}">
+        <input type="hidden" th:field="*{matchDatetime}">
+<!--        <label>-->
+<!--            소개:-->
+<!--            <textarea cols="30" rows="5" placeholder="자기 소개를 입력하세요." th:text="*{selfIntro}" th:field="*{selfIntro}" required>-->
+<!--                </textarea>-->
+<!--        </label>-->
+<!--        <label>-->
+<!--            참가 인원:-->
+<!--            <select size="5"  th:field="*{participantCount}" required></select>-->
+<!--        </label>-->
+<!--        <div class="button-row">-->
+<!--            <button type="submit" class="modify-btn">수정하기</button>-->
+<!--            <button type="button" class="delete-btn">취소하기</button>-->
+<!--        </div>-->
+        <table>
+            <tr>
+                <th>소개</th>
+                <td>
+                 <textarea placeholder="자기 소개를 입력하세요."
+                    th:text="*{selfIntro}" th:field="*{selfIntro}" required maxlength="300"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th>참가 인원</th>
+                <td>
+                    <select th:field="*{participantCount}" required></select>
+                </td>
+            </tr>
+        </table>
+        <div class="button-row">
+            <button type="submit" class="modify-btn">수정하기</button>
+            <button type="button" class="delete-btn">취소하기</button>
+        </div>
+
+    </form>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
-<script>
-    document.addEventListener("DOMContentLoaded",()=>{
-        const cancelBtn = document.querySelector(".cancel-btn");
-        cancelBtn.addEventListener("click",()=>{
-            window.history.back();
-        })
-    })
-</script>
+
 </body>
 </html>

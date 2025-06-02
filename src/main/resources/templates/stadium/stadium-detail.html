@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- 구장 상세보기 -->
+    <!-- 구장 이름을 누르면 맞는 상세보기로 이동함.-->
+    <title>STADIUM</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <style>
+        .stadiumdetail {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+
+    <h1 class="stadiumdetail">구장 상세보기</h1>
+
+    <div class="stadium-info-detail">
+        <img th:src="${stadium.fullImageUrl}" alt="구장 이미지" width="300">
+
+        <p><span th:text="${stadium.stadiumRegion}">지역명</span></p>
+        <p><span th:text="${stadium.stadiumAddress}">주소</span></p>
+        <p><span th:text="${stadium.stadiumTel}">전화번호</span></p>
+        <a th:href="@{/stadium/map(id=${stadium.id})}">구장 위치</a>
+    </div>
+
+</div>
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

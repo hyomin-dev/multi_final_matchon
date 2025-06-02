@@ -21,9 +21,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import java.time.Duration;
 
@@ -44,7 +41,7 @@ public class AwsS3Utils {
 
         // String replaceFileName = fileName + "." + FilenameUtils.getExtension(multipartFile.getResource().getFilename());
 
-        String s3Key = dirName + fileName;
+        String s3Key = dirName + fileName + "." + FilenameUtils.getExtension(multipartFile.getOriginalFilename());;
 
         System.out.println("======>    "+s3Key);
         try (InputStream inputStream = multipartFile.getInputStream()) {
@@ -73,8 +70,8 @@ public class AwsS3Utils {
 
 
     public S3Resource downloadFile(String dirName, String savedName) throws IOException {
-        String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
-        S3Resource resource =  s3Operations.download(bucket,dirName+savedNameOnly);
+        //String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+        S3Resource resource =  s3Operations.download(bucket,dirName+savedName);
 
 //       ByteArrayOutputStream outputStream = (ByteArrayOutputStream) resource.getOutputStream();
 //       byte[] data = outputStream.toByteArray();
@@ -101,14 +98,14 @@ public class AwsS3Utils {
     /* Create a pre-signed URL to download an object in a subsequent GET request. */
     public String createPresignedGetUrl(String dirName, String savedName) {
 
-        String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+        // String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
 
 
         try (S3Presigner presigner = S3Presigner.create()) {
 
             GetObjectRequest objectRequest = GetObjectRequest.builder()
                     .bucket(bucket)
-                    .key(dirName+savedNameOnly)
+                    .key(dirName+savedName)
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -141,6 +138,21 @@ public class AwsS3Utils {
             return false;
         }
     }
+
+    public String getObjectUrl(String dir, String filename, MultipartFile file) {
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        return "https://" + bucket + ".s3.amazonaws.com/" + dir + filename + "." + extension;
+    }
+
+    /**
+     * 저장 경로 전체를 인자로 받아 다운로드 (예: "community/파일명.ext")
+     */
+    public S3Resource downloadFileWithFullName(String fullPath) throws IOException {
+        return s3Operations.download(bucket, fullPath);
+    }
+
+
+
 
 
 
