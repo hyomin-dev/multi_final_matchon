@@ -6,6 +6,7 @@ import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.team.dto.req.ReqReviewDto;
 import com.multi.matchon.team.dto.req.ReqTeamDto;
 import com.multi.matchon.team.dto.req.ReqTeamJoinDto;
+import com.multi.matchon.team.dto.res.ResJoinRequestDetailDto;
 import com.multi.matchon.team.dto.res.ResJoinRequestDto;
 import com.multi.matchon.team.dto.res.ResReviewDto;
 import com.multi.matchon.team.dto.res.ResTeamDto;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -272,6 +274,31 @@ public class TeamController {
     public ResponseEntity<ApiResponse<?>> deleteResponse(@PathVariable Long responseId, @AuthenticationPrincipal CustomUser user) {
         teamService.deleteResponse(responseId, user);
         return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+
+
+    @GetMapping("/team/{teamId}/join-request/{requestId}")
+
+    public ModelAndView viewJoinRequestDetail(@PathVariable Long requestId,
+                                              @AuthenticationPrincipal CustomUser user) {
+        ModelAndView mv = new ModelAndView("team/join-request-detail");
+
+        ResJoinRequestDetailDto joinRequestDto = teamService.getJoinRequestDetail(requestId, user);
+        mv.addObject("joinRequest", joinRequestDto);
+
+        return mv;
+    }
+
+
+    @GetMapping("/team/my-team-info")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<ResTeamDto>> getMyTeamInfo(@AuthenticationPrincipal CustomUser user) {
+        ResTeamDto myTeam = teamService.findMyTeam(user);
+        if (myTeam == null) {
+            return ResponseEntity.ok(ApiResponse.ok(null));
+        }
+        return ResponseEntity.ok(ApiResponse.ok(myTeam));
     }
 
 }

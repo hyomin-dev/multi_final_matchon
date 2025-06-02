@@ -58,11 +58,15 @@ public class ReportService {
     /**
      * 페이징된 신고 목록 조회
      */
-    public Page<ReportResponse> getReportsPaged(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
-        return reportRepository.findAll(pageable)
-                .map(this::convertToResponse);
+    public Page<Report> findAll(Pageable pageable) {
+        return reportRepository.findAll(pageable);
     }
+
+    public Page<ReportResponse> getPagedReports(Pageable pageable) {
+        Page<Report> reportPage = reportRepository.findAll(pageable);
+        return reportPage.map(this::convertToResponse);
+    }
+
 
     /**
      * Report → ReportResponse 변환

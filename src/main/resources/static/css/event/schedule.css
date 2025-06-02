@@ -31,14 +31,39 @@ html, body {
 }
 .register-btn {
     display: inline-block;
-    padding: 6px 16px;
-    background-color: #4285f4;
-    color: white;
-    border: none;
+    width: 70px;
+    height: 38px;
+    line-height: 1.2;
+    padding: 8px 0;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: bold;
+    background-color: white;
+    border: 2px solid;
+    transition: all 0.2s ease;
+    text-align: center;
+    box-sizing: border-box;
 }
+
+
+.my-btn {
+    border-color: #DB778D;
+    color: #DB778D;
+}
+.my-btn:hover {
+    background-color: #ffe4ec;
+}
+
+
+.register-event-btn {
+    border-color: #255E93;
+    color: #255E93;
+}
+.register-event-btn:hover {
+    background-color: #e0ecff;
+}
+
 .calendar-wrapper {
     position: relative;
     display: flex;

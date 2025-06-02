@@ -88,9 +88,9 @@
 }
 
 .pagination a.active {
-    background-color: #3498db;
+    background-color: dodgerblue;
     color: white;
-    border-color: #3498db;
+    border-color: dodgerblue;
 }
 
 .pagination a:hover {
@@ -114,3 +114,30 @@
     color: #1c7ed6;
     text-decoration: underline;
 }
+
+/* 고정글(공지글) 강조 행 스타일 */
+.pinned-row {
+    background-color: lavenderblush;
+    font-weight: bold;
+}
+
+.pinned-row td {
+    background-color: lavenderblush;
+}
+
+/* 공지 표시 셀 스타일 */
+table.board-table .notice-cell { color: red; }
+
+/* 📌 아이콘 스타일 */
+.pinned-icon {
+    color: red;
+    margin-right: 4px;
+}
+
+.comment-count {
+    margin-left: 4px;
+    color: mediumseagreen;
+    font-size: 0.9em;
+}
+
+

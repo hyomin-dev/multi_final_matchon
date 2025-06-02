@@ -202,8 +202,9 @@
             <td>
                 <a th:href="@{/faq/detail/{id}(id=${faq.faqId})}" th:text="${faq.faqTitle}">제목</a>
             </td>
-            <td th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd')}">작성일</td>
+            <td th:if="${!isAdmin}" th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd')}">작성일</td>
             <td th:if="${isAdmin}" th:text="${#temporals.format(faq.modifiedDate, 'yyyy-MM-dd HH:mm')}">수정일</td>
+            <td th:if="${isAdmin}" th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</td>
             <td th:if="${isAdmin}">
                 <form th:action="@{/faq/delete/{id}(id=${faq.faqId})}" method="post">
                     <button type="submit" class="delete">&times;</button>
