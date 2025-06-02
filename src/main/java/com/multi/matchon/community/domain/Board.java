@@ -44,19 +44,38 @@ public class Board extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted = false;
 
+    @Column(name = "pinned", nullable = false)
+    @Builder.Default
+    private boolean pinned = false;
+
+    // === 비즈니스 로직 ===
+
     public void setIsDeleted(boolean deleted) {
         this.isDeleted = deleted;
     }
 
-    public void update(String title, String content, Category category) {
+    public void update(
+            @NotBlank @Size(max = 50) String title,
+            @NotBlank String content,
+            @NotNull Category category) {
         this.title = title;
         this.content = content;
         this.category = category;
     }
 
-    public void update(@NotBlank(message = "제목은 필수입니다.") @Size(max = 50, message = "제목은 50자 이하로 입력해주세요.") String title, @NotBlank(message = "내용은 필수입니다.") String content, @NotNull(message = "카테고리를 선택해주세요.") Category category, Object o, Object o1) {
+    public void setBoardAttachmentEnabled(boolean enabled) {
+        this.boardAttachmentEnabled = enabled;
     }
 
-    public void setBoardAttachmentEnabled(boolean b) {
+    public void pin() {
+        this.pinned = true;
+    }
+
+    public void unpin() {
+        this.pinned = false;
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
     }
 }

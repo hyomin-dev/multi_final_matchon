@@ -65,7 +65,6 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
-
     // 임시비밀번호용
     @Column(name = "is_temporary_password", nullable = false)
     @Builder.Default

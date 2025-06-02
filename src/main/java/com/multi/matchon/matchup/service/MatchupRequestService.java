@@ -1,6 +1,7 @@
 package com.multi.matchon.matchup.service;
 
 
+import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.domain.Status;
@@ -11,6 +12,7 @@ import com.multi.matchon.common.exception.custom.MatchupRequestLimitExceededExce
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
+import com.multi.matchon.matchup.dto.req.ReqMatchupRequestEditDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestOverviewListDto;
@@ -22,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +40,8 @@ public class MatchupRequestService {
     private final MatchupBoardRepository matchupBoardRepository;
     private final MatchupRequestRepository matchupRequestRepository;
     private final MemberRepository memberRepository;
-
+    private final ChatService chatService;
+    private final SimpMessageSendingOperations messageTemplate;
 
     // 등록
 
@@ -93,7 +97,7 @@ public class MatchupRequestService {
         if(findMatchupRequestOptional.isEmpty()){
             MatchupRequest newMatchupRequest = MatchupRequest.builder()
                     .matchupBoard(findMatchupBoard)
-                    .member(user.getMember())
+                    .member(user.getMember()) //applicant
                     .selfIntro(reqMatchupRequestDto.getSelfIntro())
                     .participantCount(reqMatchupRequestDto.getParticipantCount())
                     .matchupStatus(Status.PENDING)
@@ -111,7 +115,7 @@ public class MatchupRequestService {
 //                findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false); // 재요청 3번 상황
 //            }
 //            else{
-                throw new CustomException("Matchup"+"요청 이력이 있어 현재 참가 요청을 할 수 없습니다.");
+                throw new CustomException("Matchup 요청 이력이 있어 현재 참가 요청을 할 수 없습니다.");
 //            }
         }
     }
@@ -119,7 +123,7 @@ public class MatchupRequestService {
     // 조회
 
     @Transactional(readOnly = true)
-    public PageResponseDto<ResMatchupRequestListDto> findAllMyMatchupRequestWithPaging(PageRequest pageRequest, CustomUser user, String sportsType, String date) {
+    public PageResponseDto<ResMatchupRequestListDto> findAllMyMatchupRequestWithPaging(PageRequest pageRequest, CustomUser user, String sportsType, String date, Boolean availableFilter) {
 
         SportsTypeName sportsTypeName;
         if(sportsType.isBlank())
@@ -132,7 +136,7 @@ public class MatchupRequestService {
             matchDate = LocalDate.parse(date);
 
 
-        Page<ResMatchupRequestListDto> page = matchupRequestRepository.findAllResMatchupRequestListDtosByMemberIdAndSportsTypeAndMatchDateWithPaging(pageRequest,user.getMember().getId(), sportsTypeName, matchDate);
+        Page<ResMatchupRequestListDto> page = matchupRequestRepository.findAllResMatchupRequestListDtosByMemberIdAndSportsTypeAndMatchDateWithPaging(pageRequest,user.getMember().getId(), sportsTypeName, matchDate, availableFilter);
 
         return PageResponseDto.<ResMatchupRequestListDto>builder()
                 .items(page.getContent())
@@ -188,21 +192,23 @@ public class MatchupRequestService {
 
 
     //수정하기 조회용, 상태 체크를 해야됨
-
     @Transactional(readOnly = true)
     public ResMatchupRequestDto findResMatchRequestDtoByRequestIdAndModifyStatus(Long requestId) {
 
         ResMatchupRequestDto resMatchupRequestDto = matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException("Matchup"+requestId+"번 요청은 없습니다."));
 
+        // 0. 모집된 인원이 총 모집 인원보다 크거나 같은 경우 예외 발생
+        if(resMatchupRequestDto.getCurrentParticipantCount()>=resMatchupRequestDto.getMaxParticipants()){
+            throw new CustomException("Matchup 현재 정원이 가득 찼습니다. 수정이 불가능합니다.");
+        }
+
         // 1. 경기 시작 시간이 지났는지 체크
 
         if(resMatchupRequestDto.getMatchDatetime().isBefore(LocalDateTime.now())){
             throw new CustomException("Matchup 경기 시작 시간이 지나 수정할 수 없습니다.");
-
         }
 
         // 2. 수정가능한 상태인지 체크
-
         if(
                 (resMatchupRequestDto.getMatchupStatus()==Status.PENDING && resMatchupRequestDto.getMatchupRequestSubmittedCount()==1 && resMatchupRequestDto.getMatchupCancelSubmittedCount()==0 && !resMatchupRequestDto.getIsDeleted()) ||
                 (resMatchupRequestDto.getMatchupStatus()==Status.PENDING && resMatchupRequestDto.getMatchupRequestSubmittedCount()==2 && resMatchupRequestDto.getMatchupCancelSubmittedCount()==0 && !resMatchupRequestDto.getIsDeleted())
@@ -217,12 +223,12 @@ public class MatchupRequestService {
 
     // 수정
     @Transactional
-    public void updateMatchupRequest(ResMatchupRequestDto resMatchupRequestDto, Long requestId){
+    public void updateMatchupRequest(ReqMatchupRequestEditDto reqMatchupRequestEditDto, Long requestId){
         MatchupRequest findMatchupRequest = matchupRequestRepository.findById(requestId).orElseThrow(()->new IllegalArgumentException("Matchup"+requestId+"번 요청은 없습니다."));
 
         // 1. 경기 시작 시간이 지났는지 체크
 
-        if(resMatchupRequestDto.getMatchDatetime().isBefore(LocalDateTime.now())){
+        if(reqMatchupRequestEditDto.getMatchDatetime().isBefore(LocalDateTime.now())){
             throw new CustomException("Matchup 경기 시작 시간이 지나 수정할 수 없습니다.");
         }
 
@@ -231,23 +237,23 @@ public class MatchupRequestService {
                 (findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted())||
                 (findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==2 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted())
         ){
-                findMatchupRequest.update(resMatchupRequestDto.getSelfIntro(), resMatchupRequestDto.getParticipantCount());
+                findMatchupRequest.update(reqMatchupRequestEditDto.getSelfIntro(), reqMatchupRequestEditDto.getParticipantCount());
         }
         // 재요청인 경우: 상태 업데이트 해야됨
         else if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && findMatchupRequest.getIsDeleted()){
 
                 findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false);
-                findMatchupRequest.update(resMatchupRequestDto.getSelfIntro(), resMatchupRequestDto.getParticipantCount());
+                findMatchupRequest.update(reqMatchupRequestEditDto.getSelfIntro(), reqMatchupRequestEditDto.getParticipantCount());
 
         }else if(findMatchupRequest.getMatchupStatus()==Status.DENIED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
 
                 findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false);
-                findMatchupRequest.update(resMatchupRequestDto.getSelfIntro(), resMatchupRequestDto.getParticipantCount());
+                findMatchupRequest.update(reqMatchupRequestEditDto.getSelfIntro(), reqMatchupRequestEditDto.getParticipantCount());
 
         }else if(findMatchupRequest.getMatchupStatus()==Status.DENIED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && findMatchupRequest.getIsDeleted()){
 
                 findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false);
-                findMatchupRequest.update(resMatchupRequestDto.getSelfIntro(), resMatchupRequestDto.getParticipantCount());
+                findMatchupRequest.update(reqMatchupRequestEditDto.getSelfIntro(), reqMatchupRequestEditDto.getParticipantCount());
         }
         else{
             throw new CustomException("Matchup 수정하기 또는 재요청이 불가능합니다. 요청 이력을 참고해주세요.");
@@ -256,7 +262,7 @@ public class MatchupRequestService {
 
 
 
-    // 참가 취소 요청
+    // 참가 취소
     @Transactional
     public void cancelMatchupRequestBeforeApproval(Long boardId, Long requestId, CustomUser user) {
         MatchupRequest findMatchupRequest = matchupRequestRepository.findMatchupRequestWithMatchupBoardByRequestIdAndBoardIDAndApplicantId(requestId, boardId, user.getMember().getId()).orElseThrow(()->new CustomException("Matchup 요청을 찾을 수 없습니다."));
@@ -268,17 +274,45 @@ public class MatchupRequestService {
 
         //상태
         if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount() ==0 && !findMatchupRequest.getIsDeleted()){
-            findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 1, 0, true);
-        }else if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==2 && findMatchupRequest.getMatchupCancelSubmittedCount() ==0 && !findMatchupRequest.getIsDeleted()){
-            findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, true);
-        }else if(findMatchupRequest.getMatchupStatus()==Status.DENIED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount() ==0 && !findMatchupRequest.getIsDeleted()){
-            findMatchupRequest.updateRequestMangementInfo(Status.DENIED, 1, 0, true);
-        }else{
-            throw new CustomException("Matchup 참가 요청 삭제가 불가능합니다. 이력을 참고해주세요.");
+
+            findMatchupRequest.updateRequestMangementInfo(Status.PENDING, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), !findMatchupRequest.getIsDeleted());
+
+        } else if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==2 && findMatchupRequest.getMatchupCancelSubmittedCount() ==0 && !findMatchupRequest.getIsDeleted()){
+
+            findMatchupRequest.updateRequestMangementInfo(Status.PENDING, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), !findMatchupRequest.getIsDeleted());
+
+        } else{
+            throw new CustomException("Matchup 참가 요청 취소가 불가능합니다. 이력을 참고해주세요.");
+        }
+    }
+
+    // 재요청
+    @Transactional
+    public ResMatchupRequestDto retryMatchupRequest(Long boardId, Long requestId, CustomUser user) {
+
+        MatchupRequest findMatchupRequest = matchupRequestRepository.findMatchupRequestWithMatchupBoardByRequestIdAndBoardIDAndApplicantId(requestId, boardId, user.getMember().getId()).orElseThrow(()->new CustomException("Matchup 요청을 찾을 수 없습니다."));
+
+        //날짜
+        if(findMatchupRequest.getMatchupBoard().getMatchDatetime().isBefore(LocalDateTime.now())){
+            throw new CustomException("Matchup 경기 시작 시간이 지나 재요청할 수 없습니다.");
         }
 
+        if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && findMatchupRequest.getIsDeleted()){
 
+            findMatchupRequest.updateRequestMangementInfo(Status.PENDING, findMatchupRequest.getMatchupRequestSubmittedCount()+1, findMatchupRequest.getMatchupCancelSubmittedCount(), !findMatchupRequest.getIsDeleted());
+
+        }else if(findMatchupRequest.getMatchupStatus()==Status.DENIED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
+
+            findMatchupRequest.updateRequestMangementInfo(Status.PENDING, findMatchupRequest.getMatchupRequestSubmittedCount()+1, findMatchupRequest.getMatchupCancelSubmittedCount(), findMatchupRequest.getIsDeleted());
+
+        }else{
+            throw new CustomException("Matchup 현재 재요청이 불가능합니다. 요청 이력을 확인해주세요.");
+        }
+
+        return matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException("Matchup"+requestId+"번 요청은 없습니다."));
     }
+
+
 
     // 승인 취소 요청
     @Transactional
@@ -292,14 +326,16 @@ public class MatchupRequestService {
 
         //상태
         if(findMatchupRequest.getMatchupStatus()==Status.APPROVED && findMatchupRequest.getMatchupRequestSubmittedCount()==2 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
-            findMatchupRequest.updateRequestMangementInfo(Status.CANCELREQUESTED, 2, 1, false);
+
+            findMatchupRequest.updateRequestMangementInfo(Status.CANCELREQUESTED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount()+1, findMatchupRequest.getIsDeleted());
+
         }else if(findMatchupRequest.getMatchupStatus()==Status.APPROVED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
-            findMatchupRequest.updateRequestMangementInfo(Status.CANCELREQUESTED, 1, 1, false);
+
+            findMatchupRequest.updateRequestMangementInfo(Status.CANCELREQUESTED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount()+1, findMatchupRequest.getIsDeleted());
+
         }else{
             throw new CustomException("Matchup 승인 취소 요청이 불가능합니다. 이력을 참고해주세요.");
         }
-
-
 
     }
 
@@ -315,37 +351,64 @@ public class MatchupRequestService {
 
         // 참가 요청 승인: 상태 확인 → 인원 수 체크 → 업데이트
 
+        // 재요청에 대한 승인
         if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==2 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
 
 
             if(findMatchupRequest.getMatchupBoard().getCurrentParticipantCount()+findMatchupRequest.getParticipantCount()>findMatchupRequest.getMatchupBoard().getMaxParticipants()){
+
                 throw new CustomException("Matchup 모집 인원이 초과됩니다.");
             }else{
-                findMatchupRequest.updateRequestMangementInfo(Status.APPROVED, 2, 0, false);
+
+                findMatchupRequest.updateRequestMangementInfo(Status.APPROVED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), findMatchupRequest.getIsDeleted());
+
                 findMatchupRequest.getMatchupBoard().increaseCurrentParticipantCount(findMatchupRequest.getParticipantCount());
+
+                chatService.addParticipantToGroupChat(findMatchupRequest.getMatchupBoard().getChatRoom(), findMatchupRequest.getMember());
+
+
             }
 
-
+        //최초 요청에 대한 승인
         }else if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
 
             if(findMatchupRequest.getMatchupBoard().getCurrentParticipantCount()+findMatchupRequest.getParticipantCount()>findMatchupRequest.getMatchupBoard().getMaxParticipants()){
                 throw new CustomException("Matchup 모집 인원이 초과됩니다.");
+
             }else{
-                findMatchupRequest.updateRequestMangementInfo(Status.APPROVED, 1, 0, false);
+                findMatchupRequest.updateRequestMangementInfo(Status.APPROVED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), findMatchupRequest.getIsDeleted());
+
                 findMatchupRequest.getMatchupBoard().increaseCurrentParticipantCount(findMatchupRequest.getParticipantCount());
+
+                chatService.addParticipantToGroupChat(findMatchupRequest.getMatchupBoard().getChatRoom(), findMatchupRequest.getMember());
+
             }
         }
 
         // 승인 취소 요청에 대한 승인: 승인 상태 확인 → 인원 수 체크 → 업데이트
+
+        // 재요청 → 승인 → 승인 취소 요청 → 승인
         else if(findMatchupRequest.getMatchupStatus()==Status.CANCELREQUESTED && findMatchupRequest.getMatchupRequestSubmittedCount()==2 && findMatchupRequest.getMatchupCancelSubmittedCount()==1 && !findMatchupRequest.getIsDeleted()){
 
-                findMatchupRequest.updateRequestMangementInfo(Status.CANCELREQUESTED, 2, 1, true);
+                findMatchupRequest.updateRequestMangementInfo(Status.CANCELREQUESTED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), !findMatchupRequest.getIsDeleted());
+
                 findMatchupRequest.getMatchupBoard().decreaseCurrentParticipantCount(findMatchupRequest.getParticipantCount());
 
+                chatService.removeParticipantToGroupChat(findMatchupRequest.getMatchupBoard().getChatRoom(), findMatchupRequest.getMember());
+
+                messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+
+        // 최초 요청 → 승인 → 승인 취소 요청 → 승인
         } else if(findMatchupRequest.getMatchupStatus()==Status.CANCELREQUESTED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==1 && !findMatchupRequest.getIsDeleted()){
 
-            findMatchupRequest.updateRequestMangementInfo(Status.CANCELREQUESTED, 1, 1, true);
+            findMatchupRequest.updateRequestMangementInfo(Status.CANCELREQUESTED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), !findMatchupRequest.getIsDeleted());
+
             findMatchupRequest.getMatchupBoard().decreaseCurrentParticipantCount(findMatchupRequest.getParticipantCount());
+
+            chatService.removeParticipantToGroupChat(findMatchupRequest.getMatchupBoard().getChatRoom(), findMatchupRequest.getMember());
+
+            messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+
         } else{
             throw new CustomException("Matchup 현재 승인이 불가능합니다. 요청 목록을 참고해주세요.");
         }
@@ -366,55 +429,35 @@ public class MatchupRequestService {
 
         // 참가 요청 반려: 상태 확인 → 업데이트
 
+        // 재요청에 대한 반려
         if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==2 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
 
-            findMatchupRequest.updateRequestMangementInfo(Status.DENIED, 2, 0, false);
+            findMatchupRequest.updateRequestMangementInfo(Status.DENIED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), findMatchupRequest.getIsDeleted());
 
+        // 최초 요청에 대한 반려
         }else if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
 
-            findMatchupRequest.updateRequestMangementInfo(Status.DENIED, 1, 0, false);
+            findMatchupRequest.updateRequestMangementInfo(Status.DENIED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), findMatchupRequest.getIsDeleted());
 
         }
 
         // 승인 취소 요청에 대한 반려: 승인 상태 확인 →  업데이트
+
+        // 재요청 → 승인 → 승인 취소 요청 → 반려
         else if(findMatchupRequest.getMatchupStatus()==Status.CANCELREQUESTED && findMatchupRequest.getMatchupRequestSubmittedCount()==2 && findMatchupRequest.getMatchupCancelSubmittedCount()==1 && !findMatchupRequest.getIsDeleted()){
 
-            findMatchupRequest.updateRequestMangementInfo(Status.APPROVED, 2, 1, false);
+            findMatchupRequest.updateRequestMangementInfo(Status.APPROVED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), findMatchupRequest.getIsDeleted());
 
+
+        // 최초 요청 → 승인 → 승인 취소 요청 → 반려
         } else if(findMatchupRequest.getMatchupStatus()==Status.CANCELREQUESTED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==1 && !findMatchupRequest.getIsDeleted()){
 
-            findMatchupRequest.updateRequestMangementInfo(Status.APPROVED, 1, 1, false);
+            findMatchupRequest.updateRequestMangementInfo(Status.APPROVED, findMatchupRequest.getMatchupRequestSubmittedCount(), findMatchupRequest.getMatchupCancelSubmittedCount(), findMatchupRequest.getIsDeleted());
 
         } else{
             throw new CustomException("Matchup 현재 반려가 불가능합니다. 요청 목록을 참고해주세요.");
 
         }
-
     }
-
-    @Transactional
-    public ResMatchupRequestDto retryMatchupRequest(Long boardId, Long requestId, CustomUser user) {
-
-        MatchupRequest findMatchupRequest = matchupRequestRepository.findMatchupRequestWithMatchupBoardByRequestIdAndBoardIDAndApplicantId(requestId, boardId, user.getMember().getId()).orElseThrow(()->new CustomException("Matchup 요청을 찾을 수 없습니다."));
-
-        //날짜
-        if(findMatchupRequest.getMatchupBoard().getMatchDatetime().isBefore(LocalDateTime.now())){
-            throw new CustomException("Matchup 경기 시작 시간이 지나 반려할 수 없습니다.");
-        }
-
-        if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && findMatchupRequest.getIsDeleted()){
-            findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false);
-        }else if(findMatchupRequest.getMatchupStatus()==Status.DENIED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
-            findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false);
-        }else if(findMatchupRequest.getMatchupStatus()==Status.DENIED && findMatchupRequest.getMatchupRequestSubmittedCount()==1&&findMatchupRequest.getMatchupCancelSubmittedCount()==0&& findMatchupRequest.getIsDeleted()){
-            findMatchupRequest.updateRequestMangementInfo(Status.PENDING, 2, 0, false);
-        }else{
-            throw new CustomException("Matchup 현재 재요청이 불가능합니다. 내 요청을 확인해주세요.");
-        }
-
-        return matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException("Matchup"+requestId+"번 요청은 없습니다."));
-    }
-
     // 삭제
-
 }

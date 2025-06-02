@@ -88,25 +88,66 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    align-items: center;      /* 버튼 가운데 정렬 */
-    justify-content: center;  /* 부모 영역 내에서 수직 가운데 정렬 */
-    height: 100%;             /* 부모 높이 기준으로 정렬하려면 필요 */
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 }
 
-.detail-button {
+/* 버튼 공통 스타일 */
+.board-button,
+.request-button,
+.group-chat,
+.group-chat.disabled {
     display: inline-block;
-    padding: 8px 14px;
+    width: 160px;
+    height: 44px;
+    line-height: 44px;
+    padding: 0 16px;
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+/* 게시글 버튼 */
+.board-button {
     background-color: #004080;
     color: white;
-    border-radius: 6px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: opacity 0.2s;
+}
+.board-button:hover {
+    background-color: #003060;
 }
 
-.detail-button:hover {
-    opacity: 0.9;
+/* 요청 버튼 */
+.request-button {
+    background-color: #007a00;
+    color: white;
 }
+.request-button:hover {
+    background-color: #005a00;
+}
+
+/* 단체 채팅 버튼 (활성 상태용) */
+.group-chat {
+    background-color: #007bff;
+    color: white;
+}
+.group-chat:hover {
+    background-color: #0056b3;
+}
+
+/* 단체 채팅 비활성화 */
+.group-chat.disabled {
+    background-color: #dddddd !important;
+    color: #aaaaaa !important;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
 
 
 /* 페이징 */

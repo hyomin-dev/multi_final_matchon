@@ -1,6 +1,10 @@
 package com.multi.matchon.common.exception;
 
+
+import com.multi.matchon.chat.exception.custom.NotChatParticipantException;
 import com.multi.matchon.common.dto.res.ApiResponse;
+import com.multi.matchon.common.exception.custom.ApiCustomException;
+
 import com.multi.matchon.common.exception.custom.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -41,8 +45,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<Map<String, String>> CustomException(CustomException ex) {
+
+    @ExceptionHandler(ApiCustomException.class)
+    public ResponseEntity<Map<String, String>> ApiCustomException(ApiCustomException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        log.info("{}",ex.getMessage());
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(NotChatParticipantException.class)
+    public ResponseEntity<Map<String, String>> NotChatParticipantException(NotChatParticipantException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         log.info("{}",ex.getMessage());

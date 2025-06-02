@@ -36,6 +36,10 @@ public class BoardService {
         return boardRepository.findByCategory(category, pageable);
     }
 
+    public List<Board> findPinnedByCategory(Category category) {
+        return boardRepository.findByCategoryAndPinnedTrueOrderByCreatedDateDesc(category);
+    }
+
     public Board findById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));

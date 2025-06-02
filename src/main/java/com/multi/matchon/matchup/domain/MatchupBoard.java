@@ -1,6 +1,7 @@
 package com.multi.matchon.matchup.domain;
 
 
+import com.multi.matchon.chat.domain.ChatRoom;
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.common.domain.SportsType;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
@@ -30,7 +31,7 @@ public class MatchupBoard extends BaseEntity {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="writer_id",nullable = false)
-    private Member member;
+    private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="sports_type_id",nullable = false)
@@ -65,6 +66,14 @@ public class MatchupBoard extends BaseEntity {
 
     @Column(name="match_description",nullable = false, columnDefinition = "TEXT")
     private String matchDescription;
+
+    @OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="chat_room_id",nullable = false)
+    private ChatRoom chatRoom;
+
+    @Column(name="is_rating_initialized")
+    @Builder.Default
+    private Boolean isRatingInitialized = false;
 
     @Column(name="is_deleted")
     @Builder.Default

@@ -151,8 +151,7 @@ function manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupC
     // 2. 참가 요청 삭제
     else if(
         (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
-        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
-        (matchupStatus===Status.DENIED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true)
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true)
     ){
         statusEle.textContent =  "요청 취소됨";
     }
@@ -298,9 +297,9 @@ function setDecision(matchupStatus, matchupRequestSubmittedCount, matchupCancelS
 
         //취소 반려 가능
 
-
-
     }else{
+        // 예측하지 못한 오류 발생한 경우
+
         // 참가 승인 불가능
         approvedBtn.classList.add("disabled");
         approvedBtn.href = "#";
@@ -330,7 +329,6 @@ function setDecision(matchupStatus, matchupRequestSubmittedCount, matchupCancelS
         // 취소 승인 가능
 
         // 취소 반려 가능
-
 
     }
 
@@ -394,36 +392,53 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
     ){
         // 수정하기 가능
         // 요청 취소 가능
+
         //재 요청 불가능
         retryBtn.classList.add("disabled");
+        retryBtn.href = "#";
+
         //승인 취소 요청 불가능
         withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
     }
     // 2.1 참가 요청 취소- 재요청 가능
     else if(
-        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
-        (matchupStatus===Status.DENIED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true)
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true)
 
     ){
         // 수정하기 불가능
         modifyBtn.classList.add("disabled");
+        modifyBtn.href= "#";
+
         // 요청 취소 불가능
         cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+
         //재 요청 가능
 
         //승인 취소 요청 불가능
         withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
     }
     // 2.2 참가 요청 취소- 재요청 불가능
     else if( (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true)){
+
         // 수정하기 불가능
         modifyBtn.classList.add("disabled");
+        modifyBtn.href = "#";
+
         // 요청 취소 불가능
         cancelBtn.classList.add("disabled");
+        cancelBtn.href = "#";
+
         //재 요청 가능
         retryBtn.classList.add("disabled");
+        retryBtn.href = "#";
+
         //승인 취소 요청 불가능
         withdrawBtn.classList.add("disabled");
+        withdrawBtn.href = "#";
+
     }
     // 3. 참가 요청 승인
     else if(
@@ -433,12 +448,15 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
         // 수정하기 불가능
         modifyBtn.classList.add("disabled");
         modifyBtn.href = "#";
+
         // 요청 취소 불가능
         cancelBtn.classList.add("disabled");
         cancelBtn.href = "#";
+
         //재 요청 불가능
         retryBtn.classList.add("disabled");
         retryBtn.href = "#";
+
         //승인 취소 요청 가능
     }
     // 4.1 참가 요청 반려- 재요청가능
@@ -464,12 +482,15 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
         // 수정하기 불가능
         modifyBtn.classList.add("disabled");
         modifyBtn.href = "#";
+
         // 요청 취소 불가능
         cancelBtn.classList.add("disabled");
         cancelBtn.href = "#";
+
         //재 요청 가능
         retryBtn.classList.add("disabled");
         retryBtn.href = "#";
+
         //승인 취소 요청 불가능
         withdrawBtn.classList.add("disabled");
         withdrawBtn.href = "#";
@@ -485,12 +506,15 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
         // 수정하기 불가능
         modifyBtn.classList.add("disabled");
         modifyBtn.href = "#";
+
         // 요청 취소 불가능
         cancelBtn.classList.add("disabled");
         cancelBtn.href = "#";
+
         //재 요청 가능
         retryBtn.classList.add("disabled");
         retryBtn.href = "#";
+
         //승인 취소 요청 불가능
         withdrawBtn.classList.add("disabled");
         withdrawBtn.href = "#";
@@ -503,12 +527,15 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
         // 수정하기 불가능
         modifyBtn.classList.add("disabled");
         modifyBtn.href = "#";
+
         // 요청 취소 불가능
         cancelBtn.classList.add("disabled");
         cancelBtn.href = "#";
+
         //재 요청 가능
         retryBtn.classList.add("disabled");
         retryBtn.href = "#";
+
         //승인 취소 요청 불가능
         withdrawBtn.classList.add("disabled");
         withdrawBtn.href = "#";
@@ -521,12 +548,15 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
         // 수정하기 불가능
         modifyBtn.classList.add("disabled");
         modifyBtn.href = "#";
+
         // 요청 취소 불가능
         cancelBtn.classList.add("disabled");
         cancelBtn.href = "#";
+
         //재 요청 가능
         retryBtn.classList.add("disabled");
         retryBtn.href = "#";
+
         //승인 취소 요청 불가능
         withdrawBtn.classList.add("disabled");
         withdrawBtn.href = "#";
@@ -539,25 +569,34 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
         // 수정하기 불가능
         modifyBtn.classList.add("disabled");
         modifyBtn.href = "#";
+
         // 요청 취소 불가능
         cancelBtn.classList.add("disabled");
         cancelBtn.href = "#";
+
         //재 요청 가능
         retryBtn.classList.add("disabled");
         retryBtn.href = "#";
+
         //승인 취소 요청 불가능
         withdrawBtn.classList.add("disabled");
         withdrawBtn.href = "#";
+
     }else{
+        // 예측하지 못한 오류 발생
+
         // 수정하기 불가능
         modifyBtn.classList.add("disabled");
         modifyBtn.href = "#";
+
         // 요청 취소 불가능
         cancelBtn.classList.add("disabled");
         cancelBtn.href = "#";
+
         //재 요청 가능
         retryBtn.classList.add("disabled");
         retryBtn.href = "#";
+
         //승인 취소 요청 불가능
         withdrawBtn.classList.add("disabled");
         withdrawBtn.href = "#";

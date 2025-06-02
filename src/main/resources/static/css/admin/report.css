@@ -175,5 +175,17 @@ td {
     background-color: #d78e98;
 }
 
+.unban-btn {
+    background-color: #28a745; /* 녹색 */
+    color: white;
+    border: none;
+    font-weight: bold;
+}
+
+.unban-btn:hover {
+    background-color: #218838; /* hover 시 더 진한 초록색 */
+}
+
+
 
 

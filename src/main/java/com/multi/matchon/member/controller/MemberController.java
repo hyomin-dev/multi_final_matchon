@@ -2,6 +2,7 @@ package com.multi.matchon.member.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
+import com.multi.matchon.member.dto.res.ResTeamInfoDto;
 import com.multi.matchon.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,17 +19,17 @@ public class MemberController {
     private final MemberService memberService;
 
     @ResponseBody
-    @GetMapping("/search/teamname")
-    public ResponseEntity<ApiResponse<String>> getTeamNameByMemberEmail(@AuthenticationPrincipal CustomUser user){
-        String teamName = memberService.getTeamNameByMemberEmail(user.getMember().getMemberEmail());
-        return ResponseEntity.ok().body(ApiResponse.ok(teamName));
+    @GetMapping("/search/team-name")
+    public ResponseEntity<ApiResponse<ResTeamInfoDto>> getResTeamInfoByMember(@AuthenticationPrincipal CustomUser user){
+        ResTeamInfoDto resTeamInfoDto = memberService.findResTeamInfoByMember(user.getMember());
+        return ResponseEntity.ok().body(ApiResponse.ok(resTeamInfoDto));
     }
 
 
     @ResponseBody
-    @GetMapping("/search/manner-temperature")
-    public ResponseEntity<ApiResponse<Double>> getTemperatureByMemberEmail(@AuthenticationPrincipal CustomUser user){
-        Double myTemperature = memberService.getTemperatureByMemberEmail(user.getMember().getMemberEmail());
+    @GetMapping("/search/my-temperature")
+    public ResponseEntity<ApiResponse<Double>> getMyTemperatureByMember(@AuthenticationPrincipal CustomUser user){
+        Double myTemperature = memberService.findMyTemperatureByMember(user.getMember());
         return ResponseEntity.ok().body(ApiResponse.ok(myTemperature));
     }
 

@@ -19,6 +19,7 @@ public class ReportResponse {
     private Long boardId;
     private Long targetMemberId;
     private boolean suspended;
+    private boolean targetIsAdmin;
 
 }
 

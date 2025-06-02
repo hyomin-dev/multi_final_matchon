@@ -148,6 +148,12 @@ function sendMessage(roomId) {
 }
 
 function appendMessage(msg, loginEmail) {
+
+    if(msg.exceptionName === "NotChatParticipantException")
+        showErrorPage(msg.content);
+
+    console.log(msg);
+
     const isSystemMsg = msg.exceptionName === "ChatBlockException";
     const isDuplicateSystemMsg = isSystemMsg && lastSystemMessage === msg.content;
 
@@ -165,7 +171,7 @@ function appendMessage(msg, loginEmail) {
     }
 }
 
-function appendSystemMessage(content) {
+function appendSystemMessage(content){
 
     const msgDiv = document.createElement('div');
     msgDiv.className = 'chat-message system-message';
