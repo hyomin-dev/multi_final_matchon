@@ -250,7 +250,7 @@
 
 /*수정버튼*/
 .edit-link {
-    background-color: #28a745; /* 부트스트랩 스타일의 녹색 */
+    background-color: forestgreen;
     color: white;
     padding: 7px 14px;
     font-size: 14px;
@@ -261,6 +261,6 @@
 }
 
 .edit-link:hover {
-    background-color: #218838;
+    background-color: darkgreen;
 }
 

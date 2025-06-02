@@ -17,7 +17,7 @@
 button,
 .write-button,
 .edit-link {
-    background-color: #3498db;
+    background-color: dodgerblue;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -34,7 +34,7 @@ button,
 button:hover,
 .write-button:hover,
 .edit-link:hover {
-    background-color: #2980b9;
+    background-color: royalblue;
 }
 
 /* 기본 링크 */
