@@ -67,6 +67,14 @@
             float: right;
         }
 
+        .rectangle {
+            width: 500px;
+            height: 600px;
+            border: 2px solid #255E93;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
 
     </style>
 
@@ -79,6 +87,7 @@
     <h1 class="titlefaq">FAQ</h1>
     <p class="title2faq">자주 묻는 질문</p>
 
+    <div class="rectangle">
     <!-- faq 상세보기 -->
     <h1 th:text="${faqDto.faqTitle}"></h1>
     <p th:text="${faqDto.faqContent}"></p>
@@ -93,6 +102,7 @@
             <button type="submit" style="float: right; margin-right: 10px;">수정하기</button>
         </form>
     </th:block>
+    </div>
 
 
 </div>

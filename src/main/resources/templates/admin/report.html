@@ -44,10 +44,26 @@
         </td>
         <td>
             <div class="ban-controls" th:if="${!report.targetIsAdmin}">
-                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 7)'" class="ban-btn">7일</button>
-                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', 30)'" class="ban-btn">30일</button>
-                <button type="button" th:onclick="'suspendUser(' + ${report.targetMemberId} + ', null)'" class="ban-btn">영구</button>
-                <button type="button" th:if="${report.suspended}" th:onclick="'unsuspendUser(' + ${report.targetMemberId} + ')'" class="ban-btn unban-btn">해제</button>
+                <button type="button"
+                        th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 7)'"
+                        class="ban-btn"
+                        th:attr="data-member-id=${report.targetMemberId}">7일</button>
+
+                <button type="button"
+                        th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 30)'"
+                        class="ban-btn"
+                        th:attr="data-member-id=${report.targetMemberId}">30일</button>
+
+                <button type="button"
+                        th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', null)'"
+                        class="ban-btn"
+                        th:attr="data-member-id=${report.targetMemberId}">영구</button>
+
+                <button type="button"
+                        th:if="${report.suspended}"
+                        th:onclick="'unsuspendUser(event, ' + ${report.targetMemberId} + ')'"
+                        class="ban-btn unban-btn"
+                        th:attr="data-member-id=${report.targetMemberId}">해제</button>
             </div>
         </td>
     </tr>
@@ -74,8 +90,9 @@
 
 <div th:replace="~{common/footer::footer}"></div>
 </body>
+
 <script>
-    function suspendUser(memberId, days) {
+    function suspendUser(event, memberId, days) {
         if (!confirm("정말로 회원 계정을 정지하시겠습니까?")) return;
 
         const formData = new URLSearchParams();
@@ -94,9 +111,11 @@
             .then(res => {
                 if (res.ok) {
                     alert("회원 정지가 완료되었습니다.");
-                    location.reload();
+                    markAsSuspended(memberId);
                 } else {
-                    res.json().then(data => alert(data.message || "정지 실패"));
+                    res.json().then(data => {
+                        alert(data.message || "정지 실패");
+                    });
                 }
             })
             .catch(err => {
@@ -105,7 +124,26 @@
             });
     }
 
-    function unsuspendUser(memberId) {
+    function markAsSuspended(memberId) {
+        const controls = document.querySelectorAll(`.ban-controls`);
+        controls.forEach(control => {
+            const btns = control.querySelectorAll(`.ban-btn[data-member-id='${memberId}']`);
+            if (btns.length === 0) return;
+
+            // 정지 버튼들 제거
+            btns.forEach(btn => btn.remove());
+
+            // 해제 버튼 생성
+            const unbanBtn = document.createElement('button');
+            unbanBtn.textContent = '해제';
+            unbanBtn.className = 'ban-btn unban-btn';
+            unbanBtn.setAttribute('data-member-id', memberId);
+            unbanBtn.onclick = (e) => unsuspendUser(e, memberId);
+            control.appendChild(unbanBtn);
+        });
+    }
+
+    function unsuspendUser(event, memberId) {
         if (!confirm("정말로 정지를 해제하시겠습니까?")) return;
 
         const formData = new URLSearchParams();
@@ -121,15 +159,39 @@
             .then(res => {
                 if (res.ok) {
                     alert("회원 정지가 해제되었습니다.");
-                    location.reload();
+                    restoreSuspendButtons(memberId);
                 } else {
-                    res.json().then(data => alert(data.message || "해제 실패"));
+                    res.json().then(data => {
+                        alert(data.message || "해제 실패");
+                    });
                 }
             })
             .catch(err => {
                 console.error(err);
                 alert("요청 중 오류 발생");
             });
+    }
+
+    function restoreSuspendButtons(memberId) {
+        const controls = document.querySelectorAll(`.ban-controls`);
+        controls.forEach(control => {
+            const btns = control.querySelectorAll(`.ban-btn[data-member-id='${memberId}']`);
+            if (btns.length === 0) return;
+
+            // 해제 버튼 제거
+            btns.forEach(btn => btn.remove());
+
+            // 정지 버튼들 다시 생성
+            const durations = [7, 30, null];
+            durations.forEach(days => {
+                const btn = document.createElement('button');
+                btn.textContent = days === null ? '영구' : `${days}일`;
+                btn.className = 'ban-btn';
+                btn.setAttribute('data-member-id', memberId);
+                btn.onclick = (e) => suspendUser(e, memberId, days);
+                control.appendChild(btn);
+            });
+        });
     }
 </script>
 </html>

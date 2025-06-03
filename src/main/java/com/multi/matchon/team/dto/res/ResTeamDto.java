@@ -39,13 +39,16 @@ public class ResTeamDto {
     private String createdBy;
 
 
+    private String starRatingVisual; // ✅ Add this field
 
-    public static ResTeamDto from(Team team, String imageUrl) {
+
+    public static ResTeamDto from(Team team, String imageUrl, double averageRating) {
         return ResTeamDto.builder()
                 .teamId(team.getId())
                 .teamName(team.getTeamName())
                 .teamRegion(team.getTeamRegion().name())
-                .teamRatingAverage(team.getTeamRatingAverage())
+                .teamRatingAverage(averageRating) // ← Inject the calculated average
+                .starRatingVisual(generateStarRatingVisual(averageRating))  // ⬅️ Add this
                 .RecruitmentStatus(team.getRecruitmentStatus())
                 .imageUrl(imageUrl)
                 .teamIntroduction(team.getTeamIntroduction())
@@ -57,6 +60,15 @@ public class ResTeamDto {
                 )
                 .build();
     }
+
+    private static String generateStarRatingVisual(double rating) {
+        if (rating == 0.0) return "N/A";
+        int fullStars = (int) Math.floor(rating);
+        boolean halfStar = rating - fullStars >= 0.5;
+        int emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        return "⭐".repeat(fullStars) + (halfStar ? "✩" : "") + "☆".repeat(emptyStars);
+    }
+
 
 }
 
