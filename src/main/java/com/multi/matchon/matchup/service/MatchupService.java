@@ -6,6 +6,7 @@ import com.multi.matchon.common.domain.Attachment;
 import com.multi.matchon.common.domain.BoardType;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.dto.res.PageResponseDto;
+import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
 
@@ -85,7 +86,7 @@ public class MatchupService{
         List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, findMatchupBoard.getId());
 
         if(findAttachments.isEmpty())
-            throw new IllegalArgumentException("Matchup"+BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
+            throw new CustomException("Matchup "+BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
 
         String savedName = findAttachments.get(0).getSavedName();
 

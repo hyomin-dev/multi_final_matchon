@@ -28,6 +28,15 @@ function renderList(items){
     const boardArea = document.querySelector("#request-container");
     boardArea.innerHTML = '';
 
+    if(items.length ===0){
+        boardArea.innerHTML = `
+            <div class="no-result">
+                경기 참가 이력이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
         const card = document.createElement("div");
