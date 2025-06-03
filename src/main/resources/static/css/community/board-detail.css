@@ -64,7 +64,7 @@
 .board-delete-button {
     background-color: transparent;
     border: none;
-    color: #d9534f;
+    color: #F44336;
     font-weight: bold;
     font-size: 14px;
     padding: 5px 10px;
@@ -75,7 +75,7 @@
 
 .board-delete-button:hover {
     background-color: lemonchiffon;
-    color: #d32f2f;
+    color: red;
 }
 
 .back-link {
@@ -183,6 +183,9 @@
     color: #222;
     margin: 4px 0 0 0;
     line-height: 1.6;
+
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 

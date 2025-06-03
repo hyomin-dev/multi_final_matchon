@@ -39,7 +39,9 @@ public class ResMatchupBoardListDto {
 
     private Long roomId;
 
-    public ResMatchupBoardListDto(Long boardId, Long writerId, String writerEmail, String writerName, String teamName, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants, Double minMannerTemperature, Long roomId) {
+    private Boolean isRatingInitialized;
+
+    public ResMatchupBoardListDto(Long boardId, Long writerId, String writerEmail, String writerName, String teamName, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants, Double minMannerTemperature, Long roomId, Boolean isRatingInitialized) {
         this.boardId = boardId;
         this.writerId = writerId;
         this.currentParticipantCount = currentParticipantCount;
@@ -54,5 +56,6 @@ public class ResMatchupBoardListDto {
         this.writerEmail = writerEmail;
         this.writerName = writerName;
         this.roomId = roomId;
+        this.isRatingInitialized = isRatingInitialized;
     }
 }

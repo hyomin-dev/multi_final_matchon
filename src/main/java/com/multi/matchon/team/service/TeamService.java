@@ -862,6 +862,7 @@ public class TeamService {
             return ResTeamDto.from(team, imageUrl, avgRating);
         }).collect(Collectors.toList());
     }
+
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(

@@ -135,9 +135,9 @@ public class Member extends BaseTimeEntity {
     }
 
     // ==== 세터 메서드 ====
-    public void setIsTemporaryPassword(boolean isTemporaryPassword) {
-        this.isTemporaryPassword = isTemporaryPassword;
-    }
+//    public void setIsTemporaryPassword(boolean isTemporaryPassword) {
+//        this.isTemporaryPassword = isTemporaryPassword;
+//    }
 
     public void setTemporaryPassword(String encodedTempPassword) {
         this.temporaryPassword = encodedTempPassword;
@@ -153,4 +153,14 @@ public class Member extends BaseTimeEntity {
     public void clearTemporaryPassword() {
         this.temporaryPassword = null;
     }
+
+
+    public void setIsTemporaryPassword(boolean isTemporaryPassword) {
+        this.isTemporaryPassword = isTemporaryPassword;
+    }
+
+    public void updateMyTemperature(Double myTemperature){
+        this.myTemperature += myTemperature;
+    }
+
 }

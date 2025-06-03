@@ -49,16 +49,19 @@ th, td {
     white-space: normal;
 }
 
+td:nth-child(6) {
+    text-align: justify;
+}
 
-th:nth-child(1), td:nth-child(1) { width: 5%; }     /* ID */
-th:nth-child(2), td:nth-child(2) { width: 10%; }    /* 유형 */
+th:nth-child(1), td:nth-child(1) { width: 4%; }     /* ID */
+th:nth-child(2), td:nth-child(2) { width: 8%; }    /* 유형 */
 th:nth-child(3), td:nth-child(3) { width: 10%; }    /* 신고대상 */
 th:nth-child(4), td:nth-child(4) { width: 10%; }    /* 신고자 */
-th:nth-child(5), td:nth-child(5) { width: 15%; }    /* 신고분류 */
-th:nth-child(6), td:nth-child(6) { width: 30%; }    /* 상세사유 */
+th:nth-child(5), td:nth-child(5) { width: 14%; }    /* 신고분류 */
+th:nth-child(6), td:nth-child(6) { width: 32%; }    /* 상세사유 */
 th:nth-child(7), td:nth-child(7) { width: 10%; }    /* 신고일 */
-th:nth-child(8), td:nth-child(8) { width: 10%; }    /* 보기 */
-th:nth-child(9), td:nth-child(9) { width: 10%; }    /* 회원 처리 */
+th:nth-child(8), td:nth-child(8) { width: 8%; }    /* 보기 */
+th:nth-child(9), td:nth-child(9) { width: 12%; }    /* 회원 처리 */
 
 
 tbody tr:hover {

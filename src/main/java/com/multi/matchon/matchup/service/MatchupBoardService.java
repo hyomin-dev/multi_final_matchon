@@ -95,12 +95,12 @@ public class MatchupBoardService {
     @Transactional(readOnly = true)
     public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId) {
 
-        MatchupBoard matchupBoard = matchupBoardRepository.findMatchupBoardByBoardId(boardId).orElseThrow(()->new IllegalArgumentException("Matchup"+boardId +"번 게시글이 존재하지 않습니다."));
+        MatchupBoard matchupBoard = matchupBoardRepository.findMatchupBoardByBoardId(boardId).orElseThrow(()->new CustomException("Matchup"+boardId +"번 게시글이 존재하지 않습니다."));
 
         List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
 
         if(attachments.isEmpty()&&matchupBoard.getReservationAttachmentEnabled())
-            throw new IllegalArgumentException("Matchup"+boardId +"번 게시글의 첨부파일이 존재해야하는데 없습니다.");
+            throw new CustomException("Matchup"+boardId +"번 게시글의 첨부파일이 존재해야하는데 없습니다.");
 
         return ResMatchupBoardDto.builder()
                 .boardId(matchupBoard.getId())
@@ -197,7 +197,7 @@ public class MatchupBoardService {
     * */
     @Transactional
     public void updateBoard(ReqMatchupBoardEditDto reqMatchupBoardEditDto, CustomUser user) {
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(reqMatchupBoardEditDto.getBoardId()).orElseThrow(()->new IllegalArgumentException("Matchup"+reqMatchupBoardEditDto.getBoardId()+"번 게시글이 없습니다."));
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(reqMatchupBoardEditDto.getBoardId()).orElseThrow(()->new CustomException("Matchup"+reqMatchupBoardEditDto.getBoardId()+"번 게시글이 없습니다."));
 
         if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now()))
             throw new CustomException("Matchup 경기 시작 시간이 지나 수정할 수 없습니다.");
@@ -212,7 +212,7 @@ public class MatchupBoardService {
             throw new CustomException("Matchup 하한 매너 온도는 내 매너온도 이상이어야 합니다.");
 
         findMatchupBoard.update(
-                sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardEditDto.getSportsTypeName())).orElseThrow(()-> new IllegalArgumentException("Matchup"+reqMatchupBoardEditDto.getSportsTypeName()+"는 에서 지원하지 않는 종목입니다.")),
+                sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardEditDto.getSportsTypeName())).orElseThrow(()-> new CustomException("Matchup"+reqMatchupBoardEditDto.getSportsTypeName()+"는 에서 지원하지 않는 종목입니다.")),
                 reqMatchupBoardEditDto.getTeamIntro(),
                 reqMatchupBoardEditDto.getSportsFacilityName(),
                 reqMatchupBoardEditDto.getSportsFacilityAddress(),
@@ -237,7 +237,7 @@ public class MatchupBoardService {
     * */
     @Transactional
     public void softDeleteMatchupBoard(Long boardId) {
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(boardId).orElseThrow(()->new IllegalArgumentException("Matchup"+boardId+"번 게시글이 없습니다."));
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(boardId).orElseThrow(()->new CustomException("Matchup "+boardId+"번 게시글이 없습니다."));
 
         if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now()))
             throw new CustomException("Matchup 경기 시작 시간이 지나 삭제할 수 없습니다.");
@@ -247,7 +247,7 @@ public class MatchupBoardService {
 
         List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
         if(findAttachments.isEmpty())
-            throw new IllegalArgumentException("Matchup"+BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
+            throw new CustomException("Matchup "+BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
         findAttachments.get(0).delete(true);
 
     }
@@ -255,7 +255,7 @@ public class MatchupBoardService {
     @Transactional(readOnly = true)
     public ResMatchupBoardOverviewDto findResMatchupOverviewDto(Long boardId) {
 
-        return matchupBoardRepository.findResMatchupOverviewDto(boardId).orElseThrow(()->new IllegalArgumentException("Matchup"+boardId+"번 게시글이 없습니다."));
+        return matchupBoardRepository.findResMatchupOverviewDto(boardId).orElseThrow(()->new CustomException("Matchup "+boardId+"번 게시글이 없습니다."));
     }
     // ========================================================================================================
     //                                                    테스트 해본 코드
