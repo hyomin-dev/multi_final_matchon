@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     /*
     * 아이콘 클릭 → 내 채팅방 목록 페이지로 이동
     * */
+
     const chatImg = document.querySelector("#chat-icon");
 
     if (chatImg) {
@@ -114,7 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initStomp(loginEmail);
 
-
 });
 
 // secureFetch: API 요청 → accessToken 만료 시 자동 재발급 → 다시 요청
@@ -165,6 +165,7 @@ function logout() {
             alert("로그아웃 되었습니다.");
             window.location.href = "/main?_=" + new Date().getTime();
         });
+
 }
 
 async function initStomp(loginEmail){
@@ -269,6 +270,7 @@ function setDisconnects(roomId) {
         }
     });
 }
+
 
 
 

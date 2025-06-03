@@ -71,7 +71,9 @@ public class Team extends BaseEntity {
         this.teamRatingAverage = rating;
         this.recruitmentStatus = recruitStatus;
     }
-
+    public void updateRating(double averageRating) {
+        this.teamRatingAverage = averageRating;
+    }
 
 
 

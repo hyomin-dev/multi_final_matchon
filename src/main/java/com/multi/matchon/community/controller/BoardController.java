@@ -173,14 +173,21 @@ public class BoardController {
         model.addAttribute("formAction", "/community/" + id + "/edit");
         model.addAttribute("boardId", id);
         model.addAttribute("isAdmin", isAdmin);
+
+        // 기존 첨부파일 전달
+        List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, id);
+        model.addAttribute("attachments", attachments);
+
         return FORM_VIEW;
     }
+
 
     @PostMapping("/{id}/edit")
     public String update(@PathVariable Long id,
                          @Valid @ModelAttribute("boardRequest") BoardRequest boardRequest,
                          BindingResult bindingResult,
                          @RequestParam("files") MultipartFile[] files,
+                         @RequestParam(value = "deletedAttachmentIds", required = false) List<Long> deletedAttachmentIds,
                          Model model,
                          @AuthenticationPrincipal CustomUser user) throws IOException {
 
@@ -196,6 +203,7 @@ public class BoardController {
             model.addAttribute("formAction", "/community/" + id + "/edit");
             model.addAttribute("boardId", id);
             model.addAttribute("isAdmin", isAdmin);
+            model.addAttribute("attachments", attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, id));
             return FORM_VIEW;
         }
 
@@ -204,30 +212,36 @@ public class BoardController {
             return "redirect:/community";
         }
 
-        board.update(
-                boardRequest.getTitle(),
-                boardRequest.getContent(),
-                boardRequest.getCategory()
-
-        );
+        board.update(boardRequest.getTitle(), boardRequest.getContent(), boardRequest.getCategory());
 
         if (isAdmin) {
             board.setPinned(boardRequest.isPinned());
         }
 
-        board.setBoardAttachmentEnabled(false);
+        if (deletedAttachmentIds != null) {
+            for (Long fileId : deletedAttachmentIds) {
+                attachmentRepository.findById(fileId).ifPresent(att -> {
+                    att.delete(true);
+                    String savePath = att.getSavePath();
+                    int slashIdx = savePath.lastIndexOf('/');
+                    String dir = savePath.substring(0, slashIdx + 1);
+                    String filename = savePath.substring(slashIdx + 1);
+                    awsS3Utils.deleteFile(dir, filename);
+                });
+            }
+        }
 
         int fileOrder = 0;
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
-                UploadedFile uploaded = FileUploadHelper.uploadToS3(file, COMMUNITY_DIR, awsS3Utils);
+                UploadedFile uploaded = FileUploadHelper.uploadToS3(file, "community/", awsS3Utils);
                 Attachment attachment = Attachment.builder()
                         .boardType(BoardType.BOARD)
                         .boardNumber(board.getId())
                         .fileOrder(fileOrder++)
                         .originalName(uploaded.getOriginalFileName())
                         .savedName(uploaded.getSavedFileName())
-                        .savePath(COMMUNITY_DIR + uploaded.getSavedFileName())
+                        .savePath("community/" + uploaded.getSavedFileName())
                         .build();
                 attachmentRepository.save(attachment);
                 board.setBoardAttachmentEnabled(true);
@@ -237,6 +251,33 @@ public class BoardController {
         boardService.save(board);
         return "redirect:/community/" + id;
     }
+
+
+    @DeleteMapping("/attachments/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteAttachment(@PathVariable Long id, @AuthenticationPrincipal CustomUser user) {
+        Attachment attachment = attachmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("파일이 존재하지 않습니다."));
+
+        Board board = boardService.findById(attachment.getBoardNumber());
+
+        if (!board.getMember().getId().equals(user.getMember().getId())) {
+            return ResponseEntity.status(403).body("삭제 권한이 없습니다.");
+        }
+
+        attachment.delete(true);  // 소프트 삭제
+
+        String fullPath = attachment.getSavePath(); // 예: "community/abc123.png"
+        int slashIndex = fullPath.lastIndexOf('/');
+        String dir = fullPath.substring(0, slashIndex + 1); // "community/"
+        String fileName = fullPath.substring(slashIndex + 1); // "abc123.png"
+
+        awsS3Utils.deleteFile(dir, fileName);
+
+        return ResponseEntity.ok().build();
+    }
+
+
 
     @GetMapping("/download-force/{filename}")
     public ResponseEntity<Resource> forceDownload(@PathVariable String filename) throws IOException {
