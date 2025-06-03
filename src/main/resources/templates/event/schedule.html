@@ -6,6 +6,8 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/event/schedule.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+
     <script th:inline="javascript">
         const userRole = /*[[${#authentication.principal.member.memberRole}]]*/ "USER";
     </script>
@@ -29,10 +31,8 @@
         </div>
         <div class="month-title" id="monthYear"></div>
         <div style="text-align: center; margin-bottom: 10px;" th:if="${#authorization.expression('hasRole(''HOST'')')}">
-            <a href="/event/my" style="margin-right: 10px; text-decoration: none;">
-                <button class="register-btn" style="background-color: #777;">My</button>
-            </a>
-            <button class="register-btn" onclick="submitSelectedDate()">등록하기</button>
+            <button class="register-btn my-btn" onclick="location.href='/event/my'" style="margin-right: 10px;">My</button>
+            <button class="register-btn register-event-btn" onclick="submitSelectedDate()">등록</button>
         </div>
         <div class="calendar-wrapper">
             <img src="/img/back.png" class="calendar-nav-img left-arrow" onclick="changeMonth(-1)">

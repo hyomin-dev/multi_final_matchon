@@ -5,15 +5,17 @@
     <title>관리자 문의 목록</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #fff;
         }
         #wrap {
-            max-width: 1100px;
+            max-width: 1500px;
             margin: 60px auto;
             padding: 20px;
+            text-align: center;
         }
         h2 {
             font-size: 24px;
@@ -21,10 +23,14 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        h2 span {
+            border-bottom: 2px solid #000;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
+            margin: 0 auto;
         }
         th, td {
             border: 1px solid #ccc;
@@ -38,6 +44,19 @@
         tr:hover {
             background-color: #f9f9f9;
         }
+
+        th:nth-child(1), td:nth-child(1) { width: 30px; }
+        th:nth-child(2), td:nth-child(2) { width: 80px; }
+        th:nth-child(3), td:nth-child(3) { width: 500px; }
+        th:nth-child(4), td:nth-child(4) { width: 120px; }
+        th:nth-child(5), td:nth-child(5),
+        th:nth-child(6), td:nth-child(6) {
+            width: 120px;
+        }
+        th:nth-child(7), td:nth-child(7) {
+            width: 50px;
+        }
+
         a {
             color: #007BFF;
             text-decoration: none;
@@ -79,61 +98,87 @@
             color: #aaa;
             border-color: #eee;
         }
+
+        td.title-cell {
+            text-align: left;
+        }
+
+
+        .title-link {
+            display: inline-block;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            text-decoration: none;
+            color: #000;
+        }
+        .title-link:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
     <div>
-        <h2>전체 문의 목록</h2>
+        <h2><span>전체 문의 목록</span></h2>
 
+        <div style="display: flex; justify-content: center;">
+            <div id="adminInquiryTableArea" th:fragment="adminInquiryTableArea" style="width: fit-content;">
+                <table th:if="${!inquiries.empty}">
+                    <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>카테고리</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>작성일</th>
+                        <th>수정일</th>
+                        <th>상태</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="inquiry, stat : ${inquiries.content}">
+                        <td th:text="${stat.index + 1 + inquiries.number * inquiries.size}">1</td>
+                        <td th:text="${inquiry.categoryLabel}">카테고리</td>
+                        <td class="title-cell">
+                            <a class="title-link"
+                               th:href="@{'/admin/inquiry/' + ${inquiry.id}}"
+                               th:text="${inquiry.inquiryTitle}">제목</a>
+                        </td>
+                        <td th:text="${inquiry.member.memberName}">작성자</td>
+                        <td th:text="${#temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</td>
+                        <td th:text="${inquiry.modifiedDate != null and #temporals.format(inquiry.modifiedDate, 'yyyy-MM-dd HH:mm') != #temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm') ? #temporals.format(inquiry.modifiedDate, 'yyyy-MM-dd HH:mm') : '-'}">수정일</td>
+                        <td>
+                            <span th:text="${inquiry.inquiryStatus.name() == 'COMPLETED' ? '답변완료' : '대기중'}"
+                                  th:classappend="${inquiry.inquiryStatus.name() == 'COMPLETED'} ? 'status-completed' : 'status-pending'">
+                                상태
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 
-        <div id="adminInquiryTableArea" th:fragment="adminInquiryTableArea">
-            <table th:if="${!inquiries.empty}">
-                <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>카테고리</th>
-                    <th>제목</th>
-                    <th>작성자</th>
-                    <th>작성일</th>
-                    <th>상태</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="inquiry, stat : ${inquiries.content}">
-                    <td th:text="${stat.index + 1 + inquiries.number * inquiries.size}">1</td>
-                    <td th:text="${inquiry.inquiryCategory.label}">카테고리</td>
-                    <td>
-                        <a th:href="@{'/admin/inquiry/' + ${inquiry.id}}" th:text="${inquiry.inquiryTitle}">제목</a>
-                    </td>
-                    <td th:text="${inquiry.member.memberName}">작성자</td>
-                    <td th:text="${#temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</td>
-                    <td>
-                        <span th:text="${inquiry.inquiryStatus.name() == 'COMPLETED' ? '답변완료' : '대기중'}"
-                              th:classappend="${inquiry.inquiryStatus.name() == 'COMPLETED'} ? 'status-completed' : 'status-pending'">
-                            상태
-                        </span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                <div th:if="${inquiries.empty}" style="text-align: center; padding: 40px 0;">
+                    등록된 문의가 없습니다.
+                </div>
 
-            <div th:if="${inquiries.empty}" style="text-align: center; padding: 40px 0;">
-                등록된 문의가 없습니다.
-            </div>
-
-            <div class="pagination" th:if="${inquiries.totalPages > 0}">
-                <a th:classappend="${inquiries.first} ? 'disabled'" href="#" th:data-page="${inquiries.number - 1}">&laquo;</a>
-                <span th:each="pageNum : ${#numbers.sequence(0, inquiries.totalPages - 1)}">
-                    <a href="#" th:data-page="${pageNum}"
-                       th:classappend="${pageNum == inquiries.number} ? 'active'" th:text="${pageNum + 1}">1</a>
-                </span>
-                <a th:classappend="${inquiries.last} ? 'disabled'" href="#" th:data-page="${inquiries.number + 1}">&raquo;</a>
+                <div class="pagination" th:if="${inquiries.totalPages > 0}">
+                    <a th:classappend="${inquiries.first} ? 'disabled'" href="#" th:data-page="${inquiries.number - 1}">&laquo;</a>
+                    <span th:each="pageNum : ${#numbers.sequence(0, inquiries.totalPages - 1)}">
+                        <a href="#" th:data-page="${pageNum}"
+                           th:classappend="${pageNum == inquiries.number} ? 'active'" th:text="${pageNum + 1}">1</a>
+                    </span>
+                    <a th:classappend="${inquiries.last} ? 'disabled'" href="#" th:data-page="${inquiries.number + 1}">&raquo;</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 <div th:replace="~{common/footer::footer}"></div>
 
 <script>

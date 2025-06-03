@@ -10,7 +10,7 @@
         <div class="center">
             <a th:href="@{/introduction}">INTRODUCTION</a>
             <a th:href="@{/matchup/board}">MATCHUP</a>
-            <a th:href="@{/guest}">GUEST</a>
+<!--            <a th:href="@{/guest}">GUEST</a>-->
             <a th:href="@{/stadium}">STADIUM</a>
             <a th:href="@{/community}">COMMUNITY</a>
             <a th:href="@{/schedule}">SCHEDULE</a>
@@ -18,7 +18,7 @@
             <a th:href="@{/team}">TEAM</a>
         </div>
         <div class="icons">
-            <img src="/img/chat-black.png">
+            <img id="chat-icon" src="/img/chat-black.png">
             <img src="/img/bell-black.png">
         </div>
         <div class="auth">
@@ -34,6 +34,14 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            const chatImg = document.querySelector("#chat-icon");
+
+            if (chatImg) {
+                chatImg.addEventListener("click", () => {
+                    window.location.href = "/chat/my/rooms"; // 새 창에서 열기
+                });
+            }
+
             fetch('/auth/check', {
                 method: 'GET',
                 credentials: 'include'
@@ -117,7 +125,7 @@
             })
                 .then(res => {
                     alert("로그아웃 되었습니다.");
-                    window.location.href = "/main";
+                    window.location.href = "/main?_=" + new Date().getTime();
                 });
         }
     </script>

@@ -5,6 +5,7 @@
     <title>문의 상세 (관리자)</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <style>
         body {
             background-color: #ffffff;
@@ -21,21 +22,38 @@
         .meta {
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .meta-time {
+            font-size: 13px;
+            color: #888;
+            text-align: right;
             margin-bottom: 20px;
+            width: 100%;
         }
         .badge {
             padding: 6px 14px;
             border-radius: 20px;
             font-weight: bold;
             font-size: 14px;
+            display: inline-block;
+            margin-top: 4px;
         }
         .badge.category {
             background-color: #007BFF;
             color: white;
         }
-        .badge.status {
+
+        .badge.status.pending {
             background-color: #ccc;
             color: #333;
+        }
+
+        .badge.status.completed {
+            background-color: #28a745;
+            color: white;
         }
         h2 {
             font-size: 24px;
@@ -43,6 +61,7 @@
             margin: 10px 0 24px;
             border-bottom: 1px solid #ddd;
             padding-bottom: 8px;
+            word-break: break-word;
         }
         .content-box {
             font-size: 16px;
@@ -52,6 +71,7 @@
             border-radius: 6px;
             min-height: 100px;
             margin-bottom: 30px;
+            word-break: break-word;
         }
         .answer-box {
             background: #eef9ee;
@@ -60,6 +80,7 @@
             border-radius: 6px;
             font-size: 15px;
             margin-top: 30px;
+            word-break: break-word;
         }
         .answer-form textarea {
             width: 100%;
@@ -71,7 +92,7 @@
         }
         .btn-area {
             display: flex;
-            justify-content: center; /* 수정됨 */
+            justify-content: center;
             gap: 12px;
             margin-top: 16px;
         }
@@ -97,17 +118,25 @@
 <div id="wrap">
     <div class="meta">
         <span class="badge category" th:text="${inquiry.categoryLabel}">카테고리</span>
-        <span class="badge status" th:text="${inquiry.statusLabel}">상태</span>
+        <span class="badge status"
+              th:classappend="${inquiry.inquiryStatus.name() == 'COMPLETED'} ? ' completed' : ' pending'"
+              th:text="${inquiry.getStatusLabel()}">상태</span>
     </div>
 
-    <h2 th:text="${inquiry.inquiryTitle}">문의 제목</h2>
+    <div class="meta-time">
+        작성일: <span th:text="${#temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm')}"></span><br>
+        수정일: <span th:text="${inquiry.modifiedDate != null and #temporals.format(inquiry.modifiedDate, 'yyyy-MM-dd HH:mm') != #temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm') ? #temporals.format(inquiry.modifiedDate, 'yyyy-MM-dd HH:mm') : '수정된 내역 없음'}">-</span>
+    </div>
+
+    <h2 th:text="${inquiry.inquiryTitle}" style="word-break: break-word; white-space: pre-wrap;">문의 제목</h2>
 
     <div class="content-box" th:text="${inquiry.inquiryContent}">문의 내용</div>
 
     <!-- 답변 작성 폼 -->
     <div th:if="${inquiry.inquiryStatus.name() == 'PENDING'}">
         <form class="answer-form" th:action="@{'/admin/inquiry/' + ${inquiry.id} + '/answer'}" method="post">
-            <textarea name="answerContent" placeholder="답변 내용을 입력하세요"></textarea>
+            <textarea name="answerContent" placeholder="답변 내용을 입력하세요" required
+                      th:text="${inquiry.answerContent != null ? inquiry.answerContent : ''}"></textarea>
             <div class="btn-area">
                 <button type="submit" class="btn submit-btn">답변 등록</button>
                 <a th:href="@{/admin/inquiry}"><button type="button" class="btn back-btn">돌아가기</button></a>

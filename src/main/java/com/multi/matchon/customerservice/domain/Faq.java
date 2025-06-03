@@ -43,4 +43,8 @@ public class Faq extends TimeEntity {
         this.faqContent = content;
         this.faqCategory = category;
     }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
 }

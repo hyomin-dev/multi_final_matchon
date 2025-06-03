@@ -4,7 +4,7 @@ package com.multi.matchon.team.domain;
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.common.domain.Positions;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+        import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,6 +56,22 @@ public class Team extends BaseEntity {
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
+
+    @Column(name = "created_person", nullable = false, columnDefinition = "VARCHAR(100)")
+    private String createdPerson;
+
+    public void updateInfo(String name, String intro, RegionType region, Double rating, Boolean recruitStatus) {
+        this.teamName = name;
+        this.teamIntroduction = intro;
+        this.teamRegion = region;
+        this.teamRatingAverage = rating;
+        this.recruitmentStatus = recruitStatus;
+    }
+
 
 
 

@@ -13,19 +13,26 @@ document.addEventListener("DOMContentLoaded",()=>{
     const loginMember = editDto.dataset.loginMember;
 
     setSportsType(sportsTypeName); // 종목 가져옴
-    setReservationFile(originalName, savedName);
+    void setReservationFile(originalName, savedName);
     setMaxParticipants(currentParticipantCount, maxParticipants);
     setMannerTemperature(minMannerTemperature);
     setButton();
 
     const form = document.querySelector("form");
     form.addEventListener("submit", (e)=>{
-        submitCheck(e);
+        submitCheck(e, myMannerTemperature);
     })
+
+    const backBtn = document.querySelector(".back-btn");
+    backBtn.addEventListener("click",()=>{
+        history.back();
+    });
 
 })
 
-function submitCheck(e){
+function submitCheck(e, myMannerTemperature){
+
+    const sportsTypeNameEle = document.querySelector("#sportsTypeName");
 
     const teamNameEle = document.querySelector("#teamName");
 
@@ -51,30 +58,26 @@ function submitCheck(e){
 
     const matchDescriptionEle = document.querySelector("#matchDescription");
 
-    //console.log(matchDatetimeEle.value);
-    const matchDate = new Date(matchDatetimeEle.value);
-    const now = new Date();
-    // if(matchDate < now){
-    //     console.log("test");
-    // }
-
-   if(teamNameEle.value === ""){
-        alert("소속 팀이 있어야 합니다.");
+    if(sportsTypeNameEle.value ===""){
+        alert("종목을 선택하세요.");
+        e.preventDefault();
+    }else if(teamNameEle.value === ""){
+        alert("팀 이름을 입력하세요.");
         e.preventDefault();
     } else if(teamIntroEle.value ===""){
-        alert("팀 소개를 입력하세요.");
+        alert("팀 소개를 입력하세요");
         e.preventDefault();
     } else if(sportsFacilityNameEle.value ===""){
-        alert("경기장 명을 입력하세요.");
+        alert("경기장명을 입력하세요");
         e.preventDefault();
     } else if(sportsFacilityAddressEle.value ===""){
         alert("경기장 주소를 입력하세요.");
         e.preventDefault();
     } else if(matchDatetimeEle.value ===""){
-        alert("경기 날짜를 입력하세요");
+        alert("경기 시작 시간을 입력하세요.");
         e.preventDefault();
-    }  else if(matchDate<now){
-        alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+    }  else if(new Date(matchDatetimeEle.value)< new Date()){
+        alert(`경기 시작 시간은 현재 시간 이후만 가능합니다. 다시 작성해주세요.`)
         e.preventDefault();
     } else if(matchDurationEle.value ===""){
         alert("경기 진행 시간을 입력하세요.");
@@ -85,10 +88,16 @@ function submitCheck(e){
     } else if(maxParticipantsEle.value ===""){
         alert("총 모집 인원을 입력하세요.");
         e.preventDefault();
-    } else if(minMannerTemperatureEle.value ===""){
+    }else if(Number(currentParticipantCountEle.value) >Number(maxParticipantsEle.value)){
+       alert(`현재 참가 인원은 총 모집 인원보다 적어야 합니다.`)
+       e.preventDefault();
+   } else if(minMannerTemperatureEle.value ===""){
         alert("하한 매너 온도를 입력하세요.");
         e.preventDefault();
-    } else if(matchDescriptionEle.value ===""){
+    } else if(minMannerTemperatureEle.value>myMannerTemperature){
+       alert(`하한 매너 온도는 내 매너 온도 ${myMannerTemperature} 이하이어야 합니다.`);
+       e.preventDefault();
+   } else if(matchDescriptionEle.value ===""){
         alert("경기 방식 소개를 입력하세요");
         e.preventDefault();
     } else{
@@ -97,7 +106,7 @@ function submitCheck(e){
     }
 }
 
-async function setSportsType(sportsTypeName){
+function setSportsType(sportsTypeName){
     const optionSoccerEle = document.querySelector("#option-soccer");
     const optionFutsal = document.querySelector("#option-futsal");
 
@@ -128,7 +137,6 @@ async function setReservationFile(originalName, savedName){
             URL.revokeObjectURL(url);
         },500)
     })
-
     // const aEle2 = document.createElement("a");
     // aEle2.innerHTML = "삭제하기";
     //
@@ -137,7 +145,7 @@ async function setReservationFile(originalName, savedName){
 }
 
 
-function getAddress() {
+function getAddress(){
     new daum.Postcode({
         oncomplete: function(data) {
             // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
@@ -189,7 +197,7 @@ function setMannerTemperature(minMannerTemperature){
     }
 }
 
-async function setButton(){
+function setButton(){
     // const deleteBtn = document.querySelector(".delete-btn");
     // deleteBtn.addEventListener("click",async ()=>{
     //     const response = await fetch(`/matchup/board/delete?boardId=${boardId}`,{

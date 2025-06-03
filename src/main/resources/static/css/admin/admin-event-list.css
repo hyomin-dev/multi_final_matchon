@@ -1,5 +1,5 @@
 #wrap {
-    max-width: 1000px;
+    max-width: 1400px;
     margin: 60px auto;
     padding: 20px;
     font-family: 'Noto Sans KR', sans-serif;
@@ -17,8 +17,17 @@ h2 {
     display: inline-block;
     padding-bottom: 5px;
 }
-table { width: 100%; border-collapse: collapse; }
-th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+table { width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+    vertical-align: middle;
+    word-break: break-word;
+}
 th { background-color: #f3f3f3; }
 
 .status-pending {
@@ -48,9 +57,29 @@ th { background-color: #f3f3f3; }
     display: inline-block;
 }
 
+table th:nth-child(1),
+table td:nth-child(1) {
+    width: 50px;
+}
+
+table th:nth-child(2),
+table td:nth-child(2) {
+    width: 400px;
+}
+
+table th:nth-child(3),
+table td:nth-child(3) {
+    width: 120px;
+}
+
+table th:nth-child(4),
+table td:nth-child(4) {
+    width: 120px;
+}
+
 table th:nth-child(5),
 table td:nth-child(5) {
-    width: 100px;
+    width: 80px;
 }
 .pagination { margin-top: 20px; text-align: center; }
 .pagination a {
@@ -63,3 +92,29 @@ table td:nth-child(5) {
 .pagination a.active { background-color: #5478b2; color: white; }
 .detail-link { color: #0077cc; text-decoration: underline; cursor: pointer; }
 .no-data { text-align: center; padding: 30px; font-size: 16px; color: #888; }
+
+.title-cell {
+    text-align: left;
+}
+
+
+.event-title-ellipsis {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+td.title-cell a {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+    color: #007bff;
+}
+td.title-cell a:hover {
+    text-decoration: underline;
+}

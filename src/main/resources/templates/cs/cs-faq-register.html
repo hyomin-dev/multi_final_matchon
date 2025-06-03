@@ -5,6 +5,7 @@
     <title>FAQ 등록</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
 
     <style>
         .write-box {
@@ -88,7 +89,7 @@
 
             <select class="all-list" name="faqCategory" required>
                 <option value="" disabled selected>카테고리 선택</option>
-                <option value="HOWTOUSE">이용방법</option>
+                <option value="TUTORIAL">이용방법</option>
                 <option value="ACCOUNT">계정</option>
                 <option value="TEAM_GUEST">Team / Guest</option>
                 <option value="REPORT">신고</option>
@@ -101,6 +102,7 @@
                 <textarea name="faqContent" placeholder="내용을 입력 해 주세요...." required></textarea>
             </div>
 
+            <button type="button" onclick="location.href='/cs'">메뉴로 돌아가기</button>
 
             <button type="submit" class="compleate">작성 완료</button>
         </div>

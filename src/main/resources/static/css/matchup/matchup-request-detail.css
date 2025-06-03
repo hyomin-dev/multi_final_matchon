@@ -80,6 +80,8 @@ a.back-btn {
 }
 a.back-btn {
     background-color: #555; /* 진한 회색 (대비 향상) */
+    cursor: pointer; /* ✅ 마우스 손가락 모양으로 변경 */
+
 }
 
 
@@ -93,7 +95,9 @@ a#cancelBtn:hover,
 a#retryBtn:hover,
 a#withdrawBtn:hover,
 a.back-btn:hover {
-    opacity: 0.9;
+    opacity: 1;
+    transform: scale(1.02);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* 버튼 그룹 정렬 */
@@ -113,4 +117,10 @@ a.back-btn:hover {
     opacity: 0.7;                  /* 살짝 흐리게 */
     text-decoration: none;
 }
+
+td {
+    word-break: break-all;    /* 글자 단위 줄바꿈 (한글/영어 모두 적용) */
+    white-space: normal;
+}
+
 

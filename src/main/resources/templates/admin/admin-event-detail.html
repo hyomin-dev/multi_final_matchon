@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/admin/admin-event-detail.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
 
 </head>
 <body>
@@ -24,12 +25,12 @@
     <div class="info-box"><label>상태:</label> <span th:text="${statusLabel}"></span></div>
 
     <div class="btn-wrap">
-        <a th:href="@{/admin/event}" class="btn back-btn">목록으로</a>
-        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post">
+        <button type="button" class="btn back-btn" onclick="location.href='/admin/event'">목록으로</button>
+        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post" style="display: inline;">
             <input type="hidden" name="status" value="APPROVED">
             <button type="submit" class="btn approve-btn">승인</button>
         </form>
-        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post">
+        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post" style="display: inline;">
             <input type="hidden" name="status" value="DENIED">
             <button type="submit" class="btn deny-btn">반려</button>
         </form>

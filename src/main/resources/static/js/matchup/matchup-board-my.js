@@ -1,8 +1,15 @@
 let myMannerTemperature;
 let sportsType = '';
 let dateFilter = '';
+let availableFilter = false;
+let lastFilterValues = {};
 document.addEventListener("DOMContentLoaded",async ()=>{
 
+    lastFilterValues={
+        "sportsType": sportsType,
+        "dateFilter": dateFilter,
+        "availableFilter": availableFilter
+    }
 
     document.querySelector("#sports-type").addEventListener("change",(e)=>{
         sportsType = e.target.value;
@@ -13,8 +20,28 @@ document.addEventListener("DOMContentLoaded",async ()=>{
         //console.log(dateFilter);
     })
 
+    document.querySelector("#availableOnly").addEventListener("change",(e)=>{
+        availableFilter = e.target.checked;
+        // 체크O: true
+        // 체크x: false
+    })
+
     document.querySelector("#filterBtn").addEventListener("click",()=>{
-        loadItems(1, sportsType, dateFilter);
+        const isSame = lastFilterValues.sportsType === sportsType &&
+            lastFilterValues.dateFilter === dateFilter &&
+            lastFilterValues.availableFilter === availableFilter;
+
+        if(isSame){
+            e.preventDefault();
+            console.log("검색 조건이 변하지 않았습니다.");
+        }else{
+            lastFilterValues.sportsType = sportsType;
+            lastFilterValues.dateFilter = dateFilter;
+            lastFilterValues.availableFilter = availableFilter;
+            loadItems(1, sportsType, dateFilter, availableFilter);
+        }
+
+
     })
 
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
@@ -22,8 +49,8 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
 })
 
-async function loadItems(page, sportsType='', dateFilter=''){
-    const response = await fetch(`/matchup/board/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}`,{
+async function loadItems(page, sportsType='', dateFilter='', availableFilter=false){
+    const response = await fetch(`/matchup/board/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}&availableFilter=${availableFilter}`,{
         method: "GET",
         credentials: "include"
 
@@ -37,12 +64,22 @@ async function loadItems(page, sportsType='', dateFilter=''){
     //console.log(pageInfo);
 
     renderList(items);
-    renderPagination(pageInfo , sportsType, dateFilter);
+    renderPagination(pageInfo , sportsType, dateFilter, availableFilter);
 
 }
 function renderList(items){
     const boardArea = document.querySelector("#board-container");
     boardArea.innerHTML = '';
+
+    if(items.length ===0){
+        boardArea.innerHTML = `
+            <div class="no-result">
+                작성한 글이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
 
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
@@ -50,42 +87,46 @@ function renderList(items){
         const card = document.createElement("div");
         card.className = "matchup-card";
         card.innerHTML = `
-             <div class="card-section center">
-                <div><strong>작성자:</strong> ${item.memberName}</div>
+             <div class="card-section card-writer">
+                <div><strong>작성자:</strong> ${item.writerName}</div>
                 <div><strong>팀 이름:</strong> ${item.teamName}</div>
-                
+                <div class="button-group">
+                    <button onclick="window.open('/chat/group/room?roomId=${item.roomId}', '_blank')" class="group-chat">단체 채팅</button>     
+                    <button class="rating-setting disabled">평가 세팅</button>
+                </div>
+               
+               
             </div>
 
-            <div class="card-section center">
+            <div class="card-section card-match">
                 <div><strong>종목:</strong> ${item.sportsTypeName}</div>
-                <div><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                <div><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
+                <div class="truncate"><strong>경기장:</strong> ${item.sportsFacilityName}</div>
+                <div class="truncate"><strong>주소:</strong> ${item.sportsFacilityAddress}</div>
                 <div>
                     📅 날짜: ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 -
                     ${calTime(item, date.getHours(), date.getMinutes())}
                 </div>
             </div>
 
-            <div class="card-section center">
+            <div class="card-section card-status">
                 <div>${checkStatus(item)}</div>
                 <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>
-                <div>
-                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
-                        <button class="detail">상세보기</button>
-                    </a>
-                    <a href="/matchup/request/board?board-id=${item.boardId}">
-                        <button class="request">요청 확인</button>
-                    </a>
-                    
+                <div class="button-group">
+                    <button onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'" class="detail">상세보기</button>
+                    <button onclick="location.href='/matchup/request/board?board-id=${item.boardId}'" class="request">요청 확인</button>               
                 </div>
             </div>    
                 `;
+
+        setRatingSettingButton(card, item);
+
         boardArea.appendChild(card);
+
 
     })
 }
 
-function renderPagination(pageInfo, sportsType, dateFilter){
+function renderPagination(pageInfo, sportsType, dateFilter, availableFilter){
     // 프론트는 페이지 시작번호 1부터로 헷갈림
     const pageBlockSize = 5;
     // 프론트 측 page 시작 번호 1부터 변경
@@ -105,7 +146,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const firstBtn = document.createElement("button");
         firstBtn.textContent = "<<";
         firstBtn.addEventListener("click",()=>{
-            loadItems(1, sportsType, dateFilter);
+            loadItems(1, sportsType, dateFilter, availableFilter);
         });
         pagingArea.appendChild(firstBtn);
     }
@@ -115,7 +156,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const prevBtn = document.createElement("button");
         prevBtn.textContent = "<";
         prevBtn.addEventListener("click",()=>{
-            loadItems(startPage-1, sportsType, dateFilter);
+            loadItems(startPage-1, sportsType, dateFilter, availableFilter);
         });
         pagingArea.appendChild(prevBtn);
     }
@@ -128,7 +169,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
             btn.disabled = true;
 
         btn.addEventListener("click",()=>{
-            loadItems(i, sportsType, dateFilter);
+            loadItems(i, sportsType, dateFilter, availableFilter);
         })
         pagingArea.appendChild(btn);
     }
@@ -138,7 +179,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const nextBtn = document.createElement("button");
         nextBtn.textContent = ">";
         nextBtn.addEventListener("click",()=>{
-            loadItems(endPage+1, sportsType, dateFilter);
+            loadItems(endPage+1, sportsType, dateFilter, availableFilter);
         })
         pagingArea.appendChild(nextBtn);
     }
@@ -149,7 +190,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const lastBtn = document.createElement("button");
         lastBtn.textContent  = ">>";
         lastBtn.addEventListener("click",()=>{
-            loadItems(pageInfo.totalPages, sportsType, dateFilter);
+            loadItems(pageInfo.totalPages, sportsType, dateFilter, availableFilter);
         })
         pagingArea.appendChild(lastBtn);
 
@@ -191,6 +232,31 @@ function checkStatus(item){
         return "모집 완료";
     else
         return "모집 가능"
+}
+
+function setRatingSettingButton(card, item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+
+
+    if(matchDate<now &&  !item.isRatingInitialized) {
+        card.querySelector(".rating-setting").classList.remove("disabled");
+        card.querySelector(".rating-setting").addEventListener("click",async ()=>{
+            const response = await fetch(`/matchup/rating/setting?boardId=${item.boardId}`,{
+                method: "GET",
+                credentials: "include"
+            })
+            if(!response.ok)
+                throw new Error(`HTTP error! Status:${response.status}`)
+            else{
+                alert("평가 세팅이 완료되었습니다.");
+            }
+
+
+        })
+    }
+
+
 }
 
 

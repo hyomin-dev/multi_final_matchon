@@ -1,6 +1,7 @@
 package com.multi.matchon.matchup.domain;
 
 
+import com.multi.matchon.chat.domain.ChatRoom;
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.common.domain.SportsType;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
@@ -13,6 +14,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -30,7 +33,7 @@ public class MatchupBoard extends BaseEntity {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="writer_id",nullable = false)
-    private Member member;
+    private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="sports_type_id",nullable = false)
@@ -66,9 +69,22 @@ public class MatchupBoard extends BaseEntity {
     @Column(name="match_description",nullable = false, columnDefinition = "TEXT")
     private String matchDescription;
 
+    @OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="chat_room_id",nullable = false)
+    private ChatRoom chatRoom;
+
+    @Column(name="is_rating_initialized")
+    @Builder.Default
+    private Boolean isRatingInitialized = false;
+
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
+
+    @OneToMany(mappedBy = "matchupBoard")
+    @Builder.Default
+    private List<MatchupRequest> matchupRequests = new ArrayList<>();
+
 
     public void update(SportsType sportsType, String teamIntro, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants, Double minMannerTemperature, String matchDescription){
 
@@ -96,5 +112,9 @@ public class MatchupBoard extends BaseEntity {
 
     public void decreaseCurrentParticipantCount(Integer participantCount){
         this.currentParticipantCount -= participantCount;
+    }
+
+    public void setRatingInitialized(Boolean isRatingInitialized){
+        this.isRatingInitialized = isRatingInitialized;
     }
 }

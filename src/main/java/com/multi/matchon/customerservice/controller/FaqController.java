@@ -120,4 +120,11 @@ public class FaqController {
         Member member = memberRepository.findByMemberEmail(email).orElse(null);
         return member != null && member.getMemberRole().name().equals("ADMIN");
     }
+
+    @PostMapping("/faq/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // 관리자만 삭제 가능
+    public String deleteFaq(@PathVariable Long id) {
+        faqService.deleteFaqById(id); // 실제 삭제 로직 수행
+        return "redirect:/cs"; // 목록 페이지로 리디렉션
+    }
 }

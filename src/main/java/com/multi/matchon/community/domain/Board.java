@@ -3,6 +3,9 @@ package com.multi.matchon.community.domain;
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
@@ -18,7 +21,7 @@ public class Board extends BaseEntity {
     @Column(name = "board_id")
     private Long id;
 
-    @Column(name = "title", nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name = "title", nullable = false, columnDefinition = "VARCHAR(50)")
     private String title;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
@@ -41,16 +44,38 @@ public class Board extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted = false;
 
+    @Column(name = "pinned", nullable = false)
+    @Builder.Default
+    private boolean pinned = false;
+
+    // === 비즈니스 로직 ===
+
     public void setIsDeleted(boolean deleted) {
         this.isDeleted = deleted;
     }
 
-    @Column(name = "attachment_path")
-    private String attachmentPath;
+    public void update(
+            @NotBlank @Size(max = 50) String title,
+            @NotBlank String content,
+            @NotNull Category category) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+    }
 
-    @Column(name = "attachment_original_name")
-    private String attachmentOriginalName;
+    public void setBoardAttachmentEnabled(boolean enabled) {
+        this.boardAttachmentEnabled = enabled;
+    }
+
+    public void pin() {
+        this.pinned = true;
+    }
+
+    public void unpin() {
+        this.pinned = false;
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
+    }
 }
-
-
-

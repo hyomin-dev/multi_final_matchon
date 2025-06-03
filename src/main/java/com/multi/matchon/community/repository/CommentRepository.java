@@ -9,5 +9,10 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByBoardAndIsDeletedFalse(Board board);
 
+    void deleteAllByBoard(Board board);
+
+    int countByBoardIdAndIsDeletedFalse(Long boardId);
+
+
 }
 

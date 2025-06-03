@@ -5,6 +5,7 @@
   <title>MATCHON</title>
   <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
   <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
   <script th:src="@{/js/matchup/matchup-board-detail.js}" defer></script>
   <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&libraries=services'"></script>
   <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-board-detail.css}">
@@ -20,7 +21,7 @@
 <div id="wrap">
   <h1>MATCHUP 글 상세보기</h1>
   <div id="matchup-board-detail-dto"
-       th:data-member-email="${resMatchupBoardDto.memberEmail}"
+       th:data-member-email="${resMatchupBoardDto.writerEmail}"
        th:data-sports-facility-name="${resMatchupBoardDto.sportsFacilityName}"
        th:data-sports-facility-address="${resMatchupBoardDto.sportsFacilityAddress}"
        th:data-match-datetime="${resMatchupBoardDto.matchDatetime}"
@@ -36,32 +37,31 @@
   </div>
   <table>
     <tr>
-      <th>종목: </th>
+      <th>종목 </th>
       <td th:text="${resMatchupBoardDto.sportsTypeName}"></td>
     </tr>
     <tr>
-      <th>작성자: </th>
-      <td id="writer"></td>
+      <th>작성자 </th>
+      <td th:text="${resMatchupBoardDto.writerName}"></td>
     </tr>
     <tr>
-      <th>소속팀:</th>
+      <th>소속팀</th>
       <td th:text="${resMatchupBoardDto.teamName}"></td>
     </tr>
     <tr>
-      <th>팀 소개:</th>
+      <th>팀 소개</th>
       <td th:text="${resMatchupBoardDto.teamIntro}"></td>
     </tr>
     <tr>
-      <th>경기장 예약내역:</th>
-
-      <td >미리보기: <a id="reservationUrl" th:text="${resMatchupBoardDto.originalName}" target="_blank" download></a></td>
+      <th>경기장 예약내역</th>
+      <td >미리보기 <a id="reservationUrl" th:text="${resMatchupBoardDto.originalName}" target="_blank" download></a></td>
     </tr>
     <tr>
-      <th>경기장명:</th>
+      <th>경기장명</th>
       <td th:text="${resMatchupBoardDto.sportsFacilityName}"></td>
     </tr>
     <tr>
-      <th>경기장 주소:</th>
+      <th>경기장 주소</th>
       <td th:text="${resMatchupBoardDto.sportsFacilityAddress}"></td>
     </tr>
     <tr>
@@ -91,50 +91,34 @@
       <td th:text="${resMatchupBoardDto.myMannerTemperature}"></td>
     </tr>
     <tr>
-      <th>경기 방식: </th>
+      <th>경기 방식 </th>
       <td th:text="${resMatchupBoardDto.matchDescription}"></td>
     </tr>
   </table>
-<!--  <th:block th:if="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now()}">-->
-<!--    <div class="button-group">-->
-<!--      <th:block th:if="${resMatchupBoardDto.memberEmail == #authentication.name}">-->
-<!--&lt;!&ndash;        <a th:href="@{/matchup/board/edit(boardId=${resMatchupBoardDto.boardId})}" id="modifyBtn">수정하기</a>&ndash;&gt;-->
-<!--&lt;!&ndash;        <a th:href="@{/matchup/board/delete(boardId=${resMatchupBoardDto.boardId})}" id="deleteBtn">삭제하기</a>&ndash;&gt;-->
-<!--      </th:block>-->
-<!--      <th:block th:unless="${resMatchupBoardDto.memberEmail == #authentication.name}">-->
-<!--&lt;!&ndash;        <a id="chat1-1Btn" th:href="@{#}">문의하기</a>&ndash;&gt;-->
-<!--&lt;!&ndash;        <a id="requestBtn" th:href="@{/matchup/request(boardId=${resMatchupBoardDto.boardId})}">참가요청</a>&ndash;&gt;-->
-<!--      </th:block>-->
-<!--    </div>-->
-<!--  </th:block>-->
 
   <div class="button-group">
 
     <!-- 작성자 본인에게만 보이는 수정/삭제 버튼 -->
-    <a  id="modifyBtn" th:href="@{/matchup/board/edit(boardId=${resMatchupBoardDto.boardId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.memberEmail == #authentication.name} ? 'display:inline' : 'display:none'">
+    <a  id="modifyBtn" th:href="@{/matchup/board/edit(boardId=${resMatchupBoardDto.boardId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail == #authentication.name} ? 'display:inline' : 'display:none'">
       수정하기
     </a>
 
-    <a th:href="@{/matchup/board/delete(boardId=${resMatchupBoardDto.boardId})}" id="deleteBtn" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.memberEmail == #authentication.name} ? 'display:inline' : 'display:none'">
+    <a th:href="@{/matchup/board/delete(boardId=${resMatchupBoardDto.boardId})}" id="deleteBtn" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail == #authentication.name} ? 'display:inline' : 'display:none'">
       삭제하기
     </a>
 
     <!-- 작성자가 아닌 사용자에게만 보이는 문의/참가요청 버튼 -->
-    <a id="chat1-1Btn" th:href="@{#}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.memberEmail != #authentication.name} ? 'display:inline' : 'display:none'">
+    <a id="chat1-1Btn" th:href="@{/chat/private(receiverId=${resMatchupBoardDto.writerId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail != #authentication.name} ? 'display:inline' : 'display:none'" target="_blank">
       문의하기
     </a>
 
-    <a id="requestBtn" th:href="@{/matchup/request(boardId=${resMatchupBoardDto.boardId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.memberEmail != #authentication.name} ? 'display:inline' : 'display:none'">
+    <a id="requestBtn" th:href="@{/matchup/request(boardId=${resMatchupBoardDto.boardId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail != #authentication.name} ? 'display:inline' : 'display:none'">
       참가요청
     </a>
 
-    <a onclick="history.back()" class="back-btn">뒤로가기</a>
-
-
+    <a th:href="@{/matchup/board}" class="back-btn">뒤로가기</a>
 
   </div>
-
-
 
 </div>
 

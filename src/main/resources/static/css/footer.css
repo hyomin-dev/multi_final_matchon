@@ -1,24 +1,26 @@
-#wrap{
+#wrap {
     width: 85%;
     margin: 0 auto;
-    min-height:calc(100vh - 340px); /* footer, header, margin 크기 빼기 */
+    min-height: calc(100vh - 340px);
 }
 
-.footer{
+.footer {
     height: 60px;
     margin: 0 auto;
     width: 100%;
     font-size: 24px;
     text-align: center;
+    font-family: 'Arial', sans-serif;
+    color: black;
+    background-color: #ffffff;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.navy_hr{
+.navy_hr {
     border-top: 1px solid #000080;
-
 }
 
-#chatbot-img{
-    position: fixed;
-    right: 1%;
-    bottom: 8%;
-}
+

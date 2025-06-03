@@ -180,8 +180,7 @@ function manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupC
     // 2. 참가 요청 삭제
     else if(
         (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
-        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
-        (matchupStatus===Status.DENIED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true)
+        (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true)
     ){
         statusEle.textContent =  "요청 취소됨";
     }

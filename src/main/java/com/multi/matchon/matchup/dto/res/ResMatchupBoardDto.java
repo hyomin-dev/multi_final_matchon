@@ -20,9 +20,11 @@ public class ResMatchupBoardDto {
 
     private Long boardId;
 
-    private String memberEmail;
+    private Long writerId;
 
-    private String memberName;
+    private String writerEmail;
+
+    private String writerName;
 
     private String teamName;
 

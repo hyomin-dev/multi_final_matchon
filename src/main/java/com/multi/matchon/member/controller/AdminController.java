@@ -2,6 +2,9 @@ package com.multi.matchon.member.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.Status;
+import com.multi.matchon.community.domain.Report;
+import com.multi.matchon.community.dto.res.ReportResponse;
+import com.multi.matchon.community.service.ReportService;
 import com.multi.matchon.customerservice.domain.Inquiry;
 import com.multi.matchon.customerservice.domain.InquiryAnswer;
 import com.multi.matchon.customerservice.dto.res.InquiryResDto;
@@ -36,6 +39,7 @@ public class AdminController {
     private final EventRepository eventRepository;
     private final InquiryRepository inquiryRepository;
     private final InquiryAnswerRepository inquiryAnswerRepository;
+    private final ReportService reportService;
 
     @GetMapping
     public String adminHome() {
@@ -77,11 +81,10 @@ public class AdminController {
         Inquiry inquiry = inquiryRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new NoSuchElementException("문의가 존재하지 않습니다."));
 
-        if (inquiry.getInquiryStatus() == Status.COMPLETED || inquiry.getAnswer() != null) {
+        // 답변 존재 여부만으로 판단
+        if (inquiryAnswerRepository.findActiveAnswerByInquiryId(inquiry.getId()).isPresent()) {
             throw new IllegalStateException("이미 답변이 등록된 문의입니다.");
         }
-
-        inquiry.complete();
 
         InquiryAnswer answer = InquiryAnswer.builder()
                 .inquiry(inquiry)
@@ -89,8 +92,10 @@ public class AdminController {
                 .answerContent(answerContent)
                 .build();
 
-        inquiry.setAnswer(answer); // 양방향 연결
+        inquiry.setAnswer(answer);
         inquiryAnswerRepository.save(answer);
+
+        inquiry.complete(); // 상태는 저장 이후 변경
 
         return "redirect:/admin/inquiry";
     }
@@ -159,4 +164,10 @@ public class AdminController {
         eventRepository.updateEventStatus(id, status);
         return "redirect:/admin/event";
     }
+
+    @GetMapping("/reports")
+    public String redirectToReportsPage() {
+        return "redirect:/admin/reports/page";
+    }
+
 }

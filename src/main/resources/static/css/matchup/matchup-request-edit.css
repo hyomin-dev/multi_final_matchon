@@ -108,5 +108,10 @@ textarea {
     border: 1px solid #ccc;
 }
 
+td {
+    word-break: break-all;    /* 글자 단위 줄바꿈 (한글/영어 모두 적용) */
+    white-space: normal;
+}
+
 
 

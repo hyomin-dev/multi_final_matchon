@@ -98,4 +98,12 @@ public class FaqService {
                 .orElseThrow(() -> new RuntimeException("FAQ를 찾을 수 없습니다."));
         faq.update(title, content, category);
     }
+
+    @Transactional
+    public void deleteFaqById(Long id) {
+        Faq faq = faqRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("FAQ를 찾을 수 없습니다."));
+        faq.softDelete(); // 소프트 삭제
+    }
+
 }

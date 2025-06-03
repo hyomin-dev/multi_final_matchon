@@ -6,6 +6,7 @@ import com.multi.matchon.common.domain.Attachment;
 import com.multi.matchon.common.domain.BoardType;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.dto.res.PageResponseDto;
+import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
 
@@ -48,7 +49,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
+
 public class MatchupService{
 
     @Value("${spring.cloud.aws.s3.base-url}")
@@ -64,6 +65,7 @@ public class MatchupService{
 
     private final AwsS3Utils awsS3Utils;
 
+    @Transactional
     public void insertFile(MultipartFile multipartFile, MatchupBoard matchupBoard){
         String fileName = UUID.randomUUID().toString().replace("-","");
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
@@ -77,14 +79,14 @@ public class MatchupService{
                 .build();
         attachmentRepository.save(attachment);
     }
-
+    @Transactional
     public void updateFile(MultipartFile multipartFile, MatchupBoard findMatchupBoard){
         String fileName = UUID.randomUUID().toString().replace("-","");
 
         List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, findMatchupBoard.getId());
 
         if(findAttachments.isEmpty())
-            throw new IllegalArgumentException("Matchup"+BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
+            throw new CustomException("Matchup "+BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
 
         String savedName = findAttachments.get(0).getSavedName();
 

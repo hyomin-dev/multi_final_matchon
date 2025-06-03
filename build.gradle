@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -41,6 +42,8 @@ dependencies {
 
     implementation 'net.coobird:thumbnailator:0.4.14' // 썸네일
 
+    implementation 'org.springframework.boot:spring-boot-starter-mail' // 메일 기능 추가
+
     //jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'  // JWT API
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'  // JWT 구현체
@@ -53,6 +56,12 @@ dependencies {
     implementation("org.json:json:20250107") // JSONObject
 
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.2' // S3
+
+    implementation 'com.google.cloud:google-cloud-dialogflow:4.69.0' // google-dialogflow
+
+    // test
+    implementation 'com.opencsv:opencsv:5.7.1'
+
 
 
 

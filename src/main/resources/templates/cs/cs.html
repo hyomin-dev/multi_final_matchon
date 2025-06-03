@@ -4,11 +4,54 @@
     <title>CS</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}" />
+
 
     <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #aaa; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        thead {
+            background-color: #255E93;
+            color: white;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: center;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+
+        .delete {
+            background: none;
+            border: none;
+            color: red;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            cursor: pointer;
+            padding: 0;
+        }
+
         .pagination {
             display: flex; justify-content: center; align-items: center;
             gap: 12px; font-size: 18px; margin-top: 20px;
@@ -19,7 +62,91 @@
         .pagination a:hover { color: #007bff; }
         .pagination .page-number { font-weight: bold; font-size: 20px; }
         .titlefaq, .title2faq { text-align: center; }
-        .btnsubmit, .btn1 { float: right; }
+
+        .faq-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .faq-left form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .faq-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btnsubmit {
+            padding: 8px 16px;
+            border: 2px solid #255E93;
+            border-radius: 12px;
+            font-weight: bold;
+            color: #255E93;
+            background-color: transparent;
+            text-decoration: none;
+        }
+
+        .btninquiry {
+            padding: 8px 16px;
+            border: 2px solid #DB778D;
+            border-radius: 12px;
+            font-weight: bold;
+            color: #DB778D;
+            background-color: transparent;
+            text-decoration: none;
+        }
+
+        td a {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        td a:hover {
+            color: #555;
+        }
+
+        select#category {
+            background-color: #255E93;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+            padding-right: 30px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input[type="text"] {
+            width: 250px;
+            padding: 10px 16px 10px 40px;
+            border: 2px solid #255E93;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            background-color: white;
+            background-image: url('/img/fi-rr-search.png');
+            background-size: 20px;
+            background-repeat: no-repeat;
+            background-position: 12px center;
+        }
     </style>
 </head>
 <body>
@@ -30,24 +157,33 @@
     <h1 class="titlefaq">FAQ</h1>
     <p class="title2faq">자주 묻는 질문</p>
 
-    <form method="get" th:action="@{/cs}">
-        <label for="category"></label>
-        <select name="category" id="category">
-            <option value="" th:selected="${category == null}">전체 보기</option>
-            <option value="HOWTOUSE" th:selected="${category?.name() == 'HOWTOUSE'}">이용방법</option>
-            <option value="ACCOUNT" th:selected="${category?.name() == 'ACCOUNT'}">계정</option>
-            <option value="TEAM_GUEST" th:selected="${category?.name() == 'TEAM_GUEST'}">Team / Guest</option>
-            <option value="REPORT" th:selected="${category?.name() == 'REPORT'}">신고</option>
-            <option value="MANNER_TEMPERATURE" th:selected="${category?.name() == 'MANNER_TEMPERATURE'}">매너온도</option>
-        </select>
+    <div class="faq-toolbar">
+        <div class="faq-left">
+            <form method="get" th:action="@{/cs}">
+                <label for="category"></label>
+                <select name="category" id="category">
+                    <option value="" th:selected="${category == null}">전체 보기</option>
+                    <option value="TUTORIAL" th:selected="${category?.name() == 'TUTORIAL'}">이용가이드</option>
+                    <option value="ACCOUNT" th:selected="${category?.name() == 'ACCOUNT'}">계정</option>
+                    <option value="TEAM_GUEST" th:selected="${category?.name() == 'TEAM_GUEST'}">Team / Guest</option>
+                    <option value="REPORT" th:selected="${category?.name() == 'REPORT'}">신고</option>
+                    <option value="MANNER_TEMPERATURE" th:selected="${category?.name() == 'MANNER_TEMPERATURE'}">매너온도</option>
+                </select>
+                <label for="keyword"></label>
+                <div class="search-box">
+                    <input type="text" id="keyword" name="keyword" placeholder="검색.." th:value="${keyword}" />
+                </div>
+            </form>
+        </div>
 
-        <label for="keyword"></label>
-        <input type="text" id="keyword" name="keyword" placeholder="검색.." th:value="${keyword}" />
-        <button type="submit">검색</button>
+        <div class="faq-right">
+            <a href="/inquiry" class="btninquiry">1:1 문의</a>
+            <th:block th:if="${isAdmin}">
+                <a href="/faq/register" class="btnsubmit">등록하기</a>
+            </th:block>
+        </div>
+    </div>
 
-        <a href="/inquiry" class="btn1">1:1 문의 작성</a>
-    </form>
-<br>
     <table>
         <thead>
         <tr>
@@ -60,21 +196,22 @@
         </tr>
         </thead>
         <tbody>
-        <tbody>
         <tr th:each="faq, stat : ${faqList}">
-            <!-- 1부터 시작, 페이지마다 순차 증가..-->
             <td th:text="${page.number * page.size + stat.index + 1}">No</td>
             <td th:text="${faq.faqCategory.label}">카테고리</td>
             <td>
                 <a th:href="@{/faq/detail/{id}(id=${faq.faqId})}" th:text="${faq.faqTitle}">제목</a>
             </td>
-            <td th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd')}">작성일</td>
-
-            <td th:if="${isAdmin}" th:text="${faq.createdDate}">작성일</td>
-            <td th:if="${isAdmin}" th:text="${faq.modifiedDate}">수정일</td>
+            <td th:if="${!isAdmin}" th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd')}">작성일</td>
+            <td th:if="${isAdmin}" th:text="${#temporals.format(faq.modifiedDate, 'yyyy-MM-dd HH:mm')}">수정일</td>
+            <td th:if="${isAdmin}" th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</td>
+            <td th:if="${isAdmin}">
+                <form th:action="@{/faq/delete/{id}(id=${faq.faqId})}" method="post">
+                    <button type="submit" class="delete">&times;</button>
+                </form>
+            </td>
         </tr>
         </tbody>
-
     </table>
 
     <div class="pagination">
@@ -82,26 +219,6 @@
         <span class="page-number" th:text="${page.number + 1} + ' / ' + ${page.totalPages}">1</span>
         <a th:if="${!page.last}" th:href="@{/cs(page=${page.number + 1}, category=${category}, keyword=${keyword})}">&gt;</a>
     </div>
-
-
-    <!-- 관리자만 FAQ 등록 버튼 표시 -->
-    <th:block th:if="${isAdmin}">
-        <div style="text-align: right; margin: 10px 0;">
-            <a href="/faq/register" style="
-            display: inline-block;
-            padding: 8px 16px;
-            background-color: #007bff;
-            color: white;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-        ">
-                FAQ 등록
-            </a>
-        </div>
-    </th:block>
-
-
 
 </div>
 <div th:replace="~{common/footer::footer}"></div>

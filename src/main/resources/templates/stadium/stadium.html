@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>STADIUM</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
     <style>
-        .titlestadium {
-            text-align: center;
-        }
-
+        .title_stadium { text-align: center; }
         .region-tabs-stadium {
             display: flex;
             justify-content: center;
@@ -19,70 +17,101 @@
             padding-bottom: 10px;
             margin-bottom: 30px;
         }
-
+        .region-tabs-stadium a {
+            text-decoration: none;
+            color: black;
+        }
+        .region-tabs-stadium a.active {
+            color: blue;
+            border-bottom: 2px solid blue;
+        }
         .stadium-card {
             display: flex;
             align-items: flex-start;
             border-top: 1px solid #ccc;
             padding: 20px 0;
         }
-
-        .stadium-card img {
-            width: 150px;
-            height: 100px;
-            background-color: #eee;
-            margin-right: 20px;
-            object-fit: cover;
-        }
-
         .stadium-info {
             display: flex;
             flex-direction: column;
         }
-
         .stadium-location {
             font-size: 14px;
             color: #555;
             margin-bottom: 5px;
         }
-
         .stadium-name {
             font-size: 18px;
             font-weight: bold;
         }
-
+        .pagination {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .pagination a {
+            margin: 0 6px;
+            text-decoration: none;
+            color: #444;
+        }
+        .pagination a.active {
+            font-weight: bold;
+            color: blue;
+        }
     </style>
 </head>
 <body>
-
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
+    <h1 class="title_stadium">STADIUM</h1>
 
-    <h1 class="titlestadium">구장 목록</h1>
-
+    <!-- 지역 필터 탭 -->
     <div class="region-tabs-stadium">
-        <div>서울</div>
-        <div>경기</div>
-        <div>강원</div>
-        <div>충청</div>
-        <div>전라</div>
-        <div>제주</div>
-        <div>경상</div>
+        <a th:href="@{/stadium}" th:classappend="${selectedRegion} == null ? ' active' : ''">전체</a>
+        <a th:href="@{/stadium(region='서울')}" th:classappend="${selectedRegion} == '서울' ? ' active' : ''">서울</a>
+        <a th:href="@{/stadium(region='경기')}" th:classappend="${selectedRegion} == '경기' ? ' active' : ''">경기</a>
+        <a th:href="@{/stadium(region='강원')}" th:classappend="${selectedRegion} == '강원' ? ' active' : ''">강원</a>
+        <a th:href="@{/stadium(region='충청')}" th:classappend="${selectedRegion} == '충청' ? ' active' : ''">충청</a>
+        <a th:href="@{/stadium(region='전라')}" th:classappend="${selectedRegion} == '전라' ? ' active' : ''">전라</a>
+        <a th:href="@{/stadium(region='제주')}" th:classappend="${selectedRegion} == '제주' ? ' active' : ''">제주</a>
+        <a th:href="@{/stadium(region='경상')}" th:classappend="${selectedRegion} == '경상' ? ' active' : ''">경상</a>
+        <a th:href="@{/stadium(region='세종')}" th:classappend="${selectedRegion} == '세종' ? ' active' : ''">세종</a>
+        <a th:href="@{/stadium(region='부산')}" th:classappend="${selectedRegion} == '부산' ? ' active' : ''">부산</a>
+        <a th:href="@{/stadium(region='울산')}" th:classappend="${selectedRegion} == '울산' ? ' active' : ''">울산</a>
+        <a th:href="@{/stadium(region='전북')}" th:classappend="${selectedRegion} == '전북' ? ' active' : ''">전북</a>
+        <a th:href="@{/stadium(region='인천')}" th:classappend="${selectedRegion} == '인천' ? ' active' : ''">인천</a>
+        <a th:href="@{/stadium(region='대구')}" th:classappend="${selectedRegion} == '대구' ? ' active' : ''">대구</a>
+        <a th:href="@{/stadium(region='광주')}" th:classappend="${selectedRegion} == '광주' ? ' active' : ''">광주</a>
     </div>
 
-    <div class="stadium-card">
-        <img src="" alt="경기장 이미지1">
-        <div class="stadium-location">경기 / 고양시</div>
-        <div class="stadium-name">고양 AoA 풋살 스타디움</div>
+    <!-- 구장 이름 검색창 -->
+    <form th:action="@{/stadium}" method="get" style="text-align:center; margin-bottom:20px;">
+        <label>
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="구장 이름을 입력하세요">
+        </label>
+        <button type="submit">검색</button>
+    </form>
+
+    <!-- 구장 목록 출력 -->
+    <div th:each="stadium : ${stadiums.content}" class="stadium-card">
+        <div class="stadium-info">
+            <div class="stadium-location"
+                 th:text="${stadium.stadiumRegion + ' / ' + stadium.stadiumAddress}">
+                지역 / 주소
+            </div>
+            <div class="stadium-name">
+                <a th:href="@{/stadium/{id}(id=${stadium.id})}" th:text="${stadium.stadiumName}">경기장 이름</a>
+            </div>
+            <div class="stadium-location" th:text="${stadium.stadiumTel}">전화번호</div>
+        </div>
     </div>
 
-    <div class="stadium-card">
-        <img src="" alt="경기장 이미지2">
-        <div class="stadium-location">경기 / 고양시</div>
-        <div class="stadium-name">고양 데일리 그라운드 풋살장 마두점</div>
+    <!-- 페이지네이션 -->
+    <div class="pagination">
+        <a th:if="${!stadiums.first}" th:href="@{/stadium(page=${stadiums.number - 1}, region=${selectedRegion}, keyword=${keyword})}">&lt;</a>
+        <span class="page-number" th:text="${stadiums.number + 1} + ' / ' + ${stadiums.totalPages}">1</span>
+        <a th:if="${!stadiums.last}" th:href="@{/stadium(page=${stadiums.number + 1}, region=${selectedRegion}, keyword=${keyword})}">&gt;</a>
     </div>
 </div>
-
 <div th:replace="~{common/footer::footer}"></div>
 </body>
 </html>
