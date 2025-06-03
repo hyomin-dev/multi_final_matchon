@@ -49,7 +49,8 @@
             <div th:if="${attachments != null and !attachments.isEmpty()}" class="attachment-box">
                 <strong>첨부파일</strong>
                 <ul>
-                    <li th:each="att : ${attachments}">
+                    <li th:each="att : ${attachments}" class="attachment-item">
+                        <img src="/img/free-icon-attach-file-6583130.png" alt="첨부 아이콘" class="attachment-icon"/>
                         <a th:href="@{/community/download-force/{filename}(filename=${att.savedName})}"
                            th:text="${att.originalName}"></a>
                     </li>
