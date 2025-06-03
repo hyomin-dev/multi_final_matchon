@@ -87,38 +87,33 @@ function renderList(items){
         const card = document.createElement("div");
         card.className = "matchup-card";
         card.innerHTML = `
-             <div class="card-section center">
+             <div class="card-section card-writer">
                 <div><strong>작성자:</strong> ${item.writerName}</div>
                 <div><strong>팀 이름:</strong> ${item.teamName}</div>
-                <a href="/chat/group/room?roomId=${item.roomId}" target="_blank">
-                    <button class="group-chat">단체 채팅</button>
-                </a>
-                
-                <button class="rating-setting disabled">평가 세팅</button>
+                <div class="button-group">
+                    <button onclick="window.open('/chat/group/room?roomId=${item.roomId}', '_blank')" class="group-chat">단체 채팅</button>     
+                    <button class="rating-setting disabled">평가 세팅</button>
+                </div>
+               
                
             </div>
 
-            <div class="card-section center">
+            <div class="card-section card-match">
                 <div><strong>종목:</strong> ${item.sportsTypeName}</div>
                 <div class="truncate"><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                <div class="truncate"><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
+                <div class="truncate"><strong>주소:</strong> ${item.sportsFacilityAddress}</div>
                 <div>
                     📅 날짜: ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 -
                     ${calTime(item, date.getHours(), date.getMinutes())}
                 </div>
             </div>
 
-            <div class="card-section center">
+            <div class="card-section card-status">
                 <div>${checkStatus(item)}</div>
                 <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>
-                <div>
-                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
-                        <button class="detail">상세보기</button>
-                    </a>
-                    <a href="/matchup/request/board?board-id=${item.boardId}">
-                        <button class="request">요청 확인</button>
-                    </a>
-                    
+                <div class="button-group">
+                    <button onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'" class="detail">상세보기</button>
+                    <button onclick="location.href='/matchup/request/board?board-id=${item.boardId}'" class="request">요청 확인</button>               
                 </div>
             </div>    
                 `;

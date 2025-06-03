@@ -35,6 +35,15 @@ function renderList(items){
     const boardArea = document.querySelector("#request-container");
     boardArea.innerHTML = '';
 
+    if(items.length ===0){
+        boardArea.innerHTML = `
+            <div class="no-result">
+                매너 온도 평가할 대상이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
     items.forEach((item, index)=>{
 
         const card = document.createElement("div");
