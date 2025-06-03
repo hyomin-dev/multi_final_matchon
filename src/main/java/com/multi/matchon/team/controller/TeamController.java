@@ -62,9 +62,11 @@ public class TeamController {
     }
     @GetMapping
     public ModelAndView showTeamListPage(ModelAndView mv){
+        List<ResTeamDto> teams = teamService.findAllWithoutPaging();
         //PageRequest pageRequest = PageRequest.of(0,4);
         //PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest);
         mv.setViewName("team/team-list");
+        mv.addObject("teams", teams);
         //mv.addObject("pageResponseDto",pageResponseDto);
         return mv;
     }
@@ -78,6 +80,8 @@ public class TeamController {
             @RequestParam(value = "region", required = false) String region,
             @RequestParam(value = "teamRatingAverage", required = false) Double teamRatingAverage
     ){
+
+        log.info("⭐ Rating Filter Received: {}", teamRatingAverage);
         PageRequest pageRequest = PageRequest.of(page,size);
         PageResponseDto<ResTeamDto> pageResponseDto = teamService.findAllWithPaging(pageRequest, recruitingPosition, region, teamRatingAverage);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));

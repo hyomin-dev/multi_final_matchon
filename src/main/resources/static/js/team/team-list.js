@@ -45,7 +45,10 @@ function loadTeamPage(page) {
       <div>
         <h3>${team.teamName}</h3>
         <p>지역: ${team.teamRegion}</p>
-        <p>별점: ${team.teamRatingAverage ? team.teamRatingAverage.toFixed(1) : 'N/A'} ★</p>
+<p>
+  별점: ${team.teamRatingAverage.toFixed(1)}
+  <span class="star-rating" style="--rating-width: ${team.teamRatingAverage * 20}%"></span>
+</p>
         <p>포지션: ${team.recruitingPositions ? team.recruitingPositions.join(', ') : 'N/A'}</p>
         <p>${team.recruitmentStatus ? '모집 중' : '모집 완료'}</p>
         <p>작성자: ${team.createdBy || 'N/A'}</p>
@@ -116,7 +119,10 @@ document.getElementById('myTeamBtn').addEventListener('click', async () => {
                 <div>
                     <h3>${team.teamName}</h3>
                     <p>지역: ${team.teamRegion}</p>
-                    <p>별점: ${team.teamRatingAverage ? team.teamRatingAverage.toFixed(1) : 'N/A'} ★</p>
+<p>
+  별점: ${team.teamRatingAverage.toFixed(1)}
+  <span class="star-rating" style="--rating-width: ${team.teamRatingAverage * 20}%"></span>
+</p>
                     <p>포지션: ${team.recruitingPositions ? team.recruitingPositions.join(', ') : 'N/A'}</p>
                     <p>${team.recruitmentStatus ? '모집 중' : '모집 완료'}</p>
                     <p>작성자: ${team.createdBy || 'N/A'}</p>

@@ -5,13 +5,16 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/team/team-register.css}">
     <script th:src="@{/js/team/team-register.js}" defer></script>
+
 </head>
 <body>
 
 <div th:replace="~{common/header::header}"></div>
 
-<div id="wrap">
+<div class="team-register-wrapper">
+    <div class="team-register-form">
     <h1>팀 생성</h1>
 
     <form th:action="@{/team/team/register}" method="post" enctype="multipart/form-data" th:object="${ReqTeamDto}">
@@ -19,22 +22,21 @@
             <p th:each="err : ${#fields.errors('*')}" th:text="${err}" class="error-message"></p>
         </div>
         <label>팀명</label>
-        <input type="text" th:field="*{teamName}" required />
+        <input type="text" th:field="*{teamName}" maxlength="30" required />
         <div th:if="${#fields.hasErrors('teamName')}" th:errors="*{teamName}" class="field-error"></div>
 
-        <div>
-            <label>팀원 모집 여부:</label>
-            <input type="radio" name="recruitmentStatus" value="true" checked> 모집 중
-            <input type="radio" name="recruitmentStatus" value="false"> 모집 완료
-            <div th:if="${#fields.hasErrors('recruitmentStatus')}" th:errors="*{recruitmentStatus}" class="field-error"></div>
+        <label>팀원 모집 여부</label>
+        <div class="radio-group">
+            <label><input type="radio" th:field="*{recruitmentStatus}" value="true" /> 모집 중</label>
+            <label><input type="radio" th:field="*{recruitmentStatus}" value="false" /> 모집 완료</label>
         </div>
 
         <label>팀 소개</label>
-        <textarea th:field="*{teamIntroduction}" rows="4" required></textarea>
+        <textarea th:field="*{teamIntroduction}" maxlength="300" rows="4" required></textarea>
         <div th:if="${#fields.hasErrors('teamIntroduction')}" th:errors="*{teamIntroduction}" class="field-error"></div>
 
         <label>팀 지역</label>
-        <div>
+            <div class="radio-group">
             <label><input type="radio" th:field="*{teamRegion}" value="CAPITAL_REGION" /> 수도권 (서울·경기·인천)</label><br/>
             <label><input type="radio" th:field="*{teamRegion}" value="YEONGNAM_REGION" /> 영남권 (부산·대구·울산·경남·경북)</label><br/>
             <label><input type="radio" th:field="*{teamRegion}" value="HONAM_REGION" /> 호남권 (광주·전북·전남)</label><br/>
@@ -45,7 +47,7 @@
         </div>
 
         <label>팀에 필요한 포지션</label>
-        <div>
+        <div class="checkbox-group">
             <label><input type="checkbox" th:field="*{recruitingPositions}" value="GOALKEEPER" /> 골키퍼 (GK)</label><br/>
             <label><input type="checkbox" th:field="*{recruitingPositions}" value="CENTER_BACK" /> 센터백 (CB)</label><br/>
             <label><input type="checkbox" th:field="*{recruitingPositions}" value="LEFT_RIGHT_BACK" /> 풀백 (LB/RB)</label><br/>
@@ -65,9 +67,12 @@
         <input type="file" name="teamImageFile" accept="image/*" />
 
 
-        <button type="submit">완료</button>
-        <button type="button" onclick="history.back()">취소</button>
+        <div class="button-group">
+            <button type="submit">완료</button>
+            <button type="button" onclick="history.back()">취소</button>
+        </div>
     </form>
+    </div>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>
