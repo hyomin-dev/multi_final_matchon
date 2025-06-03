@@ -47,11 +47,18 @@ public class MypageController {
     }
 
     @PostMapping("/uploadProfile")
-    public String uploadProfile(@AuthenticationPrincipal CustomUser user,
-                                @RequestParam MultipartFile profileImage) {
-        Member member = memberService.findForMypage(user.getUsername());
-        mypageService.uploadProfileImage(member, profileImage);
-        return "redirect:/mypage";
+    public ResponseEntity<String> uploadProfile(@AuthenticationPrincipal CustomUser user,
+                                                @RequestParam MultipartFile profileImage) {
+        try {
+            Member member = memberService.findForMypage(user.getUsername());
+            mypageService.uploadProfileImage(member, profileImage);
+            return ResponseEntity.ok("업로드 성공");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("프로필 이미지 업로드 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업로드 중 문제가 발생했습니다.");
+        }
     }
 
     @PostMapping("/hostName")
@@ -84,9 +91,9 @@ public class MypageController {
         try {
             PositionName positionName = PositionName.valueOf((String) payload.get("positionName"));
             TimeType timeType = TimeType.valueOf((String) payload.get("timeType"));
-            Double temperature = Double.valueOf(payload.get("temperature").toString());
+            //Double temperature = Double.valueOf(payload.get("temperature").toString());
 
-            mypageService.updateMypage(user.getUsername(), positionName, timeType, temperature);
+            mypageService.updateMypage(user.getUsername(), positionName, timeType);
             return ResponseEntity.ok("수정 완료");
         } catch (Exception e) {
             log.error("마이페이지 수정 실패", e);
