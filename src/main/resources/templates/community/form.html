@@ -23,7 +23,7 @@
 
             <div class="form-group">
                 <label>제목</label>
-                <input type="text" th:field="*{title}" required/>
+                <input type="text" th:field="*{title}" maxlength="100" required/>
                 <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
             </div>
 
