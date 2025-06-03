@@ -1,71 +1,258 @@
+/* 전체 컨테이너 */
+#wrap {
+    width: 85%;
+    margin: 0 auto;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
 /* 제목 */
 h1 {
     text-align: center;
     margin-bottom: 2rem;
 }
 
-/* 카드 전체 레이아웃 */
-.matchup-card {
+
+/* 필터 */
+#filter {
     display: flex;
+    gap: 1rem;
+    align-items: center;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
+    padding-left: 0; /* 이제 필요 없음 */
+}
+
+#filter select,
+#filter input[type="date"] {
+    padding: 6px 10px;
+    border-radius: 5px;
     border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    background-color: white;
+    font-size: 0.95rem;
 }
 
-/* 카드 내부 섹션 */
-.card-section {
-    flex: 1 1 30%;
-    min-width: 220px;
-    padding: 0.5rem;
-}
-
-/* 가운데 정렬용 */
-.card-section.center {
+#filter label {
     display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #333;
 }
 
-/* 버튼 스타일 */
-.detail, .request, .group-chat {
-    padding: 6px 12px;
-    margin: 3px;
+#filter input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #007a00;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+}
+
+#filterBtn {
+    padding: 6px 14px;
+    background-color: #007a00;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+#filterBtn:hover {
+    background-color: #005a00;
+}
+
+.topbar-wrapper {
+    display: flex;
+    justify-content: space-between; /* 왼쪽: 필터 / 오른쪽: 버튼 */
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 이거 추가: 버튼 그룹 우측 정렬 */
+.topbar-buttons {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.topbar-buttons button {
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.1s ease;
+    white-space: nowrap;
+}
+
+.topbar-buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+
+.create-btn,
+.back-btn,
+.group-chat,
+.rating-setting,
+.detail,
+.request,
+.disabled {
+    display: inline-block;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    min-width: 100px;
     border: none;
     border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
     cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* 버튼 그룹 */
+.center-wrapper {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.card-writer .button-group,
+.card-status .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-start;
+    margin-top: 0.5rem;
+}
+
+.card-status .button-group {
+    align-items: flex-end;
+}
+
+/* 버튼 색상 */
+.create-btn {
+    background-color: #004080;
     color: white;
+}
+.create-btn:hover {
+    background-color: #003060;
+    transform: translateY(-2px);
+}
+
+.back-btn {
+    background-color: #888;
+    color: white;
+}
+.back-btn:hover {
+    background-color: #666;
+    transform: translateY(-2px);
+}
+
+.group-chat {
+    background-color: #007bff;
+    color: white;
+}
+.group-chat:hover {
+    background-color: #0056b3;
+}
+
+.rating-setting {
+    background-color: #e67e22;
+    color: white;
+}
+.rating-setting:hover {
+    background-color: #cf711c;
 }
 
 .detail {
     background-color: #004080;
+    color: white;
 }
-
-.request {
-    background-color: #007a00;
-}
-
-.group-chat{
-    background-color: #007bff;
-}
-
 .detail:hover {
     background-color: #003060;
 }
 
+.request {
+    background-color: #007a00;
+    color: white;
+}
 .request:hover {
     background-color: #005a00;
 }
-.group-chat:hover{
-    background-color: #0056b3;
+
+.rating-setting.disabled {
+    background-color: #bcbcbc;
+    color: white;
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: auto;
 }
 
-/* 페이징 버튼 */
+/* 마우스 올려도 hover 효과 제거 */
+.rating-setting.disabled:hover {
+    background-color: #bcbcbc;
+    color: white;
+}
+
+
+
+/* ===== 카드 레이아웃 ===== */
+.matchup-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.card-section {
+    flex: 1 1 30%;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    text-align: center;
+}
+
+/* 각 영역 구분감 부여 */
+.card-writer {
+    border-right: 1px dashed #ccc;
+    padding-right: 1rem;
+}
+
+.card-match {
+    padding: 0 1rem;
+}
+
+.card-status {
+    border-left: 1px dashed #ccc;
+    padding-left: 1rem;
+    text-align: right;
+}
+
+
+/* ===== 페이징 ===== */
 #paging-container button {
     margin: 4px;
     padding: 6px 10px;
@@ -80,107 +267,12 @@ h1 {
     cursor: not-allowed;
 }
 
-
-
-#board-create-link:hover {
-    background-color: #003060;
-}
-
 /* 페이징 영역 가운데 정렬 */
 #paging-container {
     display: flex;
     justify-content: center;
     gap: 0.5rem;
     margin-top: 2rem;
-}
-
-/* 전체 한 줄 정렬 */
-.topbar-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap; /* 화면 작을 때 줄바꿈 허용 */
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* 왼쪽 버튼 그룹 */
-.center-wrapper {
-    display: flex;
-    gap: 0.8rem;
-    flex-wrap: wrap;
-}
-
-/* 필터 영역 */
-#filter {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-#filter select,
-#filter input[type="date"] {
-    padding: 6px 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 0.95rem;
-}
-
-#create-btn,
-#filterBtn {
-    padding: 6px 14px;
-    background-color: #007a00;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s ease;
-}
-
-#filterBtn:hover {
-    background-color: #005a00;
-}
-
-.back-btn {
-    padding: 8px 14px;
-    background-color: #888;
-    color: white;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 6px;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    white-space: nowrap;
-}
-
-.back-btn:hover {
-    background-color: #666;
-    transform: translateY(-2px);
-}
-
-.create-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #004080;
-    color: white;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    text-decoration: none;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.create-btn:hover {
-    background-color: #003060;
-    transform: translateY(-2px);
 }
 
 .no-result {
@@ -191,16 +283,10 @@ h1 {
 }
 
 
+/* 줄임 처리 */
 .truncate {
-    width: 400px;           /* 너비 고정 */
-    white-space: nowrap;    /* 줄바꿈 없음 */
-    overflow: hidden;       /* 넘친 부분 숨김 */
-    text-overflow: ellipsis; /* 말줄임표 (...) 표시 */
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
-
-
-
-
-
-

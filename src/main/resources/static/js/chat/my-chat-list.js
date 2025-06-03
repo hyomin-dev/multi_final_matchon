@@ -51,6 +51,7 @@ async function getMyChatRooms(){
         if(item.isGroupChat === true){
 
             exitBtn.textContent = "나가기";
+            exitBtn.disabled = true;
             enterBtn.addEventListener("click",()=>{
                 window.open(`/chat/group/room?roomId=${item.roomId}`,"_black");
             });

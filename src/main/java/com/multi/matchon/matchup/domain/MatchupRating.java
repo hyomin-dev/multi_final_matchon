@@ -33,18 +33,24 @@ public class MatchupRating extends BaseEntity {
     @JoinColumn(name="target_member_id",nullable = false)
     private Member memberTarget;
 
-    @Column(name="manner_score",nullable = false, columnDefinition = "INT NOT NULL CHECK (1<=manner_score AND manner_score<=5)")
+    @Column(name="manner_score",columnDefinition = "INT CHECK (1<=manner_score AND manner_score<=5)")
     private Integer mannerScore;
 
-    @Column(name="skill_score",nullable = false, columnDefinition = "INT NOT NULL CHECK (1<=skill_score AND skill_score<=5)")
+    @Column(name="skill_score", columnDefinition = "INT CHECK (1<=skill_score AND skill_score<=5)")
     private Integer skillScore;
 
-    @Column(name="review",nullable = false,columnDefinition = "TEXT")
+    @Column(name="review",columnDefinition = "TEXT")
     private String review;
 
     @Column(name="is_completed")
     @Builder.Default
     private Boolean isCompleted = false;
 
+    public void rating(Integer mannerScore, Integer skillScore, String review, Boolean isCompleted){
+        this.mannerScore = mannerScore;
+        this.skillScore = skillScore;
+        this.review = review;
+        this.isCompleted = isCompleted;
+    }
 
 }

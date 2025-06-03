@@ -15,6 +15,9 @@ public class ResJoinRequestDetailDto {
     private String introduction;
     // Optionally: private String profileImageUrl;
 
+    private String profileImageUrl;
+
+
 
 
 }

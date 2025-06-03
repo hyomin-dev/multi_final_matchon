@@ -2,11 +2,13 @@ package com.multi.matchon.member.repository;
 
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.dto.res.ResTeamInfoDto;
+import com.multi.matchon.team.domain.Team;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -43,4 +45,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByMemberEmailAndIsDeletedFalse(String senderEmail);
 
+    List<Member> findAllByTeam(Team team);
 }

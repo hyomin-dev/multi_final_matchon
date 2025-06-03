@@ -76,7 +76,7 @@ public class MatchupRequestService {
 
         // 1. 참가 요청할 게시물이 있는지 확인
 
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findByIdAndIsDeletedFalse(reqMatchupRequestDto.getBoardId()).orElseThrow(()->new IllegalArgumentException("Matchup"+reqMatchupRequestDto.getBoardId()+"번 게시글이 존재하지 않습니다."));
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findByIdAndIsDeletedFalse(reqMatchupRequestDto.getBoardId()).orElseThrow(()->new CustomException("Matchup "+reqMatchupRequestDto.getBoardId()+"번 게시글이 존재하지 않습니다."));
 
         if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now())){
             throw new CustomException("Matchup 경기 시작 시간이 지나 참가 요청할 수 없습니다.");
@@ -155,7 +155,7 @@ public class MatchupRequestService {
     @Transactional(readOnly = true)
     public ReqMatchupRequestDto findReqMatchupRequestDtoByBoardId(Long boardId) {
 
-        ReqMatchupRequestDto reqMatchupRequestDto =  matchupBoardRepository.findReqMatchupRequestDtoByBoardId(boardId).orElseThrow(()->new IllegalArgumentException("Matchup"+boardId+"번 게시글이 없습니다."));
+        ReqMatchupRequestDto reqMatchupRequestDto =  matchupBoardRepository.findReqMatchupRequestDtoByBoardId(boardId).orElseThrow(()->new CustomException("Matchup"+boardId+"번 게시글이 없습니다."));
 
         // 경기 시작 시간이 지났는지 확인
         if(reqMatchupRequestDto.getMatchDatetime().isBefore(LocalDateTime.now())){
@@ -169,7 +169,7 @@ public class MatchupRequestService {
     @Transactional(readOnly = true)
     public ResMatchupRequestDto findResMatchRequestDtoByRequestId(Long requestId) {
 
-        return matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException("Matchup"+requestId+"번 요청은 없습니다."));
+        return matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new CustomException("Matchup "+requestId+"번 요청은 없습니다."));
 
     }
 
@@ -195,7 +195,7 @@ public class MatchupRequestService {
     @Transactional(readOnly = true)
     public ResMatchupRequestDto findResMatchRequestDtoByRequestIdAndModifyStatus(Long requestId) {
 
-        ResMatchupRequestDto resMatchupRequestDto = matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new IllegalArgumentException("Matchup"+requestId+"번 요청은 없습니다."));
+        ResMatchupRequestDto resMatchupRequestDto = matchupRequestRepository.findResMatchupRequestDtoByRequestId(requestId).orElseThrow(()->new CustomException("Matchup "+requestId+"번 요청은 없습니다."));
 
         // 0. 모집된 인원이 총 모집 인원보다 크거나 같은 경우 예외 발생
         if(resMatchupRequestDto.getCurrentParticipantCount()>=resMatchupRequestDto.getMaxParticipants()){
@@ -224,7 +224,7 @@ public class MatchupRequestService {
     // 수정
     @Transactional
     public void updateMatchupRequest(ReqMatchupRequestEditDto reqMatchupRequestEditDto, Long requestId){
-        MatchupRequest findMatchupRequest = matchupRequestRepository.findById(requestId).orElseThrow(()->new IllegalArgumentException("Matchup"+requestId+"번 요청은 없습니다."));
+        MatchupRequest findMatchupRequest = matchupRequestRepository.findById(requestId).orElseThrow(()->new CustomException("Matchup "+requestId+"번 요청은 없습니다."));
 
         // 1. 경기 시작 시간이 지났는지 체크
 

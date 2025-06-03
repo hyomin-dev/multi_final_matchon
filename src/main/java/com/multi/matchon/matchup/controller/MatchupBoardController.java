@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class MatchupBoardController {
 
     private final MatchupService matchupService;
     private final MatchupBoardService matchupBoardService;
+    private final SimpMessageSendingOperations messageTemplate;
 
     // 게시글 작성하기
 
@@ -65,6 +67,7 @@ public class MatchupBoardController {
         //PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest);
         mv.setViewName("matchup/matchup-board-list");
         //mv.addObject("pageResponseDto",pageResponseDto);
+        messageTemplate.convertAndSendToUser("hyomin@1234.com","/notify","test1이 보냄");
         return mv;
     }
 

@@ -6,6 +6,7 @@ import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestOverviewListDto;
+import com.multi.matchon.member.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -181,4 +183,25 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
                     t2.isDeleted=false and t3.isDeleted=false
             """)
     Optional<MatchupRequest> findMatchupRequestWithMatchupBoardByRequestIdAndBoardIDAndWriterId(@Param("requestId") Long requestId, @Param("boardId") Long boardId, @Param("writerId") Long writerId);
+
+
+    @Query("""
+            select t1
+            from MatchupRequest t1
+            join t1.matchupBoard t2
+            join fetch t1.member
+            where t2.isDeleted=false and t2.id=:boardId and t2.matchDatetime < CURRENT_TIMESTAMP and t2.writer=:loginMember and
+            (
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false)
+            )
+            
+            """)
+    List<MatchupRequest> findByBoardIdAndMemberAndGameParticipantConditionAndAfterMatchupDatetime(@Param("boardId") Long boardId, @Param("loginMember") Member loginMember);
+
+
 }

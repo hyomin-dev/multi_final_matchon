@@ -7,7 +7,6 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}"/>
     <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}"/>
     <link rel="stylesheet" th:href="@{/css/team/team-list.css}"/>
-    <link rel="stylesheet" th:href="@{/css/team/team-list-cards.css}"/>
     <script th:src="@{/js/team/team-list.js}" defer></script>
     <style>
         .team-card {
@@ -118,20 +117,23 @@
                 <h2 th:text="${team.teamName}">팀 이름</h2>
                 <p th:text="'지역: ' + ${team.teamRegion}">지역</p>
                 <p>
-                    <span>별점: </span>
-                    <span th:if="${team.teamRatingAverage == null}">N/A &#9733;</span>
-                    <span th:if="${team.teamRatingAverage != null}" th:each="i : ${#numbers.sequence(1, team.teamRatingAverage?.intValue())}" class="star">&#9733;</span>
+                    별점: <span th:text="${team.teamRatingAverage} + '점'">0점</span>
+                    <span class="star-rating"
+                          th:with="width=${team.teamRatingAverage * 20}"
+                          th:style="'width:' + width + '%'">
+    </span>
                 </p>
+                <p>DEBUG STAR: <span th:text="${team.starRatingVisual}">[nothing]</span></p>
                 <p th:text="'포지션: ' + ${team.recruitingPositions}">포지션</p>
                 <p th:text="${team.recruitmentStatus} ? '모집 중' : '모집 완료'">모집 상태</p>
-                <p th:text="'작성자: ' + ${team.creatorName}">작성자</p>
+                <p th:text="'작성자: ' + ${team.createdBy}">작성자</p>
             </div>
         </div>
     </div>
 
     <div class="button-container">
         <a th:href="@{/team/team/register}"><button>팀 등록하기</button></a>
-        <a th:href="@{#}"><button>내 팀 보기</button></a>
+        <button type="button" id="myTeamBtn">내 팀 보기</button>
     </div>
 
     <div id="paging-container"></div>

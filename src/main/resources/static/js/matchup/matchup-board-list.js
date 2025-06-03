@@ -6,6 +6,8 @@ let availableFilter = false;
 let lastFilterValues = {};
 
 document.addEventListener("DOMContentLoaded",async ()=>{
+    setButton();
+
     myMannerTemperature = await getMyMannerTemperature();
     lastFilterValues={
         "sportsType": sportsType,
@@ -98,30 +100,26 @@ function renderList(items){
         card.className = "matchup-card";
         card.innerHTML = `
                                  
-           <div class="card-section">
+           <div class="card-section card-writer">
                 <div><strong>작성자:</strong> ${item.writerName}</div>
                 <div><strong>팀 이름:</strong> ${item.teamName}</div>
-                <div>
-                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
-                        <button class="detail">상세보기</button>
-                    </a>
-                </div>
-            </div>
+                <button class="detail" onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'">상세보기</button>                
+           </div>
             
-            <div class="card-section">
+           <div class="card-section card-match">
                 <div><strong>종목:</strong> ${item.sportsTypeName}</div>
                 <div class="truncate"><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                <div class="truncate"><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
+                <div class="truncate"><strong>주소:</strong> ${item.sportsFacilityAddress}</div>
                 <div>
                     📅 날짜: ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
                     ${calTime(item, date.getHours(), date.getMinutes())}
                 </div>
-            </div>
+           </div>
             
-            <div class="card-section">
-                <div>${checkStatus(item)}</div>
+            <div class="card-section card-status">
+                <div><strong>${checkStatus(item)}</strong></div>
                 <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>
-                <div>입장 가능 매너 온도: ${item.minMannerTemperature}</div>
+                <div>입장 가능 온도: ${item.minMannerTemperature}</div>
                 <div>내 매너 온도: ${myMannerTemperature}</div>
             </div>
                 `;
@@ -257,6 +255,29 @@ async function getMyMannerTemperature(){
 
     return data.data;
 
+}
+
+function setButton(){
+
+    // 글 작성하기 버튼
+    document.querySelector(".btn-write").addEventListener("click",()=>{
+        window.location.href = "/matchup/board/register";
+    })
+
+    //내가 작성한 글 목록
+    document.querySelector(".btn-my-board").addEventListener("click",()=>{
+        window.location.href = "/matchup/board/my";
+    })
+
+    //내가 요청한 목록
+    document.querySelector(".btn-my-request").addEventListener("click",()=>{
+        window.location.href = "/matchup/request/my";
+    })
+
+    //내 경기 참가 목록
+    document.querySelector(".btn-my-match").addEventListener("click",()=>{
+        window.location.href = "/matchup/mygame/page";
+    })
 }
 
 

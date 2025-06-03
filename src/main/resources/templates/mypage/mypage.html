@@ -331,7 +331,13 @@
                     credentials: "include"
                 }).then(res => {
                     if (res.ok) location.reload();
-                    else res.text().then(msg => alert("업로드 실패: " + msg));
+                    else {
+                        res.text().then(msg => {
+                            alert("업로드 실패: " + msg);
+                        });
+                    }
+                }).catch(err => {
+                    alert("서버 오류가 발생했습니다: " + err.message);
                 });
             }
         };
@@ -356,12 +362,12 @@
     function submitMypage() {
         const token = getCookie("Authorization");
         if (!token) return alert("로그인이 필요합니다.");
-        const temperature = parseFloat(document.getElementById("temperatureInput").value);
-        if (temperature < 30) return alert("마이온도는 30도 이상이어야 합니다.");
+        // const temperature = parseFloat(document.getElementById("temperatureInput").value);
+        // if (temperature < 30) return alert("마이온도는 30도 이상이어야 합니다.");
         const data = {
             positionName: document.getElementById("positionSelect").value,
-            timeType: document.getElementById("timeSelect").value,
-            temperature
+            timeType: document.getElementById("timeSelect").value
+            //temperature
         };
         fetch("/mypage/update", {
             method: "PUT",
