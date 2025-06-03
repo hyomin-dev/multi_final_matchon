@@ -76,3 +76,30 @@
     justify-content: center;
     margin-top: 20px;
 }
+
+.star-rating {
+    position: relative;
+    display: inline-block;
+    font-size: 18px;
+    color: #ccc; /* gray empty stars */
+}
+
+.star-rating::before {
+    content: '★★★★★';
+}
+
+.star-rating::after {
+    content: '★★★★★';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--rating-width); /* MUST match name used in style */
+    overflow: hidden;
+    color: #FFD700; /* gold filled stars */
+    white-space: nowrap;
+    pointer-events: none;
+}
+/* ✅ NEW: this is the KEY to dynamically set width from inline style */
+.star-rating::after {
+    width: var(--rating-width); /* ✅ this is correct */
+}

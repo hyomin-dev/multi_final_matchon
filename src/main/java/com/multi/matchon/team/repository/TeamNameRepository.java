@@ -23,7 +23,7 @@ public interface TeamNameRepository extends JpaRepository <Team, Long> {
     WHERE t.isDeleted = false
     AND (:positionName IS NULL OR p.positionName = :positionName)
     AND (:region IS NULL OR t.teamRegion = :region)
-    AND (t.teamRatingAverage IS NOT NULL AND t.teamRatingAverage >= :rating)
+    AND (:rating IS NULL OR t.teamRatingAverage >= :rating)
 """)
     Page<Team> findWithRatingFilter(
             @Param("positionName") PositionName positionName,
