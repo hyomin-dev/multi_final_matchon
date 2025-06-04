@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <title>MATCHON</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <script th:src="@{/js/matchup/matchup-mygame-rating.js}" defer></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-mygame-rating.css}">
+
+</head>
+<body>
+
+<div th:replace="~{common/header::header}"></div>
+<div id="wrap">
+
+    <div id="matchup-rating-detail-dto"
+         th:data-board-id="${boardId}"
+    >
+    </div>
+    <h1>MATCHUP 매너 온도 평가</h1>
+
+<!--    <div class="match-info" th:object="${resMatchupBoardOverviewDto}">-->
+<!--        <p>종목: <span th:text="*{sportsTypeName}">SOCCER</span></p>-->
+<!--        <p class="truncate">경기장: <span th:text="*{sportsFacilityName}"></span></p>-->
+<!--        <p class="truncate">주소: <span th:text="*{sportsFacilityAddress}"></span></p>-->
+<!--        <p>📅 날짜: <span id="match-date"></span></p>-->
+<!--        <p id="match-status"></p>-->
+<!--        <p>( <span th:text="*{currentParticipantCount}"></span> / <span th:text="*{maxParticipants}"></span> )</p>-->
+<!--    </div>-->
+    <div class="back-btn-wrapper">
+        <button class="back-btn" onclick="location.href='/matchup/mygame/page'">뒤로가기</button>
+    </div>
+    <hr>
+
+    <div id="request-container">
+
+    </div>
+
+    <div id="paging-container">
+
+    </div>
+
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

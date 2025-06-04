@@ -102,12 +102,12 @@ public class TeamService {
 
     public void teamRegister(ReqTeamDto reqTeamDto, CustomUser user) {
 
-        if (reqTeamDto.getTeamName() == null || reqTeamDto.getTeamName().trim().isEmpty()) {
-            throw new IllegalArgumentException("팀 이름은 필수입니다.");
-        }
 
-        if (reqTeamDto.getTeamIntroduction() == null || reqTeamDto.getTeamIntroduction().trim().isEmpty()) {
-            throw new IllegalArgumentException("팀 소개는 필수입니다.");
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + user.getUsername()));
+
+        if (member.getTeam() != null) {
+            throw new IllegalArgumentException("이미 팀이 있습니다.");
         }
 
         if (reqTeamDto.getTeamRegion() == null) {
@@ -122,11 +122,8 @@ public class TeamService {
             throw new IllegalArgumentException("모집 여부를 선택해야 합니다.");
         }
         // Check if the user already has an active team
-        if (teamRepository.existsByCreatedPersonAndIsDeletedFalse(user.getUsername())) {
-            throw new IllegalArgumentException("이미 팀이 있습니다.");
-        }
-        Member member = memberRepository.findByMemberEmail(user.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + user.getUsername()));
+
+
 
         Team newTeam = Team.builder()
                 .teamName(reqTeamDto.getTeamName())
@@ -250,7 +247,8 @@ public class TeamService {
                     .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
                     .orElse("/img/default-team.png");
 
-            return ResTeamDto.from(team, imageUrl);
+            double avgRating = calculateAverageRating(team.getId());
+            return ResTeamDto.from(team, imageUrl, avgRating);
         });
 
         return PageResponseDto.<ResTeamDto>builder()
@@ -276,7 +274,8 @@ public class TeamService {
                 .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
                 .orElse("/img/default-team.png");
 
-        return ResTeamDto.from(team, imageUrl);
+        double avgRating = calculateAverageRating(team.getId());
+        return ResTeamDto.from(team, imageUrl, avgRating);
     }
 
     @Transactional
@@ -343,7 +342,11 @@ public class TeamService {
         // Save the review
         Review savedReview = reviewRepository.save(review);
         log.info("Successfully saved review with ID: {}", savedReview.getId());
+
+        double newAvgRating = calculateAverageRating(teamId); // You probably have this
+        team.updateRating(newAvgRating); // ← add this method to Team entity
     }
+
 
     @Transactional(readOnly = true)
     public List<ResReviewDto> getReviewsForTeam(Long teamId) {
@@ -404,7 +407,7 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
 
         if (member.getTeam() != null) {
-            throw new IllegalArgumentException("이미 다른 팀에 소속되어 있습니다.");
+            throw new IllegalArgumentException("이미 소속된 팀이 있습니다.");
         }
 
         // ✅ Word count check
@@ -457,6 +460,10 @@ public class TeamService {
 
         request.approved();
 
+        Member member = request.getMember(); // 가입 신청한 사용자
+        Team team = request.getTeam();       // 해당 팀
+
+
         TeamMember newMember = TeamMember.builder()
                 .member(request.getMember())
                 .team(request.getTeam())
@@ -465,6 +472,11 @@ public class TeamService {
                 .build();
 
         teamMemberRepository.save(newMember);
+
+        // ✅ member 테이블에 team_id 업데이트
+        member.setTeam(team);
+        memberRepository.save(member); // 명시적으로 저장 (선택사항이지만 안전)
+
     }
 
     @Transactional
@@ -502,6 +514,13 @@ public class TeamService {
         if (!isLeader) throw new IllegalArgumentException("팀 리더만 삭제할 수 있습니다.");
 
         team.softDelete(); // if you support soft delete
+
+        // 2. Break association: remove team from all members
+        List<Member> teamMembers = memberRepository.findAllByTeam(team);
+        for (Member m : teamMembers) {
+            m.setTeam(null); // Break the link
+        }
+        memberRepository.saveAll(teamMembers);
 
 
         teamRepository.save(team);
@@ -733,6 +752,21 @@ public class TeamService {
         Member requester = joinRequest.getMember();
 
 
+        Attachment attachment = em.createQuery(
+                        "SELECT a FROM Attachment a WHERE a.boardType = :boardType AND a.boardNumber = :boardNumber AND a.isDeleted = false ORDER BY a.fileOrder ASC",
+                        Attachment.class)
+                .setParameter("boardType", BoardType.MEMBER)
+                .setParameter("boardNumber", requester.getId())
+                .setMaxResults(1)
+                .getResultStream() // avoids NoResultException
+                .findFirst()
+                .orElse(null);
+
+        String profileImageUrl = attachment != null
+                ? awsS3Utils.createPresignedGetUrl(attachment.getSavePath(), attachment.getSavedName())
+                : "/img/default-avatar.png";
+
+
         return ResJoinRequestDetailDto.builder()
                 .requestId(joinRequest.getId())
                 .nickname(requester.getMemberName())
@@ -748,6 +782,9 @@ public class TeamService {
                                 : "미정"
                 )
                 .introduction(joinRequest.getIntroduction())
+
+                .profileImageUrl(profileImageUrl) // ✅ Make sure this exists!
+
                 .build();
     }
 
@@ -779,6 +816,51 @@ public class TeamService {
             case WEEKEND_AFTERNOON -> "주말 오후";
             case WEEKEND_EVENING -> "주말 저녁";
         };
+    }
+
+
+    public ResTeamDto findMyTeam(CustomUser user) {
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        Team team = member.getTeam();
+        Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
+
+        String imageUrl = attachment
+                .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
+                .orElse("/img/default-team.png"); // fallback if no image
+
+        double avgRating = calculateAverageRating(team.getId());
+        return ResTeamDto.from(team, imageUrl, avgRating);
+    }
+
+
+
+    public double calculateAverageRating(Long teamId) {
+        List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
+        if (reviews.isEmpty()) return 0.0;
+
+        double avg = reviews.stream()
+                .mapToInt(Review::getReviewRating)
+                .average()
+                .orElse(0.0);
+
+        return Math.round(avg * 10) / 10.0; // Round to 1 decimal place
+    }
+
+
+    public List<ResTeamDto> findAllWithoutPaging() {
+        List<Team> teams = teamRepository.findAll();
+
+        return teams.stream().map(team -> {
+            Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
+            String imageUrl = attachment
+                    .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
+                    .orElse("/img/default-team.png");
+
+            double avgRating = calculateAverageRating(team.getId());
+            return ResTeamDto.from(team, imageUrl, avgRating);
+        }).collect(Collectors.toList());
     }
 
 }

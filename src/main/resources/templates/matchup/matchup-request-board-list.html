@@ -22,7 +22,9 @@
     >
     </div>
     <h1>MATCHUP board에 요청온 request 목록</h1>
-
+    <div class="back-btn-wrapper">
+        <button class="back-btn" onclick="location.href='/matchup/board/my'">뒤로가기</button>
+    </div>
     <div class="match-info" th:object="${resMatchupBoardOverviewDto}">
         <p>종목: <span th:text="*{sportsTypeName}">SOCCER</span></p>
         <p class="truncate">경기장: <span th:text="*{sportsFacilityName}"></span></p>
@@ -31,6 +33,7 @@
         <p id="match-status"></p>
         <p>( <span th:text="*{currentParticipantCount}"></span> / <span th:text="*{maxParticipants}"></span> )</p>
     </div>
+
     <hr>
 
     <div id="request-container">

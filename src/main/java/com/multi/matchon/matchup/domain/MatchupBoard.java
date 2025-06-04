@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -79,6 +81,11 @@ public class MatchupBoard extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
+    @OneToMany(mappedBy = "matchupBoard")
+    @Builder.Default
+    private List<MatchupRequest> matchupRequests = new ArrayList<>();
+
+
     public void update(SportsType sportsType, String teamIntro, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants, Double minMannerTemperature, String matchDescription){
 
         this.sportsType = sportsType;
@@ -105,5 +112,9 @@ public class MatchupBoard extends BaseEntity {
 
     public void decreaseCurrentParticipantCount(Integer participantCount){
         this.currentParticipantCount -= participantCount;
+    }
+
+    public void setRatingInitialized(Boolean isRatingInitialized){
+        this.isRatingInitialized = isRatingInitialized;
     }
 }

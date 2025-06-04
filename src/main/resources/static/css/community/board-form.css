@@ -64,3 +64,51 @@
     background: transparent;
     cursor: pointer;
 }
+
+.file-delete-btn {
+    background: none;
+    border: none;
+    color: red;
+    padding: 3px 3px;
+    font-weight: normal;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.file-delete-btn:hover {
+    padding: 3px 3px;
+    background-color: lightgray;
+}
+
+.file-upload-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.file-upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f4faff;
+    padding: 10px 16px;
+    border: 1px solid #a0d2f5;
+    border-radius: 8px;
+    color: #0074cc;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: fit-content;
+}
+
+.file-upload-label:hover {
+    background-color: #e2f3ff;
+}
+
+.attach-icon {
+    width: 24px;
+    height: 24px;
+}
+
+

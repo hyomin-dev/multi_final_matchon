@@ -23,7 +23,7 @@
 
             <div class="form-group">
                 <label>제목</label>
-                <input type="text" th:field="*{title}" required/>
+                <input type="text" th:field="*{title}" maxlength="100" required/>
                 <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
             </div>
 
@@ -60,16 +60,33 @@
                 <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
             </div>
 
-            <div class="form-group">
-                <label>파일 첨부</label>
-                <input type="file" name="files" id="fileInput" multiple/>
+            <div class="form-group file-upload-group">
+                <label for="fileInput" class="file-upload-label">
+                    <img src="/img/attach-icon.png" alt="파일 첨부" class="attach-icon"/>
+                    <span>파일 첨부하기</span>
+                </label>
+                <input type="file" name="files" id="fileInput" multiple style="display: none;"/>
                 <div id="filePreview" class="file-preview"></div>
+            </div>
+
+            <input type="hidden" name="deletedAttachmentIds" id="deletedAttachmentIds"/>
+
+            <div class="form-group" th:if="${attachments != null and !attachments.isEmpty()}">
+                <label>첨부파일</label>
+                <ul id="existingAttachments">
+                    <li th:each="att : ${attachments}" th:attr="data-id=${att.id}">
+                        <a th:href="@{/community/download-force/{filename}(filename=${att.savedName})}"
+                           th:text="${att.originalName}" target="_blank"></a>
+                        <button type="button" class="file-delete-btn" th:data-id="${att.id}">x</button>
+                    </li>
+                </ul>
             </div>
 
             <div style="text-align: center;">
                 <button type="submit" th:text="${boardId != null} ? '수정 완료' : '등록'">등록</button>
                 <button type="button" onclick="confirmCancel()" class="btn-outline-danger">취소</button>
             </div>
+
         </form>
     </div>
 </div>
@@ -191,6 +208,38 @@
         fileList.forEach(file => dataTransfer.items.add(file));
         fileInput.files = dataTransfer.files;
     }
+
+    const deletedIds = new Set(); // 삭제된 ID 저장용
+
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("file-delete-btn") && e.target.dataset.id) {
+            const attachmentId = e.target.dataset.id;
+
+            fetch(`/community/attachments/${attachmentId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include"
+            }).then(response => {
+                if (response.ok) {
+                    const li = e.target.closest("li");
+                    li.remove();
+
+                    deletedIds.add(attachmentId);
+                    document.getElementById("deletedAttachmentIds").value = Array.from(deletedIds).join(",");
+                } else if (response.status === 403) {
+                    alert("삭제 권한이 없습니다.");
+                } else {
+                    alert("삭제 실패");
+                }
+            }).catch(err => {
+                console.error("삭제 요청 오류:", err);
+                alert("오류 발생");
+            });
+        }
+    });
+
 </script>
 
 </body>
