@@ -45,7 +45,6 @@
                 <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
             </div>
 
-            <!-- ✅ 관리자만 상단 고정 가능 -->
             <div class="form-group" th:if="${isAdmin}">
                 <label>
                     <input type="checkbox" th:field="*{pinned}"/>
@@ -66,21 +65,22 @@
                     <span>파일 첨부하기</span>
                 </label>
                 <input type="file" name="files" id="fileInput" multiple style="display: none;"/>
-                <div id="filePreview" class="file-preview"></div>
             </div>
 
-            <input type="hidden" name="deletedAttachmentIds" id="deletedAttachmentIds"/>
-
-            <div class="form-group" th:if="${attachments != null and !attachments.isEmpty()}">
-                <label>첨부파일</label>
+            <div class="attachment-box">
+                <strong>첨부파일</strong>
                 <ul id="existingAttachments">
-                    <li th:each="att : ${attachments}" th:attr="data-id=${att.id}">
+                    <li id="emptyMessage" th:if="${attachments == null or attachments.isEmpty()}">첨부된 파일이 없습니다.</li>
+                    <li th:each="att : ${attachments}" th:attr="data-id=${att.id}" class="attachment-item">
+                        <img th:src="@{/img/attach-file.png}" alt="첨부 아이콘" class="attachment-icon"/>
                         <a th:href="@{/community/download-force/{filename}(filename=${att.savedName})}"
                            th:text="${att.originalName}" target="_blank"></a>
-                        <button type="button" class="file-delete-btn" th:data-id="${att.id}">x</button>
+                        <button type="button" class="file-delete-btn btn-comment-delete" th:data-id="${att.id}">x</button>
                     </li>
                 </ul>
             </div>
+
+            <input type="hidden" name="deletedAttachmentIds" id="deletedAttachmentIds"/>
 
             <div style="text-align: center;">
                 <button type="submit" th:text="${boardId != null} ? '수정 완료' : '등록'">등록</button>
@@ -104,68 +104,62 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        const editorContainer = document.querySelector('#editor');
-        const form = document.querySelector('form');
-        const hiddenContent = document.getElementById('hiddenContent');
-
-        if (editorContainer && form && hiddenContent) {
-            const editor = new toastui.Editor({
-                el: editorContainer,
-                height: '400px',
-                initialEditType: 'wysiwyg',
-                previewStyle: 'tab',
-                toolbarItems: [
-                    ['heading', 'bold', 'italic', 'strike'],
-                    ['ul', 'ol'],
-                    ['table', 'link', 'image']
-                ],
-                hooks: {
-                    addImageBlobHook: (blob, callback) => {
-                        new Compressor(blob, {
-                            quality: 0.7,
-                            maxWidth: 1200,
-                            success(compressedBlob) {
-                                const formData = new FormData();
-                                formData.append('image', compressedBlob);
-                                fetch('/community/image-upload', {
-                                    method: 'POST',
-                                    body: formData
-                                })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        const imageHtml = `<img src="${data.url}" loading="lazy" style="max-width:100%; height:auto; display:block;" />`;
-                                        callback(data.url, '이미지', imageHtml);
-                                    });
-                            },
-                            error(err) {
-                                console.error('이미지 압축 오류:', err);
-                            }
-                        });
-                    }
+        const editor = new toastui.Editor({
+            el: document.querySelector('#editor'),
+            height: '400px',
+            initialEditType: 'wysiwyg',
+            previewStyle: 'tab',
+            toolbarItems: [
+                ['heading', 'bold', 'italic', 'strike'],
+                ['ul', 'ol'],
+                ['table', 'link', 'image']
+            ],
+            hooks: {
+                addImageBlobHook: (blob, callback) => {
+                    new Compressor(blob, {
+                        quality: 0.7,
+                        maxWidth: 1200,
+                        success(compressedBlob) {
+                            const formData = new FormData();
+                            formData.append('image', compressedBlob);
+                            fetch('/community/image-upload', {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(res => res.json())
+                                .then(data => {
+                                    callback(data.url, '이미지', `<img src="${data.url}" loading="lazy" style="max-width:100%; height:auto; display:block;" />`);
+                                });
+                        },
+                        error(err) {
+                            console.error('이미지 압축 오류:', err);
+                        }
+                    });
                 }
-            });
+            }
+        });
 
-            if (hiddenContent.value) {
-                editor.setHTML(hiddenContent.value);
+        const hiddenContent = document.getElementById('hiddenContent');
+        if (hiddenContent.value) {
+            editor.setHTML(hiddenContent.value);
+        }
+
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const htmlContent = editor.getHTML().trim();
+            const plainText = editor.getMarkdown().replace(/[\n\r]/g, '').trim();
+
+            if (!plainText) {
+                alert("내용은 필수입니다.");
+                e.preventDefault();
+                return;
             }
 
-            form.addEventListener('submit', function (e) {
-                const htmlContent = editor.getHTML().trim();
-                const plainText = editor.getMarkdown().replace(/[\n\r]/g, '').trim();
-
-                if (!plainText) {
-                    alert("내용은 필수입니다.");
-                    e.preventDefault();
-                    return;
-                }
-
-                hiddenContent.value = htmlContent;
-            });
-        }
+            hiddenContent.value = htmlContent;
+        });
     });
 
     const fileInput = document.getElementById('fileInput');
-    const filePreview = document.getElementById('filePreview');
+    const existingUl = document.getElementById("existingAttachments");
     let fileList = [];
 
     fileInput.addEventListener('change', function () {
@@ -179,38 +173,60 @@
             return true;
         });
 
-        updatePreview();
+        updateAttachmentBox();
     });
 
-    function updatePreview() {
-        filePreview.innerHTML = '';
+    function updateAttachmentBox() {
+        if (!existingUl) return;
+
+        const existingFileNames = new Set(
+            Array.from(existingUl.querySelectorAll('li a, li span')).map(el => el.textContent.trim())
+        );
+
         fileList.forEach((file, index) => {
-            const previewBox = document.createElement('div');
-            const fileNameSpan = document.createElement('span');
-            fileNameSpan.textContent = file.name;
+            if (existingFileNames.has(file.name)) return;
 
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'x';
-            deleteBtn.type = 'button';
-            deleteBtn.classList.add('file-delete-btn');
+            const li = document.createElement("li");
+            li.classList.add("attachment-item", "new-file");
 
-            deleteBtn.onclick = function () {
+            const icon = document.createElement("img");
+            icon.src = "/img/attach-file.png";
+            icon.alt = "첨부 아이콘";
+            icon.className = "attachment-icon";
+
+            const fileName = document.createElement("span");
+            fileName.textContent = file.name;
+            fileName.style.color = "#555";
+
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "x";
+            delBtn.type = "button";
+            delBtn.className = "file-delete-btn btn-comment-delete";
+            delBtn.onclick = () => {
                 fileList.splice(index, 1);
-                updatePreview();
+                li.remove();
+                updateInputFiles();
             };
 
-            previewBox.appendChild(fileNameSpan);
-            previewBox.appendChild(deleteBtn);
-            filePreview.appendChild(previewBox);
+            li.appendChild(icon);
+            li.appendChild(fileName);
+            li.appendChild(delBtn);
+            existingUl.appendChild(li);
+
+            const emptyMsg = document.getElementById("emptyMessage");
+            if (emptyMsg) emptyMsg.remove();
         });
 
+        updateInputFiles();
+    }
+
+    function updateInputFiles() {
         const dataTransfer = new DataTransfer();
         fileList.forEach(file => dataTransfer.items.add(file));
         fileInput.files = dataTransfer.files;
     }
 
-    const deletedIds = new Set(); // 삭제된 ID 저장용
-
+    const deletedIds = new Set();
     document.addEventListener("click", function (e) {
         if (e.target.classList.contains("file-delete-btn") && e.target.dataset.id) {
             const attachmentId = e.target.dataset.id;
@@ -223,9 +239,7 @@
                 credentials: "include"
             }).then(response => {
                 if (response.ok) {
-                    const li = e.target.closest("li");
-                    li.remove();
-
+                    e.target.closest("li").remove();
                     deletedIds.add(attachmentId);
                     document.getElementById("deletedAttachmentIds").value = Array.from(deletedIds).join(",");
                 } else if (response.status === 403) {
@@ -239,7 +253,6 @@
             });
         }
     });
-
 </script>
 
 </body>
