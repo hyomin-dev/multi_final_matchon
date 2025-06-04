@@ -228,14 +228,17 @@ function setDisconnects(roomId) {
         }
     });
 }
+const reconnectDelay = 5000;
 
 function onError(error){
     console.warn("STOMP 연결 끊어짐. 재시도 중...",error);
 
     if(!reconnectTimeout){
         reconnectTimeout = setTimeout(()=>{
-            connect();
-        },reconnectDelay);
+            const token = getJwtToken();
+            const email = document.querySelector("#header-detail-dto")?.dataset?.loginEmail;
+            connect(token, email);
+        }, reconnectDelay);
     }
 }
 
@@ -244,26 +247,17 @@ async function initSideBar(){
     const closeBtn = document.getElementById('closeMiniDrawerBtn');
     const miniDrawer = document.getElementById('miniDrawer');
 
+    openBtn.onclick = () => miniDrawer.style.display = 'block';
+    closeBtn.onclick = () => miniDrawer.style.display = 'none';
 
-    // 초기에 읽지 않은 메시지를 가져옴
-    const notifications = await getUnreadNoti();
-
-    setUnreadNoti(notifications);
-
-    openBtn.onclick = () => {
-        miniDrawer.style.display = 'block';
-    };
-
-    closeBtn.onclick = () => {
-        miniDrawer.style.display = 'none';
-    };
-
-    // 바깥 클릭 시 닫기 (선택사항)
-    window.addEventListener("click", (e) => {
+    window.addEventListener("click", e => {
         if (!miniDrawer.contains(e.target) && e.target !== openBtn) {
             miniDrawer.style.display = 'none';
         }
     });
+
+    const notifications = await getUnreadNoti();
+    setUnreadNoti(notifications);
 }
 
 async function getUnreadNoti(){
@@ -283,26 +277,27 @@ async function getUnreadNoti(){
 function setUnreadNoti(notifications){
     console.log(notifications);
 
-    if(notifications.length===0){
-        const miniDrawer = document.getElementById('miniDrawer');
+    const badge = document.getElementById("notificationBadge");
+    badge.innerText = notifications.length;
+    badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
 
-        const wrapper = document.createElement("div");
-        const msg = document.createElement("span");
-
-        wrapper.classList.add("notification");
-        msg.textContent = "읽지 않은 알림이 없습니다.";
-
-        wrapper.appendChild(msg);
-        miniDrawer.appendChild(wrapper);
+    if (notifications.length === 0) {
+        addEmptyNotification();
         return;
     }
 
-    notifications.forEach(noti =>{
-
+    notifications.forEach(noti => {
         createNotiStructure(noti.notificationId, noti.notificationMessage, noti.createdDate);
-
-
     });
+}
+
+function addEmptyNotification() {
+    const miniDrawer = document.getElementById('miniDrawer');
+    const header = document.querySelector(".mini-drawer-header");
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("notification");
+    wrapper.innerHTML = "<span>읽지 않은 알림이 없습니다.</span>";
+    miniDrawer.insertBefore(wrapper, header.nextSibling);
 }
 
 function formatDate(dateStr) {
@@ -321,11 +316,9 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
     const header = document.querySelector(".mini-drawer-header");
 
     const wrapper = document.createElement("div");
-    const msg = document.createElement("span");
-
-
     wrapper.classList.add("notification");
 
+    const msg = document.createElement("span");
     msg.textContent = notificationMessage;
 
     const dateSpan = document.createElement("span");
@@ -334,59 +327,35 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
     wrapper.appendChild(msg);
     wrapper.appendChild(dateSpan);
-    miniDrawer.appendChild(wrapper);
     miniDrawer.insertBefore(wrapper, header.nextSibling);
 
+    const bell = document.getElementById("openMiniDrawerBtn");
+    bell.classList.add("bell-shake");
+    setTimeout(() => bell.classList.remove("bell-shake"), 600);
 
-    msg.addEventListener("click",async ()=>{
-        const response = await fetch(`/notification/update/unread?notificationId=${notificationId}`,{
+    const badge = document.getElementById("notificationBadge");
+    badge.innerText = parseInt(badge.innerText || '0') + 1;
+    badge.style.display = 'inline-block';
+
+    msg.addEventListener("click", async () => {
+        const res = await fetch(`/notification/update/unread?notificationId=${notificationId}`, {
             method: "GET",
             credentials: "include"
         });
-        if(!response.ok)
-            throw new Error(`HTTP error! Status:${response.status}`);
+        const data = await res.json();
 
-        const data = await response.json();
+        wrapper.classList.add("read");
+        msg.style.pointerEvents = "none";
+        msg.style.opacity = "0.6";
 
-        wrapper.classList.add("clicked");
-        msg.style.pointerEvents = "none"; // 클릭 자체를 비활성화
-        msg.style.opacity = "0.6"; // 시각적으로도 회색 느낌
-
-        if(data && typeof data.data === "string" && data.data.trim() !== ""){
-            const reply = confirm("알림 페이지로 이동하시겠습니까?")
-            if(reply)
-                window.location.href = data.data;
-        }else{
+        if (data?.data?.trim()) {
+            const go = confirm("알림 페이지로 이동하시겠습니까?");
+            if (go) window.location.href = data.data;
+        } else {
             alert("알림이 확인되었습니다.");
         }
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
