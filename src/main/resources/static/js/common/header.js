@@ -411,7 +411,7 @@ function setUnreadNoti(notifications){
     console.log(notifications);
 
     const badge = document.getElementById("notificationBadge");
-    badge.innerText = notifications.length;
+    badge.innerText = 0;//notifications.length;
     badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
 
     if (notifications.length === 0) {
