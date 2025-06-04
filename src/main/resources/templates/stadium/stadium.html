@@ -7,27 +7,45 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}">
     <style>
-        #map { width: 100%; height: 900px; }
+        #map-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #map {
+            width: 800px;
+            height: 800px;
+        }
+
+        .title1 {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
 
-<!-- 비동기 방식이므로 ul은 비워두고 JS에서 채움 -->
+<h1 class="title1">구장 보기</h1>
+
 <ul id="stadium-data" style="display: none;"></ul>
 
-<div id="map"></div>
+<div id="map-container">
+    <div id="map"></div>
+</div>
 
-<!-- 카카오맵 API -->
+<!-- 카카오맵 -->
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a7fac0ef351b12f799117f0847bf1d23&autoload=false&libraries=services"></script>
 
 <script>
-    kakao.maps.load(function () {
+    kakao.maps.load(function(callback) {
         const map = new kakao.maps.Map(document.getElementById('map'), {
             center: new kakao.maps.LatLng(37.289506, 127.053467),
-            level: 11
+            level: 14
         });
 
+        // 마커 이미지 표시(별 모양)
         const markerImage = new kakao.maps.MarkerImage(
             "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
             new kakao.maps.Size(24, 35)
@@ -35,23 +53,21 @@
 
         const bounds = new kakao.maps.LatLngBounds();
 
-        // ✅ stadium 데이터 fetch
         fetch("/api/stadiums")
             .then(response => response.json())
             .then(data => {
                 const ul = document.getElementById("stadium-data");
 
                 data.forEach(stadium => {
-                    const { stadiumId, stadiumName, stadiumRegion, stadiumAddress, latitude, longitude } = stadium;
+                    const { stadiumId, stadiumName, stadiumRegion, stadiumAddress, latitude, longitude
+                    } = stadium;
 
-                    // ul 요소에도 li 추가해보기 (필요 시)
                     const li = document.createElement("li");
                     li.textContent = stadiumName;
                     li.dataset.name = stadiumName;
                     li.dataset.lat = latitude;
                     li.dataset.lng = longitude;
                     ul.appendChild(li);
-
                     if (!latitude || !longitude) return;
 
                     const position = new kakao.maps.LatLng(latitude, longitude);
@@ -68,13 +84,14 @@
                         content: `<div style="padding:5px;font-size:14px;">${stadiumName}</div>`
                     });
 
+                    // 마우스 오버 이벤트 표시(구장명 표시)
                     kakao.maps.event.addListener(marker, 'mouseover', () => infowindow.open(map, marker));
-                    kakao.maps.event.addListener(marker, 'mouseout', () => infowindow.close());
+                        kakao.maps.event.addListener(marker, 'mouseout', () => infowindow.close());
                 });
 
-                if (!bounds.isEmpty()) {
-                    map.setBounds(bounds);
-                }
+                    if (!bounds.isEmpty()) {
+                        map.setBounds(bounds);
+                    }
             })
             .catch(error => {
                 console.error("stadium 데이터 불러오기 실패:", error);

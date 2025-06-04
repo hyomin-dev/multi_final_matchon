@@ -36,9 +36,12 @@
         <td th:text="${report.reason}">사유</td>
         <td th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">날짜</td>
         <td>
-            <a th:if="${report.reportType == 'BOARD'}"
+            <span th:if="${!report.targetExists}">삭제됨</span>
+
+            <a th:if="${report.reportType == 'BOARD' and report.targetExists}"
                th:href="@{'/community/' + ${report.boardId}}" class="view-link">게시글</a>
-            <a th:if="${report.reportType == 'COMMENT'}"
+
+            <a th:if="${report.reportType == 'COMMENT' and report.targetExists}"
                th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}"
                class="view-link">댓글</a>
         </td>

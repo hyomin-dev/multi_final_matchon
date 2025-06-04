@@ -243,7 +243,7 @@
 
 
 @keyframes fadeHighlight {
-    0% { background-color: #fffbcc; }
+    0% { background-color: pink; }
     100% { background-color: transparent; }
 }
 

@@ -18,6 +18,7 @@ public class ReportResponse {
     private LocalDateTime createdDate;
     private Long boardId;
     private Long targetMemberId;
+    private boolean targetExists;
     private boolean suspended;
     private boolean targetIsAdmin;
 
