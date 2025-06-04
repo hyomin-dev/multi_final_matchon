@@ -12,6 +12,7 @@ public class EventReqDto {
     private LocalDate eventDate;
     private EventRegionType eventRegionType;
     private String eventTitle;
+    private String eventDescription;
     private String eventAddress;
     private String eventMethod;
     private String eventContact;

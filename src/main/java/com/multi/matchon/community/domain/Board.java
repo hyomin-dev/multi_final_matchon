@@ -21,7 +21,7 @@ public class Board extends BaseEntity {
     @Column(name = "board_id")
     private Long id;
 
-    @Column(name = "title", nullable = false, columnDefinition = "VARCHAR(50)")
+    @Column(name = "title", nullable = false, columnDefinition = "VARCHAR(100)")
     private String title;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")

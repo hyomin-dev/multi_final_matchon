@@ -70,6 +70,7 @@ public class MatchupBoardController {
         //PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest);
         mv.setViewName("matchup/matchup-board-list");
         //mv.addObject("pageResponseDto",pageResponseDto);
+        messageTemplate.convertAndSendToUser("hyomin@1234.com","/notify","test1이 보냄");
         return mv;
     }
 

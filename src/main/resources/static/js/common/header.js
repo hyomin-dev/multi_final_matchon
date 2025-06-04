@@ -1,10 +1,8 @@
 let stompClient = null;
 let isSubscribed = false;
 let count = 0;
-let reconnectTimeout = null;
-const reconnectDelay = 5000; // 5초 후 재시도
 
-let realtimeNotifications = [];
+let reconnectTimeout = null;
 
 document.addEventListener("DOMContentLoaded", function () {
     const detailDto = document.querySelector("#header-detail-dto");
@@ -162,6 +160,7 @@ function connect(token, loginEmail) {
                 console.log("STOMP 연결 성공");
                 stompClient.subscribe(`/user/${loginEmail}/notify`, message => {
                     //const body = JSON.parse(message.body);
+
                     //openbtn.src = "/img/bell-ring-black.png";
                    //console.log(message);
                    const messageBody = JSON.parse(message.body);
@@ -170,9 +169,11 @@ function connect(token, loginEmail) {
 
                     createNotiStructure(messageBody.notificationId, messageBody.notificationMessage, messageBody.createdDate);
 
+
                     //console.error("메시지 처리 중 에러", e);
                 }, { Authorization: `Bearer ${token}` });
                 isSubscribed = true;
+
                 if(reconnectTimeout){
                     clearTimeout(reconnectTimeout);
                     reconnectTimeout = null;
@@ -185,6 +186,7 @@ function connect(token, loginEmail) {
                 // //showErrorPage(error?.headers?.message || "Chat STOMP 연결 실패");
                 // reject(error); // 실패 시
                 onError(error);
+
             }
         );
     });
@@ -359,7 +361,6 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
         }
     });
 }
-
 
 
 

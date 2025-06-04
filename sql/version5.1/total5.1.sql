@@ -52,10 +52,10 @@ create table stadium
     stadium_address                 varchar(255),
     stadium_tel						varchar(255),
     create_date                     DATETIME DEFAULT current_timestamp,
-    create_person                   varchar(100),
     modified_date                   DATETIME DEFAULT current_timestamp on update current_timestamp,
-    modified_person                 varchar(100),
-    is_deleted                      boolean  default false
+    is_deleted                      boolean  default false,
+    latitude                        double,
+    longitude                       double
 );
 
 -- positions
@@ -250,14 +250,12 @@ CREATE TABLE host_profile (
 
 CREATE TABLE notification
 (
-
-	notification_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-	received_member_id BIGINT NOT NULL,
-	notification_message TEXT NOT NULL,
-	target_url		VARCHAR(500) NOT NULL,
-	is_read			BOOLEAN NULL DEFAULT FALSE,
-	created_date      DATETIME DEFAULT CURRENT_TIMESTAMP,
-
+    notification_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    received_member_id BIGINT NOT NULL,
+    notification_message TEXT NOT NULL,
+    target_url		VARCHAR(500) NOT NULL,
+    is_read			BOOLEAN NULL DEFAULT FALSE,
+    created_date      DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_person    VARCHAR(100)        NOT NULL,
     modified_date     DATETIME DEFAULT current_timestamp on update current_timestamp,
     modified_person   VARCHAR(100)        NOT NULL,

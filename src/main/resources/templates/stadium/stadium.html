@@ -1,117 +1,104 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
-    <title>STADIUM</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
-    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+    <meta charset="utf-8">
+    <title>전국 구장 보기</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}">
     <style>
-        .title_stadium { text-align: center; }
-        .region-tabs-stadium {
+        #map-container {
             display: flex;
             justify-content: center;
-            gap: 30px;
-            font-weight: bold;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
+            align-items: center;
+            height: 100vh;
         }
-        .region-tabs-stadium a {
-            text-decoration: none;
-            color: black;
+
+        #map {
+            width: 800px;
+            height: 800px;
         }
-        .region-tabs-stadium a.active {
-            color: blue;
-            border-bottom: 2px solid blue;
-        }
-        .stadium-card {
-            display: flex;
-            align-items: flex-start;
-            border-top: 1px solid #ccc;
-            padding: 20px 0;
-        }
-        .stadium-info {
-            display: flex;
-            flex-direction: column;
-        }
-        .stadium-location {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 5px;
-        }
-        .stadium-name {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .pagination {
+
+        .title1 {
             text-align: center;
-            margin-top: 30px;
-        }
-        .pagination a {
-            margin: 0 6px;
-            text-decoration: none;
-            color: #444;
-        }
-        .pagination a.active {
-            font-weight: bold;
-            color: blue;
         }
     </style>
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
-<div id="wrap">
-    <h1 class="title_stadium">STADIUM</h1>
 
-    <!-- 지역 필터 탭 -->
-    <div class="region-tabs-stadium">
-        <a th:href="@{/stadium}" th:classappend="${selectedRegion} == null ? ' active' : ''">전체</a>
-        <a th:href="@{/stadium(region='서울')}" th:classappend="${selectedRegion} == '서울' ? ' active' : ''">서울</a>
-        <a th:href="@{/stadium(region='경기')}" th:classappend="${selectedRegion} == '경기' ? ' active' : ''">경기</a>
-        <a th:href="@{/stadium(region='강원')}" th:classappend="${selectedRegion} == '강원' ? ' active' : ''">강원</a>
-        <a th:href="@{/stadium(region='충청')}" th:classappend="${selectedRegion} == '충청' ? ' active' : ''">충청</a>
-        <a th:href="@{/stadium(region='전라')}" th:classappend="${selectedRegion} == '전라' ? ' active' : ''">전라</a>
-        <a th:href="@{/stadium(region='제주')}" th:classappend="${selectedRegion} == '제주' ? ' active' : ''">제주</a>
-        <a th:href="@{/stadium(region='경상')}" th:classappend="${selectedRegion} == '경상' ? ' active' : ''">경상</a>
-        <a th:href="@{/stadium(region='세종')}" th:classappend="${selectedRegion} == '세종' ? ' active' : ''">세종</a>
-        <a th:href="@{/stadium(region='부산')}" th:classappend="${selectedRegion} == '부산' ? ' active' : ''">부산</a>
-        <a th:href="@{/stadium(region='울산')}" th:classappend="${selectedRegion} == '울산' ? ' active' : ''">울산</a>
-        <a th:href="@{/stadium(region='전북')}" th:classappend="${selectedRegion} == '전북' ? ' active' : ''">전북</a>
-        <a th:href="@{/stadium(region='인천')}" th:classappend="${selectedRegion} == '인천' ? ' active' : ''">인천</a>
-        <a th:href="@{/stadium(region='대구')}" th:classappend="${selectedRegion} == '대구' ? ' active' : ''">대구</a>
-        <a th:href="@{/stadium(region='광주')}" th:classappend="${selectedRegion} == '광주' ? ' active' : ''">광주</a>
-    </div>
+<h1 class="title1">구장 보기</h1>
 
-    <!-- 구장 이름 검색창 -->
-    <form th:action="@{/stadium}" method="get" style="text-align:center; margin-bottom:20px;">
-        <label>
-            <input type="text" name="keyword" th:value="${keyword}" placeholder="구장 이름을 입력하세요">
-        </label>
-        <button type="submit">검색</button>
-    </form>
+<ul id="stadium-data" style="display: none;"></ul>
 
-    <!-- 구장 목록 출력 -->
-    <div th:each="stadium : ${stadiums.content}" class="stadium-card">
-        <div class="stadium-info">
-            <div class="stadium-location"
-                 th:text="${stadium.stadiumRegion + ' / ' + stadium.stadiumAddress}">
-                지역 / 주소
-            </div>
-            <div class="stadium-name">
-                <a th:href="@{/stadium/{id}(id=${stadium.id})}" th:text="${stadium.stadiumName}">경기장 이름</a>
-            </div>
-            <div class="stadium-location" th:text="${stadium.stadiumTel}">전화번호</div>
-        </div>
-    </div>
-
-    <!-- 페이지네이션 -->
-    <div class="pagination">
-        <a th:if="${!stadiums.first}" th:href="@{/stadium(page=${stadiums.number - 1}, region=${selectedRegion}, keyword=${keyword})}">&lt;</a>
-        <span class="page-number" th:text="${stadiums.number + 1} + ' / ' + ${stadiums.totalPages}">1</span>
-        <a th:if="${!stadiums.last}" th:href="@{/stadium(page=${stadiums.number + 1}, region=${selectedRegion}, keyword=${keyword})}">&gt;</a>
-    </div>
+<div id="map-container">
+    <div id="map"></div>
 </div>
+
+<!-- 카카오맵 -->
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a7fac0ef351b12f799117f0847bf1d23&autoload=false&libraries=services"></script>
+
+<script>
+    kakao.maps.load(function(callback) {
+        const map = new kakao.maps.Map(document.getElementById('map'), {
+            center: new kakao.maps.LatLng(37.289506, 127.053467),
+            level: 14
+        });
+
+        // 마커 이미지 표시(별 모양)
+        const markerImage = new kakao.maps.MarkerImage(
+            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+            new kakao.maps.Size(24, 35)
+        );
+
+        const bounds = new kakao.maps.LatLngBounds();
+
+        fetch("/api/stadiums")
+            .then(response => response.json())
+            .then(data => {
+                const ul = document.getElementById("stadium-data");
+
+                data.forEach(stadium => {
+                    const { stadiumId, stadiumName, stadiumRegion, stadiumAddress, latitude, longitude
+                    } = stadium;
+
+                    const li = document.createElement("li");
+                    li.textContent = stadiumName;
+                    li.dataset.name = stadiumName;
+                    li.dataset.lat = latitude;
+                    li.dataset.lng = longitude;
+                    ul.appendChild(li);
+                    if (!latitude || !longitude) return;
+
+                    const position = new kakao.maps.LatLng(latitude, longitude);
+                    bounds.extend(position);
+
+                    const marker = new kakao.maps.Marker({
+                        map: map,
+                        position: position,
+                        title: stadiumName,
+                        image: markerImage
+                    });
+
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: `<div style="padding:5px;font-size:14px;">${stadiumName}</div>`
+                    });
+
+                    // 마우스 오버 이벤트 표시(구장명 표시)
+                    kakao.maps.event.addListener(marker, 'mouseover', () => infowindow.open(map, marker));
+                        kakao.maps.event.addListener(marker, 'mouseout', () => infowindow.close());
+                });
+
+                    if (!bounds.isEmpty()) {
+                        map.setBounds(bounds);
+                    }
+            })
+            .catch(error => {
+                console.error("stadium 데이터 불러오기 실패:", error);
+            });
+    });
+</script>
+
 <div th:replace="~{common/footer::footer}"></div>
 </body>
 </html>
