@@ -76,6 +76,10 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Boolean isTemporaryPassword = false;
 
+    @Column(name = "email_agreement", nullable = false)
+    @Builder.Default
+    private Boolean emailAgreement = false; // 기본값 false
+
     @Column(name = "suspended_until")
     private LocalDateTime suspendedUntil;
 
@@ -163,4 +167,7 @@ public class Member extends BaseTimeEntity {
         this.myTemperature += myTemperature;
     }
 
+    public void setEmailAgreement(Boolean emailAgreement) {
+        this.emailAgreement = emailAgreement;
+    }
 }

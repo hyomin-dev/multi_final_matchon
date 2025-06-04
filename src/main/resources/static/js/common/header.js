@@ -228,6 +228,49 @@ function setDisconnects(roomId) {
         }
     });
 }
+const reconnectDelay = 5000;
+
+function onError(error){
+    console.warn("STOMP 연결 끊어짐. 재시도 중...",error);
+
+    if(!reconnectTimeout){
+        reconnectTimeout = setTimeout(()=>{
+            const token = getJwtToken();
+            const email = document.querySelector("#header-detail-dto")?.dataset?.loginEmail;
+            connect(token, email);
+        }, reconnectDelay);
+    }
+}
+
+async function initSideBar(){
+    const openBtn = document.getElementById('openMiniDrawerBtn');
+    const closeBtn = document.getElementById('closeMiniDrawerBtn');
+    const miniDrawer = document.getElementById('miniDrawer');
+
+    openBtn.onclick = () => miniDrawer.style.display = 'block';
+    closeBtn.onclick = () => miniDrawer.style.display = 'none';
+
+    window.addEventListener("click", e => {
+        if (!miniDrawer.contains(e.target) && e.target !== openBtn) {
+            miniDrawer.style.display = 'none';
+        }
+    });
+
+    const notifications = await getUnreadNoti();
+    setUnreadNoti(notifications);
+}
+
+async function getUnreadNoti(){
+    const response = await fetch("/notification/get/unread");
+    if(!response.ok)
+        throw new Error(`HTTP error! Status:${response.status}`)
+
+    const data = await response.json();
+
+    //console.log(data);
+    return data.data;
+
+}
 
 function onError(error){
     console.warn("STOMP 연결 끊어짐. 재시도 중...",error);
@@ -364,29 +407,88 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
 
 
+function setUnreadNoti(notifications){
+    console.log(notifications);
 
+    const badge = document.getElementById("notificationBadge");
+    badge.innerText = notifications.length;
+    badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
 
+    if (notifications.length === 0) {
+        addEmptyNotification();
+        return;
+    }
 
+    notifications.forEach(noti => {
+        createNotiStructure(noti.notificationId, noti.notificationMessage, noti.createdDate);
+    });
+}
 
+function addEmptyNotification() {
+    const miniDrawer = document.getElementById('miniDrawer');
+    const header = document.querySelector(".mini-drawer-header");
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("notification");
+    wrapper.innerHTML = "<span>읽지 않은 알림이 없습니다.</span>";
+    miniDrawer.insertBefore(wrapper, header.nextSibling);
+}
 
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+}
 
+function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
+    const miniDrawer = document.getElementById('miniDrawer');
+    const header = document.querySelector(".mini-drawer-header");
 
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("notification");
 
+    const msg = document.createElement("span");
+    msg.textContent = notificationMessage;
 
+    const dateSpan = document.createElement("span");
+    dateSpan.classList.add("notification-date");
+    dateSpan.textContent = formatDate(createdDate);
 
+    wrapper.appendChild(msg);
+    wrapper.appendChild(dateSpan);
+    miniDrawer.insertBefore(wrapper, header.nextSibling);
 
+    const bell = document.getElementById("openMiniDrawerBtn");
+    bell.classList.add("bell-shake");
+    setTimeout(() => bell.classList.remove("bell-shake"), 600);
 
+    const badge = document.getElementById("notificationBadge");
+    badge.innerText = parseInt(badge.innerText || '0') + 1;
+    badge.style.display = 'inline-block';
 
+    msg.addEventListener("click", async () => {
+        const res = await fetch(`/notification/update/unread?notificationId=${notificationId}`, {
+            method: "GET",
+            credentials: "include"
+        });
+        const data = await res.json();
 
+        wrapper.classList.add("read");
+        msg.style.pointerEvents = "none";
+        msg.style.opacity = "0.6";
 
-
-
-
-
-
-
-
+        if (data?.data?.trim()) {
+            const go = confirm("알림 페이지로 이동하시겠습니까?");
+            if (go) window.location.href = data.data;
+        } else {
+            alert("알림이 확인되었습니다.");
+        }
+    });
+}
 
 
 

@@ -36,7 +36,8 @@ spring:
           starttls:
             enable: true
 
-
+app:
+  domain-url: http://localhost:8090
 
 matchon:
   kakao-api: ${KAKAO_API_KEY}

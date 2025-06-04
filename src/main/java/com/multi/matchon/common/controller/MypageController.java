@@ -43,6 +43,7 @@ public class MypageController {
 
         model.addAttribute("myPosition", member.getPositions() != null ? member.getPositions().getPositionName().name() : "");
         model.addAttribute("myTimeType", member.getTimeType() != null ? member.getTimeType().name() : "");
+        model.addAttribute("emailAgreement", member.getEmailAgreement());
         return "mypage/mypage";
     }
 
@@ -119,5 +120,16 @@ public class MypageController {
         Member member = memberService.findForMypage(user.getUsername());
         mypageService.deleteProfileImage(member);
         return ResponseEntity.ok("삭제 완료");
+
+    }
+
+    // 이메일 동의
+    @PutMapping("/email-agreement")
+    public ResponseEntity<String> updateEmailAgreement(@AuthenticationPrincipal CustomUser user,
+                                                       @RequestBody Map<String, Boolean> payload) {
+        boolean agreement = payload.getOrDefault("emailAgreement", false);
+        Member member = memberService.findByEmail(user.getUsername());
+        mypageService.updateEmailAgreement(member, agreement);
+        return ResponseEntity.ok("변경 완료");
     }
 }
