@@ -171,4 +171,10 @@ public class MypageService {
                     attachmentRepository.save(att);
                 });
     }
+
+    // 이메일 동의 업데이트
+    public void updateEmailAgreement(Member member, boolean agreement) {
+        member.setEmailAgreement(agreement);
+        memberRepository.save(member);
+    }
 }

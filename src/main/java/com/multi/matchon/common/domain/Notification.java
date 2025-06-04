@@ -35,4 +35,8 @@ public class Notification extends BaseEntity{
     private Boolean isRead=false;
 
 
+    public void updateIsRead(Boolean isRead) {
+        this.isRead = isRead;
+    }
+
 }

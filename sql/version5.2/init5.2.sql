@@ -32,29 +32,6 @@ VALUES
     (TRUE, 'Chat Room 9', '2025-05-17 20:52:28', 'Member9', '2025-05-17 20:52:28', 'Member9', FALSE),
     (FALSE, 'Chat Room 10', '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28', 'Member10', FALSE);
 
-INSERT INTO stadium (stadium_region, stadium_name, stadium_address, stadium_tel,
-                     create_date, create_person, modified_date, modified_person, is_deleted)
-VALUES
-    ('Seoul', 'Seoul Stadium', 'Seoul Address', '010-1234', '2025-05-17 20:52:28', 'Admin1', '2025-05-17 20:52:28',
-     'Admin1', FALSE),
-    ('Busan', 'Busan Stadium', 'Busan Address', '010-1234', '2025-05-17 20:52:28', 'Admin2', '2025-05-17 20:52:28',
-     'Admin2', FALSE),
-    ('Incheon', 'Incheon Stadium', 'Incheon Address', '010-1234', '2025-05-17 20:52:28', 'Admin3',
-     '2025-05-17 20:52:28', 'Admin3', FALSE),
-    ('Daegu', 'Daegu Stadium', 'Daegu Address', '010-1234', '2025-05-17 20:52:28', 'Admin4', '2025-05-17 20:52:28',
-     'Admin4', FALSE),
-    ('Daejeon', 'Daejeon Stadium', 'Daejeon Address', '010-1234', '2025-05-17 20:52:28', 'Admin5',
-     '2025-05-17 20:52:28', 'Admin5', FALSE),
-    ('Gwangju', 'Gwangju Stadium', 'Gwangju Address', '010-1234', '2025-05-17 20:52:28', 'Admin6',
-     '2025-05-17 20:52:28', 'Admin6', FALSE),
-    ('Suwon', 'Suwon Stadium', 'Suwon Address', '010-1234', '2025-05-17 20:52:28', 'Admin7', '2025-05-17 20:52:28',
-     'Admin7', FALSE),
-    ('Ulsan', 'Ulsan Stadium', 'Ulsan Address', '010-1234', '2025-05-17 20:52:28', 'Admin8', '2025-05-17 20:52:28',
-     'Admin8', FALSE),
-    ('Jeju', 'Jeju Stadium', 'Jeju Address', '010-1234', '2025-05-17 20:52:28', 'Admin9', '2025-05-17 20:52:28',
-     'Admin9', FALSE),
-    ('Sejong', 'Sejong Stadium', 'Sejong Address', '010-1234', '2025-05-17 20:52:28', 'Admin10',
-     '2025-05-17 20:52:28', 'Admin10', FALSE);
 
 INSERT INTO positions (position_name)
 VALUES
@@ -94,20 +71,20 @@ VALUES
     ('Team10', 'CHUNGCHEONG_REGION', 3.00, FALSE, 'User10', '2025-05-17 20:52:28', 'User10',
      '2025-05-17 20:52:28', 'This is team 10''s introduction.', TRUE, FALSE);
 
-INSERT INTO member (member_email, member_password, previous_password, temporary_password,member_name, member_role, position_id, preferred_time,
-                    team_id, my_temperature, picture_attachment_enabled, is_temporary_password,suspended_until, created_date, modified_date, is_deleted)
+INSERT INTO member (member_email, member_password, previous_password, temporary_password, member_name, member_role, position_id, preferred_time,
+    				team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
 VALUES
-    ('user1@example.com', '$2b$12$XLxwreDeCJ05HT6Dfgoi2eT0LypkvILlxflUAM7UbGXg4Nx9vwnNO', NULL, NULL, 'Member1', 'USER', 1, 'WEEKEND_MORNING', 1, 35.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password1
-	('user2@example.com', '$2b$12$q6pH.HBpAqY3OWdtbErQ8.DenIlABy470AbWWtRQEXJLTTASFXA7O', NULL, NULL, 'Member2', 'USER', 2, 'WEEKEND_AFTERNOON', 2, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password2
-	('user3@example.com', '$2b$12$Khi4Sn7FXd6XrFtO2DQXje9UKC5UZ59CMM5X1unnX0Ncp4RfV8LMC', NULL, NULL, 'Member3', 'USER', 3, 'WEEKEND_EVENING', 3, 39.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password3
-	('user4@example.com', '$2b$12$KgSiwAuAkWA/tU2vrk5S6.mqgsAGGMdVlGUpE6IKyVn4X3m76fqGe', NULL, NULL, 'Member4', 'USER', 4, 'WEEKDAY_MORNING', 4, 39.0, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password4
-	('user5@example.com', '$2b$12$BLAHeM/XhFsqMahBapPpRu3u/9W4/bqTkWBPmooKUPBfX7xdyw71S', NULL, NULL, 'Member5', 'USER', 5, 'WEEKDAY_AFTERNOON', 5, 39.1, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password5
-	('user6@example.com', '$2b$12$IhGuAY/N8QL9kJJ2FCz/8.OKIVGI.WbcicvI2kwtvUeqyMKRXbxvi', NULL, NULL, 'Member6', 'USER', 6, 'WEEKDAY_EVENING', 6, 36.5, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password6
-	('user7@example.com', '$2b$12$iYsymbDQPRrBz4Ui.fCnEeVR4XhpgAfimntKqchOAUqIUdStbUfku', NULL, NULL, 'Member7', 'USER', 7, 'WEEKEND_MORNING', 7, 38.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password7
-	('user8@example.com', '$2b$12$O9catkQ.S.GJZad57FhhwupYTmC3GfmVeLcakmKtrePzGm.Need06', NULL, NULL, 'Member8', 'USER', 8, 'WEEKEND_AFTERNOON', 8, 36.1, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password8
-	('user9@example.com', '$2b$12$fxng2YxGQJbkY4LdC9628uES33t3j4gcxU9RDstYjUs0zH3uuEiS2', NULL, NULL, 'Member9', 'USER', 9, 'WEEKEND_EVENING', 9, 35.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password9
-	('user10@example.com', '$2b$12$64F.CeDtWhfn/as6d9jTwu9dBjzolmChl9jWFfKYyfqcoAdYnz8Oy', NULL, NULL, 'Member10', 'USER', 10, 'WEEKDAY_MORNING', 10, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE), -- password10
-	('matchon2025@gmail.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'admin', 'ADMIN', NULL, NULL, NULL, NULL, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE); -- Mathcon2025!!
+    ('user1@example.com', '$2b$12$XLxwreDeCJ05HT6Dfgoi2eT0LypkvILlxflUAM7UbGXg4Nx9vwnNO', NULL, NULL, 'Member1', 'USER', 1, 'WEEKEND_MORNING', 1, 35.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password1
+    ('user2@example.com', '$2b$12$q6pH.HBpAqY3OWdtbErQ8.DenIlABy470AbWWtRQEXJLTTASFXA7O', NULL, NULL, 'Member2', 'USER', 2, 'WEEKEND_AFTERNOON', 2, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password2
+    ('user3@example.com', '$2b$12$Khi4Sn7FXd6XrFtO2DQXje9UKC5UZ59CMM5X1unnX0Ncp4RfV8LMC', NULL, NULL, 'Member3', 'USER', 3, 'WEEKEND_EVENING', 3, 39.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- password3
+    ('user4@example.com', '$2b$12$KgSiwAuAkWA/tU2vrk5S6.mqgsAGGMdVlGUpE6IKyVn4X3m76fqGe', NULL, NULL, 'Member4', 'USER', 4, 'WEEKDAY_MORNING', 4, 39.0, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password4
+    ('user5@example.com', '$2b$12$BLAHeM/XhFsqMahBapPpRu3u/9W4/bqTkWBPmooKUPBfX7xdyw71S', NULL, NULL, 'Member5', 'USER', 5, 'WEEKDAY_AFTERNOON', 5, 39.1, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- password5
+    ('user6@example.com', '$2b$12$IhGuAY/N8QL9kJJ2FCz/8.OKIVGI.WbcicvI2kwtvUeqyMKRXbxvi', NULL, NULL, 'Member6', 'USER', 6, 'WEEKDAY_EVENING', 6, 36.5, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password6
+    ('user7@example.com', '$2b$12$iYsymbDQPRrBz4Ui.fCnEeVR4XhpgAfimntKqchOAUqIUdStbUfku', NULL, NULL, 'Member7', 'USER', 7, 'WEEKEND_MORNING', 7, 38.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password7
+    ('user8@example.com', '$2b$12$O9catkQ.S.GJZad57FhhwupYTmC3GfmVeLcakmKtrePzGm.Need06', NULL, NULL, 'Member8', 'USER', 8, 'WEEKEND_AFTERNOON', 8, 36.1, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- password8
+    ('user9@example.com', '$2b$12$fxng2YxGQJbkY4LdC9628uES33t3j4gcxU9RDstYjUs0zH3uuEiS2', NULL, NULL, 'Member9', 'USER', 9, 'WEEKEND_EVENING', 9, 35.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password9
+    ('user10@example.com', '$2b$12$64F.CeDtWhfn/as6d9jTwu9dBjzolmChl9jWFfKYyfqcoAdYnz8Oy', NULL, NULL, 'Member10', 'USER', 10, 'WEEKDAY_MORNING', 10, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password10
+    ('matchon2025@gmail.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'admin', 'ADMIN', NULL, NULL, NULL, NULL, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE); -- Mathcon2025!!
 
 INSERT INTO refresh_token (member_id, refresh_token_data, refresh_token_expired_date, created_date)
 VALUES
@@ -247,18 +224,16 @@ VALUES	(1, 'Host1', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE),
 
 INSERT INTO notification (received_member_id, notification_message, target_url, is_read, created_person, modified_person)
 VALUES
-
-(1, '[매치업] 6월 6일 경기 신청이 승인되었습니다.', '/matchup/board', FALSE, 'user1@example.com', 'user1@example.com'),
-(2, '[후기 요청] 6월 7일 경기 상대를 평가해주세요.', '/matchup/board', FALSE, 'user2@example.com', 'user2@example.com'),
-(3, '[알림] 새로운 채팅 메시지가 도착했습니다.', '/matchup/board', FALSE, 'user3@example.com', 'user3@example.com'),
-(4, '[공지] 6월 9일 시스템 점검 안내', '/matchup/board', FALSE, 'user4@example.com', 'user4@example.com'),
-(5, '[매치업] 새로운 경기 요청이 도착했습니다.', '/matchup/board', FALSE, 'user5@example.com', 'user5@example.com'),
-(6, '[팀 초대] MATCHON 팀에 초대되었습니다.', '/matchup/board', FALSE, 'user6@example.com', 'user6@example.com'),
-(7, '[경고] 비정상적인 접근이 감지되었습니다.', '/matchup/board', FALSE, 'user7@example.com', 'user7@example.com'),
-(8, '[알림] 일정이 곧 시작됩니다. 준비하세요!', '/matchup/board', FALSE, 'user8@example.com', 'user8@example.com'),
-(9, '[후기 수신] 상대방이 당신을 평가했습니다.', '/matchup/board', FALSE, 'user9@example.com', 'user9@example.com'),
-(10, '[채팅방] 새로운 참가자가 입장했습니다.', '/matchup/board', FALSE, 'user10@example.com', 'user10@example.com');
-
+    (1, '[매치업] 6월 6일 경기 신청이 승인되었습니다.', '/matchup/board', FALSE, 'user1@example.com', 'user1@example.com'),
+    (2, '[후기 요청] 6월 7일 경기 상대를 평가해주세요.', '/matchup/board', FALSE, 'user2@example.com', 'user2@example.com'),
+    (3, '[알림] 새로운 채팅 메시지가 도착했습니다.', '/matchup/board', FALSE, 'user3@example.com', 'user3@example.com'),
+    (4, '[공지] 6월 9일 시스템 점검 안내', '/matchup/board', FALSE, 'user4@example.com', 'user4@example.com'),
+    (5, '[매치업] 새로운 경기 요청이 도착했습니다.', '/matchup/board', FALSE, 'user5@example.com', 'user5@example.com'),
+    (6, '[팀 초대] MATCHON 팀에 초대되었습니다.', '/matchup/board', FALSE, 'user6@example.com', 'user6@example.com'),
+    (7, '[경고] 비정상적인 접근이 감지되었습니다.', '/matchup/board', FALSE, 'user7@example.com', 'user7@example.com'),
+    (8, '[알림] 일정이 곧 시작됩니다. 준비하세요!', '/matchup/board', FALSE, 'user8@example.com', 'user8@example.com'),
+    (9, '[후기 수신] 상대방이 당신을 평가했습니다.', '/matchup/board', FALSE, 'user9@example.com', 'user9@example.com'),
+    (10, '[채팅방] 새로운 참가자가 입장했습니다.', '/matchup/board', FALSE, 'user10@example.com', 'user10@example.com');
 
 
 
