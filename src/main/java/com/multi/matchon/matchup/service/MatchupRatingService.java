@@ -82,10 +82,6 @@ public class MatchupRatingService {
                     .matchupBoard(ratingMatchupBoard)
                     .memberEval(user.getMember())
                     .memberTarget(mr.getMember())
-                    .mannerScore(1)
-                    .skillScore(1)
-                    .review("tmp")
-                    .isCompleted(false)
                     .build();
 
             matchupRatings.add(matchupRating);
@@ -98,10 +94,6 @@ public class MatchupRatingService {
                     .matchupBoard(ratingMatchupBoard)
                     .memberEval(mr.getMember())
                     .memberTarget(user.getMember())
-                    .mannerScore(1)
-                    .skillScore(1)
-                    .review("tmp")
-                    .isCompleted(false)
                     .build();
 
             matchupRatings.add(matchupRating);
@@ -117,10 +109,6 @@ public class MatchupRatingService {
                         .matchupBoard(ratingMatchupBoard)
                         .memberEval(mr1.getMember())
                         .memberTarget(mr2.getMember())
-                        .mannerScore(1)
-                        .skillScore(1)
-                        .review("tmp")
-                        .isCompleted(false)
                         .build();
                 matchupRatings.add(matchupRating);
             }

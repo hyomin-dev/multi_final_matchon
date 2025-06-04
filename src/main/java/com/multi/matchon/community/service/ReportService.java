@@ -87,9 +87,18 @@ public class ReportService {
                     .orElse(null);
         }
 
+        boolean exists = false;
+
+        if (report.getReportType() == ReportType.BOARD) {
+            exists = boardRepository.existsById(report.getTargetId());
+        } else if (report.getReportType() == ReportType.COMMENT) {
+            exists = commentRepository.existsById(report.getTargetId());
+        }
+
         return ReportResponse.builder()
                 .id(report.getId())
                 .reportType(report.getReportType().name())
+                .boardId(resolveBoardId(report))
                 .targetId(report.getTargetId())
                 .targetWriterName(targetWriterName)
                 .reporterName(report.getReporter().getMemberName())
@@ -100,6 +109,7 @@ public class ReportService {
                 .targetMemberId(targetMember != null ? targetMember.getId() : null)
                 .suspended(targetMember != null && targetMember.isSuspended())
                 .targetIsAdmin(targetMember != null && targetMember.getMemberRole().name().equals("ADMIN"))
+                .targetExists(exists)
                 .build();
     }
 
@@ -124,7 +134,6 @@ public class ReportService {
     /**
      * 댓글의 경우 해당 댓글이 포함된 게시글 ID 조회
      */
-
     private Long resolveBoardId(Report report) {
         if (report.getReportType() == ReportType.BOARD) {
             return report.getTargetId();

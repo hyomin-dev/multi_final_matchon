@@ -81,3 +81,110 @@
     background-color: lightgray;
 }
 
+.file-upload-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.file-upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f4faff;
+    padding: 10px 16px;
+    border: 1px solid #a0d2f5;
+    border-radius: 8px;
+    color: #0074cc;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: fit-content;
+}
+
+.file-upload-label:hover {
+    background-color: #e2f3ff;
+}
+
+.attach-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* 게시글 작성/수정 첨부파일 - 상세 페이지 스타일 일치 */
+
+.attachment-box {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding: 20px 25px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    background-color: #f4f7fa;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.attachment-box strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #222;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 6px;
+}
+
+.attachment-box ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 8px;
+}
+
+.attachment-box li {
+    margin-bottom: 6px;
+}
+
+/* 첨부파일 항목 아이템 구성 */
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.attachment-icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.75;
+    transition: transform 0.2s ease;
+}
+
+.attachment-item:hover .attachment-icon {
+    transform: scale(1.1);
+    opacity: 0.95;
+}
+
+.attachment-box a {
+    color: #1a73e8;
+    text-decoration: underline;
+    word-break: break-word;
+}
+
+/* 삭제 버튼 재사용 */
+.attachment-item .file-delete-btn {
+    background: none;
+    border: none;
+    color: #F44336;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.attachment-item .file-delete-btn:hover {
+    background-color: lemonchiffon;
+    color: red;
+}
+
+
+

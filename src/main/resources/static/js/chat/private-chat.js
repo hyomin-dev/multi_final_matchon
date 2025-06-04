@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     setStompClient();
     //메시지 보낼 때 설정
     setSend(roomId);
+
     //연결 해제 설정
     setDisconnects(roomId);
 
