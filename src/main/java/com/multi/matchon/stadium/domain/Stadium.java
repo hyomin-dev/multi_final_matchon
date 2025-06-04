@@ -40,6 +40,9 @@ public class Stadium extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
+    private Double latitude;
+    private Double longitude;
+
     public String getFullImageUrl() {
         String regionFolder = switch (stadiumRegion) {
             case "경기도" -> "gyeonggi";
