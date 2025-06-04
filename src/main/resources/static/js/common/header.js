@@ -272,13 +272,146 @@ async function getUnreadNoti(){
 
 }
 
+function onError(error){
+    console.warn("STOMP 연결 끊어짐. 재시도 중...",error);
+
+    if(!reconnectTimeout){
+        reconnectTimeout = setTimeout(()=>{
+            connect();
+        },reconnectDelay);
+    }
+}
+
+async function initSideBar(){
+    const openBtn = document.getElementById('openMiniDrawerBtn');
+    const closeBtn = document.getElementById('closeMiniDrawerBtn');
+    const miniDrawer = document.getElementById('miniDrawer');
+
+
+    // 초기에 읽지 않은 메시지를 가져옴
+    const notifications = await getUnreadNoti();
+
+    setUnreadNoti(notifications);
+
+    openBtn.onclick = () => {
+        miniDrawer.style.display = 'block';
+    };
+
+    closeBtn.onclick = () => {
+        miniDrawer.style.display = 'none';
+    };
+
+    // 바깥 클릭 시 닫기 (선택사항)
+    window.addEventListener("click", (e) => {
+        if (!miniDrawer.contains(e.target) && e.target !== openBtn) {
+            miniDrawer.style.display = 'none';
+        }
+    });
+}
+
+async function getUnreadNoti(){
+    const response = await fetch("/notification/get/unread");
+    if(!response.ok)
+        throw new Error(`HTTP error! Status:${response.status}`)
+
+    const data = await response.json();
+
+    //console.log(data);
+    return data.data;
+
+}
+
+
+
+function setUnreadNoti(notifications){
+    console.log(notifications);
+
+    if(notifications.length===0){
+        const miniDrawer = document.getElementById('miniDrawer');
+
+        const wrapper = document.createElement("div");
+        const msg = document.createElement("span");
+
+        wrapper.classList.add("notification");
+        msg.textContent = "읽지 않은 알림이 없습니다.";
+
+        wrapper.appendChild(msg);
+        miniDrawer.appendChild(wrapper);
+        return;
+    }
+
+    notifications.forEach(noti =>{
+
+        createNotiStructure(noti.notificationId, noti.notificationMessage, noti.createdDate);
+
+
+    });
+}
+
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+}
+
+function createNotiStructure(notificationId, notificationMessage, createdDate) {
+
+    const miniDrawer = document.getElementById('miniDrawer');
+    const header = document.querySelector(".mini-drawer-header");
+
+    const wrapper = document.createElement("div");
+    const msg = document.createElement("span");
+
+
+    wrapper.classList.add("notification");
+
+    msg.textContent = notificationMessage;
+
+    const dateSpan = document.createElement("span");
+    dateSpan.classList.add("notification-date");
+    dateSpan.textContent = formatDate(createdDate);
+
+    wrapper.appendChild(msg);
+    wrapper.appendChild(dateSpan);
+    miniDrawer.appendChild(wrapper);
+    miniDrawer.insertBefore(wrapper, header.nextSibling);
+
+
+    msg.addEventListener("click",async ()=>{
+        const response = await fetch(`/notification/update/unread?notificationId=${notificationId}`,{
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`);
+
+        const data = await response.json();
+
+        wrapper.classList.add("clicked");
+        msg.style.pointerEvents = "none"; // 클릭 자체를 비활성화
+        msg.style.opacity = "0.6"; // 시각적으로도 회색 느낌
+
+        if(data && typeof data.data === "string" && data.data.trim() !== ""){
+            const reply = confirm("알림 페이지로 이동하시겠습니까?")
+            if(reply)
+                window.location.href = data.data;
+        }else{
+            alert("알림이 확인되었습니다.");
+        }
+    });
+}
+
 
 
 function setUnreadNoti(notifications){
     console.log(notifications);
 
     const badge = document.getElementById("notificationBadge");
-    badge.innerText = notifications.length;
+    badge.innerText = 0;//notifications.length;
     badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
 
     if (notifications.length === 0) {

@@ -104,6 +104,8 @@
     padding: 6px 10px;
     border-bottom: 1px solid #eee;
     font-size: 0.8rem;
+<<<<<<< HEAD
+=======
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
@@ -150,7 +152,9 @@
 .notification {
     padding: 10px;
     border-bottom: 1px solid #ccc;
+>>>>>>> develop
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 .notification:hover {
     background-color: #f1f1f1;
@@ -162,11 +166,32 @@
     margin-top: 4px;
 }
 
-#miniDrawer {
-    max-height: 300px;
-    overflow-y: auto;
+.notification-date {
+    font-size: 0.7rem;
+    color: #aaa;
+    margin-top: 3px;
 }
 
-.notification.read {
-    opacity: 0.6;
+.notification span {
+    word-break: break-word;   /* 단어 중간도 줄바꿈 허용 */
+    white-space: normal;      /* 텍스트가 줄바꿈 되도록 */
+    overflow-wrap: break-word;
+    width: 100%;              /* 부모 영역에 꽉 차게 */
+}
+
+/* 마우스 오버 시 배경색 */
+.notification:hover {
+    background-color: #f0f0f0;
+}
+
+/* 클릭 순간 (누르고 있는 상태) */
+.notification:active {
+    background-color: #d0d0d0;
+}
+
+/* 클릭 완료 후 스타일 (JS에서 클래스 추가해줌) */
+.notification.clicked {
+    background-color: #e0e0e0;
+    color: #999;
+
 }
