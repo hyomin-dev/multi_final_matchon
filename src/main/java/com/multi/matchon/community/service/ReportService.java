@@ -134,7 +134,6 @@ public class ReportService {
     /**
      * 댓글의 경우 해당 댓글이 포함된 게시글 ID 조회
      */
-
     private Long resolveBoardId(Report report) {
         if (report.getReportType() == ReportType.BOARD) {
             return report.getTargetId();
