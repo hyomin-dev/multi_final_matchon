@@ -2,11 +2,11 @@
     width: 90%;
     max-width: 900px;
     margin: 30px auto;
-    background-color: #ffffff;
+    background-color: #fff;
     padding: 40px;
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e2e2e2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid beige;
 }
 
 .form-group {

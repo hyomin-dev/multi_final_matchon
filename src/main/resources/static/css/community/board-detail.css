@@ -3,11 +3,11 @@
     width: 90%;
     max-width: 900px;
     margin: 30px auto;
-    background: #fafafa;
-    padding: 35px;
-    border-radius: 10px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border: 1px solid #e0e0e0;
+    border: 1px solid beige;
 }
 
 .post-title {
