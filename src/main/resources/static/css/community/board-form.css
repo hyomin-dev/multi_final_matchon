@@ -135,9 +135,14 @@
 }
 
 .attachment-box a {
-    color: #1a73e8;
-    text-decoration: underline;
+    color: royalblue;
+    text-decoration: none;
     word-break: break-word;
+}
+
+.attachment-box a:hover {
+    color: blue;
+    text-decoration: underline;
 }
 
 /* ===== 삭제 버튼 ===== */
