@@ -9,6 +9,7 @@ import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.common.exception.custom.hasCanceledMatchRequestMoreThanOnceException;
 import com.multi.matchon.common.exception.custom.MatchupRequestLimitExceededException;
+import com.multi.matchon.common.service.NotificationService;
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
@@ -42,6 +43,7 @@ public class MatchupRequestService {
     private final MemberRepository memberRepository;
     private final ChatService chatService;
     private final SimpMessageSendingOperations messageTemplate;
+    private final NotificationService notificationService;
 
     // 등록
 
@@ -82,6 +84,7 @@ public class MatchupRequestService {
             throw new CustomException("Matchup 경기 시작 시간이 지나 참가 요청할 수 없습니다.");
         }
 
+
         if(findMatchupBoard.getCurrentParticipantCount()>findMatchupBoard.getMaxParticipants()){
             throw new CustomException("Matchup 현재 모집 인원을 초과해서 참가 요청을 할 수 없습니다.");
         }
@@ -118,6 +121,12 @@ public class MatchupRequestService {
                 throw new CustomException("Matchup 요청 이력이 있어 현재 참가 요청을 할 수 없습니다.");
 //            }
         }
+
+        /*
+        * 작성자에게 알림 보내기
+        * */
+        notificationService.sendNotification(findMatchupBoard.getWriter() , "[참가 요청]"+user.getMember().getMemberName()+"님의 참가 요청이 있습니다.", "/matchup/request/board?"+"board-id="+findMatchupBoard.getId());
+
     }
 
     // 조회
