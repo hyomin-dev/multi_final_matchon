@@ -250,12 +250,14 @@ CREATE TABLE host_profile (
 
 CREATE TABLE notification
 (
-    notification_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    received_member_id BIGINT NOT NULL,
-    notification_message TEXT NOT NULL,
-    target_url		VARCHAR(500) NOT NULL,
-    is_read			BOOLEAN NULL DEFAULT FALSE,
-    created_date      DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+	notification_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	received_member_id BIGINT NOT NULL,
+	notification_message TEXT NOT NULL,
+	target_url		VARCHAR(500) NOT NULL,
+	is_read			BOOLEAN NULL DEFAULT FALSE,
+	created_date      DATETIME DEFAULT CURRENT_TIMESTAMP,
+
     created_person    VARCHAR(100)        NOT NULL,
     modified_date     DATETIME DEFAULT current_timestamp on update current_timestamp,
     modified_person   VARCHAR(100)        NOT NULL,

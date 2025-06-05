@@ -18,14 +18,43 @@ h2 {
     max-width: 100%;
     white-space: normal;
 }
+
+.description-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.description-box label {
+    width: 90px;
+    flex-shrink: 0;
+    font-weight: 600;
+    margin-top: 4px;
+}
 .info-box {
+    display: flex;
+    align-items: flex-start;
     margin-bottom: 14px;
     font-size: 16px;
 }
-label {
+
+
+.info-box label {
     font-weight: 600;
-    display: inline-block;
-    width: 70px;
+    width: 90px;
+    flex-shrink: 0;
+}
+
+
+.event-description {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 15px;
+    text-align: left;
+    flex-grow: 1;
+    word-break: break-word;
 }
 #map {
     width: 100%;

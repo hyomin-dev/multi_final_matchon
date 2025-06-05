@@ -22,7 +22,23 @@
         </div>
         <div class="icons" style="position: relative">
             <img id="chat-icon" src="/img/chat-black.png">
-            <img src="/img/bell-black.png" id="openMiniDrawerBtn">
+            <div style="position: relative; display: inline-block;">
+                <img src="/img/bell-black.png" id="openMiniDrawerBtn">
+                <span id="notificationBadge" style="
+                    position: absolute;
+                    top: -5px;
+                    right: -5px;
+                    background: red;
+                    color: white;
+                    border-radius: 50%;
+                    font-size: 12px;
+                    width: 18px;
+                    height: 18px;
+                    text-align: center;
+                    line-height: 18px;
+                    display: none;
+                ">0</span>
+            </div>
             <div class="mini-drawer" id="miniDrawer">
                 <div class="mini-drawer-header">
                     <h4>알림</h4>
@@ -41,7 +57,6 @@
             <a id="btn-admin" th:href="@{/admin}" class="btn" style="display: none;">ADMIN</a>
             <a id="btn-logout" href="javascript:logout()" class="btn" style="display: none;">LOGOUT</a>
         </div>
-
 
     </div>
     <hr class="blue_hr">

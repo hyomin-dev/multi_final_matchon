@@ -2,6 +2,7 @@ package com.multi.matchon.member.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.Status;
+import com.multi.matchon.common.service.NotificationService;
 import com.multi.matchon.community.domain.Report;
 import com.multi.matchon.community.dto.res.ReportResponse;
 import com.multi.matchon.community.service.ReportService;
@@ -40,6 +41,7 @@ public class AdminController {
     private final InquiryRepository inquiryRepository;
     private final InquiryAnswerRepository inquiryAnswerRepository;
     private final ReportService reportService;
+    private final NotificationService notificationService;
 
     @GetMapping
     public String adminHome() {
@@ -96,6 +98,12 @@ public class AdminController {
         inquiryAnswerRepository.save(answer);
 
         inquiry.complete(); // 상태는 저장 이후 변경
+
+        notificationService.sendNotification(
+                inquiry.getMember(), // 알림 받을 사용자
+                "문의에 답변이 등록되었습니다.",
+                "/inquiry/" + inquiry.getId()
+        );
 
         return "redirect:/admin/inquiry";
     }
@@ -162,6 +170,19 @@ public class AdminController {
     @Transactional
     public String updateEventStatus(@PathVariable Long id, @RequestParam("status") Status status) {
         eventRepository.updateEventStatus(id, status);
+        EventRequest event = eventRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 대회를 찾을 수 없습니다."));
+
+        eventRepository.updateEventStatus(id, status);
+
+        // 승인된 경우에만 알림 전송
+        if (status == Status.APPROVED) {
+            notificationService.sendNotification(
+                    event.getMember(), // 등록한 사용자
+                    "대회가 승인되었습니다.",
+                    "/host/event/" + event.getId()
+            );
+        }
         return "redirect:/admin/event";
     }
 

@@ -7,27 +7,42 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}">
     <style>
+        #map-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
         #map {
-            width: 100%;
-            height: 900px;
+            width: 800px;
+            height: 800px;
+        }
+
+        .title1 {
+            text-align: center;
         }
     </style>
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
 
+<h1 class="title1">구장 보기</h1>
+
 <ul id="stadium-data" style="display: none;"></ul>
 
-<div id="map"></div>
+<div id="map-container">
+    <div id="map"></div>
+</div>
 
 <!-- 카카오맵 -->
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a7fac0ef351b12f799117f0847bf1d23&autoload=false&libraries=services"></script>
 
 <script>
-    kakao.maps.load(function() {
+    kakao.maps.load(function(callback) {
         const map = new kakao.maps.Map(document.getElementById('map'), {
             center: new kakao.maps.LatLng(37.289506, 127.053467),
-            level: 11
+            level: 14
         });
 
         // 마커 이미지 표시(별 모양)
@@ -66,7 +81,7 @@
                     });
 
                     const infowindow = new kakao.maps.InfoWindow({
-                        content: '<div style="padding:5px;font-size:14px;">${stadiumName}</div>'
+                        content: `<div style="padding:5px;font-size:14px;">${stadiumName}</div>`
                     });
 
                     // 마우스 오버 이벤트 표시(구장명 표시)

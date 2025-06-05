@@ -3,6 +3,7 @@ package com.multi.matchon.matchup.controller;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.PageResponseDto;
+import com.multi.matchon.common.dto.res.ResNotificationDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardEditDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
@@ -19,6 +20,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/matchup/board")

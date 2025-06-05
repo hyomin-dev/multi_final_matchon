@@ -3,6 +3,7 @@ package com.multi.matchon.common.auth.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 public class MailService {
 
     private final JavaMailSender mailSender;
+    @Value("${app.domain-url}")
+    private String domainUrl;
 
     public void sendTemporaryPassword(String toEmail, String tempPassword) {
         try {
@@ -53,5 +56,46 @@ public class MailService {
         }
     }
 
+    public void sendNotificationEmail(String toEmail, String subject, String htmlContent) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
+
+
+            ClassPathResource logo = new ClassPathResource("static/img/matchon_logo.png");
+            helper.addInline("matchonLogo", logo);
+
+            mailSender.send(message);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("알림 메일 전송 실패: " + e.getMessage());
+        }
+    }
+
+    // 이메일 본문 생성 메서드
+    public String buildNotificationBody(String message, String targetUrl) {
+        String fullUrl = domainUrl + targetUrl;
+        return """
+        <div style="font-family: 'Noto Sans KR', sans-serif; color: #333;">
+            <img src='cid:matchonLogo' style='width: 120px; margin-bottom: 20px;' alt='MatchOn Logo'/>
+            <h2 style="color: #d77a8f;">📢 새로운 알림이 도착했습니다!</h2>
+
+            <div style="padding: 14px 20px; background-color: #f2f2f2; border-left: 4px solid #d3365d; margin: 20px 0; font-size: 16px;">
+                <strong>%s</strong>
+            </div>
+
+            <p>해당 알림은 아래 내용을 확인하시면 됩니다.</p>
+            <p>
+                <a href="%s" style="display:inline-block; margin-top:10px; background-color:#d77a8f; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">👉 바로 가기</a>
+            </p>
+
+            <hr style="margin-top: 30px;">
+            <p style="font-size: 13px; color: #888;">본 메일은 알림 수신에 동의하신 회원에게 발송되었습니다.</p>
+        </div>
+        """.formatted(message, fullUrl);
+    }
 }
