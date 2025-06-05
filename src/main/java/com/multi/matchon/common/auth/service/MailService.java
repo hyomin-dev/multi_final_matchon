@@ -78,7 +78,7 @@ public class MailService {
 
     // 이메일 본문 생성 메서드
     public String buildNotificationBody(String message, String targetUrl) {
-        String fullUrl = domainUrl + targetUrl;
+        String redirectUrl = domainUrl + "/redirect?url=" + targetUrl;
         return """
         <div style="font-family: 'Noto Sans KR', sans-serif; color: #333;">
             <img src='cid:matchonLogo' style='width: 120px; margin-bottom: 20px;' alt='MatchOn Logo'/>
@@ -96,6 +96,6 @@ public class MailService {
             <hr style="margin-top: 30px;">
             <p style="font-size: 13px; color: #888;">본 메일은 알림 수신에 동의하신 회원에게 발송되었습니다.</p>
         </div>
-        """.formatted(message, fullUrl);
+        """.formatted(message, redirectUrl);
     }
 }

@@ -60,6 +60,7 @@ public class NotificationService {
     /*
      * 알림 전송 (저장 + 실시간 + 메일)
      */
+    @Transactional
     public void sendNotification(Member receiver, String message, String targetUrl) {
         // 1. DB 저장
         Notification notification = Notification.builder()
@@ -78,7 +79,7 @@ public class NotificationService {
                 .build();
 
         messageTemplate.convertAndSendToUser(
-                receiver.getMemberEmail(), "/queue/notifications", dto
+                receiver.getMemberEmail(), "/notify", dto
         );
 
         // 3. 이메일 수신 동의 시에만 전송
