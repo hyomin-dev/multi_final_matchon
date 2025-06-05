@@ -25,7 +25,7 @@ async function setContent(){
 
     drawMap(sportsFacilityAddress, sportsFacilityName);
     calTime(matchDatetime, matchDuration);
-    checkStatus(matchDatetime, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature);
+    checkStatus(matchDatetime, matchDuration, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature);
     setButton(matchDatetime, writerEmail, loginEmail, currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature);
 
 
@@ -129,7 +129,7 @@ function calTime(matchDatetime, matchDuration){
 
 }
 
-function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature){
+function checkStatus(matchDatetime, matchDuration, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature){
     const statusEle = document.querySelector("#status");
 
     // console.log(currentParticipantCount)
@@ -138,25 +138,30 @@ function checkStatus(matchDatetime, currentParticipantCount, maxParticipants, wr
     // 공통: 경기 날짜 지나면 경기종료
     const matchDate = new Date(matchDatetime);
     const now = new Date();
-    if(matchDate<now)
-        statusEle.innerHTML = "경기 종료"
-    else if(writerEmail === loginEmail){
+    const durationParts = matchDuration.split(":");
+    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+
+    if(matchDate <now && now <= matchEnd){
+        statusEle.textContent = "경기 진행";
+    }else if(matchEnd<now){
+        statusEle.textContent = "경기 종료";
+    }else if(writerEmail === loginEmail){
         // 경우1: 사용자가 쓴 글
         // 신청 가능 여부: 모집 중, 모집 완료, 경기 종료
 
         if(currentParticipantCount < maxParticipants)
-            statusEle.innerHTML =  "모집 가능";
+            statusEle.textContent =  "모집 가능";
         else
-            statusEle.innerHTML = "모집 완료";
+            statusEle.textContent = "모집 완료";
     }else{
         // 경우2: 다른 사람의 글
         // 신청 가능 여부: 신청 가능, 신청 마감, 입장 불가, 경기 종료
         if(minMannerTemperature>myMannerTemperature)
-            statusEle.innerHTML = "입장 불가";
+            statusEle.textContent = "입장 불가";
         else if(currentParticipantCount < maxParticipants)
-            statusEle.innerHTML = "신청 가능";
+            statusEle.textContent = "신청 가능";
         else
-            statusEle.innerHTML = "신청 불가";
+            statusEle.textContent = "신청 불가";
     }
 }
 

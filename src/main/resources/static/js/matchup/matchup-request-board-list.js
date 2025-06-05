@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     const maxParticipants = detailDto.dataset.maxParticipants;
 
     calTime(matchDatetime, matchDuration);
-    checkMatchStatus(matchDatetime);
+    checkMatchStatus(matchDatetime, matchDuration);
 
 
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
@@ -184,12 +184,18 @@ function calTime(matchDatetime, matchDuration){
 
 }
 
-function checkMatchStatus(matchDatetime){
+function checkMatchStatus(matchDatetime, matchDuration){
+
     const matchStatusEle = document.querySelector("#match-status");
 
     const matchDate = new Date(matchDatetime);
     const now = new Date();
-    if(matchDate<now)
+    const durationParts = matchDuration.split(":");
+    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+
+    if(matchDate <=now && now <= matchEnd)
+        matchStatusEle.innerHTML = "경기 진행";
+    else if(matchEnd<now)
         matchStatusEle.textContent = "경기 종료";
     else
         matchStatusEle.textContent =  "경기 시작전";
