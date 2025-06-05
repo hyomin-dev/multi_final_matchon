@@ -99,7 +99,7 @@ function submitCheck(e){
         alert("경기 방식 소개를 입력하세요");
         e.preventDefault();
     } else{
-        alert("submit");
+        alert("글 작성이 완료되었습니다.");
     }
 }
 

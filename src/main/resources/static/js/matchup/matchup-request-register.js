@@ -43,7 +43,7 @@ function submitCheck(e, matchDatetime){
         alert("경기 시작 시간이 지나 등록할 수 없습니다.");
         e.preventDefault();
     }else{
-        alert("submit");
+        alert("요청 등록이 완료되었습니다.");
     }
 }
 

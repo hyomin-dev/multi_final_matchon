@@ -286,7 +286,9 @@
     gap: 6px;
 }
 
+
 /* ===== 댓글 삭제 버튼 ===== */
+
 .btn-comment-delete {
     padding: 2px 8px;
     background: none;

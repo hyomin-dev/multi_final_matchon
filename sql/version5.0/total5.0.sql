@@ -44,7 +44,7 @@ CREATE TABLE chat_room
 
 );
 
-CREATE TABLE stadium
+create table stadium
 (
     stadium_id                      bigint primary KEY AUTO_INCREMENT,
     stadium_region                  varchar(100),
@@ -248,6 +248,21 @@ CREATE TABLE host_profile (
                               CONSTRAINT FK_host_profile_2_member FOREIGN KEY (host_id) REFERENCES member (member_id)
 );
 
+CREATE TABLE notification
+(
+    notification_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    received_member_id BIGINT NOT NULL,
+    notification_message TEXT NOT NULL,
+    target_url		VARCHAR(500) NOT NULL,
+    is_read			BOOLEAN NULL DEFAULT FALSE,
+    created_date      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_person    VARCHAR(100)        NOT NULL,
+    modified_date     DATETIME DEFAULT current_timestamp on update current_timestamp,
+    modified_person   VARCHAR(100)        NOT NULL,
+    CONSTRAINT FK_notification_2_member FOREIGN KEY (received_member_id) REFERENCES member (member_id)
+);
+
+
 
 -- ↑FK 1개인 것
 -- ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
@@ -294,7 +309,7 @@ CREATE TABLE matchup_board
     created_person                 VARCHAR(100)        NOT NULL,
     modified_date                  DATETIME                    DEFAULT current_timestamp on update current_timestamp,
     modified_person                VARCHAR(100)        NOT NULL,
-    is_deleted                     BOOLEAN            NOT NULL DEFAULT FALSE,    
+    is_deleted                     BOOLEAN            NOT NULL DEFAULT FALSE,
     CONSTRAINT FK_matchup_board_2_member FOREIGN KEY (writer_id) REFERENCES member (member_id),
     CONSTRAINT FK_matchup_board_2_sports_type FOREIGN KEY (sports_type_id) REFERENCES sports_type (sports_type_id),
     CONSTRAINT FK_matchup_board_2_chat_room FOREIGN KEY (chat_room_id) REFERENCES chat_room (chat_room_id)
@@ -426,9 +441,9 @@ CREATE TABLE matchup_rating
     matchup_board_id        BIGINT             NOT NULL,
     evaluator_id      BIGINT             NOT NULL,
     target_member_id  BIGINT             NOT NULL,
-    manner_score      INT                NOT NULL CHECK (1 <= manner_score AND manner_score <= 5),
-    skill_score       INT                NOT NULL CHECK (1 <= skill_score AND skill_score <= 5),
-    review            TEXT               NOT NULL,
+    manner_score      INT                NULL CHECK (1 <= manner_score AND manner_score <= 5),
+    skill_score       INT                NULL CHECK (1 <= skill_score AND skill_score <= 5),
+    review            TEXT               NULL,
     is_completed	  BOOLEAN DEFAULT FALSE,
     created_date      DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_person    VARCHAR(100)        NOT NULL,
