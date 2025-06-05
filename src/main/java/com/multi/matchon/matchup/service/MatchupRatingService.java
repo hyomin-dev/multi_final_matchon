@@ -290,7 +290,6 @@ public class MatchupRatingService {
 
         Double changeTemp = (reqMatchupRatingDto.getMannerScore()*0.14+ reqMatchupRatingDto.getSkillScore()*0.06 -0.4) *0.01;
 
-
         target.updateMyTemperature(changeTemp);
 
         /*
@@ -303,6 +302,7 @@ public class MatchupRatingService {
     }
 
     @Transactional(readOnly = true)
+
     public ResMatchupRatingDto findDetailResMatchupRatingDto(Long boardId, Long evalId, Long targetId) {
 
         return matchupRatingRepository.findDetailResMatchupRatingDtoByBoardIdAndEvalIdAndTargetId(boardId, evalId, targetId).orElseThrow(() ->new CustomException("Matchup 등록된 평가가 없습니다."));
