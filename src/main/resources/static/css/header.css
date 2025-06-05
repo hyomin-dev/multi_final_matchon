@@ -59,12 +59,10 @@
 
 
     position: absolute;
-    top: 40%;              /* 종 아래로 바로 붙임 */
-    left: 60%;              /* 종 중심 기준 */
-    transform: translateX(-50%);  /* 가운데 정렬 */
-    /*margin-top: 8px;        !* 종과의 간격 *!*/
+    top: 40%;
+    left: 60%;
+    transform: translateX(-50%);
     width: 280px;
-
     background-color: white;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -104,8 +102,6 @@
     padding: 6px 10px;
     border-bottom: 1px solid #eee;
     font-size: 0.8rem;
-<<<<<<< HEAD
-=======
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
@@ -152,7 +148,6 @@
 .notification {
     padding: 10px;
     border-bottom: 1px solid #ccc;
->>>>>>> develop
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
