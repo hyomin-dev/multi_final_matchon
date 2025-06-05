@@ -145,6 +145,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     @Query("""
             select t1
             from MatchupBoard t1
+            join fetch t1.writer
             where t1.id=:boardId and t1.isDeleted=false and t1.writer.isDeleted=false
             """)
     Optional<MatchupBoard> findByIdAndIsDeletedFalse(Long boardId);

@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -158,7 +159,7 @@ public class MatchupRatingService {
     /*
     * 매너 온도 평가 등록, 마이페이지 업데이트
     * */
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void registerMatchupRating(@Valid ReqMatchupRatingDto reqMatchupRatingDto, CustomUser user) {
 
         if(!reqMatchupRatingDto.getEvalId().equals(user.getMember().getId()))
@@ -168,11 +169,13 @@ public class MatchupRatingService {
 
         matchupRating.rating(reqMatchupRatingDto.getMannerScore(), reqMatchupRatingDto.getSkillScore(), reqMatchupRatingDto.getReview(), true);
 
-        Member member =  memberRepository.findByIdAndIsDeletedFalse(reqMatchupRatingDto.getTargetId()).orElseThrow(()->new CustomException("Matchup 평가 대상 회원이 존재하지 않습니다."));
+        Member member =  memberRepository.findByIdAndIsDeletedFalseWithLock(reqMatchupRatingDto.getTargetId()).orElseThrow(()->new CustomException("Matchup 평가 대상 회원이 존재하지 않습니다."));
 
 //        Double sumScoreWithSigmoid = sigmoid((reqMatchupRatingDto.getMannerScore()+ reqMatchupRatingDto.getSkillScore())/10.0);
 
-        member.updateMyTemperature(0.1);
+        Double changeTemp = member.getMyTemperature() + (reqMatchupRatingDto.getMannerScore()*0.14+ reqMatchupRatingDto.getSkillScore()*0.06 -0.4) *0.01;
+
+        member.updateMyTemperature(changeTemp);
 
 
 
