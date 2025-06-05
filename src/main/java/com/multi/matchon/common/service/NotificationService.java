@@ -1,11 +1,13 @@
 package com.multi.matchon.common.service;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
+
 import com.multi.matchon.common.auth.service.MailService;
 import com.multi.matchon.common.domain.Notification;
 import com.multi.matchon.common.dto.res.ResNotificationDto;
 import com.multi.matchon.common.exception.custom.ApiCustomException;
 import com.multi.matchon.common.repository.NotificationRepository;
+
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Service
@@ -23,8 +25,10 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+
     private final SimpMessageSendingOperations messageTemplate;
     private final MailService mailService;
+
 
     /*
     * 읽지 않은 정보 가져오기
@@ -35,6 +39,7 @@ public class NotificationService {
         // 읽지 않은 알림 가져오기
 
        return notificationRepository.findAllByMemberAndUnreadFalse(user.getMember());
+
 
     }
 
