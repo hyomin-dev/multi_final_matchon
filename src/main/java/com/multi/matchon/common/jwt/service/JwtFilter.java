@@ -162,6 +162,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 uri.startsWith("/css") ||
                 uri.startsWith("/js") ||
                 uri.startsWith("/img") ||
+                uri.startsWith("/redirect") ||
                 uri.equals("/favicon.ico");
     }
 }
