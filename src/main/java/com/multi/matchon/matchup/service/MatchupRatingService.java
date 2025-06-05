@@ -284,20 +284,25 @@ public class MatchupRatingService {
 
         matchupRating.rating(reqMatchupRatingDto.getMannerScore(), reqMatchupRatingDto.getSkillScore(), reqMatchupRatingDto.getReview(), true);
 
-        Member member =  memberRepository.findByIdAndIsDeletedFalseWithLock(reqMatchupRatingDto.getTargetId()).orElseThrow(()->new CustomException("Matchup 평가 대상 회원이 존재하지 않습니다."));
+        Member target =  memberRepository.findByIdAndIsDeletedFalseWithLock(reqMatchupRatingDto.getTargetId()).orElseThrow(()->new CustomException("Matchup 평가 대상 회원이 존재하지 않습니다."));
 
 //        Double sumScoreWithSigmoid = sigmoid((reqMatchupRatingDto.getMannerScore()+ reqMatchupRatingDto.getSkillScore())/10.0);
 
         Double changeTemp = (reqMatchupRatingDto.getMannerScore()*0.14+ reqMatchupRatingDto.getSkillScore()*0.06 -0.4) *0.01;
 
+        target.updateMyTemperature(changeTemp);
 
-        member.updateMyTemperature(changeTemp);
+        /*
+         * 작성자에게 알림 보내기
+         * */
+        notificationService.sendNotification(target , "[평가 알림]"+user.getMember().getMemberName()+"님으로 부터 매너 온도 평가가 도착했습니다. 확인해보세요.", "/matchup/rating/detail?"+"boardId="+reqMatchupRatingDto.getBoardId()+"&evalId="+user.getMember().getId()+"&targetId="+target.getId());
 
 
 
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
+
     public ResMatchupRatingDto findDetailResMatchupRatingDto(Long boardId, Long evalId, Long targetId) {
 
         return matchupRatingRepository.findDetailResMatchupRatingDtoByBoardIdAndEvalIdAndTargetId(boardId, evalId, targetId).orElseThrow(() ->new CustomException("Matchup 등록된 평가가 없습니다."));
