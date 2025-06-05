@@ -1,14 +1,16 @@
+/* ===== 공통 레이아웃 ===== */
 .form-container {
     width: 90%;
     max-width: 900px;
     margin: 30px auto;
-    background-color: #fff;
     padding: 40px;
+    background-color: #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border: 1px solid beige;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* ===== 폼 그룹 ===== */
 .form-group {
     margin-bottom: 2px;
 }
@@ -22,12 +24,13 @@
     margin-bottom: 20px;
 }
 
+/* ===== 에디터 ===== */
 .toast-editor-container {
     border: none;
     padding: 0;
     margin-top: 8px;
-    box-shadow: none;
     background: transparent;
+    box-shadow: none;
 }
 
 .toastui-editor-defaultUI {
@@ -36,6 +39,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
+/* ===== 버튼 ===== */
 .btn-outline-danger {
     padding: 8px 15px;
     background-color: white;
@@ -50,37 +54,7 @@
     background-color: mistyrose;
 }
 
-/* 파일 미리보기 */
-.file-preview div {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 5px;
-}
-
-.file-preview button,
-.file-delete-btn {
-    color: red;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-}
-
-.file-delete-btn {
-    background: none;
-    border: none;
-    color: red;
-    padding: 3px 3px;
-    font-weight: normal;
-    margin-left: 8px;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.file-delete-btn:hover {
-    padding: 3px 3px;
-    background-color: lightgray;
-}
-
+/* ===== 파일 업로드 ===== */
 .file-upload-group {
     display: flex;
     flex-direction: column;
@@ -91,8 +65,8 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background-color: #f4faff;
     padding: 10px 16px;
+    background-color: #f4faff;
     border: 1px solid #a0d2f5;
     border-radius: 8px;
     color: #0074cc;
@@ -111,15 +85,13 @@
     height: 24px;
 }
 
-/* 게시글 작성/수정 첨부파일 - 상세 페이지 스타일 일치 */
-
+/* ===== 첨부파일 박스 ===== */
 .attachment-box {
-    margin-top: 20px;
-    margin-bottom: 15px;
+    margin: 20px 0 15px;
     padding: 20px 25px;
+    background-color: #f4f7fa;
     border: 1px solid #d0d0d0;
     border-radius: 8px;
-    background-color: #f4f7fa;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
@@ -128,12 +100,12 @@
     margin-bottom: 10px;
     font-size: 16px;
     color: #222;
-    border-bottom: 1px solid #ccc;
     padding-bottom: 6px;
+    border-bottom: 1px solid #ccc;
 }
 
 .attachment-box ul {
-    list-style-type: none;
+    list-style: none;
     padding-left: 0;
     margin-top: 8px;
 }
@@ -142,7 +114,7 @@
     margin-bottom: 6px;
 }
 
-/* 첨부파일 항목 아이템 구성 */
+/* ===== 첨부파일 항목 ===== */
 .attachment-item {
     display: flex;
     align-items: center;
@@ -168,23 +140,35 @@
     word-break: break-word;
 }
 
-/* 삭제 버튼 재사용 */
+/* ===== 삭제 버튼 ===== */
+.file-delete-btn,
 .attachment-item .file-delete-btn {
     background: none;
     border: none;
-    color: #F44336;
-    font-size: 0.85rem;
-    font-weight: bold;
+    color: #f44336;
     cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85rem;
     padding: 2px 6px;
     border-radius: 4px;
     transition: background-color 0.2s ease;
 }
 
+.file-delete-btn:hover,
 .attachment-item .file-delete-btn:hover {
     background-color: lemonchiffon;
-    color: red;
 }
 
+/* ===== 파일 미리보기 영역 (추가 기능용) ===== */
+.file-preview div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
 
-
+.file-preview button {
+    color: red;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}

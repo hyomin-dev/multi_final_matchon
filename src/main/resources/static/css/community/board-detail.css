@@ -1,36 +1,37 @@
-/* 게시글 상세 레이아웃 */
+/* ===== 게시글 상세 레이아웃 ===== */
 .content-box {
     width: 90%;
     max-width: 900px;
     margin: 30px auto;
-    background: #fff;
     padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background: #fff;
     border: 1px solid beige;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* ===== 게시글 제목 및 메타 정보 ===== */
 .post-title {
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 20px;
-    border-bottom: 2px solid #e2e2e2;
     padding-bottom: 10px;
+    border-bottom: 2px solid #e2e2e2;
 }
 
 .meta-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
     background-color: #f0f3f5;
     padding: 10px 15px;
     border-radius: 6px;
     margin-bottom: 20px;
     font-size: 14px;
     color: #555;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
 }
 
-/* 본문 상단 사용자 조작 */
+/* ===== 게시글 상단 조작 영역 ===== */
 .post-header {
     position: relative;
     padding-top: 10px;
@@ -44,10 +45,6 @@
     margin-bottom: 10px;
 }
 
-.post-actions {
-    margin-top: 18px;
-}
-
 .post-action-right {
     position: absolute;
     top: 10px;
@@ -57,12 +54,27 @@
     align-items: center;
 }
 
+.post-actions {
+    margin-top: 18px;
+}
+
 .post-action-right button {
     margin-left: 10px;
 }
 
+.back-link {
+    font-size: 14px;
+    color: #3498db;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* ===== 버튼 스타일 (삭제, 신고, 수정) ===== */
 .board-delete-button {
-    background-color: transparent;
+    background: transparent;
     border: none;
     color: #F44336;
     font-weight: bold;
@@ -78,23 +90,51 @@
     color: red;
 }
 
-.back-link {
+.report-button {
+    padding: 3px 8px;
+    background: none;
+    color: #F44336;
+    border: none;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.report-button:hover {
+    background-color: mistyrose;
+    color: red;
+    transform: scale(1.05);
+}
+
+.post-action-right .report-button {
+    padding: 4px 10px;
     font-size: 14px;
-    color: #3498db;
+    font-weight: bold;
+}
+
+.edit-link {
+    background-color: forestgreen;
+    color: white;
+    padding: 7px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
     text-decoration: none;
+    transition: background-color 0.3s ease;
 }
 
-.back-link:hover {
-    text-decoration: underline;
+.edit-link:hover {
+    background-color: darkgreen;
 }
 
-/* 첨부파일 */
+/* ===== 첨부파일 영역 ===== */
 .attachment-box {
     margin-top: 40px;
     padding: 20px 25px;
+    background-color: #f4f7fa;
     border: 1px solid #d0d0d0;
     border-radius: 8px;
-    background-color: #f4f7fa;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
@@ -103,13 +143,13 @@
     margin-bottom: 10px;
     font-size: 16px;
     color: #222;
-    border-bottom: 1px solid #ccc;
     padding-bottom: 6px;
+    border-bottom: 1px solid #ccc;
 }
 
 .attachment-box ul {
-    list-style-type: none; /* 점 제거 */
-    padding-left: 0; /* 왼쪽 여백 제거 */
+    list-style: none;
+    padding-left: 0;
     margin-top: 8px;
 }
 
@@ -123,7 +163,6 @@
     word-break: break-word;
 }
 
-/* 첨부파일 항목 스타일 */
 .attachment-item {
     display: flex;
     align-items: center;
@@ -147,38 +186,39 @@
     opacity: 0.75;
     transition: transform 0.2s ease;
 }
+
 .attachment-box li:hover img {
     transform: scale(1.1);
 }
 
-/* 댓글 */
+/* ===== 댓글 영역 ===== */
 .comment-section {
     width: 100%;
     max-width: 900px;
     margin: 50px auto;
-    background-color: #fdfdfd;
     padding: 30px;
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
     border-radius: 12px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e0e0e0;
 }
 
 .comment-section h3 {
     font-size: 20px;
     margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;
     padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
 }
 
 .comment-section textarea {
     width: 100%;
     height: 80px;
-    resize: vertical;
     padding: 10px;
+    margin-bottom: 10px;
     font-size: 14px;
     border-radius: 6px;
     border: 1px solid #ccc;
-    margin-bottom: 10px;
+    resize: vertical;
 }
 
 .comment-section ul {
@@ -190,11 +230,23 @@
 .comment-section li {
     padding: 12px 16px;
     margin-bottom: 8px;
-    background-color: #ffffff;
-    border-radius: 6px;
+    background-color: #fff;
     border: 1px solid #e0e0e0;
+    border-radius: 6px;
 }
 
+.comment-section li.highlight {
+    border: 2px solid goldenrod;
+    background-color: lightyellow;
+    animation: fadeHighlight 2s ease-in-out;
+}
+
+@keyframes fadeHighlight {
+    0% { background-color: pink; }
+    100% { background-color: transparent; }
+}
+
+/* ===== 댓글 요소 ===== */
 .comment-meta {
     font-size: 15px;
     color: #666;
@@ -214,48 +266,30 @@
     margin-right: 6px;
 }
 
-/* 댓글 본문 텍스트 */
 .comment-section li p {
     font-size: 15px;
     font-weight: 500;
     color: #222;
-    margin: 4px 0 0 0;
     line-height: 1.6;
-
     white-space: pre-wrap;
     word-break: break-word;
+    margin: 4px 0 0 0;
 }
-
 
 .comment-actions {
     display: flex;
     gap: 6px;
 }
 
-.comment-section li.highlight {
-    border: 2px solid goldenrod;
-    background-color: lightyellow;
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    animation: fadeHighlight 2s ease-in-out;
-}
-
-
-@keyframes fadeHighlight {
-    0% { background-color: pink; }
-    100% { background-color: transparent; }
-}
-
-
+/* ===== 댓글 삭제 버튼 ===== */
 .btn-comment-delete {
     padding: 2px 8px;
     background: none;
     color: #F44336;
     border: none;
-    border-radius: 4px;
     font-size: 0.8rem;
     font-weight: bold;
+    border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
 }
@@ -264,44 +298,3 @@
     background-color: lemonchiffon;
     color: red;
 }
-
-.report-button {
-    padding: 3px 8px;
-    color: #F44336;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-
-}
-
-.report-button:hover {
-    background-color: mistyrose;
-    color: red;
-    transform: scale(1.05);
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.post-action-right .report-button {
-    padding: 4px 10px;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-/*수정버튼*/
-.edit-link {
-    background-color: forestgreen;
-    color: white;
-    padding: 7px 14px;
-    font-size: 14px;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-}
-
-.edit-link:hover {
-    background-color: darkgreen;
-}
-
