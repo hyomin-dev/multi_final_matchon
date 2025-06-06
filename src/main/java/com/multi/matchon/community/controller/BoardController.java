@@ -278,7 +278,6 @@ public class BoardController {
     }
 
 
-
     @GetMapping("/download-force/{filename}")
     public ResponseEntity<Resource> forceDownload(@PathVariable String filename) throws IOException {
         Optional<Attachment> optional = attachmentRepository.findCommunityAttachmentBySavedName(filename);
@@ -313,7 +312,15 @@ public class BoardController {
             return ResponseEntity.status(401).body("로그인이 필요합니다.");
         }
 
-        boardService.deleteByIdAndUser(id, user.getMember());
+        Board board = boardService.findById(id);
+        boolean isOwner = board.getMember().getId().equals(user.getMember().getId());
+        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            return ResponseEntity.status(403).body("삭제 권한이 없습니다.");
+        }
+
+        boardService.deleteById(id);
         return ResponseEntity.ok().build();
     }
 }

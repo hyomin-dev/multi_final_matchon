@@ -53,13 +53,9 @@ public class BoardService {
     }
 
     @Transactional
-    public void deleteByIdAndUser(Long id, Member member) {
+    public void deleteById(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-
-        if (!board.getMember().getId().equals(member.getId())) {
-            throw new SecurityException("삭제 권한이 없습니다.");
-        }
 
         // 댓글 먼저 삭제
         commentService.deleteAllByBoard(board);
@@ -70,6 +66,7 @@ public class BoardService {
         // 게시글 삭제
         boardRepository.deleteById(id);
     }
+
 
     private void softDeleteCommunityAttachments(Long boardId) {
         List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, boardId);

@@ -58,7 +58,11 @@ public class CommentController {
         }
 
         Comment comment = commentService.findById(commentId);
-        if (!comment.getMember().getId().equals(userDetails.getMember().getId())) {
+
+        boolean isOwner = comment.getMember().getId().equals(userDetails.getMember().getId());
+        boolean isAdmin = userDetails.getMember().getMemberRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
             return ResponseEntity.status(403).body("삭제 권한이 없습니다.");
         }
 
