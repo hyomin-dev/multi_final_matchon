@@ -223,10 +223,16 @@ function calTime(item, startHour, startMinute){
 }
 
 function checkMatchStatus(item){
+
     const matchDate = new Date(item.matchDatetime);
     const now = new Date();
-    if(matchDate<now)
-        return "경기 종료"
+    const durationParts = item.matchDuration.split(":");
+    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+
+    if(matchDate <now && now <= matchEnd)
+        return "경기 진행";
+    else if(matchEnd<now)
+        return "경기 종료";
     else
         return "경기 시작전"
 }

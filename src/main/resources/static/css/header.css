@@ -51,40 +51,18 @@
 
 /* 알림 열기 버튼 */
 #openMiniDrawerBtn {
-    /*position: relative;*/
-    /*top: 20px;*/
-    /*right: 20px;*/
-    /*padding: 8px 12px;*/
-    /*background-color: #1976d2;*/
-    /*color: white;*/
-    /*border: none;*/
-    /*border-radius: 4px;*/
-    /*cursor: pointer;*/
-    /*z-index: 1001;*/
+
 }
 
 /* 미니 알림창 */
 .mini-drawer {
-    /*position: absolute;*/
-    /*top: 70px;   !* 종 아이콘 바로 아래 *!*/
-    /*right: 300px;*/
-    /*margin-top: 8px;  !* 약간 아래 띄우기 *!*/
-    /*width: 280px;*/
-    /*background-color: white;*/
-    /*border: 1px solid #ccc;*/
-    /*border-radius: 8px;*/
-    /*box-shadow: 0 2px 10px rgba(0,0,0,0.15);*/
-    /*padding: 15px;*/
-    /*z-index: 1002;*/
-    /*display: none;*/
+
 
     position: absolute;
-    top: 40%;              /* 종 아래로 바로 붙임 */
-    left: 60%;              /* 종 중심 기준 */
-    transform: translateX(-50%);  /* 가운데 정렬 */
-    /*margin-top: 8px;        !* 종과의 간격 *!*/
+    top: 40%;
+    left: 60%;
+    transform: translateX(-50%);
     width: 280px;
-
     background-color: white;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -116,29 +94,99 @@
     cursor: pointer;
 }
 
-/*.notification {*/
-/*    font-size: 14px;*/
-/*    padding: 8px 0;*/
-/*    border-bottom: 1px solid #eee;*/
-/*}*/
-
 .notification {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
+    justify-content: flex-start;
+    flex-direction: column; /* 아래로 쌓기 */
+    align-items: flex-start;
+    padding: 6px 10px;
     border-bottom: 1px solid #eee;
-}
-
-.read-btn {
-    background-color: #ccc;
-    border: none;
-    padding: 4px 8px;
     font-size: 0.8rem;
-    border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-.read-btn:hover {
-    background-color: #aaa;
+.notification-date {
+    font-size: 0.7rem;
+    color: #aaa;
+    margin-top: 3px;
+}
+
+.notification span {
+    word-break: break-word;   /* 단어 중간도 줄바꿈 허용 */
+    white-space: normal;      /* 텍스트가 줄바꿈 되도록 */
+    overflow-wrap: break-word;
+    width: 100%;              /* 부모 영역에 꽉 차게 */
+}
+
+/* 마우스 오버 시 배경색 */
+.notification:hover {
+    background-color: #f0f0f0;
+}
+
+/* 클릭 순간 (누르고 있는 상태) */
+.notification:active {
+    background-color: #d0d0d0;
+}
+
+/* 클릭 완료 후 스타일 (JS에서 클래스 추가해줌) */
+.notification.clicked {
+    background-color: #e0e0e0;
+    color: #999;
+}
+
+@keyframes bell-ring {
+    0% { transform: rotate(0); }
+    25% { transform: rotate(10deg); }
+    50% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+    100% { transform: rotate(0); }
+}
+.bell-shake {
+    animation: bell-ring 0.6s ease-in-out;
+}
+.notification {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.notification:hover {
+    background-color: #f1f1f1;
+}
+.notification-date {
+    display: block;
+    font-size: 11px;
+    color: gray;
+    margin-top: 4px;
+}
+
+.notification-date {
+    font-size: 0.7rem;
+    color: #aaa;
+    margin-top: 3px;
+}
+
+.notification span {
+    word-break: break-word;   /* 단어 중간도 줄바꿈 허용 */
+    white-space: normal;      /* 텍스트가 줄바꿈 되도록 */
+    overflow-wrap: break-word;
+    width: 100%;              /* 부모 영역에 꽉 차게 */
+}
+
+/* 마우스 오버 시 배경색 */
+.notification:hover {
+    background-color: #f0f0f0;
+}
+
+/* 클릭 순간 (누르고 있는 상태) */
+.notification:active {
+    background-color: #d0d0d0;
+}
+
+/* 클릭 완료 후 스타일 (JS에서 클래스 추가해줌) */
+.notification.clicked {
+    background-color: #e0e0e0;
+    color: #999;
+
 }

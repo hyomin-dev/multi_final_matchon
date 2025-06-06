@@ -226,6 +226,7 @@ public class ChatService {
                     .content(c.getContent())
                     .senderEmail(c.getMember().getMemberEmail())
                     .senderName(c.getMember().getMemberName())
+                    .createdDate(c.getCreatedDate())
                     .build();
 
             resChatDtos.add(resChatDto);

@@ -32,6 +32,6 @@ function submitCheck(e){
         alert("리뷰를 입력하세요");
         e.preventDefault();
     } else{
-        alert("submit");
+        alert("매너 후기가 보내졌습니다.");
     }
 }

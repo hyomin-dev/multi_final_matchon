@@ -137,6 +137,9 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             select
              t1
             from MatchupRequest t1
+            join fetch t1.matchupBoard t2 
+            join fetch t2.writer
+            join fetch t1.member
             where  t1.id=:requestId and t1.matchupBoard.isDeleted=false and t1.matchupBoard.writer.isDeleted = false
             """)
     Optional<MatchupRequest> findById(Long requestId);
@@ -166,6 +169,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             t1
             from MatchupRequest  t1
             join fetch t1.matchupBoard t2
+            join fetch t2.writer
             join fetch t1.member t3
             where t1.id=:requestId and t2.id=:boardId and t3.id=:applicantId and
                     t2.isDeleted=false and t2.writer.isDeleted=false
@@ -202,6 +206,28 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             
             """)
     List<MatchupRequest> findByBoardIdAndMemberAndGameParticipantConditionAndAfterMatchupDatetime(@Param("boardId") Long boardId, @Param("loginMember") Member loginMember);
+
+
+    @Query("""
+            select t1
+            from MatchupRequest t1
+            join t1.matchupBoard t2
+            join fetch t1.member
+            where t2.isDeleted=false and  t2.matchDatetime < CURRENT_TIMESTAMP and
+            (
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false)
+            )
+            
+            """)
+    List<MatchupRequest> findByGameParticipantConditionAndAfterMatchupDatetime();
+
+
+
 
 
 }

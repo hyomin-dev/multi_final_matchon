@@ -17,6 +17,10 @@
 <div id="wrap">
     <h2 th:text="${event.eventTitle}">대회 제목</h2>
 
+    <div class="info-box description-box">
+        <label>대회 소개:</label>
+        <div class="event-description" th:text="${event.eventDescription}"></div>
+    </div>
     <div class="info-box"><label>주최기관:</label> <span th:text="${event.hostProfile.hostName}"></span></div>
     <div class="info-box"><label>일자:</label> <span th:text="${event.eventDate}"></span></div>
     <div class="info-box"><label>지역:</label> <span th:text="${regionLabel}"></span></div>
