@@ -260,7 +260,8 @@
 
 .truncate {
     width: 250px;           /* 너비 고정 */
-    white-space: wrap;
+    white-space: pre-wrap;    /* 줄바꿈과 공백 유지 + 자동 줄바꿈 */
+    word-break: break-word;   /* 단어 중간이라도 줄바꿈 */
 }
 
 

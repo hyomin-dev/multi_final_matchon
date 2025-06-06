@@ -33,6 +33,7 @@
                     소속팀
                     <input type="text" th:field="*{teamName}" readonly required>
                 </label>
+
             </div>
             <div class="form-group">
                 <label>
@@ -56,8 +57,10 @@
             <div class="form-group">
                 <label>
                     경기장 주소
-                    <input type="text" th:field="*{sportsFacilityAddress}" placeholder="주소 찾기 버튼을 누르세요." required readonly maxlength="100">
-                    <input type="button" onclick="getAddress()" value="주소 찾기">
+                    <div class="address-row">
+                        <input type="text" th:field="*{sportsFacilityAddress}" placeholder="주소 찾기 버튼을 누르세요." required readonly maxlength="100">
+                        <input type="button" onclick="getAddress()" value="주소 찾기">
+                    </div>
                 </label>
             </div>
             <div class="form-group">
@@ -105,9 +108,9 @@
                 </label>
             </div>
 
-            <div class="btn">
-                <button type="submit">등록하기</button>
-                <button type="button" class="cancel-btn">취소하기</button>
+            <div class="btn-group">
+                <button type="submit">등록</button>
+                <button type="button" class="cancel-btn">취소</button>
             </div>
         </form>
     </div>

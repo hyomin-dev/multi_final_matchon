@@ -23,8 +23,8 @@ document.addEventListener("DOMContentLoaded",()=>{
         submitCheck(e, myMannerTemperature);
     })
 
-    const backBtn = document.querySelector(".back-btn");
-    backBtn.addEventListener("click",()=>{
+    const cancelBtn = document.querySelector(".cancel-btn");
+    cancelBtn.addEventListener("click",()=>{
         history.back();
     });
 
@@ -127,16 +127,30 @@ async function setReservationFile(originalName, savedName){
     const url = window.URL.createObjectURL(data2);
     const aEle = document.querySelector("#reservationLoadBox > span > a");
 
-
     aEle.href = url;
     aEle.download = originalName;
 
-    aEle.addEventListener("click",()=>{
-        setTimeout(()=>{
-            aEle.removeAttribute("href")
+
+    // 한 번 클릭만 가능하게
+    aEle.addEventListener("click", () => {
+        setTimeout(() => {
+            aEle.removeAttribute("href");
             URL.revokeObjectURL(url);
-        },500)
-    })
+            aEle.style.pointerEvents = "none";
+            aEle.style.opacity = "0.5";
+            aEle.textContent += " (다운로드 완료)";
+        }, 500);
+    }, { once: true });
+
+    // aEle.addEventListener("click",function handleClick (){
+    //     setTimeout(()=>{
+    //         aEle.removeAttribute("href")
+    //         URL.revokeObjectURL(url);
+    //         aEle.removeEventListener("click", handleClick); // 이벤트 제거
+    //         aEle.style.pointerEvents = "none";              // 클릭 불가 처리 (옵션)
+    //         aEle.style.opacity = "0.5";
+    //     },500)
+    // })
     // const aEle2 = document.createElement("a");
     // aEle2.innerHTML = "삭제하기";
     //
@@ -210,26 +224,48 @@ function setButton(){
     //     window.location.href="/matchup";
     // })
 
+    // const toggleBtn = document.querySelector("#toggleBtn");
+    // const reservationLoadBox = document.querySelector("#reservationLoadBox");
+    // const reservationFileBox = document.querySelector("#reservationFileBox");
+    //
+    // toggleBtn.addEventListener("click",()=>{
+    //     const isDelete = toggleBtn.textContent === "파일 변경";
+    //
+    //     if(isDelete){
+    //         toggleBtn.textContent = "변경 취소";
+    //         reservationLoadBox.style.display = "none";
+    //         reservationFileBox.style.display = "block";
+    //         document.querySelector("#reservationFileBox > input").required = true;
+    //     }
+    //     else{
+    //         toggleBtn.textContent = "파일 변경";
+    //         reservationLoadBox.style.display = "block";
+    //         reservationFileBox.style.display = "none";
+    //         document.querySelector("#reservationFileBox > input").required = false;
+    //         document.querySelector("#reservationFileBox > input").value = '';
+    //
+    //     }
+    // })
     const toggleBtn = document.querySelector("#toggleBtn");
     const reservationLoadBox = document.querySelector("#reservationLoadBox");
     const reservationFileBox = document.querySelector("#reservationFileBox");
+    const fileInput = document.querySelector("#reservationFileInput");
 
-    toggleBtn.addEventListener("click",()=>{
-        const isDelete = toggleBtn.textContent === "파일 변경";
+    toggleBtn.addEventListener("click", () => {
+        const isChange = toggleBtn.textContent === "파일 변경";
 
-        if(isDelete){
+        if (isChange) {
             toggleBtn.textContent = "변경 취소";
             reservationLoadBox.style.display = "none";
             reservationFileBox.style.display = "block";
-            document.querySelector("#reservationFileBox > input").required = true;
-        }
-        else{
+            fileInput.required = true;
+        } else {
             toggleBtn.textContent = "파일 변경";
             reservationLoadBox.style.display = "block";
             reservationFileBox.style.display = "none";
-            document.querySelector("#reservationFileBox > input").required = false;
-            document.querySelector("#reservationFileBox > input").value = '';
-
+            fileInput.required = false;
+            fileInput.value = ""; // 초기화
         }
-    })
+    });
+
 }

@@ -130,6 +130,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     @Query("""
             select new com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto(
             t1.id,
+            t1.writer.memberName,
             t2.sportsTypeName,
             t1.sportsFacilityName,
             t1.sportsFacilityAddress,
