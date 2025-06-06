@@ -107,17 +107,19 @@
 
         .custom_typebtn {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            bottom: 10px;
+            right: 10px;
             z-index: 10;
         }
 
-        .custom_typebtn .back_btn .refreshbtn {
+        .custom_typebtn .refresh_btn {
+            display: block;
             width: 32px;
-            height: 28px;
-            font-size: 0;
-            background: url(/img/refresh_btn.png) no-repeat 0 -40px;
-            text-indent: -9999px
+            height: 32px;
+            background: url(/img/refresh_btn.png) no-repeat center center;
+            background-size: contain;
+            text-indent: -9999px;
+            cursor: pointer;
         }
 
 
@@ -146,12 +148,11 @@
                     <span class="coach_accessLocation"></span>
                 </a>
             </div>
-        </div>
-        <div class="custom_typebtn">
-            <a href="#backbtn" class="back_btn" onclick="resetMap()" title="돌아가기">
-                <span class="screen_out"></span>
-                <span class="refreshbtn" onclick="resetMap()"><img src="/img/refresh_btn.png" alt="돌아가기"></span>
-            </a>
+            <div class="custom_typebtn">
+                <a href="#none" class="refresh_btn" onclick="resetMap()" title="돌아가기">
+                    <span class="screen_out">돌아가기</span>
+                </a>
+            </div>
         </div>
     </div>
 </div>
