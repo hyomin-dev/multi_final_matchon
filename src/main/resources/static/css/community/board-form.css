@@ -85,7 +85,6 @@
     height: 24px;
 }
 
-
 /* ===== 첨부파일 박스 ===== */
 .attachment-box {
     margin: 20px 0 15px;
@@ -101,7 +100,6 @@
     margin-bottom: 10px;
     font-size: 16px;
     color: #222;
-
     padding-bottom: 6px;
     border-bottom: 1px solid #ccc;
 }
@@ -115,7 +113,6 @@
 .attachment-box li {
     margin-bottom: 6px;
 }
-
 
 /* ===== 첨부파일 항목 ===== */
 .attachment-item {
@@ -162,12 +159,10 @@
     transition: background-color 0.2s ease;
 }
 
-
 .file-delete-btn:hover,
 .attachment-item .file-delete-btn:hover {
     background-color: lemonchiffon;
 }
-
 
 /* ===== 파일 미리보기 영역 (추가 기능용) ===== */
 .file-preview div {
