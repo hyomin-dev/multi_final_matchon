@@ -30,7 +30,7 @@
     <tr th:each="report, stat : ${reports}">
         <td th:text="${(currentPage != null ? currentPage : 0) * 5 + stat.index + 1}">1</td>
         <td th:text="${report.reportType}">BOARD</td>
-        <td th:text="${report.targetWriterName}">Name</td>
+        <td th:text="${report.targetWriterName}" class="target-writer-name">Name</td>
         <td th:text="${report.reporterName}">홍길동</td>
         <td th:text="${report.reasonType}">욕설/비방</td>
         <td th:text="${report.reason}">사유</td>
