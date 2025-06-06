@@ -47,21 +47,25 @@
         </td>
         <td>
             <div class="ban-controls" th:if="${!report.targetIsAdmin}">
-                <button type="button"
-                        th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 7)'"
-                        class="ban-btn"
-                        th:attr="data-member-id=${report.targetMemberId}">7일</button>
+                <!-- 정지 버튼들 → suspended == false일 때만 렌더링 -->
+                <th:block th:if="${!report.suspended}">
+                    <button type="button"
+                            th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 7)'"
+                            class="ban-btn"
+                            th:attr="data-member-id=${report.targetMemberId}">7일</button>
 
-                <button type="button"
-                        th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 30)'"
-                        class="ban-btn"
-                        th:attr="data-member-id=${report.targetMemberId}">30일</button>
+                    <button type="button"
+                            th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 30)'"
+                            class="ban-btn"
+                            th:attr="data-member-id=${report.targetMemberId}">30일</button>
 
-                <button type="button"
-                        th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', null)'"
-                        class="ban-btn"
-                        th:attr="data-member-id=${report.targetMemberId}">영구</button>
+                    <button type="button"
+                            th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', null)'"
+                            class="ban-btn"
+                            th:attr="data-member-id=${report.targetMemberId}">영구</button>
+                </th:block>
 
+                <!-- 해제 버튼 → suspended == true일 때만 렌더링 -->
                 <button type="button"
                         th:if="${report.suspended}"
                         th:onclick="'unsuspendUser(event, ' + ${report.targetMemberId} + ')'"
@@ -114,7 +118,8 @@
             .then(res => {
                 if (res.ok) {
                     alert("회원 정지가 완료되었습니다.");
-                    markAsSuspended(memberId);
+                    // 🔄 상태 동기화를 위해 새로고침
+                    location.reload();
                 } else {
                     res.json().then(data => {
                         alert(data.message || "정지 실패");
