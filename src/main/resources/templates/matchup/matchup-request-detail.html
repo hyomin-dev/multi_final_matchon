@@ -98,16 +98,16 @@
 
     <div id="button-group">
         <!--/*-->
-        게시글 작성자인 경우 아래 버튼이 보임
-        <!--*/-->
+<!--        게시글 작성자인 경우 아래 버튼이 보임-->
+<!--        &lt;!&ndash;*/&ndash;&gt;-->
 
-        <a  id="approvedBtn" th:href="@{/matchup/request/approve(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">참가 요청 승인</a>
+<!--        <a  id="approvedBtn" th:href="@{/matchup/request/approve(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">참가 요청 승인</a>-->
 
-        <a id="deniedBtn" th:href="@{/matchup/request/deny(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">참가 요청 반려</a>
+<!--        <a id="deniedBtn" th:href="@{/matchup/request/deny(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">참가 요청 반려</a>-->
 
-        <a  id="approveWithdrawRequestBtn" th:href="@{/matchup/request/approve(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">취소 요청 승인</a>
+<!--        <a  id="approveWithdrawRequestBtn" th:href="@{/matchup/request/approve(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">취소 요청 승인</a>-->
 
-        <a id="denyWithdrawRequestBtn" th:href="@{/matchup/request/deny(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">취소 요청 반려</a>
+<!--        <a id="denyWithdrawRequestBtn" th:href="@{/matchup/request/deny(board-id=${resMatchupRequestDto.boardId},request-id=${resMatchupRequestDto.requestId})}" th:style="${resMatchupRequestDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupRequestDto.boardWriterEmail == #authentication.name} ? 'display:inline' : 'display:none'">취소 요청 반려</a>-->
 
         <!--/*-->
             참가 신청자인 경우 아래 버튼이 보임

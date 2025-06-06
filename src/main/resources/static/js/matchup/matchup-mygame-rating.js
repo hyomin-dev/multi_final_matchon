@@ -5,9 +5,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     boardId = Number(detailDto.dataset.boardId);
 
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
-
-
-
 })
 
 async function loadItems(page){
@@ -32,11 +29,11 @@ async function loadItems(page){
 function renderList(items){
 
 
-    const boardArea = document.querySelector("#request-container");
-    boardArea.innerHTML = '';
+    const matchArea = document.querySelector("#match-container");
+    matchArea.innerHTML = '';
 
     if(items.length ===0){
-        boardArea.innerHTML = `
+        matchArea.innerHTML = `
             <div class="no-result">
                 매너 온도 평가할 대상이 없습니다.
             </div>
@@ -46,27 +43,18 @@ function renderList(items){
 
     items.forEach((item, index)=>{
 
-        const card = document.createElement("div");
+        const card = document.createElement("tr");
         card.className = "matchup-card";
         card.innerHTML = `
-            <div class="card-content">
-                <div class="left-info">
-                    <div><strong>평가 대상: </strong>${item.targetName}</div>          
-                </div>         
-                <div class="button-wrap">
-                    <div><strong>후기 보냄: </strong>${setIsCompletedSend(item.isCompletedSend)}</div>
-                    <button class="send-btn"></button>
-                </div>
-                <div class="button-wrap">
-                    <div><strong>후기 받음: </strong>${setIsCompletedSend(item.isCompletedReceive)}</div>
-                    <button class="receive-btn">받은 후기</button>        
-                </div>
-            </div>    
-                                            
+                    <td>${item.targetName}</td>
+                    <td>${setReceivedScore(item)}</td>
+                    <td class="truncate">${setReceivedReview(item)}</td>
+                    <td>${setSendedScore(item)}</td>
+                    <td class="truncate">${setSendedReview(item)}</td>       
+                    <td><button class="send-btn">후기 작성</button></td>                                     
                 `;
         setSendBtn(card,item);
-        setReceiveBtn(card, item);
-        boardArea.appendChild(card);
+        matchArea.appendChild(card);
 
     })
 }
@@ -114,7 +102,8 @@ function renderPagination(pageInfo){
         const btn = document.createElement("button");
         btn.textContent = i;
         if( i=== curPage)
-            btn.disabled = true;
+            //btn.disabled = true;
+            btn.classList.add("active");
 
         btn.addEventListener("click",()=>{
             loadItems(i);
@@ -161,12 +150,8 @@ function setSendBtn(card, item){
 
     // 내가 후기 작성을 한 경우
     if(item.isCompletedSend){
-        sendBtn.textContent = "보낸 후기";
-        sendBtn.addEventListener("click",()=>{
-            window.location.href = `/matchup/rating/detail?boardId=${item.boardId}&evalId=${item.sendedEvalId}&targetId=${item.sendedTargetId}`;
-        })
+        sendBtn.classList.add("disabled");
     }else{
-        sendBtn.textContent = "후기 쓰기";
         sendBtn.addEventListener("click",()=>{
             window.location.href = `/matchup/rating/register?boardId=${item.boardId}&evalId=${item.sendedEvalId}&targetId=${item.sendedTargetId}`;
         })
@@ -189,4 +174,44 @@ function setReceiveBtn(card, item){
 
     }
 }
+
+function setReceivedScore(item){
+    if(item.isCompletedReceive){
+        return `
+                매너 점수: ${item.receivedMannerScore} <br/>
+                실력 점수: ${item.recievedSkillScore}
+                `;
+    }else{
+        return "후기 없음";
+    }
+}
+
+function setReceivedReview(item){
+    if(item.isCompletedReceive){
+        return item.receivedReview;
+    }else{
+        return "상대방이 아직 후기를 작성 안했습니다.";
+    }
+}
+
+
+function setSendedScore(item){
+    if(item.isCompletedSend){
+        return `
+                매너 점수: ${item.sendedMannerScore} <br/>
+                실력 점수: ${item.sendedSkillScore}
+                `;
+    }else{
+        return "후기 없음";
+    }
+}
+
+function setSendedReview(item){
+    if(item.isCompletedSend){
+        return item.sendedReview;
+    }else{
+        return "후기를 작성 해주세요.";
+    }
+}
+
 

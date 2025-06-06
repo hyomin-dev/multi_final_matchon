@@ -112,7 +112,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
                     (:matchDate is null or DATE(t1.matchDatetime) >=:matchDate) and
                     (:availableFilter =false or (:availableFilter=true and t1.matchDatetime>CURRENT_TIMESTAMP)) and
                     t1.isDeleted=false and t1.writer =:loginMember and t1.isDeleted=false and t2.isDeleted=false
-            order by t1.matchDatetime DESC
+            order by t1.createdDate DESC
             """)
     Page<ResMatchupBoardListDto> findAllResMatchupBoardListDtosByMemberWithPaging(Pageable pageable, @Param("loginMember") Member loginMember, @Param("sportsType") SportsTypeName sportsType, @Param("matchDate") LocalDate matchDate, @Param("availableFilter") Boolean availableFilter);
 
@@ -156,6 +156,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             select
             new com.multi.matchon.matchup.dto.res.ResMatchupBoardOverviewDto(
                 t1.id,
+                t1.writer.memberName,
                 t2.sportsTypeName,
                 t1.sportsFacilityName,
                 t1.sportsFacilityAddress,

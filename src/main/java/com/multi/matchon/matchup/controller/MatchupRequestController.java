@@ -119,7 +119,7 @@ public class MatchupRequestController {
     // 참가자: 재요청
     @GetMapping("/retry")
     public ModelAndView showMatchupRequestEditPage(@RequestParam("board-id") Long boardId, @RequestParam("request-id") Long requestId, @AuthenticationPrincipal CustomUser user, ModelAndView mv){
-        ResMatchupRequestDto resMatchupRequestDto = matchupRequestService.retryMatchupRequest(boardId, requestId, user);
+        ResMatchupRequestDto resMatchupRequestDto = matchupRequestService.checkRetryMatchupRequest(boardId, requestId, user);
         mv.addObject("resMatchupRequestDto",resMatchupRequestDto);
         mv.setViewName("matchup/matchup-request-edit");
         return mv;
