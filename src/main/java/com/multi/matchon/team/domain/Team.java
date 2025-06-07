@@ -1,13 +1,11 @@
 package com.multi.matchon.team.domain;
 
 
+import com.multi.matchon.chat.domain.ChatRoom;
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.common.domain.Positions;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +62,11 @@ public class Team extends BaseEntity {
     @Column(name = "created_person", nullable = false, columnDefinition = "VARCHAR(100)")
     private String createdPerson;
 
+    @Setter
+    @OneToOne
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
     public void updateInfo(String name, String intro, RegionType region, Double rating, Boolean recruitStatus) {
         this.teamName = name;
         this.teamIntroduction = intro;
@@ -71,12 +74,9 @@ public class Team extends BaseEntity {
         this.teamRatingAverage = rating;
         this.recruitmentStatus = recruitStatus;
     }
-
-
-
-
-
-
+    public void updateRating(double averageRating) {
+        this.teamRatingAverage = averageRating;
+    }
 
 
 }

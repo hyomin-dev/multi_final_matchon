@@ -2,7 +2,9 @@ package com.multi.matchon.community.service;
 
 import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
+import com.multi.matchon.community.dto.res.BoardListResponse;
 import com.multi.matchon.community.repository.BoardRepository;
+import com.multi.matchon.community.repository.CommentRepository;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.common.domain.Attachment;
 import com.multi.matchon.common.domain.BoardType;
@@ -22,6 +24,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final CommentService commentService;
+    private final CommentRepository commentRepository;
     private final AttachmentRepository attachmentRepository; // 첨부파일 repository 주입
 
     public List<Board> findAll() {
@@ -36,6 +39,10 @@ public class BoardService {
         return boardRepository.findByCategory(category, pageable);
     }
 
+    public List<Board> findPinnedByCategory(Category category) {
+        return boardRepository.findByCategoryAndPinnedTrueOrderByCreatedDateDesc(category);
+    }
+
     public Board findById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
@@ -46,13 +53,9 @@ public class BoardService {
     }
 
     @Transactional
-    public void deleteByIdAndUser(Long id, Member member) {
+    public void deleteById(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-
-        if (!board.getMember().getId().equals(member.getId())) {
-            throw new SecurityException("삭제 권한이 없습니다.");
-        }
 
         // 댓글 먼저 삭제
         commentService.deleteAllByBoard(board);
@@ -64,11 +67,29 @@ public class BoardService {
         boardRepository.deleteById(id);
     }
 
+
     private void softDeleteCommunityAttachments(Long boardId) {
         List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, boardId);
         for (Attachment att : attachments) {
             att.delete(true);
         }
+    }
+
+    //댓글 수 포함 목록 DTO 반환 메서드
+    public Page<BoardListResponse> findBoardsWithCommentCount(Category category, Pageable pageable) {
+        Page<Board> boardsPage = (category == null)
+                ? boardRepository.findAll(pageable)
+                : boardRepository.findByCategory(category, pageable);
+
+        return boardsPage.map(board -> new BoardListResponse(
+                board.getId(),
+                board.getTitle(),
+                board.getCategory().getDisplayName(),
+                board.getMember().getMemberName(),
+                board.getCreatedDate(),
+                commentRepository.countByBoardIdAndIsDeletedFalse(board.getId()),
+                board.isPinned()
+        ));
     }
 
 }

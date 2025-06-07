@@ -4,7 +4,8 @@
     <title>CS</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
-    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+    <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}" />
+
 
     <style>
         body {
@@ -52,14 +53,37 @@
         }
 
         .pagination {
-            display: flex; justify-content: center; align-items: center;
-            gap: 12px; font-size: 18px; margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 8px;
         }
+
         .pagination a {
-            text-decoration: none; font-size: 24px; color: #333;
+            display: inline-block;
+            min-width: 32px;
+            padding: 8px 12px;
+            text-align: center;
+            border-radius: 8px;
+            border: 1px solid #255E93;
+            color: #255E93;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s ease;
         }
-        .pagination a:hover { color: #007bff; }
-        .pagination .page-number { font-weight: bold; font-size: 20px; }
+
+        .pagination a:hover {
+            background-color: #f0f8ff;
+        }
+
+        .pagination a.active {
+            background-color: #255E93;
+            color: white;
+            pointer-events: none;
+            cursor: default;
+        }
+
         .titlefaq, .title2faq { text-align: center; }
 
         .faq-toolbar {
@@ -116,7 +140,6 @@
             color: white;
             border: none;
             padding: 8px 12px;
-            border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
             appearance: none;
@@ -127,25 +150,29 @@
             background-position: right 10px center;
             background-size: 14px;
             padding-right: 30px;
-        }
-
-        .search-box {
-            position: relative;
+            text-align: center;
+            border-radius: 10px;
+            height: 35px;
+            width: 100px;
+            box-sizing: border-box;
         }
 
         .search-box input[type="text"] {
-            width: 250px;
-            padding: 10px 16px 10px 40px;
-            border: 2px solid #255E93;
-            border-radius: 12px;
-            font-size: 16px;
-            outline: none;
+            position: relative;
+            width: 150px;
+            height: 35px;
+            border-radius: 10px;
             background-color: white;
+            border-color: #255E93;
             background-image: url('/img/fi-rr-search.png');
             background-size: 20px;
             background-repeat: no-repeat;
             background-position: 12px center;
+            padding-left: 40px;
+            box-sizing: border-box;
         }
+
+
     </style>
 </head>
 <body>
@@ -201,8 +228,9 @@
             <td>
                 <a th:href="@{/faq/detail/{id}(id=${faq.faqId})}" th:text="${faq.faqTitle}">제목</a>
             </td>
-            <td th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd')}">작성일</td>
+            <td th:if="${!isAdmin}" th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd')}">작성일</td>
             <td th:if="${isAdmin}" th:text="${#temporals.format(faq.modifiedDate, 'yyyy-MM-dd HH:mm')}">수정일</td>
+            <td th:if="${isAdmin}" th:text="${#temporals.format(faq.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</td>
             <td th:if="${isAdmin}">
                 <form th:action="@{/faq/delete/{id}(id=${faq.faqId})}" method="post">
                     <button type="submit" class="delete">&times;</button>
@@ -213,10 +241,17 @@
     </table>
 
     <div class="pagination">
-        <a th:if="${!page.first}" th:href="@{/cs(page=${page.number - 1}, category=${category}, keyword=${keyword})}">&lt;</a>
-        <span class="page-number" th:text="${page.number + 1} + ' / ' + ${page.totalPages}">1</span>
-        <a th:if="${!page.last}" th:href="@{/cs(page=${page.number + 1}, category=${category}, keyword=${keyword})}">&gt;</a>
+        <a th:if="${!page.first}" th:href="@{/cs(page=${page.number - 1}, category=${category}, keyword=${keyword})}">&laquo;</a>
+
+        <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+           th:href="@{/cs(page=${i}, category=${category}, keyword=${keyword})}"
+           th:class="${page.number == i} ? 'active'">
+            <span th:text="${i + 1}">1</span>
+        </a>
+
+        <a th:if="${!page.last}" th:href="@{/cs(page=${page.number + 1}, category=${category}, keyword=${keyword})}">&raquo;</a>
     </div>
+
 
 </div>
 <div th:replace="~{common/footer::footer}"></div>

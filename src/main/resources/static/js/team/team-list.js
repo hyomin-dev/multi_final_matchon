@@ -45,7 +45,10 @@ function loadTeamPage(page) {
       <div>
         <h3>${team.teamName}</h3>
         <p>지역: ${team.teamRegion}</p>
-        <p>별점: ${team.teamRatingAverage ? team.teamRatingAverage.toFixed(1) : 'N/A'} ★</p>
+<p>
+  별점: ${team.teamRatingAverage.toFixed(1)}
+  <span class="star-rating" style="--rating-width: ${team.teamRatingAverage * 20}%"></span>
+</p>
         <p>포지션: ${team.recruitingPositions ? team.recruitingPositions.join(', ') : 'N/A'}</p>
         <p>${team.recruitmentStatus ? '모집 중' : '모집 완료'}</p>
         <p>작성자: ${team.createdBy || 'N/A'}</p>
@@ -92,4 +95,45 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filterBtn').addEventListener('click', () => {
         loadTeamPage(0);
     });
+});
+document.getElementById('myTeamBtn').addEventListener('click', async () => {
+    try {
+        const res = await fetch('/team/team/my-team-info');
+        const result = await res.json();
+        const team = result.data;
+
+        const container = document.getElementById('team-container');
+        const paging = document.getElementById('paging-container');
+        container.innerHTML = '';
+        paging.innerHTML = '';
+
+        if (!team) {
+            container.innerHTML = '<p>소속된 팀이 없습니다.</p>';
+            return;
+        }
+
+        container.innerHTML = `
+        <a href="/team/team/${team.teamId}" style="text-decoration: none; color: inherit;">
+            <div class="team-card" id="team-card-${team.teamId}">
+                <img src="${team.imageUrl || '/img/default-team.png'}" alt="${team.teamName} 이미지" style="width: 80px; height: 80px; margin-right: 15px; object-fit: contain;">
+                <div>
+                    <h3>${team.teamName}</h3>
+                    <p>지역: ${team.teamRegion}</p>
+
+<p>
+  별점: ${team.teamRatingAverage.toFixed(1)}
+  <span class="star-rating" style="--rating-width: ${team.teamRatingAverage * 20}%"></span>
+</p>
+
+                    <p>포지션: ${team.recruitingPositions ? team.recruitingPositions.join(', ') : 'N/A'}</p>
+                    <p>${team.recruitmentStatus ? '모집 중' : '모집 완료'}</p>
+                    <p>작성자: ${team.createdBy || 'N/A'}</p>
+                </div>
+            </div>
+        </a>
+        `;
+    } catch (err) {
+        console.error("❌ 내 팀 정보 로딩 실패:", err);
+        alert("소속된 팀이 없습니다.");
+    }
 });

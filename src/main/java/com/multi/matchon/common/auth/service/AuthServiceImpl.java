@@ -122,26 +122,37 @@ public class AuthServiceImpl implements AuthService {
         Member member = memberRepository.findByMemberEmailAndIsDeletedFalse(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        if (!passwordEncoder.matches(dto.getPassword(), member.getMemberPassword())) {
+        boolean normalLogin = passwordEncoder.matches(dto.getPassword(), member.getMemberPassword());
+        boolean tempLogin = member.getIsTemporaryPassword()
+                && member.getTemporaryPassword() != null
+                && passwordEncoder.matches(dto.getPassword(), member.getTemporaryPassword());
+
+        if (!normalLogin && !tempLogin) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         String accessToken = jwtTokenProvider.createAccessToken(member.getMemberEmail(), member.getMemberRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberEmail(), member.getMemberRole());
 
-        Optional<RefreshToken> existingToken = refreshTokenRepository.findByMember(member);
-        if (existingToken.isPresent()) {
-            existingToken.get().update(refreshToken, LocalDateTime.now().plusDays(14));
-        } else {
-            RefreshToken token = RefreshToken.builder()
-                    .member(member)
-                    .refreshTokenData(refreshToken)
-                    .refreshTokenExpiredDate(LocalDateTime.now().plusDays(14))
-                    .build();
-            refreshTokenRepository.save(token);
+        refreshTokenRepository.findByMember(member).ifPresentOrElse(
+                existing -> existing.update(refreshToken, LocalDateTime.now().plusDays(14)),
+                () -> refreshTokenRepository.save(
+                        RefreshToken.builder()
+                                .member(member)
+                                .refreshTokenData(refreshToken)
+                                .refreshTokenExpiredDate(LocalDateTime.now().plusDays(14))
+                                .build()
+                )
+        );
+
+        // 정상 로그인일 경우 임시 로그인 플래그 해제
+        if (normalLogin && member.getIsTemporaryPassword()) {
+            member.setIsTemporaryPassword(false);
+            member.setTemporaryPassword(null);
+            memberRepository.save(member);
         }
 
-        return new TokenResponseDto(accessToken, refreshToken);
+        return new TokenResponseDto(accessToken, refreshToken, tempLogin);
     }
 
     @Override
@@ -177,5 +188,52 @@ public class AuthServiceImpl implements AuthService {
         if (password.matches("(.)\\1\\1")) {
             throw new IllegalArgumentException("같은 문자를 연속으로 사용할 수 없습니다.");
         }
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(String newPassword, String confirmPassword, Member memberParam) {
+
+        // 사용자 정보 다시 조회
+        Member member = memberRepository.findById(memberParam.getId())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        // 비밀번호 일치 여부 확인
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 유효성 검사
+        if (!isValidPassword(newPassword)) {
+            throw new IllegalArgumentException("비밀번호는 8자 이상이며 숫자, 대소문자, 특수문자를 포함해야 합니다.");
+        }
+
+        // 현재 비밀번호와 동일한지 확인
+        if (passwordEncoder.matches(newPassword, member.getMemberPassword())) {
+            throw new IllegalArgumentException("현재 사용 중인 비밀번호와 동일합니다.");
+        }
+
+        // 직전 비밀번호와 동일한지 확인
+        if (member.getPreviousPassword() != null &&
+                passwordEncoder.matches(newPassword, member.getPreviousPassword())) {
+            throw new IllegalArgumentException("직전에 사용한 비밀번호와 동일합니다.");
+        }
+
+        // 비밀번호 변경 및 이전 비밀번호 저장
+        if (member.getIsTemporaryPassword()) {
+            // 임시 비밀번호 사용자는 previousPassword를 업데이트하지 않음
+            member.updatePassword(passwordEncoder.encode(newPassword));
+        } else {
+            // 일반 사용자 → 이전 비밀번호 저장
+            member.updatePasswordWithHistory(passwordEncoder.encode(newPassword));
+        }
+        member.setIsTemporaryPassword(false); // 임시 비밀번호 해제
+        memberRepository.save(member);
+
+        System.out.println("새 비밀번호 설정 완료: 사용자 이메일 = " + member.getMemberEmail());
+    }
+
+    private boolean isValidPassword(String password) {
+        return password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()]).{8,}$");
     }
 }

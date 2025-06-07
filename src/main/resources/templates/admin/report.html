@@ -2,10 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>신고 관리</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/report.css}"> <!-- 분리된 CSS 추가 -->
-    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/report.css}">
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
@@ -22,21 +22,184 @@
         <th>신고분류</th>
         <th>상세사유</th>
         <th>신고일</th>
+        <th>보기</th>
+        <th>회원 처리</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="report, stat : ${reports}">
-        <td data-label="번호" th:text="${stat.index + 1}">1</td>
-        <td data-label="유형" th:text="${report.reportType}">BOARD</td>
-        <td data-label="신고대상" th:text="${report.targetWriterName}">Name</td>
-        <td data-label="신고자" th:text="${report.reporterName}">홍길동</td>
-        <td data-label="신고분류" th:text="${report.reasonType}">욕설/비방/괴롭힘</td>
-        <td data-label="상세사유" th:text="${report.reason}">구체적인 이유</td>
-        <td data-label="신고일" th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">2025-05-28</td>
+        <td th:text="${(currentPage != null ? currentPage : 0) * 5 + stat.index + 1}">1</td>
+        <td th:text="${report.reportType}">BOARD</td>
+        <td th:text="${report.targetWriterName}" class="target-writer-name">Name</td>
+        <td th:text="${report.reporterName}">홍길동</td>
+        <td th:text="${report.reasonType}">욕설/비방</td>
+        <td th:text="${report.reason}">사유</td>
+        <td th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">날짜</td>
+        <td>
+            <span th:if="${!report.targetExists}">삭제됨</span>
+
+            <a th:if="${report.reportType == 'BOARD' and report.targetExists}"
+               th:href="@{'/community/' + ${report.boardId}}" class="view-link">게시글</a>
+
+            <a th:if="${report.reportType == 'COMMENT' and report.targetExists}"
+               th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}"
+               class="view-link">댓글</a>
+        </td>
+        <td>
+            <div class="ban-controls" th:if="${!report.targetIsAdmin}">
+                <!-- 정지 버튼들 → suspended == false일 때만 렌더링 -->
+                <th:block th:if="${!report.suspended}">
+                    <button type="button"
+                            th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 7)'"
+                            class="ban-btn"
+                            th:attr="data-member-id=${report.targetMemberId}">7일</button>
+
+                    <button type="button"
+                            th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 30)'"
+                            class="ban-btn"
+                            th:attr="data-member-id=${report.targetMemberId}">30일</button>
+
+                    <button type="button"
+                            th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', null)'"
+                            class="ban-btn"
+                            th:attr="data-member-id=${report.targetMemberId}">영구</button>
+                </th:block>
+
+                <!-- 해제 버튼 → suspended == true일 때만 렌더링 -->
+                <button type="button"
+                        th:if="${report.suspended}"
+                        th:onclick="'unsuspendUser(event, ' + ${report.targetMemberId} + ')'"
+                        class="ban-btn unban-btn"
+                        th:attr="data-member-id=${report.targetMemberId}">해제</button>
+            </div>
+        </td>
     </tr>
     </tbody>
 </table>
 
+<!-- 페이지네이션 -->
+<div class="pagination" th:if="${reportPage.totalPages > 1}">
+    <a class="page-link"
+       th:if="${reportPage.hasPrevious()}"
+       th:href="@{/admin/reports/page(page=${reportPage.number - 1})}">이전</a>
+
+    <a class="page-link"
+       th:each="i : ${#numbers.sequence(0, reportPage.totalPages - 1)}"
+       th:href="@{/admin/reports/page(page=${i})}"
+       th:text="${i + 1}"
+       th:classappend="${i == reportPage.number} ? 'active' : ''">
+    </a>
+
+    <a class="page-link"
+       th:if="${reportPage.hasNext()}"
+       th:href="@{/admin/reports/page(page=${reportPage.number + 1})}">다음</a>
+</div>
+
 <div th:replace="~{common/footer::footer}"></div>
 </body>
+
+<script>
+    function suspendUser(event, memberId, days) {
+        if (!confirm("정말로 회원 계정을 정지하시겠습니까?")) return;
+
+        const formData = new URLSearchParams();
+        formData.append("memberId", memberId);
+        if (days != null) {
+            formData.append("days", days);
+        }
+
+        fetch("/member/suspend", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("회원 정지가 완료되었습니다.");
+                    // 🔄 상태 동기화를 위해 새로고침
+                    location.reload();
+                } else {
+                    res.json().then(data => {
+                        alert(data.message || "정지 실패");
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("요청 중 오류 발생");
+            });
+    }
+
+    function markAsSuspended(memberId) {
+        const controls = document.querySelectorAll(`.ban-controls`);
+        controls.forEach(control => {
+            const btns = control.querySelectorAll(`.ban-btn[data-member-id='${memberId}']`);
+            if (btns.length === 0) return;
+
+            // 정지 버튼들 제거
+            btns.forEach(btn => btn.remove());
+
+            // 해제 버튼 생성
+            const unbanBtn = document.createElement('button');
+            unbanBtn.textContent = '해제';
+            unbanBtn.className = 'ban-btn unban-btn';
+            unbanBtn.setAttribute('data-member-id', memberId);
+            unbanBtn.onclick = (e) => unsuspendUser(e, memberId);
+            control.appendChild(unbanBtn);
+        });
+    }
+
+    function unsuspendUser(event, memberId) {
+        if (!confirm("정말로 정지를 해제하시겠습니까?")) return;
+
+        const formData = new URLSearchParams();
+        formData.append("memberId", memberId);
+
+        fetch("/member/unsuspend", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("회원 정지가 해제되었습니다.");
+                    restoreSuspendButtons(memberId);
+                } else {
+                    res.json().then(data => {
+                        alert(data.message || "해제 실패");
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("요청 중 오류 발생");
+            });
+    }
+
+    function restoreSuspendButtons(memberId) {
+        const controls = document.querySelectorAll(`.ban-controls`);
+        controls.forEach(control => {
+            const btns = control.querySelectorAll(`.ban-btn[data-member-id='${memberId}']`);
+            if (btns.length === 0) return;
+
+            // 해제 버튼 제거
+            btns.forEach(btn => btn.remove());
+
+            // 정지 버튼들 다시 생성
+            const durations = [7, 30, null];
+            durations.forEach(days => {
+                const btn = document.createElement('button');
+                btn.textContent = days === null ? '영구' : `${days}일`;
+                btn.className = 'ban-btn';
+                btn.setAttribute('data-member-id', memberId);
+                btn.onclick = (e) => suspendUser(e, memberId, days);
+                control.appendChild(btn);
+            });
+        });
+    }
+</script>
 </html>

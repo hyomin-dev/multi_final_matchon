@@ -11,6 +11,7 @@ import com.multi.matchon.community.domain.Board;
 import com.multi.matchon.community.domain.Category;
 import com.multi.matchon.community.dto.req.BoardRequest;
 import com.multi.matchon.community.dto.req.CommentRequest;
+import com.multi.matchon.community.dto.res.BoardListResponse;
 import com.multi.matchon.community.service.BoardService;
 import com.multi.matchon.community.service.CommentService;
 import com.multi.matchon.community.service.ReportService;
@@ -20,10 +21,7 @@ import io.awspring.cloud.s3.S3Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -58,43 +56,52 @@ public class BoardController {
                        @RequestParam(defaultValue = "0") int page,
                        Model model) {
         Pageable pageable = PageRequest.of(page, 6, Sort.by("createdDate").descending());
-        Page<Board> boardsPage = boardService.findByCategory(category, pageable);
+
+        Page<BoardListResponse> boardsPage = boardService.findBoardsWithCommentCount(category, pageable);
+
+        List<BoardListResponse> pinnedPosts = boardService.findPinnedByCategory(category).stream()
+                .map(board -> new BoardListResponse(
+                        board.getId(),
+                        board.getTitle(),
+                        board.getCategory().getDisplayName(),
+                        board.getMember().getMemberName(),
+                        board.getCreatedDate(),
+                        commentService.getCommentsByBoard(board).size(), // 또는 commentRepository.countByBoardIdAndIsDeletedFalse()
+                        board.isPinned()
+                ))
+                .toList();
 
         model.addAttribute("boardsPage", boardsPage);
         model.addAttribute("selectedCategory", category);
         model.addAttribute("categories", Category.values());
-
+        model.addAttribute("pinnedPosts", pinnedPosts);
         return "community/view";
     }
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         Board board = boardService.findById(id);
-
         List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, board.getId());
 
         model.addAttribute("board", board);
-        model.addAttribute("attachments", attachments); // 추가된 부분
+        model.addAttribute("attachments", attachments);
         model.addAttribute("commentRequest", new CommentRequest());
         model.addAttribute("comments", commentService.getCommentsByBoard(board));
         return "community/detail";
     }
 
-
     @GetMapping("/new")
     public String form(Model model, @AuthenticationPrincipal CustomUser user) {
         if (user == null) return "redirect:/login";
-
-        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN; // 역할 기반 분기
+        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN;
 
         model.addAttribute("boardRequest", new BoardRequest());
         model.addAttribute("categories", Category.values());
         model.addAttribute("memberName", user.getMember().getMemberName());
         model.addAttribute("formAction", "/community");
-        model.addAttribute("isAdmin", isAdmin); // 관리자 여부 추가
+        model.addAttribute("isAdmin", isAdmin);
         return FORM_VIEW;
     }
-
 
     @PostMapping
     public String create(@Valid @ModelAttribute("boardRequest") BoardRequest boardRequest,
@@ -113,7 +120,7 @@ public class BoardController {
             model.addAttribute("categories", Category.values());
             model.addAttribute("memberName", user.getMember().getMemberName());
             model.addAttribute("formAction", "/community");
-            model.addAttribute("isAdmin", isAdmin); // 다시 주입
+            model.addAttribute("isAdmin", isAdmin);
             return FORM_VIEW;
         }
 
@@ -124,6 +131,7 @@ public class BoardController {
                 .category(boardRequest.getCategory())
                 .member(member)
                 .boardAttachmentEnabled(false)
+                .pinned(isAdmin && boardRequest.isPinned())
                 .build();
 
         boardService.save(board);
@@ -157,14 +165,19 @@ public class BoardController {
 
         boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN;
 
-        BoardRequest request = new BoardRequest(board.getTitle(), board.getContent(), board.getCategory());
+        BoardRequest request = new BoardRequest(board.getTitle(), board.getContent(), board.getCategory(), board.isPinned());
 
         model.addAttribute("boardRequest", request);
         model.addAttribute("categories", Category.values());
         model.addAttribute("memberName", user.getMember().getMemberName());
         model.addAttribute("formAction", "/community/" + id + "/edit");
         model.addAttribute("boardId", id);
-        model.addAttribute("isAdmin", isAdmin); // 관리자 여부 추가
+        model.addAttribute("isAdmin", isAdmin);
+
+        // 기존 첨부파일 전달
+        List<Attachment> attachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, id);
+        model.addAttribute("attachments", attachments);
+
         return FORM_VIEW;
     }
 
@@ -174,6 +187,7 @@ public class BoardController {
                          @Valid @ModelAttribute("boardRequest") BoardRequest boardRequest,
                          BindingResult bindingResult,
                          @RequestParam("files") MultipartFile[] files,
+                         @RequestParam(value = "deletedAttachmentIds", required = false) List<Long> deletedAttachmentIds,
                          Model model,
                          @AuthenticationPrincipal CustomUser user) throws IOException {
 
@@ -189,6 +203,7 @@ public class BoardController {
             model.addAttribute("formAction", "/community/" + id + "/edit");
             model.addAttribute("boardId", id);
             model.addAttribute("isAdmin", isAdmin);
+            model.addAttribute("attachments", attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, id));
             return FORM_VIEW;
         }
 
@@ -197,27 +212,36 @@ public class BoardController {
             return "redirect:/community";
         }
 
-        board.update(
-                boardRequest.getTitle(),
-                boardRequest.getContent(),
-                boardRequest.getCategory(),
-                null,
-                null
-        );
+        board.update(boardRequest.getTitle(), boardRequest.getContent(), boardRequest.getCategory());
 
-        board.setBoardAttachmentEnabled(false);
+        if (isAdmin) {
+            board.setPinned(boardRequest.isPinned());
+        }
+
+        if (deletedAttachmentIds != null) {
+            for (Long fileId : deletedAttachmentIds) {
+                attachmentRepository.findById(fileId).ifPresent(att -> {
+                    att.delete(true);
+                    String savePath = att.getSavePath();
+                    int slashIdx = savePath.lastIndexOf('/');
+                    String dir = savePath.substring(0, slashIdx + 1);
+                    String filename = savePath.substring(slashIdx + 1);
+                    awsS3Utils.deleteFile(dir, filename);
+                });
+            }
+        }
 
         int fileOrder = 0;
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
-                UploadedFile uploaded = FileUploadHelper.uploadToS3(file, COMMUNITY_DIR, awsS3Utils);
+                UploadedFile uploaded = FileUploadHelper.uploadToS3(file, "community/", awsS3Utils);
                 Attachment attachment = Attachment.builder()
                         .boardType(BoardType.BOARD)
                         .boardNumber(board.getId())
                         .fileOrder(fileOrder++)
                         .originalName(uploaded.getOriginalFileName())
                         .savedName(uploaded.getSavedFileName())
-                        .savePath(COMMUNITY_DIR + uploaded.getSavedFileName())
+                        .savePath("community/" + uploaded.getSavedFileName())
                         .build();
                 attachmentRepository.save(attachment);
                 board.setBoardAttachmentEnabled(true);
@@ -228,15 +252,39 @@ public class BoardController {
         return "redirect:/community/" + id;
     }
 
+
+    @DeleteMapping("/attachments/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteAttachment(@PathVariable Long id, @AuthenticationPrincipal CustomUser user) {
+        Attachment attachment = attachmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("파일이 존재하지 않습니다."));
+
+        Board board = boardService.findById(attachment.getBoardNumber());
+
+        if (!board.getMember().getId().equals(user.getMember().getId())) {
+            return ResponseEntity.status(403).body("삭제 권한이 없습니다.");
+        }
+
+        attachment.delete(true);  // 소프트 삭제
+
+        String fullPath = attachment.getSavePath(); // 예: "community/abc123.png"
+        int slashIndex = fullPath.lastIndexOf('/');
+        String dir = fullPath.substring(0, slashIndex + 1); // "community/"
+        String fileName = fullPath.substring(slashIndex + 1); // "abc123.png"
+
+        awsS3Utils.deleteFile(dir, fileName);
+
+        return ResponseEntity.ok().build();
+    }
+
+
     @GetMapping("/download-force/{filename}")
     public ResponseEntity<Resource> forceDownload(@PathVariable String filename) throws IOException {
         Optional<Attachment> optional = attachmentRepository.findCommunityAttachmentBySavedName(filename);
-
         if (optional.isEmpty()) return ResponseEntity.notFound().build();
 
         Attachment attachment = optional.get();
         S3Resource resource = awsS3Utils.downloadFileWithFullName(attachment.getSavePath());
-
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
@@ -244,7 +292,6 @@ public class BoardController {
                 .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
                 .body(resource);
     }
-
 
     @PostMapping("/image-upload")
     @ResponseBody
@@ -265,7 +312,15 @@ public class BoardController {
             return ResponseEntity.status(401).body("로그인이 필요합니다.");
         }
 
-        boardService.deleteByIdAndUser(id, user.getMember());
+        Board board = boardService.findById(id);
+        boolean isOwner = board.getMember().getId().equals(user.getMember().getId());
+        boolean isAdmin = user.getMember().getMemberRole() == MemberRole.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            return ResponseEntity.status(403).body("삭제 권한이 없습니다.");
+        }
+
+        boardService.deleteById(id);
         return ResponseEntity.ok().build();
     }
 }

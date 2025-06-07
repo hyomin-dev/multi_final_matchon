@@ -1,126 +1,274 @@
 
 
-/* 제목 */
-h1 {
+/*제목*/
+.page-title {
     text-align: center;
-    margin-bottom: 2rem;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #2c3e50;
 }
 
 /* 전체 감싸는 wrapper */
 .filter-wrapper {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: nowrap; /* ❗ 줄바꿈 방지 */
+    justify-content: space-between; /* 왼쪽: 필터 / 오른쪽: 버튼 */
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
     width: 100%;
     box-sizing: border-box;
 }
 
-
-/* 필터 영역 */
+/* 필터 부분 */
 #filter {
     display: flex;
-    gap: 1rem;
+    gap: 0.8rem;
     align-items: center;
     flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
-#filter select,
-#filter input[type="date"] {
-    padding: 6px 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 0.95rem;
-}
-
-/* 검색 버튼 */
-#filterBtn {
-    padding: 6px 14px;
-    background-color: #007a00;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s ease;
-}
-
-#filterBtn:hover {
-    background-color: #005a00;
-}
-
-/* 뒤로가기 버튼 */
-.back-btn {
-    padding: 8px 14px;
-    background-color: #888;
-    color: white;
-    font-weight: bold;
-    text-decoration: none;
+#sports-type{
+    width: 180px;
+    height: 40px;
+    padding: 10px 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: darkslategray;
+    background-color: #f9f9f9;
+    border: 2px solid dodgerblue;
     border-radius: 6px;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    white-space: nowrap; /* 줄바꿈 방지 */
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.back-btn:hover {
-    background-color: #666;
-    transform: translateY(-2px);
-}
-
-
-.card-3col {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3등분 */
-    gap: 1.5rem;
-    padding: 1.2rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-    margin-bottom: 1rem;
-    align-items: center; /* ← 이거 중요 */
-
-}
-
-/* 버튼 세로 정렬 */
-.button-group-vertical {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    align-items: center;      /* 버튼 가운데 정렬 */
-    justify-content: center;  /* 부모 영역 내에서 수직 가운데 정렬 */
-    height: 100%;             /* 부모 높이 기준으로 정렬하려면 필요 */
-}
-
-.detail-button {
-    display: inline-block;
-    padding: 8px 14px;
-    background-color: #004080;
-    color: white;
+#date-filter{
+    width: 180px;
+    height: 40px;
+    padding: 0px 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: darkslategray;
+    background-color: #f9f9f9;
+    border: 2px solid dodgerblue;
     border-radius: 6px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: opacity 0.2s;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.detail-button:hover {
-    opacity: 0.9;
+#date-filter:focus,
+#sports-type:focus{
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
 }
 
 
-/* 페이징 */
-#paging-container button {
-    margin: 4px;
-    padding: 6px 10px;
-    border: 1px solid #aaa;
-    background-color: #f8f8f8;
-    cursor: pointer;
+/* 체크박스 스타일 */
+#availableOnly {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid dodgerblue;
     border-radius: 4px;
+    background-color: #f9f9f9;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    margin-right: 8px;
 }
 
-#paging-container button:disabled {
-    background-color: #d0d0d0;
+#availableOnly:checked {
+    background-color: dodgerblue;
+    border-color: dodgerblue;
+}
+
+#availableOnly:checked::after {
+    content: '✔';
+    color: white;
+    font-size: 12px;
+    position: absolute;
+    left: 2px;
+    top: -1px;
+}
+
+label[for="availableOnly"], label:has(#availableOnly) {
+    font-size: 15px;
+    font-weight: 500;
+    color: darkslategray;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+
+#filterBtn{
+    background-color: dodgerblue;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+#filterBtn:hover{
+    background-color: royalblue;
+}
+
+/* 이거 추가: 버튼 그룹 우측 정렬 */
+.topbar-buttons {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.button-group,
+.topbar-buttons button {
+    background-color: dodgerblue;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+.button-group:hover,
+.topbar-buttons button:hover{
+    background-color: royalblue;
+}
+
+.group-chat.disabled{
+    background-color: #bcbcbc;
+    color: white;
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+
+/* 마우스 올려도 hover 효과 제거 */
+.group-chat.disabled:hover {
+    background-color: #bcbcbc;
+    color: white;
+}
+
+.board-detail,
+.request-detail{
+    min-width: 96px;
+    margin-bottom: 5px;
+}
+
+
+/* ===== 게시판 테이블 ===== */
+.board-table {
+    width: 100%;
+    margin: 30px auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    background: #fff;
+    border: 2px solid dodgerblue;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.board-table th,
+.board-table td {
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 15px;
+    word-wrap: break-word;
+    border-bottom: 1px solid #ddd;
+}
+
+.board-table th {
+    background-color: #eaf4fb;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.board-table td {
+    background-color: #ffffff;
+}
+
+.board-table tr:hover {
+    background-color: #e1f3ff;
+}
+
+/* ===== 테이블 열 너비 설정 ===== */
+
+.col-type {width: 5%}
+.col-sports-facility-address {width: 25%}
+.col-match-date {width: 15%}
+.col-status {width: 6%}
+.col-quota {width: 5%}
+.col-participants {width: 5%}
+.col-request-status {width: 8%}
+.col-request-cancel-count {width: 5%}
+.col-detail {width: 8%}
+.col-group-chat {width: 6%}
+
+
+
+/*!* 요청 버튼 *!*/
+/*.request-button {*/
+/*    background-color: #007a00;*/
+/*    color: white;*/
+/*}*/
+/*.request-button:hover {*/
+/*    background-color: #005a00;*/
+/*}*/
+
+/*!* 단체 채팅 버튼 (활성 상태용) *!*/
+/*.group-chat {*/
+/*    background-color: #007bff;*/
+/*    color: white;*/
+/*}*/
+/*.group-chat:hover {*/
+/*    background-color: #0056b3;*/
+/*}*/
+
+/*!* 단체 채팅 비활성화 *!*/
+/*.group-chat.disabled {*/
+/*    background-color: #dddddd !important;*/
+/*    color: #aaaaaa !important;*/
+/*    pointer-events: none;*/
+/*    cursor: not-allowed;*/
+/*}*/
+
+
+
+/* ===== 페이징 ===== */
+#paging-container button {
+    text-align: center;
+    margin: 0 5px;
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    color: #333;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    background-color : white;
+}
+
+/* hover 효과도 동일하게 */
+#paging-container button:hover {
+    background-color: #e0e0e0;
+}
+
+/* 활성화된 버튼 */
+#paging-container button.active {
+    background-color: dodgerblue;
+    color: white;
+    border-color: dodgerblue;
     cursor: not-allowed;
 }
 
@@ -133,8 +281,14 @@ h1 {
 }
 
 .no-result {
-    text-align: center;
-    font-size: 1.2rem;
+    text-align: center !important;
     color: #777;
     padding: 2rem 0;
+}
+
+.truncate {
+    width: 385px;           /* 너비 고정 */
+    white-space: nowrap;    /* 줄바꿈 없음 */
+    overflow: hidden;       /* 넘친 부분 숨김 */
+    text-overflow: ellipsis; /* 말줄임표 (...) 표시 */
 }

@@ -14,7 +14,10 @@
 
 <div id="wrap">
     <h2 th:text="${event.eventTitle}">대회 제목</h2>
-
+    <div class="info-box description-box">
+        <label>대회 소개:</label>
+        <div class="event-description" th:text="${event.eventDescription}"></div>
+    </div>
     <div class="info-box"><label>주최기관:</label> <span th:text="${event.hostProfile.hostName}"></span></div>
     <div class="info-box"><label>일자:</label> <span th:text="${event.eventDate}"></span></div>
     <div class="info-box"><label>지역:</label> <span th:text="${regionLabel}"></span></div>
@@ -25,12 +28,12 @@
     <div class="info-box"><label>상태:</label> <span th:text="${statusLabel}"></span></div>
 
     <div class="btn-wrap">
-        <a th:href="@{/admin/event}" class="btn back-btn">목록으로</a>
-        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post">
+        <button type="button" class="btn back-btn" onclick="location.href='/admin/event'">목록으로</button>
+        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post" style="display: inline;">
             <input type="hidden" name="status" value="APPROVED">
             <button type="submit" class="btn approve-btn">승인</button>
         </form>
-        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post">
+        <form th:action="@{'/admin/event/' + ${event.id} + '/status'}" method="post" style="display: inline;">
             <input type="hidden" name="status" value="DENIED">
             <button type="submit" class="btn deny-btn">반려</button>
         </form>

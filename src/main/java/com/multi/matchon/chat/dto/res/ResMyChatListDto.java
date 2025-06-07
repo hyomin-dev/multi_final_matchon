@@ -1,5 +1,6 @@
 package com.multi.matchon.chat.dto.res;
 
+import com.multi.matchon.chat.domain.ChatRoom;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +19,13 @@ public class ResMyChatListDto {
     private Long unReadCount;
 
 
+    public static ResMyChatListDto from(ChatRoom room, Long memberId, boolean isBlocked, Long unreadCount) {
+        return ResMyChatListDto.builder()
+                .roomId(room.getId())
+                .roomName(room.getChatRoomName())
+                .isGroupChat(room.getIsGroupChat())
+                .isBlock(isBlocked)
+                .unReadCount(unreadCount)
+                .build();
+    }
 }

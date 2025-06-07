@@ -12,7 +12,7 @@ import lombok.Setter;
 public class BoardRequest {
 
     @NotBlank(message = "제목은 필수입니다.")
-    @Size(max = 50, message = "제목은 50자 이하로 입력해주세요.")
+    @Size(max = 100, message = "제목은 100자 이하로 입력해주세요.")
     private String title;
 
     @NotBlank(message = "내용은 필수입니다.")
@@ -21,14 +21,19 @@ public class BoardRequest {
     @NotNull(message = "카테고리를 선택해주세요.")
     private Category category;
 
-    public BoardRequest(String title, String content, Category category) {
+    private boolean pinned = false; // 관리자만 설정 가능
+
+    public BoardRequest(String title, String content, Category category, boolean pinned) {
         this.title = title;
         this.content = content;
         this.category = category;
+        this.pinned = pinned;
+    }
+
+    public BoardRequest(String title, String content, Category category) {
+        this(title, content, category, false);
     }
 
     public BoardRequest() {
-
     }
 }
-

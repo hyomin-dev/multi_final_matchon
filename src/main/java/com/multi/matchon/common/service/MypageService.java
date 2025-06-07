@@ -61,11 +61,14 @@ public class MypageService {
 
 
         Optional<Attachment> profileAttachment = attachmentRepository.findLatestAttachment(BoardType.MEMBER, member.getId());
+
+        boolean isDefaultProfile = profileAttachment.isEmpty();
         String imageUrl = profileAttachment
                 .map(att -> awsS3Utils.createPresignedGetUrl(PROFILE_DIR, att.getSavedName()))
-                .orElse("/img/default-profile.jpg");
+                .orElse("/img/default-user.png");
 
         data.put("profileImageUrl", imageUrl);
+        data.put("isDefaultProfile", isDefaultProfile);
 
         return data;
     }
@@ -90,6 +93,12 @@ public class MypageService {
 
     public void uploadProfileImage(Member member, MultipartFile file) {
 
+        // 확장자 검사
+        String ext = FilenameUtils.getExtension(file.getOriginalFilename()).toLowerCase();
+        if (!List.of("jpg", "jpeg", "png").contains(ext)) {
+            throw new IllegalArgumentException("jpg, jpeg, png 파일만 업로드할 수 있습니다.");
+        }
+
         // 1. 기존 첨부 파일이 있으면 삭제
         Optional<Attachment> existingAttachmentOpt =
                 attachmentRepository.findLatestAttachment(BoardType.MEMBER, member.getId());
@@ -101,7 +110,6 @@ public class MypageService {
 
         // 2. 새 파일 저장
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String ext = FilenameUtils.getExtension(file.getOriginalFilename());
         String savedName = uuid + "." + ext;
 
         awsS3Utils.saveFile(PROFILE_DIR, uuid, file); // 확장자 내부에서 붙임
@@ -119,7 +127,7 @@ public class MypageService {
     }
 
     @Transactional
-    public void updateMypage(String email, PositionName positionName, TimeType timeType, Double temperature) {
+    public void updateMypage(String email, PositionName positionName, TimeType timeType) {
         Member member = memberRepository.findByMemberEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
@@ -128,7 +136,7 @@ public class MypageService {
 
         member.setPositions(position);
         member.setTimeType(timeType);
-        member.setMyTemperature(temperature);
+        //member.setMyTemperature(temperature);
 
         memberRepository.saveAndFlush(member);
         em.clear();
@@ -152,5 +160,21 @@ public class MypageService {
 
         // 탈퇴 처리
         member.markAsDeleted(); // is_deleted = true
+    }
+
+    // 프로필 이미지 삭제
+    public void deleteProfileImage(Member member) {
+        attachmentRepository.findLatestAttachment(BoardType.MEMBER, member.getId())
+                .ifPresent(att -> {
+                    awsS3Utils.deleteFile(att.getSavePath(), att.getSavedName());
+                    att.delete(true); // 소프트 삭제
+                    attachmentRepository.save(att);
+                });
+    }
+
+    // 이메일 동의 업데이트
+    public void updateEmailAgreement(Member member, boolean agreement) {
+        member.setEmailAgreement(agreement);
+        memberRepository.save(member);
     }
 }

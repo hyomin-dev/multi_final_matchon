@@ -2,6 +2,7 @@ package com.multi.matchon.member.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.Status;
+import com.multi.matchon.common.service.NotificationService;
 import com.multi.matchon.community.domain.Report;
 import com.multi.matchon.community.dto.res.ReportResponse;
 import com.multi.matchon.community.service.ReportService;
@@ -40,6 +41,7 @@ public class AdminController {
     private final InquiryRepository inquiryRepository;
     private final InquiryAnswerRepository inquiryAnswerRepository;
     private final ReportService reportService;
+    private final NotificationService notificationService;
 
     @GetMapping
     public String adminHome() {
@@ -96,6 +98,12 @@ public class AdminController {
         inquiryAnswerRepository.save(answer);
 
         inquiry.complete(); // 상태는 저장 이후 변경
+
+        notificationService.sendNotification(
+                inquiry.getMember(), // 알림 받을 사용자
+                "문의에 답변이 등록되었습니다.",
+                "/inquiry/" + inquiry.getId()
+        );
 
         return "redirect:/admin/inquiry";
     }
@@ -162,13 +170,26 @@ public class AdminController {
     @Transactional
     public String updateEventStatus(@PathVariable Long id, @RequestParam("status") Status status) {
         eventRepository.updateEventStatus(id, status);
+        EventRequest event = eventRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 대회를 찾을 수 없습니다."));
+
+        eventRepository.updateEventStatus(id, status);
+
+        // 승인 or 반려 시 알림 전송
+        if (status == Status.APPROVED || status == Status.DENIED) {
+            String message = (status == Status.APPROVED) ? "대회가 승인되었습니다." : "대회가 반려되었습니다.";
+            notificationService.sendNotification(
+                    event.getMember(),
+                    message,
+                    "/event/" + event.getId()
+            );
+        }
         return "redirect:/admin/event";
     }
 
     @GetMapping("/reports")
-    public String listAllReports(Model model) {
-        List<ReportResponse> reports = reportService.getAllReports();
-        model.addAttribute("reports", reports);
-        return "admin/report";
+    public String redirectToReportsPage() {
+        return "redirect:/admin/reports/page";
     }
+
 }

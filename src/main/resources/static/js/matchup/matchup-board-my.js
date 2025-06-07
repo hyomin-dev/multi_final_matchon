@@ -1,8 +1,15 @@
 let myMannerTemperature;
 let sportsType = '';
 let dateFilter = '';
+let availableFilter = false;
+let lastFilterValues = {};
 document.addEventListener("DOMContentLoaded",async ()=>{
 
+    lastFilterValues={
+        "sportsType": sportsType,
+        "dateFilter": dateFilter,
+        "availableFilter": availableFilter
+    }
 
     document.querySelector("#sports-type").addEventListener("change",(e)=>{
         sportsType = e.target.value;
@@ -13,8 +20,28 @@ document.addEventListener("DOMContentLoaded",async ()=>{
         //console.log(dateFilter);
     })
 
+    document.querySelector("#availableOnly").addEventListener("change",(e)=>{
+        availableFilter = e.target.checked;
+        // 체크O: true
+        // 체크x: false
+    })
+
     document.querySelector("#filterBtn").addEventListener("click",()=>{
-        loadItems(1, sportsType, dateFilter);
+        const isSame = lastFilterValues.sportsType === sportsType &&
+            lastFilterValues.dateFilter === dateFilter &&
+            lastFilterValues.availableFilter === availableFilter;
+
+        if(isSame){
+            e.preventDefault();
+            console.log("검색 조건이 변하지 않았습니다.");
+        }else{
+            lastFilterValues.sportsType = sportsType;
+            lastFilterValues.dateFilter = dateFilter;
+            lastFilterValues.availableFilter = availableFilter;
+            loadItems(1, sportsType, dateFilter, availableFilter);
+        }
+
+
     })
 
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
@@ -22,22 +49,33 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
 })
 
-async function loadItems(page, sportsType='', dateFilter=''){
-    const response = await fetch(`/matchup/board/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}`,{
-        method: "GET",
-        credentials: "include"
+async function loadItems(page, sportsType='', dateFilter='', availableFilter=false){
+    let items = [];
+    let pageInfo = {
+        page: 0,
+        totalPages: 1
+    };
 
-    });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data);
-    const items = data.data.items;
-    const pageInfo = data.data.pageInfo;
-    //console.log(pageInfo);
+    try{
+        const response = await fetch(`/matchup/board/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}&availableFilter=${availableFilter}`,{
+            method: "GET",
+            credentials: "include"
+
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data);
+        items = data.data.items;
+        pageInfo = data.data.pageInfo;
+        //console.log(pageInfo);
+    }catch(err){
+        console.log(err);
+    }
+
 
     renderList(items);
-    renderPagination(pageInfo , sportsType, dateFilter);
+    renderPagination(pageInfo , sportsType, dateFilter, availableFilter);
 
 }
 function renderList(items){
@@ -46,9 +84,9 @@ function renderList(items){
 
     if(items.length ===0){
         boardArea.innerHTML = `
-            <div class="no-result">
-                작성한 글이 없습니다.
-            </div>
+            <tr>
+                <td colspan="11" class="no-result"> 현재 작성된 게시글이 없습니다.</td>
+            </tr>
         `;
         return;
     }
@@ -57,45 +95,33 @@ function renderList(items){
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
 
-        const card = document.createElement("div");
-        card.className = "matchup-card";
+        const card = document.createElement("tr");
         card.innerHTML = `
-             <div class="card-section center">
-                <div><strong>작성자:</strong> ${item.memberName}</div>
-                <div><strong>팀 이름:</strong> ${item.teamName}</div>
-                
-            </div>
+                         <td>${item.boardId}</td>
+                         <td>${setSportsType(item.sportsTypeName)}</td> 
+                         <td class="truncate">${item.sportsFacilityAddress}</td>
+                         <td>📅 ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
+                                ${calTime(item, date.getHours(), date.getMinutes())}</td>
+                         <td>${checkStatus(item)}</td>
+                         <td>( ${item.currentParticipantCount} / ${item.maxParticipants} )</td>
+                         <td> ${item.minMannerTemperature}</td>                         
+                         <td><button onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'" class="detail button-group">상세보기</button></td>
+                         <td><button onclick="location.href='/matchup/request/board?board-id=${item.boardId}'" class="request button-group">요청 확인</button></td>
+                         <td><button onclick="window.open('/chat/group/room?roomId=${item.roomId}', '_blank')" class="group-chat button-group">단체 채팅</button></td>
+                         <td><button class="rating-setting disabled button-group">평가 세팅</button></td>     
+                         
+                                            
+                         `;
 
-            <div class="card-section center">
-                <div><strong>종목:</strong> ${item.sportsTypeName}</div>
-                <div><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                <div><strong>경기장 주소:</strong> ${item.sportsFacilityAddress}</div>
-                <div>
-                    📅 날짜: ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 -
-                    ${calTime(item, date.getHours(), date.getMinutes())}
-                </div>
-            </div>
-
-            <div class="card-section center">
-                <div>${checkStatus(item)}</div>
-                <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>
-                <div>
-                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}">
-                        <button class="detail">상세보기</button>
-                    </a>
-                    <a href="/matchup/request/board?board-id=${item.boardId}">
-                        <button class="request">요청 확인</button>
-                    </a>
-                    
-                </div>
-            </div>    
-                `;
+        setRatingSettingButton(card, item);
+        markIfPastMatchdatetime(card, item);
         boardArea.appendChild(card);
+
 
     })
 }
 
-function renderPagination(pageInfo, sportsType, dateFilter){
+function renderPagination(pageInfo, sportsType, dateFilter, availableFilter){
     // 프론트는 페이지 시작번호 1부터로 헷갈림
     const pageBlockSize = 5;
     // 프론트 측 page 시작 번호 1부터 변경
@@ -115,7 +141,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const firstBtn = document.createElement("button");
         firstBtn.textContent = "<<";
         firstBtn.addEventListener("click",()=>{
-            loadItems(1, sportsType, dateFilter);
+            loadItems(1, sportsType, dateFilter, availableFilter);
         });
         pagingArea.appendChild(firstBtn);
     }
@@ -125,7 +151,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const prevBtn = document.createElement("button");
         prevBtn.textContent = "<";
         prevBtn.addEventListener("click",()=>{
-            loadItems(startPage-1, sportsType, dateFilter);
+            loadItems(startPage-1, sportsType, dateFilter, availableFilter);
         });
         pagingArea.appendChild(prevBtn);
     }
@@ -135,10 +161,11 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const btn = document.createElement("button");
         btn.textContent = i;
         if( i=== curPage)
-            btn.disabled = true;
+            //btn.disabled = true;
+            btn.classList.add("active");
 
         btn.addEventListener("click",()=>{
-            loadItems(i, sportsType, dateFilter);
+            loadItems(i, sportsType, dateFilter, availableFilter);
         })
         pagingArea.appendChild(btn);
     }
@@ -148,7 +175,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const nextBtn = document.createElement("button");
         nextBtn.textContent = ">";
         nextBtn.addEventListener("click",()=>{
-            loadItems(endPage+1, sportsType, dateFilter);
+            loadItems(endPage+1, sportsType, dateFilter, availableFilter);
         })
         pagingArea.appendChild(nextBtn);
     }
@@ -159,7 +186,7 @@ function renderPagination(pageInfo, sportsType, dateFilter){
         const lastBtn = document.createElement("button");
         lastBtn.textContent  = ">>";
         lastBtn.addEventListener("click",()=>{
-            loadItems(pageInfo.totalPages, sportsType, dateFilter);
+            loadItems(pageInfo.totalPages, sportsType, dateFilter, availableFilter);
         })
         pagingArea.appendChild(lastBtn);
 
@@ -193,14 +220,82 @@ function calTime(item, startHour, startMinute){
 }
 
 function checkStatus(item){
+
     const matchDate = new Date(item.matchDatetime);
     const now = new Date();
-    if(matchDate<now)
-        return "경기 종료"
+    const durationParts = item.matchDuration.split(":");
+    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+
+    if(matchDate <now && now <= matchEnd)
+        return "경기 진행";
+    else if(matchEnd<now)
+        return "경기 종료";
     else if(item.currentParticipantCount >= item.maxParticipants)
         return "모집 완료";
     else
         return "모집 가능"
+}
+
+function setRatingSettingButton(card, item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+
+    const durationParts = item.matchDuration.split(":");
+    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+
+
+    if(matchEnd<now &&  !item.isRatingInitialized) {
+        card.querySelector(".rating-setting").classList.remove("disabled");
+        card.querySelector(".rating-setting").addEventListener("click",async ()=>{
+            try{
+                const response = await fetch(`/matchup/rating/setting?boardId=${item.boardId}`,{
+                    method: "GET",
+                    credentials: "include"
+                })
+                if(!response.ok)
+                    throw new Error(`HTTP error! Status:${response.status}`)
+                else{
+                    alert("평가 세팅이 완료되었습니다.");
+                }
+            }catch (err){
+                console.log(err);
+            }
+
+        })
+    }
+}
+
+function setSportsType(sportsTypeName){
+    if(sportsTypeName ==="SOCCER"){
+        return `
+                <span style="color: #1abc9c;">SOCCER</span>
+                `
+    }else{
+        return `
+                <span style="color: #e67e22;">FUTSAL</span>
+                `
+    }
+}
+
+/*경기 시작 시간이 지났다면 회색으로 표현*/
+function markIfPastMatchdatetime(card, item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+    if(matchDate<now){
+        const tds = card.querySelectorAll("td");
+        tds.forEach(td =>{
+            td.style.backgroundColor = "lightgray";
+        })
+    }
+
+}
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
 }
 
 

@@ -1,23 +1,73 @@
+<!-- team-list.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>MATCHON - 팀 목록</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}"/>
+    <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}"/>
+    <link rel="stylesheet" th:href="@{/css/team/team-list.css}"/>
     <script th:src="@{/js/team/team-list.js}" defer></script>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/team/team-list.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
-
     <style>
-        a {
-            display: block;
+        .team-card {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px auto;
+            width: 80%;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .team-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 24px;
+        }
+        .team-info {
+            flex: 1;
+        }
+        .team-info h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .team-info p {
+            margin: 4px 0;
+        }
+        .star {
+            color: #FFD700;
+            font-size: 18px;
+        }
+        #filter {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #255e93;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .button-container button:hover {
+            background-color: #1d4b6e;
         }
     </style>
 </head>
 <body>
-
 <div th:replace="~{common/header::header}"></div>
-
 <div id="wrap">
     <h1>TEAM 목록</h1>
     <div id="user-info" th:data-email="${#authentication.name}"></div>
@@ -60,14 +110,34 @@
         <button id="filterBtn">검색</button>
     </div>
 
-    <a th:href="@{/team/team/register}"><button>팀 등록하기</button></a>
-    <a th:href="@{#}"><button>내 팀 보기</button></a>
+    <div id="team-container">
+        <div th:each="team : ${teams}" class="team-card">
+            <img th:src="${team.imageUrl}" alt="Team Image"/>
+            <div class="team-info">
+                <h2 th:text="${team.teamName}">팀 이름</h2>
+                <p th:text="'지역: ' + ${team.teamRegion}">지역</p>
+                <p>
+                    별점: <span th:text="${team.teamRatingAverage} + '점'">0점</span>
+                    <span class="star-rating"
+                          th:with="width=${team.teamRatingAverage * 20}"
+                          th:style="'width:' + width + '%'">
+    </span>
+                </p>
+                <p>DEBUG STAR: <span th:text="${team.starRatingVisual}">[nothing]</span></p>
+                <p th:text="'포지션: ' + ${team.recruitingPositions}">포지션</p>
+                <p th:text="${team.recruitmentStatus} ? '모집 중' : '모집 완료'">모집 상태</p>
+                <p th:text="'작성자: ' + ${team.createdBy}">작성자</p>
+            </div>
+        </div>
+    </div>
 
-    <div id="team-container"></div>
+    <div class="button-container">
+        <a th:href="@{/team/team/register}"><button>팀 등록하기</button></a>
+        <button type="button" id="myTeamBtn">내 팀 보기</button>
+    </div>
+
     <div id="paging-container"></div>
 </div>
-
 <div th:replace="~{common/footer::footer}"></div>
-
 </body>
 </html>

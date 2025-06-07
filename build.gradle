@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -40,6 +41,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     implementation 'net.coobird:thumbnailator:0.4.14' // 썸네일
+
+    implementation 'org.springframework.boot:spring-boot-starter-mail' // 메일 기능 추가
 
     //jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'  // JWT API
@@ -58,6 +61,9 @@ dependencies {
 
     // test
     implementation 'com.opencsv:opencsv:5.7.1'
+
+    //html, js, css 자동 반영
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 
 

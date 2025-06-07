@@ -3,6 +3,8 @@ package com.multi.matchon.chat.repository;
 
 import com.multi.matchon.chat.domain.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -10,5 +12,15 @@ import java.util.Optional;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findByIdAndIsDeletedFalse(Long roomId);
+
+    @Query("""
+            select t1.isGroupChat
+            from ChatRoom t1
+            where t1.id=:roomId and t1.isDeleted=false
+            """)
+    Boolean isGroupChat(@Param("roomId")Long roomId);
+
+    Optional<ChatRoom> findByTeamIdAndIsGroupChatTrue(Long teamId);
+
 
 }

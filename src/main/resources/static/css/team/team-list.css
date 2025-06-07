@@ -1,0 +1,105 @@
+.team-card {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px auto;
+    width: 80%;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.team-card img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 24px;
+}
+.team-info {
+    flex: 1;
+}
+.team-info h2 {
+    margin: 0;
+    font-size: 24px;
+}
+.team-info p {
+    margin: 4px 0;
+}
+.star {
+    color: #FFD700;
+    font-size: 18px;
+}
+#filter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 10px;
+}
+#filter select,
+#filter button {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+#filter button {
+    background-color: #255e93;
+    color: white;
+    cursor: pointer;
+}
+#filter button:hover {
+    background-color: #1d4b6e;
+}
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 40px;
+}
+.button-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    background-color: #255e93;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.button-container button:hover {
+    background-color: #1d4b6e;
+}
+#paging-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.star-rating {
+    position: relative;
+    display: inline-block;
+    font-size: 18px;
+    color: #ccc; /* gray empty stars */
+}
+
+.star-rating::before {
+    content: '★★★★★';
+}
+
+.star-rating::after {
+    content: '★★★★★';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--rating-width); /* MUST match name used in style */
+    overflow: hidden;
+    color: #FFD700; /* gold filled stars */
+    white-space: nowrap;
+    pointer-events: none;
+}
+/* ✅ NEW: this is the KEY to dynamically set width from inline style */
+.star-rating::after {
+    width: var(--rating-width); /* ✅ this is correct */
+}

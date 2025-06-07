@@ -8,6 +8,7 @@ import lombok.Getter;
 public class EventSummaryDto {
     private Long id;
     private String eventTitle;
+    private String eventDescription;
     private String region;
     private String hostName;
     private String eventAddress;

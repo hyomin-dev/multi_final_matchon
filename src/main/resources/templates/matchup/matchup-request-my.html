@@ -13,7 +13,7 @@
 
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
-    <h1>MATCHUP request my 목록</h1>
+    <h2 class="page-title">MATCHUP 내 참가 요청 목록</h2>
 
     <div class="filter-wrapper">
         <div id="filter">
@@ -22,19 +22,34 @@
                 <option value="SOCCER">축구</option>
                 <option value="FUTSAL">풋살</option>
             </select>
-            <label>날짜<input type="date" id="date-filter"></label>
+            <input type="date" id="date-filter">
+            <label>
+                경기 시작 전
+                <input type="checkbox" id="availableOnly">
+            </label>
             <button id="filterBtn">검색</button>
         </div>
-        <a th:href="@{/matchup/board}" class="back-btn">뒤로가기</a>
-
+        <div class="topbar-buttons">
+            <button class="btn-back" onclick="goBack()">뒤로가기</button>
+        </div>
     </div>
-
-
-
-
-    <div id="request-container">
-
-    </div>
+    <table class="board-table">
+        <thead>
+        <tr>
+            <th class="col-type">종목</th>
+            <th class="col-sports-facility-address">경기장</th>
+            <th class="col-match-date">날짜</th>
+            <th class="col-status">상태</th>
+            <th class="col-quota">정원</th>
+            <th class="col-participants">신청 인원</th>
+            <th class="col-request-status">요청 상태</th>
+            <th class="col-request-cancel-count">요청 통계</th>
+            <th class="col-detail">상세 보기</th>
+            <th class="col-group-chat">단체 채팅</th>
+        </tr>
+        </thead>
+        <tbody id="request-container"></tbody>
+    </table>
 
     <div id="paging-container">
 

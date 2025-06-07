@@ -1,7 +1,12 @@
 package com.multi.matchon.team.service;
 
+import com.multi.matchon.chat.domain.ChatRoom;
+import com.multi.matchon.chat.repository.ChatRoomRepository;
+import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
+import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.team.domain.Review;
+import com.multi.matchon.team.dto.res.ResJoinRequestDetailDto;
 import com.multi.matchon.team.dto.res.ResJoinRequestDto;
 import com.multi.matchon.team.repository.*;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,13 +42,16 @@ import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.connection.RedisListCommands;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -79,6 +87,9 @@ public class TeamService {
     private final MemberRepository memberRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final TeamJoinRequestRepository teamJoinRequestRepository;
+    private final ResponseRepository responseRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatService chatService;
 
     @PersistenceContext
     private EntityManager em;
@@ -87,7 +98,7 @@ public class TeamService {
 
 
     public List<Team> findAll() {
-        List<Team> teamBoards = teamRepository.findAll();
+        List<Team> teamBoards = teamRepository.findAllNotDeleted();
 
 
         return teamBoards;
@@ -96,12 +107,12 @@ public class TeamService {
 
     public void teamRegister(ReqTeamDto reqTeamDto, CustomUser user) {
 
-        if (reqTeamDto.getTeamName() == null || reqTeamDto.getTeamName().trim().isEmpty()) {
-            throw new IllegalArgumentException("팀 이름은 필수입니다.");
-        }
 
-        if (reqTeamDto.getTeamIntroduction() == null || reqTeamDto.getTeamIntroduction().trim().isEmpty()) {
-            throw new IllegalArgumentException("팀 소개는 필수입니다.");
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + user.getUsername()));
+
+        if (member.getTeam() != null) {
+            throw new IllegalArgumentException("이미 팀이 있습니다.");
         }
 
         if (reqTeamDto.getTeamRegion() == null) {
@@ -116,11 +127,8 @@ public class TeamService {
             throw new IllegalArgumentException("모집 여부를 선택해야 합니다.");
         }
         // Check if the user already has an active team
-        if (teamRepository.existsByCreatedPersonAndIsDeletedFalse(user.getUsername())) {
-            throw new IllegalArgumentException("이미 팀이 있습니다.");
-        }
-        Member member = memberRepository.findByMemberEmail(user.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + user.getUsername()));
+
+
 
         Team newTeam = Team.builder()
                 .teamName(reqTeamDto.getTeamName())
@@ -128,9 +136,25 @@ public class TeamService {
                 .teamRatingAverage(reqTeamDto.getTeamRatingAverage())
                 .recruitmentStatus(reqTeamDto.getRecruitmentStatus()).teamIntroduction(reqTeamDto.getTeamIntroduction())
                 .teamAttachmentEnabled(true)
-                .createdPerson(member.getMemberName())
+                .createdPerson(member.getMemberEmail())
                 .build();
         Team savedTeam = teamRepository.save(newTeam);
+
+        // ⬇️ INSERT BELOW ⬇️
+        String identifierChatRoomName = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        ChatRoom teamChatRoom = ChatRoom.builder()
+                .isGroupChat(true)
+                .chatRoomName("Team Chat - " + savedTeam.getTeamName() + " - " + identifierChatRoomName)
+                .teamId(savedTeam.getId())
+                .build();
+        chatRoomRepository.save(teamChatRoom);
+
+        // ✅ Link chat room to team
+        savedTeam.setChatRoom(teamChatRoom);  // this assumes you have a chatRoom field
+        teamRepository.save(savedTeam);       // save the relationship
+
+        chatService.addParticipantToRoom(teamChatRoom, member);
+
 
         // Add creator as team member (leader)
 
@@ -244,7 +268,8 @@ public class TeamService {
                     .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
                     .orElse("/img/default-team.png");
 
-            return ResTeamDto.from(team, imageUrl);
+            double avgRating = calculateAverageRating(team.getId());
+            return ResTeamDto.from(team, imageUrl, avgRating);
         });
 
         return PageResponseDto.<ResTeamDto>builder()
@@ -262,7 +287,7 @@ public class TeamService {
 
 
     public ResTeamDto findTeamById(Long teamId) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다: " + teamId));
 
         Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
@@ -270,12 +295,13 @@ public class TeamService {
                 .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
                 .orElse("/img/default-team.png");
 
-        return ResTeamDto.from(team, imageUrl);
+        double avgRating = calculateAverageRating(team.getId());
+        return ResTeamDto.from(team, imageUrl, avgRating);
     }
 
     @Transactional
     public void processTeamJoinRequest(Long teamId, ReqTeamJoinDto joinRequest, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다: " + teamId));
 
         if (!team.getRecruitmentStatus()) {
@@ -337,13 +363,20 @@ public class TeamService {
         // Save the review
         Review savedReview = reviewRepository.save(review);
         log.info("Successfully saved review with ID: {}", savedReview.getId());
+
+        double newAvgRating = calculateAverageRating(teamId); // You probably have this
+        team.updateRating(newAvgRating); // ← add this method to Team entity
     }
+
 
     @Transactional(readOnly = true)
     public List<ResReviewDto> getReviewsForTeam(Long teamId) {
         return reviewRepository.findReviewsByTeamId(teamId)
                 .stream()
-                .map(ResReviewDto::from)
+                .map(review -> {
+                    Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(review);
+                    return ResReviewDto.from(review, response.orElse(null));
+                })
                 .collect(Collectors.toList());
     }
 
@@ -379,20 +412,23 @@ public class TeamService {
     public List<ResReviewDto> getMyReviewsForTeam(Long teamId, String userEmail) {
         return reviewRepository.findReviewsByTeamId(teamId).stream()
                 .filter(r -> r.getMember().getMemberEmail().equals(userEmail))
-                .map(ResReviewDto::from)
+                .map(review -> {
+                    Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(review);
+                    return ResReviewDto.from(review, response.orElse(null));
+                })
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public void sendJoinRequest(Long teamId, CustomUser user, ReqTeamJoinDto joinDto) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         Member member = memberRepository.findByMemberEmail(user.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
 
         if (member.getTeam() != null) {
-            throw new IllegalArgumentException("이미 다른 팀에 소속되어 있습니다.");
+            throw new IllegalArgumentException("이미 소속된 팀이 있습니다.");
         }
 
         // ✅ Word count check
@@ -416,7 +452,7 @@ public class TeamService {
     }
     @Transactional(readOnly = true)
     public List<ResJoinRequestDto> getJoinRequestsForTeam(Long teamId, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         // Optional: check if user is team leader
@@ -445,6 +481,10 @@ public class TeamService {
 
         request.approved();
 
+        Member member = request.getMember(); // 가입 신청한 사용자
+        Team team = request.getTeam();       // 해당 팀
+
+
         TeamMember newMember = TeamMember.builder()
                 .member(request.getMember())
                 .team(request.getTeam())
@@ -453,6 +493,17 @@ public class TeamService {
                 .build();
 
         teamMemberRepository.save(newMember);
+
+        // ✅ member 테이블에 team_id 업데이트
+        member.setTeam(team);
+        memberRepository.save(member); // 명시적으로 저장 (선택사항이지만 안전)
+
+        // ✅✅ [NEW] Add to group chat room
+        ChatRoom teamGroupChatRoom = chatRoomRepository.findByTeamIdAndIsGroupChatTrue(team.getId())
+                .orElseThrow(() -> new IllegalStateException("해당 팀의 채팅방이 존재하지 않습니다."));
+
+        chatService.addParticipantToRoom(teamGroupChatRoom, member); // 👈 add member to chat
+
     }
 
     @Transactional
@@ -473,15 +524,16 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
         return teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(
-                teamRepository.findById(teamId).orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다.")),
+                teamRepository.findByIdNotDeleted(teamId).orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다.")),
                 member
         );
     }
 
     @Transactional
     public void deleteTeam(Long teamId, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+
+        Team team = teamRepository.findByIdNotDeleted(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("삭제된 팀이거나 존재하지 않습니다."));
         Member member = memberRepository.findByMemberEmail(user.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
@@ -489,12 +541,22 @@ public class TeamService {
         if (!isLeader) throw new IllegalArgumentException("팀 리더만 삭제할 수 있습니다.");
 
         team.softDelete(); // if you support soft delete
+
+        // 2. Break association: remove team from all members
+        List<Member> teamMembers = memberRepository.findAllByTeam(team);
+        for (Member m : teamMembers) {
+            m.setTeam(null); // Break the link
+        }
+        memberRepository.saveAll(teamMembers);
+
+
+        teamRepository.save(team);
     }
 
 
     @Transactional(readOnly = true)
     public ReqTeamDto getTeamEditForm(Long teamId, CustomUser user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdNotDeleted(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         Member member = memberRepository.findByMemberEmail(user.getUsername())
@@ -526,7 +588,9 @@ public class TeamService {
             throw new IllegalArgumentException("팀 ID가 없습니다.");
         }
 
-        Team team = teamRepository.findById(dto.getTeamId())
+
+        Team team = teamRepository.findByIdNotDeleted(dto.getTeamId())
+
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
 
         Member member = memberRepository.findByMemberEmail(user.getUsername())
@@ -543,6 +607,9 @@ public class TeamService {
 
         // Remove and re-insert recruiting positions
         recruitingPositionRepository.deleteByTeam(team);
+
+        em.flush();
+
 
 
         for (String posName : dto.getRecruitingPositions()) {
@@ -563,6 +630,266 @@ public class TeamService {
             updateFile(dto.getTeamImageFile(), team);
         }
     }
+    //리뷰 답변 쓰기
+
+    @Transactional
+    public void writeReviewResponse(Long reviewId, String content, CustomUser user) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰가 존재하지 않습니다."));
+
+        Team team = review.getTeam();
+        Member leader = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        if (!teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, leader)) {
+            throw new IllegalArgumentException("팀 리더만 답변을 작성할 수 있습니다.");
+        }
+
+        if (responseRepository.existsByReviewAndIsDeletedFalse(review)) {
+            throw new IllegalArgumentException("이미 답변이 작성된 리뷰입니다.");
+        }
+
+        Response response = Response.builder()
+                .review(review)
+                .reviewResponse(content)
+                .build();
+
+        responseRepository.save(response);
+    }
+
+    //답변 존재여부 상관 없이 모든 리뷰 보기
+    @Transactional(readOnly = true)
+    public List<ResReviewDto> getAllReviewsWithResponses(Long teamId, CustomUser user) {
+        Team team = teamRepository.findByIdNotDeleted(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("팀이 존재하지 않습니다."));
+
+        Member leader = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        if (!teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, leader)) {
+            throw new IllegalArgumentException("팀 리더만 볼 수 있습니다.");
+        }
+
+        List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
+
+        return reviews.stream()
+                .map(r -> {
+                    Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(r);
+                    return ResReviewDto.from(r, response.orElse(null));
+                })
+                .collect(Collectors.toList());
+    }
+
+    //답변 존재하는 리뷰 보기
+    @Transactional(readOnly = true)
+    public List<ResReviewDto> getAnsweredReviews(Long teamId, CustomUser user) {
+        Team team = teamRepository.findByIdNotDeleted(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("팀이 존재하지 않습니다."));
+
+        Member leader = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        if (!teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, leader)) {
+            throw new IllegalArgumentException("팀 리더만 볼 수 있습니다.");
+        }
+
+        return reviewRepository.findReviewsByTeamId(teamId).stream()
+                .map(r -> responseRepository.findByReviewAndIsDeletedFalse(r)
+                        .map(resp -> ResReviewDto.from(r, resp))
+                        .orElse(null))
+                .filter(r -> r != null)
+                .collect(Collectors.toList());
+    }
+
+    public Long getTeamIdByReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+        return review.getTeam().getId();
+    }
+
+
+    //답변 수정하기
+    @Transactional
+    public void updateReviewResponse(Long responseId, String updatedText, CustomUser user) {
+        // 1. Fetch the response
+        Response response = responseRepository.findById(responseId)
+                .orElseThrow(() -> new CustomException("답변을 찾을 수 없습니다."));
+
+        // 2. Check that the user is the leader of the team related to the review
+        Review review = response.getReview();
+        Team team = review.getTeam();
+
+        // Fetch the TeamMember entry for this user and team
+        TeamMember teamMember = teamMemberRepository.findByMember_IdAndTeam_Id(
+                user.getMember().getId(), team.getId()
+        ).orElseThrow(() -> new CustomException("팀 멤버 정보를 찾을 수 없습니다."));
+
+        if (!teamMember.getTeamLeaderStatus()) {
+            throw new AccessDeniedException("팀장이 아니므로 답변을 수정할 권한이 없습니다.");
+        }
+
+        // 3. Update the content and timestamp
+        response.updateContent(updatedText);
+
+        // 4. Save (if not using dirty checking)
+        responseRepository.save(response);
+    }
+
+
+    //답변 삭제
+    @Transactional
+    public void deleteResponse(Long responseId, CustomUser user) {
+        // 1. Find the response entity
+        Response response = responseRepository.findById(responseId)
+                .orElseThrow(() -> new CustomException("답변을 찾을 수 없습니다."));
+
+        // 2. Get the associated team from the review linked to this response
+        Review review = response.getReview();
+        Team team = review.getTeam();
+
+        // 3. Get member info from CustomUser
+        Member member = user.getMember();
+
+        // 4. Check if this member is the team leader
+        TeamMember teamMember = teamMemberRepository.findByMember_IdAndTeam_Id(member.getId(), team.getId())
+                .orElseThrow(() -> new CustomException("팀 멤버 정보를 찾을 수 없습니다."));
+
+        if (!Boolean.TRUE.equals(teamMember.getTeamLeaderStatus())) {
+            throw new AccessDeniedException("팀 리더만 답변을 삭제할 수 있습니다.");
+        }
+
+        // 5. Perform deletion
+        responseRepository.delete(response);
+    }
+
+    public ResJoinRequestDetailDto getJoinRequestDetail(Long requestId, CustomUser user) {
+        TeamJoinRequest joinRequest = teamJoinRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NoSuchElementException("가입 요청을 찾을 수 없습니다."));
+
+        Team team = joinRequest.getTeam();
+        Member currentUser = memberRepository.findByMemberEmailAndIsDeletedFalse(user.getUsername())
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+
+        // ✅ Check if the user is the leader using existing method
+        boolean isLeader = teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, currentUser);
+        if (!isLeader) {
+            throw new AccessDeniedException("팀 리더만 가입 요청 상세를 볼 수 있습니다.");
+        }
+
+        Member requester = joinRequest.getMember();
+
+
+        Attachment attachment = em.createQuery(
+                        "SELECT a FROM Attachment a WHERE a.boardType = :boardType AND a.boardNumber = :boardNumber AND a.isDeleted = false ORDER BY a.fileOrder ASC",
+                        Attachment.class)
+                .setParameter("boardType", BoardType.MEMBER)
+                .setParameter("boardNumber", requester.getId())
+                .setMaxResults(1)
+                .getResultStream() // avoids NoResultException
+                .findFirst()
+                .orElse(null);
+
+        String profileImageUrl = attachment != null
+                ? awsS3Utils.createPresignedGetUrl(attachment.getSavePath(), attachment.getSavedName())
+                : "/img/default-avatar.png";
+
+
+        return ResJoinRequestDetailDto.builder()
+                .requestId(joinRequest.getId())
+                .nickname(requester.getMemberName())
+                .position(
+                        requester.getPositions() != null
+                                ? translatePosition(requester.getPositions().getPositionName())
+                                : "미정"
+                )
+                .temperature(requester.getMyTemperature())
+                .preferredTime(
+                        requester.getTimeType() != null
+                                ? translateTimeType(requester.getTimeType())
+                                : "미정"
+                )
+                .introduction(joinRequest.getIntroduction())
+
+                .profileImageUrl(profileImageUrl) // ✅ Make sure this exists!
+
+                .build();
+    }
+
+    private String translatePosition(PositionName positionName) {
+        if (positionName == null) return "미정";
+        return switch (positionName) {
+            case GOALKEEPER -> "골키퍼";
+            case CENTER_BACK -> "센터백";
+            case LEFT_RIGHT_BACK -> "좌/우 풀백";
+            case LEFT_RIGHT_WING_BACK -> "좌/우 윙백";
+            case CENTRAL_DEFENSIVE_MIDFIELDER -> "수비형 미드필더";
+            case CENTRAL_MIDFIELDER -> "중앙 미드필더";
+            case CENTRAL_ATTACKING_MIDFIELDER -> "공격형 미드필더";
+            case LEFT_RIGHT_WING -> "좌/우 윙";
+            case STRIKER_CENTER_FORWARD -> "스트라이커";
+            case SECOND_STRIKER -> "세컨드 스트라이커";
+            case LEFT_RIGHT_WINGER -> "좌/우 윙어";
+        };
+    }
+
+
+    private String translateTimeType(TimeType timeType) {
+        if (timeType == null) return "미정";
+        return switch (timeType) {
+            case WEEKDAY_MORNING -> "평일 오전";
+            case WEEKDAY_AFTERNOON -> "평일 오후";
+            case WEEKDAY_EVENING -> "평일 저녁";
+            case WEEKEND_MORNING -> "주말 오전";
+            case WEEKEND_AFTERNOON -> "주말 오후";
+            case WEEKEND_EVENING -> "주말 저녁";
+        };
+    }
+
+
+    public ResTeamDto findMyTeam(CustomUser user) {
+        Member member = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        Team team = member.getTeam();
+        Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
+
+        String imageUrl = attachment
+                .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
+                .orElse("/img/default-team.png"); // fallback if no image
+
+        double avgRating = calculateAverageRating(team.getId());
+        return ResTeamDto.from(team, imageUrl, avgRating);
+    }
+
+
+
+    public double calculateAverageRating(Long teamId) {
+        List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
+        if (reviews.isEmpty()) return 0.0;
+
+        double avg = reviews.stream()
+                .mapToInt(Review::getReviewRating)
+                .average()
+                .orElse(0.0);
+
+        return Math.round(avg * 10) / 10.0; // Round to 1 decimal place
+    }
+
+
+    public List<ResTeamDto> findAllWithoutPaging() {
+        List<Team> teams = teamRepository.findAll();
+
+        return teams.stream().map(team -> {
+            Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
+            String imageUrl = attachment
+                    .map(att -> awsS3Utils.createPresignedGetUrl(att.getSavePath(), att.getSavedName()))
+                    .orElse("/img/default-team.png");
+
+            double avgRating = calculateAverageRating(team.getId());
+            return ResTeamDto.from(team, imageUrl, avgRating);
+        }).collect(Collectors.toList());
+    }
+
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(

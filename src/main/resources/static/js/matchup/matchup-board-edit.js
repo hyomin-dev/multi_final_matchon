@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     const editDto = document.querySelector("#matchup-board-edit-dto");
 
-    const boardId = Number(editDto.dataset.boardId);
     const sportsTypeName = editDto.dataset.sportsTypeName;
     const currentParticipantCount = Number(editDto.dataset.currentParticipantCount);
     const maxParticipants = Number(editDto.dataset.maxParticipants);
@@ -10,27 +9,24 @@ document.addEventListener("DOMContentLoaded",()=>{
     const originalName = editDto.dataset.originalName;
     const savedName = editDto.dataset.savedName;
     const myMannerTemperature = Number(editDto.dataset.myMannerTemperature);
-    const loginMember = editDto.dataset.loginMember;
 
     setSportsType(sportsTypeName); // 종목 가져옴
-    setReservationFile(originalName, savedName);
+    void setReservationFile(originalName, savedName);
     setMaxParticipants(currentParticipantCount, maxParticipants);
     setMannerTemperature(minMannerTemperature);
     setButton();
+    autoResize();
 
     const form = document.querySelector("form");
     form.addEventListener("submit", (e)=>{
         submitCheck(e, myMannerTemperature);
     })
 
-    const backBtn = document.querySelector(".back-btn");
-    backBtn.addEventListener("click",()=>{
-        history.back();
-    });
-
 })
 
 function submitCheck(e, myMannerTemperature){
+
+    const sportsTypeNameEle = document.querySelector("#sportsTypeName");
 
     const teamNameEle = document.querySelector("#teamName");
 
@@ -56,30 +52,26 @@ function submitCheck(e, myMannerTemperature){
 
     const matchDescriptionEle = document.querySelector("#matchDescription");
 
-    //console.log(matchDatetimeEle.value);
-    const matchDate = new Date(matchDatetimeEle.value);
-    const now = new Date();
-    // if(matchDate < now){
-    //     console.log("test");
-    // }
-
-   if(teamNameEle.value === ""){
-        alert("소속 팀이 있어야 합니다.");
+    if(sportsTypeNameEle.value ===""){
+        alert("종목을 선택하세요.");
+        e.preventDefault();
+    }else if(teamNameEle.value === ""){
+        alert("팀 이름을 입력하세요.");
         e.preventDefault();
     } else if(teamIntroEle.value ===""){
-        alert("팀 소개를 입력하세요.");
+        alert("팀 소개를 입력하세요");
         e.preventDefault();
     } else if(sportsFacilityNameEle.value ===""){
-        alert("경기장 명을 입력하세요.");
+        alert("경기장명을 입력하세요");
         e.preventDefault();
     } else if(sportsFacilityAddressEle.value ===""){
         alert("경기장 주소를 입력하세요.");
         e.preventDefault();
     } else if(matchDatetimeEle.value ===""){
-        alert("경기 날짜를 입력하세요");
+        alert("경기 시작 시간을 입력하세요.");
         e.preventDefault();
-    }  else if(matchDate<now){
-        alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+    }  else if(new Date(matchDatetimeEle.value)< new Date()){
+        alert(`경기 시작 시간은 현재 시간 이후만 가능합니다. 다시 작성해주세요.`)
         e.preventDefault();
     } else if(matchDurationEle.value ===""){
         alert("경기 진행 시간을 입력하세요.");
@@ -97,18 +89,18 @@ function submitCheck(e, myMannerTemperature){
         alert("하한 매너 온도를 입력하세요.");
         e.preventDefault();
     } else if(minMannerTemperatureEle.value>myMannerTemperature){
-       alert(`하한 매너 온도는 내 매너 온도 ${myMannerTemperature} 이상이어야 합니다.`);
+       alert(`하한 매너 온도는 내 매너 온도 ${myMannerTemperature} 이하이어야 합니다.`);
        e.preventDefault();
    } else if(matchDescriptionEle.value ===""){
         alert("경기 방식 소개를 입력하세요");
         e.preventDefault();
     } else{
-        alert("submit");
+        alert("글 수정이 완료되었습니다.");
 
     }
 }
 
-async function setSportsType(sportsTypeName){
+function setSportsType(sportsTypeName){
     const optionSoccerEle = document.querySelector("#option-soccer");
     const optionFutsal = document.querySelector("#option-futsal");
 
@@ -129,17 +121,30 @@ async function setReservationFile(originalName, savedName){
     const url = window.URL.createObjectURL(data2);
     const aEle = document.querySelector("#reservationLoadBox > span > a");
 
-
     aEle.href = url;
     aEle.download = originalName;
 
-    aEle.addEventListener("click",()=>{
-        setTimeout(()=>{
-            aEle.removeAttribute("href")
-            URL.revokeObjectURL(url);
-        },500)
-    })
 
+    // 한 번 클릭만 가능하게
+    aEle.addEventListener("click", () => {
+        setTimeout(() => {
+            aEle.removeAttribute("href");
+            URL.revokeObjectURL(url);
+            aEle.style.pointerEvents = "none";
+            aEle.style.opacity = "0.5";
+            aEle.textContent += " (다운로드 완료)";
+        }, 500);
+    }, { once: true });
+
+    // aEle.addEventListener("click",function handleClick (){
+    //     setTimeout(()=>{
+    //         aEle.removeAttribute("href")
+    //         URL.revokeObjectURL(url);
+    //         aEle.removeEventListener("click", handleClick); // 이벤트 제거
+    //         aEle.style.pointerEvents = "none";              // 클릭 불가 처리 (옵션)
+    //         aEle.style.opacity = "0.5";
+    //     },500)
+    // })
     // const aEle2 = document.createElement("a");
     // aEle2.innerHTML = "삭제하기";
     //
@@ -148,7 +153,7 @@ async function setReservationFile(originalName, savedName){
 }
 
 
-function getAddress() {
+function getAddress(){
     new daum.Postcode({
         oncomplete: function(data) {
             // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
@@ -200,7 +205,7 @@ function setMannerTemperature(minMannerTemperature){
     }
 }
 
-async function setButton(){
+function setButton(){
     // const deleteBtn = document.querySelector(".delete-btn");
     // deleteBtn.addEventListener("click",async ()=>{
     //     const response = await fetch(`/matchup/board/delete?boardId=${boardId}`,{
@@ -213,26 +218,66 @@ async function setButton(){
     //     window.location.href="/matchup";
     // })
 
+    // const toggleBtn = document.querySelector("#toggleBtn");
+    // const reservationLoadBox = document.querySelector("#reservationLoadBox");
+    // const reservationFileBox = document.querySelector("#reservationFileBox");
+    //
+    // toggleBtn.addEventListener("click",()=>{
+    //     const isDelete = toggleBtn.textContent === "파일 변경";
+    //
+    //     if(isDelete){
+    //         toggleBtn.textContent = "변경 취소";
+    //         reservationLoadBox.style.display = "none";
+    //         reservationFileBox.style.display = "block";
+    //         document.querySelector("#reservationFileBox > input").required = true;
+    //     }
+    //     else{
+    //         toggleBtn.textContent = "파일 변경";
+    //         reservationLoadBox.style.display = "block";
+    //         reservationFileBox.style.display = "none";
+    //         document.querySelector("#reservationFileBox > input").required = false;
+    //         document.querySelector("#reservationFileBox > input").value = '';
+    //
+    //     }
+    // })
     const toggleBtn = document.querySelector("#toggleBtn");
     const reservationLoadBox = document.querySelector("#reservationLoadBox");
     const reservationFileBox = document.querySelector("#reservationFileBox");
+    const fileInput = document.querySelector("#reservationFileInput");
 
-    toggleBtn.addEventListener("click",()=>{
-        const isDelete = toggleBtn.textContent === "파일 변경";
+    toggleBtn.addEventListener("click", () => {
+        const isChange = toggleBtn.textContent === "파일 변경";
 
-        if(isDelete){
+        if (isChange) {
             toggleBtn.textContent = "변경 취소";
             reservationLoadBox.style.display = "none";
             reservationFileBox.style.display = "block";
-            document.querySelector("#reservationFileBox > input").required = true;
-        }
-        else{
+            fileInput.required = true;
+        } else {
             toggleBtn.textContent = "파일 변경";
             reservationLoadBox.style.display = "block";
             reservationFileBox.style.display = "none";
-            document.querySelector("#reservationFileBox > input").required = false;
-            document.querySelector("#reservationFileBox > input").value = '';
-
+            fileInput.required = false;
+            fileInput.value = ""; // 초기화
         }
-    })
+    });
+
 }
+
+function autoResize() {
+    const allTextarea = document.querySelectorAll('textarea');
+    allTextarea.forEach(el =>{
+        el.style.height = 'auto';  // 초기화
+        el.style.height = el.scrollHeight + 'px';  // 실제 내용에 맞춤
+    });
+}
+
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
+

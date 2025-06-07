@@ -22,6 +22,7 @@ table {
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
     border-radius: 6px;
     overflow: hidden;
+    table-layout: fixed;
 }
 
 thead {
@@ -29,18 +30,63 @@ thead {
     color: white;
 }
 
+thead th {
+    background-color: #007BFF;
+    color: white;
+}
+
+thead th:hover {
+    background-color: #007BFF !important;
+    color: white !important;
+    cursor: default;
+}
+
 th, td {
     padding: 14px 18px;
     text-align: center;
     border-bottom: 1px solid #eee;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
-tr:hover {
-    background-color: #f1f7ff;
+td:nth-child(6) {
+    text-align: justify;
+}
+
+th:nth-child(1), td:nth-child(1) { width: 4%; }     /* ID */
+th:nth-child(2), td:nth-child(2) { width: 8%; }    /* 유형 */
+th:nth-child(3), td:nth-child(3) { width: 10%; }    /* 신고대상 */
+th:nth-child(4), td:nth-child(4) { width: 10%; }    /* 신고자 */
+th:nth-child(5), td:nth-child(5) { width: 14%; }    /* 신고분류 */
+th:nth-child(6), td:nth-child(6) { width: 32%; }    /* 상세사유 */
+th:nth-child(7), td:nth-child(7) { width: 10%; }    /* 신고일 */
+th:nth-child(8), td:nth-child(8) { width: 8%; }    /* 보기 */
+th:nth-child(9), td:nth-child(9) { width: 12%; }    /* 회원 처리 */
+
+
+tbody tr:hover {
+    background-color: #fffbe6;
+    transition: background-color 0.2s ease-in-out;
 }
 
 td {
     color: #333;
+}
+
+/* 보기 버튼 */
+.view-link {
+    display: inline-block;
+    padding: 6px 10px;
+    font-size: 13px;
+    background-color: dodgerblue;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.view-link:hover {
+    background-color: royalblue;
 }
 
 @media (max-width: 768px) {
@@ -63,6 +109,8 @@ td {
         padding: 12px;
         text-align: left;
         position: relative;
+        white-space: normal;
+        word-wrap: break-word;
     }
 
     td::before {
@@ -76,3 +124,67 @@ td {
         display: inline-block;
     }
 }
+
+
+.ban-controls {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 6px;
+}
+
+.ban-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    background-color: #fff;
+    border: 1px solid mediumpurple;
+    border-radius: 4px;
+    color: mediumpurple;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.ban-btn:hover {
+    background-color: ghostwhite;
+}
+
+.unban-btn {
+    background-color: forestgreen;
+    color: white;
+    border: none;
+    font-weight: 500;
+}
+
+.unban-btn:hover {
+    background-color: darkgreen;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 4px;
+}
+
+.page-link {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    color: #333;
+}
+
+.page-link.active {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
+.target-writer-name {
+    color: red;
+    font-weight: 600;
+}
+
+
+
+
+

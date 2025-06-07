@@ -17,5 +17,6 @@ public class ResChatDto {
     private String senderName;
     private String content;
     private LocalDateTime createdDate;
+    private String exceptionName;
 
 }

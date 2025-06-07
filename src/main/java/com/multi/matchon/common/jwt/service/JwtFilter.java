@@ -10,9 +10,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -36,10 +36,17 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            // accessToken 유효 → 인증 처리
             String email = jwtTokenProvider.getEmailFromToken(token);
             CustomUser userDetails = (CustomUser) customUserDetailsService.loadUserByUsername(email);
 
+            // ✅ 정지된 회원이면 로그인 차단 및 쿠키 제거 + 리다이렉트
+            if (userDetails.getMember().isSuspended()) {
+                log.warn("[JwtFilter] 정지된 계정 accessToken 로그인 차단: {}", email);
+                sendSuspendedResponse(response, userDetails);
+                return;
+            }
+
+            // 정상 인증 처리
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -49,17 +56,24 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         else {
-            // accessToken 없음 또는 만료됨 → refreshToken 확인
             String refreshToken = resolveRefreshToken(request);
 
             if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
-                log.info("[JwtFilter] accessToken 없거나 만료됨 → refreshToken으로 재발급");
+                log.info("[JwtFilter] accessToken 없음 또는 만료됨 → refreshToken으로 재발급");
 
                 String email = jwtTokenProvider.getEmailFromToken(refreshToken);
                 MemberRole role = jwtTokenProvider.getRoleFromToken(refreshToken);
-                String newAccessToken = jwtTokenProvider.createAccessToken(email, role);
+                CustomUser userDetails = (CustomUser) customUserDetailsService.loadUserByUsername(email);
 
-                // 쿠키 재설정
+                // ✅ refreshToken 인증에서도 정지된 회원 차단
+                if (userDetails.getMember().isSuspended()) {
+                    log.warn("[JwtFilter] 정지된 계정 refreshToken 인증 차단: {}", email);
+                    sendSuspendedResponse(response, userDetails);
+                    return;
+                }
+
+                // accessToken 재발급
+                String newAccessToken = jwtTokenProvider.createAccessToken(email, role);
                 Cookie accessCookie = new Cookie("Authorization", newAccessToken);
                 accessCookie.setHttpOnly(false);
                 accessCookie.setPath("/");
@@ -67,21 +81,19 @@ public class JwtFilter extends OncePerRequestFilter {
                 response.addCookie(accessCookie);
 
                 // SecurityContext 갱신
-                CustomUser userDetails = (CustomUser) customUserDetailsService.loadUserByUsername(email);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                // 재요청 (필터 계속 진행)
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            // accessToken + refreshToken 모두 없음 or 만료
+            // accessToken + refreshToken 모두 만료 → 인증 필요
             else if (!isExcludedPath(uri)) {
-                log.warn("[JwtFilter] accessToken + refreshToken 모두 없음 or 만료 → 로그인 필요");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 클라이언트가 /login으로 리디렉트하도록 유도
+                log.warn("[JwtFilter] 모든 토큰 없음 또는 만료 → 로그인 필요");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
         }
@@ -89,14 +101,36 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * ✅ 정지된 회원 응답 처리: 쿠키 제거 + 로그인 페이지로 리다이렉트
+     */
+    private void sendSuspendedResponse(HttpServletResponse response, CustomUser userDetails) throws IOException {
+        // ❗ 쿠키 삭제 (무한 리다이렉트 방지)
+        Cookie deleteAccess = new Cookie("Authorization", null);
+        deleteAccess.setPath("/");
+        deleteAccess.setMaxAge(0);
+        response.addCookie(deleteAccess);
+
+        Cookie deleteRefresh = new Cookie("Refresh-Token", null);
+        deleteRefresh.setPath("/");
+        deleteRefresh.setMaxAge(0);
+        response.addCookie(deleteRefresh);
+
+        // ❗ 로그인 페이지로 리다이렉트 + 정지 사유 전달
+        String redirectUrl = "/login?error=suspended";
+        if (userDetails.getMember().getSuspendedUntil() != null) {
+            redirectUrl += "&date=" + userDetails.getMember().getSuspendedUntil().toLocalDate();
+        }
+
+        response.sendRedirect(redirectUrl);
+    }
+
     private String resolveToken(HttpServletRequest request) {
-        // 헤더
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
 
-        // 쿠키
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("Authorization".equals(cookie.getName())) {
@@ -128,6 +162,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 uri.startsWith("/css") ||
                 uri.startsWith("/js") ||
                 uri.startsWith("/img") ||
+                uri.startsWith("/redirect") ||
                 uri.equals("/favicon.ico");
     }
 }

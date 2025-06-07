@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,4 +32,13 @@ public class Response extends BaseEntity {
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
+
+
+    @Column(name = "responded_at")
+    private LocalDateTime respondedAt;
+
+    public void updateContent(String newContent) {
+        this.reviewResponse = newContent;
+        this.respondedAt = LocalDateTime.now();
+    }
 }
