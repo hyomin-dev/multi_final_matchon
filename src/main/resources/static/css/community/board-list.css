@@ -73,7 +73,7 @@
 
 /* ===== 게시글 제목 링크 ===== */
 .board-title-link {
-    color: #2c3e50;
+    color: darkslategray;
     text-decoration: none;
     font-weight: 600;
     font-size: 15px;
