@@ -113,6 +113,7 @@ public class NotificationService {
         }
     }
 
+
     private void sendNotificationWithoutMail(Member receiver, String message, String targetUrl) {
         Notification notification = Notification.builder()
                 .receivedMember(receiver)
@@ -132,6 +133,7 @@ public class NotificationService {
                 receiver.getMemberEmail(), "/notify", dto
         );
     }
+
 
     /*
      * 이메일 본문 생성

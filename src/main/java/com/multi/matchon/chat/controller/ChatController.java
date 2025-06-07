@@ -6,6 +6,8 @@ import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.exception.custom.CustomException;
+import com.multi.matchon.team.domain.TeamMember;
+import com.multi.matchon.team.repository.TeamMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
@@ -23,6 +25,8 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/chat")
 public class ChatController {
+
+    private final TeamMemberRepository teamMemberRepository;
 
     private final ChatService chatService;
 
@@ -48,7 +52,13 @@ public class ChatController {
     @GetMapping("/room/private")
     public ResponseEntity<ApiResponse<Long>> getPrivateChatRoom(@RequestParam Long receiverId, @AuthenticationPrincipal CustomUser user){
 
+        Long senderId = user.getMember().getId();
+        System.out.println("🔍 Creating or fetching private chat room between sender " + senderId + " and receiver " + receiverId);
+
         Long roomId = chatService.findPrivateChatRoom(receiverId, user.getMember().getId());
+
+
+        System.out.println("✅ Found or created roomId: " + roomId);
 
         return ResponseEntity.ok().body(ApiResponse.ok(roomId));
     }
@@ -66,12 +76,28 @@ public class ChatController {
     /*
     * 내가 속한 채팅방 목록 전달하는 메서드
     * */
+    //팀 채팅 목록에서 팀 채팅 만 보이도록 수정
     @PostMapping("/my/rooms")
     @ResponseBody
-    public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getMyChatRooms(@AuthenticationPrincipal CustomUser user){
-        List<ResMyChatListDto> resMyChatListDtos = chatService.findAllMyChatRoom(user);
+    public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getMyChatRooms(@AuthenticationPrincipal CustomUser user) {
+        List<ResMyChatListDto> chatRooms;
 
-        return ResponseEntity.ok().body(ApiResponse.ok(resMyChatListDtos));
+
+        TeamMember teamMember = teamMemberRepository.findByMemberId(user.getMember().getId())
+                .orElse(null);
+
+        boolean isLeader = teamMember != null && teamMember.getTeamLeaderStatus();
+        boolean hasTeam = user.getMember().getTeam() != null;
+
+        if (isLeader && hasTeam) {
+            Long leaderId = user.getMember().getId();
+            Long teamId = user.getMember().getTeam().getId();
+            chatRooms = chatService.findRelevantRoomsForLeader(leaderId, teamId); // ✅ filtered
+        } else {
+            chatRooms = chatService.findAllRoomsForUser(user.getMember().getId()); // fallback
+        }
+
+        return ResponseEntity.ok().body(ApiResponse.ok(chatRooms));
     }
 
     /*
@@ -130,5 +156,12 @@ public class ChatController {
     }
 
 
+    @GetMapping("/group/room-id")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Long>> getTeamChatRoomId(@RequestParam Long teamId) {
+        Long roomId = chatService.findTeamChatRoomByTeamId(teamId);
+        return ResponseEntity.ok(ApiResponse.ok(roomId));
+    }
     // 삭제
+
 }
