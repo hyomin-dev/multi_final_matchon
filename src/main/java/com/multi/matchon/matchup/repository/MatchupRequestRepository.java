@@ -147,8 +147,13 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
     @Query("""
             
             select new com.multi.matchon.matchup.dto.res.ResMatchupRequestOverviewListDto(
-            t3.memberName,
+            t2.id,
+            t2.matchDatetime,
+            t2.currentParticipantCount,
+            t2.maxParticipants,
             t1.id,
+            t3.memberName,
+            t1.selfIntro,
             t1.participantCount,
             t1.matchupStatus,
             t1.matchupRequestSubmittedCount,

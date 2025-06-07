@@ -81,7 +81,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
                     (:matchDate is null or DATE(t1.matchDatetime) >=:matchDate) and
                     (:availableFilter =false or (:availableFilter=true and t1.currentParticipantCount<t1.maxParticipants and t1.minMannerTemperature<=:myTemperature and t1.matchDatetime>CURRENT_TIMESTAMP)) and
                     (t1.isDeleted=false and t2.isDeleted=false)
-            order by t1.createdDate DESC
+            order by t1.modifiedDate DESC
             """)
     Page<ResMatchupBoardListDto> findAllMatchupBoardsWithPaging(Pageable pageable, @Param("sportsType") SportsTypeName sportsType, @Param("region") String region, @Param("matchDate") LocalDate matchDate, @Param("availableFilter") Boolean availableFilter, @Param("myTemperature") Double myTemperature);
 
@@ -112,7 +112,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
                     (:matchDate is null or DATE(t1.matchDatetime) >=:matchDate) and
                     (:availableFilter =false or (:availableFilter=true and t1.matchDatetime>CURRENT_TIMESTAMP)) and
                     t1.isDeleted=false and t1.writer =:loginMember and t1.isDeleted=false and t2.isDeleted=false
-            order by t1.matchDatetime DESC
+            order by t1.modifiedDate DESC
             """)
     Page<ResMatchupBoardListDto> findAllResMatchupBoardListDtosByMemberWithPaging(Pageable pageable, @Param("loginMember") Member loginMember, @Param("sportsType") SportsTypeName sportsType, @Param("matchDate") LocalDate matchDate, @Param("availableFilter") Boolean availableFilter);
 
@@ -130,6 +130,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     @Query("""
             select new com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto(
             t1.id,
+            t1.writer.memberName,
             t2.sportsTypeName,
             t1.sportsFacilityName,
             t1.sportsFacilityAddress,
@@ -156,6 +157,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             select
             new com.multi.matchon.matchup.dto.res.ResMatchupBoardOverviewDto(
                 t1.id,
+                t1.writer.memberName,
                 t2.sportsTypeName,
                 t1.sportsFacilityName,
                 t1.sportsFacilityAddress,
