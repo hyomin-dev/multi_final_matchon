@@ -3,6 +3,8 @@ package com.multi.matchon.team.controller;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.PageResponseDto;
+import com.multi.matchon.member.domain.Member;
+import com.multi.matchon.member.repository.MemberRepository;
 import com.multi.matchon.team.dto.req.ReqReviewDto;
 import com.multi.matchon.team.dto.req.ReqTeamDto;
 import com.multi.matchon.team.dto.req.ReqTeamJoinDto;
@@ -31,6 +33,8 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class TeamController {
+
+    private final MemberRepository memberRepository;
 
     private final TeamService teamService;
 
@@ -97,6 +101,26 @@ public class TeamController {
         // Add team leader status flag
         boolean isLeader = teamService.isTeamLeader(teamId, user.getUsername()); // you'll add this method
         mv.addObject("isTeamLeader", isLeader);
+
+        // NEW: Resolve leaderId from createdBy
+        Member leader = memberRepository.findByMemberEmail(teamDto.getCreatedBy())
+                .orElseThrow(() -> new IllegalArgumentException("팀장 정보를 찾을 수 없습니다."));
+
+        teamDto.setLeaderId(leader.getId()); // ✅ inject leaderId into the DTO
+
+
+        // NEW: Calculate user role
+        String userRole;
+        if (isLeader) {
+            userRole = "LEADER";
+        } else if (user.getMember().getTeam() != null && user.getMember().getTeam().getId().equals(teamId)) {
+            userRole = "MEMBER";
+        } else {
+            userRole = "GUEST";
+        }
+
+        mv.addObject("teamLeaderId", leader.getId());
+        mv.addObject("userRole", userRole);
 
         return mv;
     }
