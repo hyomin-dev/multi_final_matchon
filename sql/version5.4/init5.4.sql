@@ -80,11 +80,11 @@ VALUES
     (TRUE, 'Team 7 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE),
     (TRUE, 'Team 8 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE),
     (TRUE, 'Team 9 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE),
-    (TRUE, 'Team 10 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE;
+    (TRUE, 'Team 10 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE);
 
 
 INSERT INTO member (member_email, member_password, previous_password, temporary_password, member_name, member_role, position_id, preferred_time,
-    				team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
+                    team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
 VALUES
     ('user1@example.com', '$2b$12$XLxwreDeCJ05HT6Dfgoi2eT0LypkvILlxflUAM7UbGXg4Nx9vwnNO', NULL, NULL, 'Member1', 'USER', 1, 'WEEKEND_MORNING', 1, 35.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password1
     ('user2@example.com', '$2b$12$q6pH.HBpAqY3OWdtbErQ8.DenIlABy470AbWWtRQEXJLTTASFXA7O', NULL, NULL, 'Member2', 'USER', 2, 'WEEKEND_AFTERNOON', 2, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password2
