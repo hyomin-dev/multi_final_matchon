@@ -100,9 +100,9 @@ public class NotificationService {
         String senderName = sender.getMemberName();
 
         for (Member admin : admins) {
-            sendNotification(admin, content, url);
+            sendNotificationWithoutMail(admin, content, url);
 
-            // 메일 알림
+            // 메일 전송
             if (Boolean.TRUE.equals(admin.getEmailAgreement())) {
                 mailService.sendAdminNotificationEmail(
                         admin.getMemberEmail(),
@@ -111,6 +111,26 @@ public class NotificationService {
                 );
             }
         }
+    }
+
+    private void sendNotificationWithoutMail(Member receiver, String message, String targetUrl) {
+        Notification notification = Notification.builder()
+                .receivedMember(receiver)
+                .notificationMessage(message)
+                .targetUrl(targetUrl)
+                .isRead(false)
+                .build();
+        notificationRepository.save(notification);
+
+        ResNotificationDto dto = ResNotificationDto.builder()
+                .notificationId(notification.getId())
+                .notificationMessage(notification.getNotificationMessage())
+                .createdDate(notification.getCreatedDate())
+                .build();
+
+        messageTemplate.convertAndSendToUser(
+                receiver.getMemberEmail(), "/notify", dto
+        );
     }
 
     /*
