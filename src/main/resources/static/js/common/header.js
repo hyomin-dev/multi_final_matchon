@@ -323,30 +323,29 @@ async function getUnreadNoti(){
 
 
 
-function setUnreadNoti(notifications){
-    console.log(notifications);
-
-    if(notifications.length===0){
-        const miniDrawer = document.getElementById('miniDrawer');
-
-        const wrapper = document.createElement("div");
-        const msg = document.createElement("span");
-
-        wrapper.classList.add("notification");
-        msg.textContent = "읽지 않은 알림이 없습니다.";
-
-        wrapper.appendChild(msg);
-        miniDrawer.appendChild(wrapper);
-        return;
-    }
-
-    notifications.forEach(noti =>{
-
-        createNotiStructure(noti.notificationId, noti.notificationMessage, noti.createdDate);
-
-
-    });
-}
+// function setUnreadNoti(notifications){
+//     console.log(notifications);
+//
+//     if(notifications.length===0){
+//         const miniDrawer = document.getElementById('miniDrawer');
+//
+//         const wrapper = document.createElement("div");
+//         const msg = document.createElement("span");
+//
+//         wrapper.classList.add("notification");
+//         msg.textContent = "읽지 않은 알림이 없습니다.";
+//
+//         wrapper.appendChild(msg);
+//         miniDrawer.appendChild(wrapper);
+//         return;
+//     }
+//
+//     notifications.forEach(noti =>{
+//
+//         createNotiStructure(noti.notificationId, noti.notificationMessage, noti.createdDate);
+//
+//     });
+// }
 
 function formatDate(dateStr) {
     const date = new Date(dateStr);
@@ -429,7 +428,7 @@ function addEmptyNotification() {
     const header = document.querySelector(".mini-drawer-header");
     const wrapper = document.createElement("div");
     wrapper.classList.add("notification");
-    wrapper.innerHTML = "<span>읽지 않은 알림이 없습니다.</span>";
+    wrapper.innerHTML = "<span>새로운 알림이 없습니다.</span>";
     miniDrawer.insertBefore(wrapper, header.nextSibling);
 }
 
@@ -470,15 +469,15 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
     badge.innerText = parseInt(badge.innerText || '0') + 1;
     badge.style.display = 'inline-block';
 
-    msg.addEventListener("click", async () => {
+    wrapper.addEventListener("click", async () => {
         const res = await fetch(`/notification/update/unread?notificationId=${notificationId}`, {
             method: "GET",
             credentials: "include"
         });
         const data = await res.json();
 
-        wrapper.classList.add("read");
-        msg.style.pointerEvents = "none";
+        wrapper.classList.add("clicked");
+        wrapper.style.pointerEvents = "none";
         msg.style.opacity = "0.6";
 
         if (data?.data?.trim()) {

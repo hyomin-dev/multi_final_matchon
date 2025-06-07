@@ -5,6 +5,9 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
+
+    const storedRedirectUrl = localStorage.getItem("loginRedirectUrl") || "/main";
+
     fetch("/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -27,7 +30,10 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
             }
 
             alert("로그인 성공!");
-            window.location.href = "/main";
+            setTimeout(() => {
+                window.location.href = storedRedirectUrl;
+                localStorage.removeItem("loginRedirectUrl");
+            }, 300);
 
         })
         .catch(err => {

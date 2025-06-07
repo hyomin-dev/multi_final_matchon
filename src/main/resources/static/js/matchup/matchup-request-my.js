@@ -75,9 +75,9 @@ function renderList(items){
 
     if(items.length ===0){
         boardArea.innerHTML = `
-            <div class="no-result">
-                요청한 글이 없습니다.
-            </div>
+            <tr>
+                <td colspan="9" class="no-result"> 현재 참가 요청 내역이 없습니다.</td>
+            </tr>           
         `;
         return;
     }
@@ -85,35 +85,26 @@ function renderList(items){
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
 
-        const card = document.createElement("div");
+        const card = document.createElement("tr");
         card.className = "matchup-card";
         card.innerHTML = `                                             
-             <div class="card-3col">
-                  <!-- 1. 버튼 영역 -->
-                  <div class="button-group-vertical">
-                    <a href="/matchup/board/detail?matchup-board-id=${item.boardId}" class="board-button">게시글 상세보기</a>
-                    <a href="/matchup/request/detail?request-id=${item.requestId}" class="request-button">요청 상세보기</a>
-                    <a href="#" class="group-chat disabled"> 단체 채팅 </a>
-                  </div>
-
-                  <!-- 2. 경기 정보 영역 -->
-                  <div class="match-info">
-                    <div><strong>종목:</strong> ${item.sportsTypeName}</div>
-                    <div class="truncate"><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                    <div class="truncate">경기장 주소: ${item.sportsFacilityAddress}</div>
-                    <div>📅 날짜: ${date.getMonth()+1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - ${calTime(item,date.getHours(), date.getMinutes())}</div>
-                    <div><strong>경기 상태:</strong> ${checkMatchStatus(item)}</div>
-                  </div>
-
-                  <!-- 3. 요청 상태 영역 -->
-                  <div class="request-info">
-                    <div><strong>현재 정원:</strong> (${item.currentParticipantCount} / ${item.maxParticipants})</div>
-                    <div><strong>신청 인원:</strong> ${item.participantCount}</div>
-                    <div><strong>요청 상태:</strong> ${manageRequestInfo(item)}</div>
-                    <div><strong>참가 요청 횟수:</strong> ${item.matchupRequestSubmittedCount}</div>
-                    <div><strong>취소 횟수:</strong> ${item.matchupCancelSubmittedCount}</div>
-                  </div>
-            </div>
+                <td>${setSportsType(item.sportsTypeName)}</td>
+                <td class="truncate">${item.sportsFacilityAddress}</td>
+                <td>📅 ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
+                                ${calTime(item, date.getHours(), date.getMinutes())}</td>
+                <td>${checkMatchStatus(item)}</td>
+                <td>( ${item.currentParticipantCount} / ${item.maxParticipants} )</td>
+                <td>${item.participantCount}</td>
+                <td>${manageRequestInfo(item)}</td>
+                <td>
+                    요청: ${item.matchupRequestSubmittedCount} <br/>
+                    취소: ${item.matchupCancelSubmittedCount}
+                </td>                
+                <td>
+                    <button onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'" class="board-detail button-group"> 게시글</button><br/>
+                    <button onclick="location.href='/matchup/request/detail?request-id=${item.requestId}'" class="request-detail button-group">참가요청</button>
+                </td>               
+                <td><button class="group-chat disabled button-group">단체 채팅</button></td>
                 `;
         boardArea.appendChild(card);
         setGroupChatButton(card, item);
@@ -164,7 +155,8 @@ function renderPagination(pageInfo, sportsType, dateFilter, availableFilter){
         const btn = document.createElement("button");
         btn.textContent = i;
         if( i=== curPage)
-            btn.disabled = true;
+            //btn.disabled = true;
+            btn.classList.add("active");
 
         btn.addEventListener("click",()=>{
             loadItems(i,sportsType, dateFilter, availableFilter);
@@ -223,10 +215,16 @@ function calTime(item, startHour, startMinute){
 }
 
 function checkMatchStatus(item){
+
     const matchDate = new Date(item.matchDatetime);
     const now = new Date();
-    if(matchDate<now)
-        return "경기 종료"
+    const durationParts = item.matchDuration.split(":");
+    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+
+    if(matchDate <now && now <= matchEnd)
+        return "경기 진행";
+    else if(matchEnd<now)
+        return "경기 종료";
     else
         return "경기 시작전"
 }
@@ -330,7 +328,8 @@ function setGroupChatButton(card, item){
         (item.matchupStatus===Status.CANCELREQUESTED && item.matchupRequestSubmittedCount === 1 && item.matchupCancelSubmittedCount===1 && item.isDeleted===true)
 
     ){
-        groupChatBtn.href = "#";
+        groupChatBtn.classList.add("disabled");
+
     }else if(
         // 3. 참가 요청 승인
         (item.matchupStatus===Status.APPROVED && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount===0 && item.isDeleted===false)||
@@ -355,26 +354,39 @@ function setGroupChatButton(card, item){
 
     ){
         // groupChatBtn.href=`/chat/group/room?roomId=${item.roomId}`;
-        groupChatBtn.href = `/chat/group/room?roomId=${item.roomId}`;
-        groupChatBtn.target = "_blank";
+        // groupChatBtn.href = `/chat/group/room?roomId=${item.roomId}`;
+        // groupChatBtn.target = "_blank";
+        // groupChatBtn.classList.remove("disabled");
+
         groupChatBtn.classList.remove("disabled");
+        groupChatBtn.addEventListener("click",()=>{
+            window.open(`/chat/group/room?roomId=${item.roomId}`,"_blank");
+        })
+
+
     }else{
-        groupChatBtn.href = "#";
+        groupChatBtn.classList.add("disabled");
     }
 
+}
 
+function setSportsType(sportsTypeName){
+    if(sportsTypeName ==="SOCCER"){
+        return `
+                <span style="color: #1abc9c;">SOCCER</span>
+                `
+    }else{
+        return `
+                <span style="color: #e67e22;">FUTSAL</span>
+                `
+    }
+}
 
+function goBack() {
 
-
-
-
-
-
-
-
-
-
-
-
-
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board"; // fallback URL
+    }
 }

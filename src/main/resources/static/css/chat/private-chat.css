@@ -37,19 +37,52 @@ h1 {
     border: 1px solid #ddd;
     padding: 10px;
     margin-bottom: 10px;
+
+    /* 추가: 메시지를 세로로 정렬 */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 메시지 간 간격 */
 }
 
 .chat-message {
     margin-bottom: 10px;
+    max-width: 70%;
+    display: block;
+    padding: 10px;
+    border-radius: 10px;
+    word-wrap: break-word;
+    position: relative;
 }
 
 .sent {
-    text-align: right;
+    text-align: left;
+    background-color: #25fd00; /* 보낸 메시지 배경 */
+    align-self: flex-end;
+    margin-left: auto;
 }
 
 .received {
     text-align: left;
+    background-color: #cbcbcb; /* 받은 메시지 배경 */
+    border: 1px solid #ddd;
+    align-self: flex-start;
+    margin-right: auto;
 }
+
+.chat-message strong {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.chat-timestamp {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 5px;
+    text-align: right;
+}
+
 
 #messageInput {
     width: 100%;

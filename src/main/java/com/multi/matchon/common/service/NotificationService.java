@@ -9,6 +9,7 @@ import com.multi.matchon.common.exception.custom.ApiCustomException;
 import com.multi.matchon.common.repository.NotificationRepository;
 
 import com.multi.matchon.member.domain.Member;
+import com.multi.matchon.member.domain.MemberRole;
 import com.multi.matchon.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-
+    private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messageTemplate;
     private final MailService mailService;
 
@@ -60,6 +61,7 @@ public class NotificationService {
     /*
      * 알림 전송 (저장 + 실시간 + 메일)
      */
+    @Transactional
     public void sendNotification(Member receiver, String message, String targetUrl) {
         // 1. DB 저장
         Notification notification = Notification.builder()
@@ -78,7 +80,7 @@ public class NotificationService {
                 .build();
 
         messageTemplate.convertAndSendToUser(
-                receiver.getMemberEmail(), "/queue/notifications", dto
+                receiver.getMemberEmail(), "/notify", dto
         );
 
         // 3. 이메일 수신 동의 시에만 전송
@@ -90,6 +92,48 @@ public class NotificationService {
             );
         }
     }
+
+    // 관리자용 알림
+    @Transactional
+    public void notifyAdmins(String content, String url, Member sender) {
+        List<Member> admins = memberRepository.findByMemberRoleAndIsDeletedFalse(MemberRole.ADMIN);
+        String senderName = sender.getMemberName();
+
+        for (Member admin : admins) {
+            sendNotificationWithoutMail(admin, content, url);
+
+            // 메일 전송
+            if (Boolean.TRUE.equals(admin.getEmailAgreement())) {
+                mailService.sendAdminNotificationEmail(
+                        admin.getMemberEmail(),
+                        content,
+                        mailService.buildAdminNotificationBody(senderName, content, url)
+                );
+            }
+        }
+    }
+
+
+    private void sendNotificationWithoutMail(Member receiver, String message, String targetUrl) {
+        Notification notification = Notification.builder()
+                .receivedMember(receiver)
+                .notificationMessage(message)
+                .targetUrl(targetUrl)
+                .isRead(false)
+                .build();
+        notificationRepository.save(notification);
+
+        ResNotificationDto dto = ResNotificationDto.builder()
+                .notificationId(notification.getId())
+                .notificationMessage(notification.getNotificationMessage())
+                .createdDate(notification.getCreatedDate())
+                .build();
+
+        messageTemplate.convertAndSendToUser(
+                receiver.getMemberEmail(), "/notify", dto
+        );
+    }
+
 
     /*
      * 이메일 본문 생성

@@ -175,12 +175,13 @@ public class AdminController {
 
         eventRepository.updateEventStatus(id, status);
 
-        // 승인된 경우에만 알림 전송
-        if (status == Status.APPROVED) {
+        // 승인 or 반려 시 알림 전송
+        if (status == Status.APPROVED || status == Status.DENIED) {
+            String message = (status == Status.APPROVED) ? "대회가 승인되었습니다." : "대회가 반려되었습니다.";
             notificationService.sendNotification(
-                    event.getMember(), // 등록한 사용자
-                    "대회가 승인되었습니다.",
-                    "/host/event/" + event.getId()
+                    event.getMember(),
+                    message,
+                    "/event/" + event.getId()
             );
         }
         return "redirect:/admin/event";

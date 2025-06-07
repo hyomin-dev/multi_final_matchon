@@ -44,10 +44,8 @@ public class MatchupBoardController {
 
     @PostMapping("/register")
     public String registerMatchupBoard(@Valid @ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
-        //log.info("{}", reqMatchupBoardDto);
         matchupBoardService.registerMatchupBoard(reqMatchupBoardDto, user);
-
-        log.info("matchup 게시글 등록 완료");
+        log.info("Matchup 게시글 등록 완료");
         return "redirect:/matchup/board";
     }
 
@@ -66,11 +64,7 @@ public class MatchupBoardController {
 
     @GetMapping
     public ModelAndView showMatchupBoardPage(ModelAndView mv){
-        //PageRequest pageRequest = PageRequest.of(0,4);
-        //PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest);
         mv.setViewName("matchup/matchup-board-list");
-        //mv.addObject("pageResponseDto",pageResponseDto);
-        messageTemplate.convertAndSendToUser("hyomin@1234.com","/notify","test1이 보냄");
         return mv;
     }
 

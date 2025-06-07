@@ -1,30 +1,101 @@
 
-/* 제목 */
-h1 {
+/*제목*/
+.page-title {
     text-align: center;
-    margin-bottom: 2rem;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #2c3e50;
 }
 
-/* 정보 테이블 */
-table {
+/* ===== 공통 레이아웃 ===== */
+.form-container {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid beige;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* ===== 폼 그룹 ===== */
+.form-group {
+    margin-bottom: 2px;
+}
+
+.readonly-box,
+input,
+textarea,
+select {
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 2rem;
+    padding: 12px 14px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    background-color: #fafafa;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-th, td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #3498db;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+    outline: none;
 }
 
-th {
-    background-color: #f9f9f9;
-    font-weight: bold;
-    width: 25%;
+.readonly-box {
+    white-space: pre-wrap; /* 줄바꿈 및 공백 유지 */
+    min-height: 100px;
+}
+.readonly-box.clickable{
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+}
+.readonly-box.clickable:hover {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); /* 연하게 */
+    background-color: #fff;
+    outline: none;
 }
 
-/* 지도 */
+.button-group{
+    display: flex;
+    justify-content: center;
+
+}
+.button-group .btn {
+    display: inline-block;
+    padding: 10px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    background-color: dodgerblue;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.button-group .btn:hover {
+    background-color: royalblue;
+}
+
+/* 지도 스타일 */
 #map {
     width: 100%;
     height: 350px;
@@ -33,85 +104,134 @@ th {
     margin-top: 0.5rem;
 }
 
-/* 폼 입력 영역 */
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+.disabled {
+    background-color: #555 !important;  /* 더 진한 회색 */
+    color: #ddd !important;
+    pointer-events: none;          /* 클릭 안 되게 */
+    cursor: not-allowed;           /* 마우스 모양 변경 */
+    opacity: 0.7;                  /* 살짝 흐리게 */
+    text-decoration: none;
 }
 
-/* 각 label 영역 */
-label {
-    display: flex;
-    flex-direction: column;
-    font-weight: bold;
+.truncate {
+    width: 900px;           /* 너비 고정 */
+    white-space: pre-wrap;    /* 줄바꿈과 공백 유지 + 자동 줄바꿈 */
+    word-break: break-word;   /* 단어 중간이라도 줄바꿈 */
 }
 
-/* input, select */
-input[type="text"],
-select {
-    margin-top: 0.5rem;
-    padding: 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-    width: 100%;
+.truncateMap{
+    width: 150px;           /* 너비 고정 */
+    white-space: pre-wrap;    /* 줄바꿈과 공백 유지 + 자동 줄바꿈 */
+    word-break: break-word;   /* 단어 중간이라도 줄바꿈 */
 }
 
-/* select size */
-select[size] {
-    height: auto;
-}
+/*!* 정보 테이블 *!*/
+/*table {*/
+/*    width: 100%;*/
+/*    border-collapse: collapse;*/
+/*    margin-bottom: 2rem;*/
+/*}*/
 
-/* 각각 버튼 역할별 스타일 */
-.modify-btn {
-    background-color: #007a00;
-    color: white;
-    padding: 10px 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
+/*th, td {*/
+/*    padding: 0.75rem 1rem;*/
+/*    border-bottom: 1px solid #ddd;*/
+/*    text-align: left;*/
+/*}*/
 
-.delete-btn {
-    background-color: #888;
-    color: white;
-    padding: 10px 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
+/*th {*/
+/*    background-color: #f9f9f9;*/
+/*    font-weight: bold;*/
+/*    width: 25%;*/
+/*}*/
 
-/* hover 효과 공통 */
-.modify-btn:hover,
-.delete-btn:hover {
-    opacity: 0.9;
-}
+/*!* 지도 *!*/
+/*#map {*/
+/*    width: 100%;*/
+/*    height: 350px;*/
+/*    border: 1px solid #ccc;*/
+/*    border-radius: 6px;*/
+/*    margin-top: 0.5rem;*/
+/*}*/
 
-/* 버튼을 가로로 나란히 */
-.button-row {
-    display: flex;
-    gap: 1rem;
+/*!* 폼 입력 영역 *!*/
+/*form {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    gap: 1.5rem;*/
+/*}*/
 
-    margin: 0 auto;
-}
+/*!* 각 label 영역 *!*/
+/*label {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    font-weight: bold;*/
+/*}*/
 
-textarea {
-    width: 100%;
-    height: 6rem;
-    padding: 0.5rem;
-    resize: vertical; /* 또는 none/fixed 등 */
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
+/*!* input, select *!*/
+/*input[type="text"],*/
+/*select {*/
+/*    margin-top: 0.5rem;*/
+/*    padding: 0.6rem;*/
+/*    border: 1px solid #ccc;*/
+/*    border-radius: 6px;*/
+/*    font-size: 1rem;*/
+/*    width: 100%;*/
+/*}*/
 
-td {
-    word-break: break-all;    /* 글자 단위 줄바꿈 (한글/영어 모두 적용) */
-    white-space: normal;
-}
+/*!* select size *!*/
+/*select[size] {*/
+/*    height: auto;*/
+/*}*/
+
+/*!* 각각 버튼 역할별 스타일 *!*/
+/*.modify-btn {*/
+/*    background-color: #007a00;*/
+/*    color: white;*/
+/*    padding: 10px 16px;*/
+/*    font-weight: bold;*/
+/*    border: none;*/
+/*    border-radius: 6px;*/
+/*    cursor: pointer;*/
+/*}*/
+
+/*.delete-btn {*/
+/*    background-color: #888;*/
+/*    color: white;*/
+/*    padding: 10px 16px;*/
+/*    font-weight: bold;*/
+/*    border: none;*/
+/*    border-radius: 6px;*/
+/*    cursor: pointer;*/
+/*}*/
+
+/*!* hover 효과 공통 *!*/
+/*.modify-btn:hover,*/
+/*.delete-btn:hover {*/
+/*    opacity: 0.9;*/
+/*}*/
+
+/*!* 버튼을 가로로 나란히 *!*/
+/*.button-row {*/
+/*    display: flex;*/
+/*    gap: 1rem;*/
+
+/*    margin: 0 auto;*/
+/*}*/
+
+/*textarea {*/
+/*    width: 100%;*/
+/*    height: 6rem;*/
+/*    padding: 0.5rem;*/
+/*    resize: vertical; !* 또는 none/fixed 등 *!*/
+/*    font-size: 1rem;*/
+/*    border-radius: 6px;*/
+/*    border: 1px solid #ccc;*/
+/*}*/
+
+/*td {*/
+/*    word-break: break-all;    !* 글자 단위 줄바꿈 (한글/영어 모두 적용) *!*/
+/*    white-space: normal;*/
+/*}*/
 
 
 
