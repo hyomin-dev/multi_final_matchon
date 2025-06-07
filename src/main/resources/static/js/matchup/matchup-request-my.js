@@ -51,22 +51,30 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
 
 async function loadItems(page, sportsType='', dateFilter='', availableFilter=false){
-    const response = await fetch(`/matchup/request/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}&availableFilter=${availableFilter}`,{
+    let items = [];
+    let pageInfo = {
+        page: 0,
+        totalPages: 1
+    };
+    try{
+        const response = await fetch(`/matchup/request/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}&availableFilter=${availableFilter}`,{
 
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data);
-    const items = data.data.items;
-    const pageInfo = data.data.pageInfo;
-    //console.log(pageInfo);
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data);
+        items = data.data.items;
+        pageInfo = data.data.pageInfo;
+        //console.log(pageInfo);
+    }catch (err){
+        console.error(err);
+    }
 
     renderList(items);
     renderPagination(pageInfo,sportsType, dateFilter, availableFilter);
-
 
 }
 function renderList(items){
@@ -76,7 +84,7 @@ function renderList(items){
     if(items.length ===0){
         boardArea.innerHTML = `
             <tr>
-                <td colspan="9" class="no-result"> 현재 참가 요청 내역이 없습니다.</td>
+                <td colspan="10" class="no-result"> 현재 참가 요청 내역이 없습니다.</td>
             </tr>           
         `;
         return;
@@ -107,6 +115,7 @@ function renderList(items){
                 <td><button class="group-chat disabled button-group">단체 채팅</button></td>
                 `;
         boardArea.appendChild(card);
+        markIfPastMatchdatetime(card, item);
         setGroupChatButton(card, item);
 
     })
@@ -380,6 +389,19 @@ function setSportsType(sportsTypeName){
                 <span style="color: #e67e22;">FUTSAL</span>
                 `
     }
+}
+
+/*경기 시작 시간이 지났다면 회색으로 표현*/
+function markIfPastMatchdatetime(card, item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+    if(matchDate<now){
+        const tds = card.querySelectorAll("td");
+        tds.forEach(td =>{
+            td.style.backgroundColor = "lightgray";
+        })
+    }
+
 }
 
 function goBack() {
