@@ -35,6 +35,12 @@ spring:
           auth: true
           starttls:
             enable: true
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: false
+
 
 app:
   domain-url: http://localhost:8090

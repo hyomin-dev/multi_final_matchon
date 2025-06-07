@@ -46,25 +46,39 @@ async function loadItems(page){
 
 }
 function renderList(items){
-    const boardArea = document.querySelector("#request-container");
-    boardArea.innerHTML = '';
+    const requestArea = document.querySelector("#request-container");
+    requestArea.innerHTML = '';
+
+    if(items.length ===0){
+        requestArea.innerHTML = `
+            <tr>
+                <td colspan="6" class="no-result"> 현재 참가 요청이 없습니다.</td>
+            </tr>           
+        `;
+        return;
+    }
 
     items.forEach(item=>{
-        const card = document.createElement("div");
+        const card = document.createElement("tr");
         card.className = "matchup-card";
         card.innerHTML = `
-            <div class="card-content">
-                <div class="left-info">
-                    <div><strong><a href="/matchup/request/detail?request-id=${item.requestId}">상세보기</a></strong></div>
-                    <div><strong>신청자: ${item.applicantName}</strong></div>
-                    <div><strong>신청 인원: ${item.participantCount}</strong></div>
-                    <div><strong>요청 횟수: ${item.matchupRequestSubmittedCount}</strong></div>
-                    <div><strong>승인 취소 요청 횟수 : ${item.matchupCancelSubmittedCount}</strong></div>
-                    <div><strong>상태: ${manageRequestInfo(item)}</strong></div>
-                </div>               
-            </div>       
-                `;
-        boardArea.appendChild(card);
+                        <td class="truncate">${item.applicantName}</td>
+                        <td class="truncate">${item.selfIntro}</td>
+                        <td>${item.participantCount}</td>
+                        <td>${manageRequestInfo(item)}</td>
+                        <td>
+                            요청: ${item.matchupRequestSubmittedCount} <br/>
+                            취소: ${item.matchupCancelSubmittedCount}
+                        </td>
+                        <td class="button-group">
+                            <button id="approvedBtn">참가 요청 승인</button>
+                            <button id="deniedBtn">참가 요청 반려</button><br/>
+                            <button id="approveWithdrawRequestBtn">취소 요청 승인</button>
+                            <button id="denyWithdrawRequestBtn">취소 요청 반려</button>
+                        </td>
+                        `;
+        setDecision(card,item);
+        requestArea.appendChild(card);
 
     })
 }
@@ -112,7 +126,8 @@ function renderPagination(pageInfo){
         const btn = document.createElement("button");
         btn.textContent = i;
         if( i=== curPage)
-            btn.disabled = true;
+            //btn.disabled = true;
+            btn.classList.add("active");
 
         btn.addEventListener("click",()=>{
             loadItems(i);
@@ -275,8 +290,144 @@ function manageRequestInfo(item){
         return "서버 오류";
     }
 
-
-
-
-
 }
+
+function setDecision(card,item){
+    //matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime, boardId, requestId, currentParticipantCount, maxParticipants, participantCount
+
+
+    const approvedBtn = card.querySelector("#approvedBtn");
+    const deniedBtn = card.querySelector("#deniedBtn");
+    const approveWithdrawRequestBtn = card.querySelector("#approveWithdrawRequestBtn");
+    const denyWithdrawRequestBtn = card.querySelector("#denyWithdrawRequestBtn");
+
+    // 클릭 시 체크 날짜, 인원수 --> DB에서도 체크해야됨
+    const matchDate = new Date(item.matchDatetime);
+    let now = new Date();
+
+    approvedBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 승인을 할 수 없습니다.");
+        }else{
+            window.location.href = `/matchup/request/approve?board-id=${item.boardId}&request-id=${item.requestId}`;
+        }
+    });
+
+    deniedBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 반려를 할 수 없습니다.");
+        }else{
+            window.location.href = `/matchup/request/deny?board-id=${item.boardId}&request-id=${item.requestId}`;
+        }
+    })
+
+    approveWithdrawRequestBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 취소 요청 승인을 할 수 없습니다.");
+        }else{
+            window.location.href = `/matchup/request/approve?board-id=${item.boardId}&request-id=${item.requestId}`;
+        }
+    })
+
+    denyWithdrawRequestBtn.addEventListener("click",(e)=>{
+        now = new Date();
+        if(matchDate<now){
+            e.preventDefault();
+            e.target.href = "#";
+            e.target.classList.add("disabled");
+            alert("경기 시작 시간이 지나 취소 요청 반려를 할 수 없습니다.");
+        }else{
+            window.location.href = `/matchup/request/deny?board-id=${item.boardId}&request-id=${item.requestId}`;
+        }
+    })
+
+    // 참가 요청에 대한 승인/반려
+    if(
+        (item.matchupStatus===Status.PENDING && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount ===0 && item.isDeleted===false)||
+        (item.matchupStatus===Status.PENDING && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount ===0 && item.isDeleted===false)
+    ){
+        // approvedBtn.href = `/matchup/request/approve?request-id=${requestId}&board-id=${boardId}`;
+        // deniedBtn.href = `/matchup/request/deny?request-id=${requestId}&board-id=${boardId}`;
+
+        // 참가 승인 가능
+
+        // 참가 반려 가능
+
+        //취소 승인 불가능
+        approveWithdrawRequestBtn.classList.add("disabled");
+        //approveWithdrawRequestBtn.href = "#";
+
+        //취소 반려 불가능
+
+        denyWithdrawRequestBtn.classList.add("disabled");
+        //denyWithdrawRequestBtn.href = "#";
+
+    }
+    //승인 취소 요청에 대한 승인/반려
+    else if(
+        (item.matchupStatus===Status.CANCELREQUESTED && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount ===1 && item.isDeleted===false) ||
+        (item.matchupStatus===Status.CANCELREQUESTED && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount ===1 && item.isDeleted===false)
+    ){
+        // approvedBtn.href = `/matchup/request/approve?request-id=${requestId}&board-id=${boardId}`;
+        // deniedBtn.href = `/matchup/request/deny?request-id=${requestId}&board-id=${boardId}`;
+
+        // 참가 승인 불가능
+        approvedBtn.classList.add("disabled");
+        //approvedBtn.href = "#";
+
+        // 참가 반려 불가능
+        deniedBtn.classList.add("disabled");
+        //deniedBtn.href = "#";
+
+        //취소 승인 가능
+
+        //취소 반려 가능
+
+    }else{
+        // 예측하지 못한 오류 발생한 경우
+
+        // 참가 승인 불가능
+        approvedBtn.classList.add("disabled");
+        //approvedBtn.href = "#";
+
+        // 참가 반려 불가능
+        deniedBtn.classList.add("disabled");
+        //deniedBtn.href = "#";
+
+        //취소 승인 불가능
+        approveWithdrawRequestBtn.classList.add("disabled");
+        //approveWithdrawRequestBtn.href = "#";
+
+        //취소 반려 불가능
+        denyWithdrawRequestBtn.classList.add("disabled");
+        //denyWithdrawRequestBtn.href = "#";
+    }
+
+    // 마지막에 인원수 체크, 승인 버튼 없애기
+    if(item.currentParticipantCount+item.participantCount>item.maxParticipants){
+
+        // 참가 승인 불가능
+        approvedBtn.classList.add("disabled");
+        //approvedBtn.href = "#";
+
+        // 참가 반려 불가능
+
+        // 취소 승인 가능
+
+        // 취소 반려 가능
+
+    }
+}
+
