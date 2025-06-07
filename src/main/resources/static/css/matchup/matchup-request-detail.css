@@ -82,7 +82,6 @@ form label {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
     outline: none;
 }
-
 .readonly-box {
     white-space: pre-wrap; /* 줄바꿈 및 공백 유지 */
     min-height: 100px;

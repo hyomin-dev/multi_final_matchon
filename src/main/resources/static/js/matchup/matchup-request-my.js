@@ -391,6 +391,7 @@ function setSportsType(sportsTypeName){
     }
 }
 
+
 /*경기 시작 시간이 지났다면 회색으로 표현*/
 function markIfPastMatchdatetime(card, item){
     const matchDate = new Date(item.matchDatetime);
@@ -401,7 +402,6 @@ function markIfPastMatchdatetime(card, item){
             td.style.backgroundColor = "lightgray";
         })
     }
-
 }
 
 function goBack() {

@@ -20,4 +20,11 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             """)
     Boolean isGroupChat(@Param("roomId")Long roomId);
 
+    @Query("""
+    SELECT t.chatRoom FROM Team t
+    WHERE t.id = :teamId AND t.chatRoom.isGroupChat = true
+""")
+    Optional<ChatRoom> findTeamGroupChatRoom(@Param("teamId") Long teamId);
+
+
 }

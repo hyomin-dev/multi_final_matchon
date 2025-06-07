@@ -301,7 +301,6 @@ function manageRequestInfo(item){
     }else{
         return "서버 오류";
     }
-
 }
 
 function setDecision(card,item){

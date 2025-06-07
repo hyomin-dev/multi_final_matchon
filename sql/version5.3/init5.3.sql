@@ -18,19 +18,6 @@ VALUES
     ('BOARD', 9, 1, 'file9.png', 'file9_saved.png', '/uploads/2025/05/', '/uploads/2025/05/thumb/file9_saved.png', '2025-05-17 20:52:28', 'System', '2025-05-17 20:52:28', 'System', FALSE),
     ('BOARD', 10, 1, 'file10.png', 'file10_saved.png', '/uploads/2025/05/', '/uploads/2025/05/thumb/file10_saved.png', '2025-05-17 20:52:28', 'System', '2025-05-17 20:52:28', 'System', FALSE);
 
-INSERT INTO chat_room (is_group_chat, chat_room_name, created_date, created_person, modified_date,
-                       modified_person, is_deleted)
-VALUES
-    (TRUE, 'Chat Room 1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', 'Member1', FALSE),
-    (FALSE, 'Chat Room 2', '2025-05-17 20:52:28', 'Member2', '2025-05-17 20:52:28', 'Member2', FALSE),
-    (TRUE, 'Chat Room 3', '2025-05-17 20:52:28', 'Member3', '2025-05-17 20:52:28', 'Member3', FALSE),
-    (FALSE, 'Chat Room 4', '2025-05-17 20:52:28', 'Member4', '2025-05-17 20:52:28', 'Member4', FALSE),
-    (TRUE, 'Chat Room 5', '2025-05-17 20:52:28', 'Member5', '2025-05-17 20:52:28', 'Member5', FALSE),
-    (FALSE, 'Chat Room 6', '2025-05-17 20:52:28', 'Member6', '2025-05-17 20:52:28', 'Member6', FALSE),
-    (TRUE, 'Chat Room 7', '2025-05-17 20:52:28', 'Member7', '2025-05-17 20:52:28', 'Member7', FALSE),
-    (FALSE, 'Chat Room 8', '2025-05-17 20:52:28', 'Member8', '2025-05-17 20:52:28', 'Member8', FALSE),
-    (TRUE, 'Chat Room 9', '2025-05-17 20:52:28', 'Member9', '2025-05-17 20:52:28', 'Member9', FALSE),
-    (FALSE, 'Chat Room 10', '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28', 'Member10', FALSE);
 
 
 INSERT INTO positions (position_name)
@@ -50,26 +37,51 @@ VALUES
 INSERT INTO team (team_name, team_region, team_rating_average, recruitment_status, created_person,
                   created_date, modified_person, modified_date, team_introduction, team_attachment_enabled, is_deleted)
 VALUES
-    ('Team1', 'CAPITAL_REGION', 2.00, TRUE, 'User1', '2025-05-17 20:52:28', 'User1', '2025-05-17 20:52:28',
+    ('Team1', 'CAPITAL_REGION', 2.00, TRUE, 'user1@example.com', '2025-05-17 20:52:28', 'user1@example.com', '2025-05-17 20:52:28',
      'This is team 1''s introduction.', TRUE, FALSE),
-    ('Team2', 'YEONGNAM_REGION', 3.00, FALSE, 'User2', '2025-05-17 20:52:28', 'User2', '2025-05-17 20:52:28',
+    ('Team2', 'YEONGNAM_REGION', 3.00, FALSE, 'user2@example.com', '2025-05-17 20:52:28', 'user2@example.com', '2025-05-17 20:52:28',
      'This is team 2''s introduction.', TRUE, FALSE),
-    ('Team3', 'HONAM_REGION', 5.00, TRUE, 'User3', '2025-05-17 20:52:28', 'User3', '2025-05-17 20:52:28',
+    ('Team3', 'HONAM_REGION', 5.00, TRUE, 'user3@example.com', '2025-05-17 20:52:28', 'user3@example.com', '2025-05-17 20:52:28',
      'This is team 3''s introduction.', TRUE, FALSE),
-    ('Team4', 'CHUNGCHEONG_REGION', 1.00, FALSE, 'User4', '2025-05-17 20:52:28', 'User4', '2025-05-17 20:52:28',
+    ('Team4', 'CHUNGCHEONG_REGION', 1.00, FALSE, 'user4@example.com', '2025-05-17 20:52:28', 'user4@example.com', '2025-05-17 20:52:28',
      'This is team 4''s introduction.', TRUE, FALSE),
-    ('Team5', 'GANGWON_REGION', 3.00, TRUE, 'User5', '2025-05-17 20:52:28', 'User5', '2025-05-17 20:52:28',
+    ('Team5', 'GANGWON_REGION', 3.00, TRUE, 'user5@example.com', '2025-05-17 20:52:28', 'user5@example.com', '2025-05-17 20:52:28',
      'This is team 5''s introduction.', TRUE, FALSE),
-    ('Team6', 'JEJU', 4.00, FALSE, 'User6', '2025-05-17 20:52:28', 'User6', '2025-05-17 20:52:28',
+    ('Team6', 'JEJU', 4.00, FALSE, 'user6@example.com', '2025-05-17 20:52:28', 'user6@example.com', '2025-05-17 20:52:28',
      'This is team 6''s introduction.', TRUE, FALSE),
-    ('Team7', 'CAPITAL_REGION', 2.00, TRUE, 'User7', '2025-05-17 20:52:28', 'User7', '2025-05-17 20:52:28',
+    ('Team7', 'CAPITAL_REGION', 2.00, TRUE, 'user7@example.com', '2025-05-17 20:52:28', 'user7@example.com', '2025-05-17 20:52:28',
      'This is team 7''s introduction.', TRUE, FALSE),
-    ('Team8', 'YEONGNAM_REGION', 1.00, FALSE, 'User8', '2025-05-17 20:52:28', 'User8', '2025-05-17 20:52:28',
+    ('Team8', 'YEONGNAM_REGION', 1.00, FALSE, 'user8@example.com', '2025-05-17 20:52:28', 'user8@example.com', '2025-05-17 20:52:28',
      'This is team 8''s introduction.', TRUE, FALSE),
-    ('Team9', 'HONAM_REGION', 4.00, TRUE, 'User9', '2025-05-17 20:52:28', 'User9', '2025-05-17 20:52:28',
+    ('Team9', 'HONAM_REGION', 4.00, TRUE, 'user9@example.com', '2025-05-17 20:52:28', 'user9@example.com', '2025-05-17 20:52:28',
      'This is team 9''s introduction.', TRUE, FALSE),
-    ('Team10', 'CHUNGCHEONG_REGION', 3.00, FALSE, 'User10', '2025-05-17 20:52:28', 'User10',
+    ('Team10', 'CHUNGCHEONG_REGION', 3.00, FALSE, 'user10@example.com', '2025-05-17 20:52:28', 'user10@example.com',
      '2025-05-17 20:52:28', 'This is team 10''s introduction.', TRUE, FALSE);
+
+INSERT INTO chat_room (is_group_chat, chat_room_name, created_date, created_person,
+                       modified_date, modified_person, is_deleted, team_id)
+VALUES
+    (TRUE, 'Chat Room 1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', 'Member1', FALSE , null),
+    (FALSE, 'Chat Room 2', '2025-05-17 20:52:28', 'Member2', '2025-05-17 20:52:28', 'Member2', FALSE , null),
+    (TRUE, 'Chat Room 3', '2025-05-17 20:52:28', 'Member3', '2025-05-17 20:52:28', 'Member3', FALSE , null),
+    (FALSE, 'Chat Room 4', '2025-05-17 20:52:28', 'Member4', '2025-05-17 20:52:28', 'Member4', FALSE , null),
+    (TRUE, 'Chat Room 5', '2025-05-17 20:52:28', 'Member5', '2025-05-17 20:52:28', 'Member5', FALSE , null),
+    (FALSE, 'Chat Room 6', '2025-05-17 20:52:28', 'Member6', '2025-05-17 20:52:28', 'Member6', FALSE , null),
+    (TRUE, 'Chat Room 7', '2025-05-17 20:52:28', 'Member7', '2025-05-17 20:52:28', 'Member7', FALSE , null),
+    (FALSE, 'Chat Room 8', '2025-05-17 20:52:28', 'Member8', '2025-05-17 20:52:28', 'Member8', FALSE, null),
+    (TRUE, 'Chat Room 9', '2025-05-17 20:52:28', 'Member9', '2025-05-17 20:52:28', 'Member9', FALSE , null),
+    (FALSE, 'Chat Room 10', '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28', 'Member10', FALSE , null),
+    (TRUE, 'Team 1 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 1),
+    (TRUE, 'Team 2 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 2),
+    (TRUE, 'Team 3 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 3),
+    (TRUE, 'Team 4 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 4),
+    (TRUE, 'Team 5 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 5),
+    (TRUE, 'Team 6 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 6),
+    (TRUE, 'Team 7 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 7),
+    (TRUE, 'Team 8 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 8),
+    (TRUE, 'Team 9 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 9),
+    (TRUE, 'Team 10 Chat', '2025-06-05 10:00:00', 'System', '2025-06-05 10:00:00', 'System', FALSE, 10);
+
 
 INSERT INTO member (member_email, member_password, previous_password, temporary_password, member_name, member_role, position_id, preferred_time,
     				team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
@@ -84,7 +96,7 @@ VALUES
     ('user8@example.com', '$2b$12$O9catkQ.S.GJZad57FhhwupYTmC3GfmVeLcakmKtrePzGm.Need06', NULL, NULL, 'Member8', 'USER', 8, 'WEEKEND_AFTERNOON', 8, 36.1, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- password8
     ('user9@example.com', '$2b$12$fxng2YxGQJbkY4LdC9628uES33t3j4gcxU9RDstYjUs0zH3uuEiS2', NULL, NULL, 'Member9', 'USER', 9, 'WEEKEND_EVENING', 9, 35.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password9
     ('user10@example.com', '$2b$12$64F.CeDtWhfn/as6d9jTwu9dBjzolmChl9jWFfKYyfqcoAdYnz8Oy', NULL, NULL, 'Member10', 'USER', 10, 'WEEKDAY_MORNING', 10, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password10
-    ('matchon2025@gmail.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'admin', 'ADMIN', NULL, NULL, NULL, NULL, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE); -- Mathcon2025!!
+    ('matchon2025@gmail.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'admin', 'ADMIN', NULL, NULL, NULL, NULL, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE); -- Mathcon2025!!
 
 INSERT INTO refresh_token (member_id, refresh_token_data, refresh_token_expired_date, created_date)
 VALUES

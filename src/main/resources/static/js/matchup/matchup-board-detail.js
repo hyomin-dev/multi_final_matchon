@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded",()=>{
         setContent();
-
-
-
 })
 
 
@@ -55,16 +52,6 @@ async function setContent(){
     // const data2 = await response2.json();
     // console.log(data2);
 
-    // document.querySelector("#requestBtn").addEventListener("click",(e)=>{
-    //     if(myMannerTemperature<minMannerTemperature){
-    //         alert("현재 매너 온도가 입장 가능 매너 온도보다 낮아 참가 신청이 불가능합니다.")
-    //         e.preventDefault();
-    //     }else if(currentParticipantCount >=maxParticipants){
-    //         alert("현재 정원이 다 모집되어 참가 신청이 불가능합니다. 1대1 문의해보세요.")
-    //         e.preventDefault();
-    //     }
-    //
-    // })
 
 
 }
@@ -239,6 +226,15 @@ function goBack(){
         window.location.href = "/matchup/board";
     }
 }
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
+
 
 
 

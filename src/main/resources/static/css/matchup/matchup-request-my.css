@@ -1,3 +1,4 @@
+
 /*제목*/
 .page-title {
     text-align: center;
@@ -215,6 +216,7 @@ label[for="availableOnly"], label:has(#availableOnly) {
 .col-group-chat {width: 6%}
 
 
+
 /* ===== 페이징 ===== */
 #paging-container button {
     text-align: center;
@@ -289,5 +291,6 @@ label[for="availableOnly"], label:has(#availableOnly) {
 /*    pointer-events: none;*/
 /*    cursor: not-allowed;*/
 /*}*/
+
 
 

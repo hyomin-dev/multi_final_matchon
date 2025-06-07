@@ -98,4 +98,46 @@ public class MailService {
         </div>
         """.formatted(message, redirectUrl);
     }
+
+    public void sendAdminNotificationEmail(String toEmail, String subject, String htmlContent) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setSubject("[MatchOn 관리자 알림] " + subject);
+            helper.setText(htmlContent, true);
+
+            ClassPathResource logo = new ClassPathResource("static/img/matchon_logo.png");
+            helper.addInline("matchonLogo", logo);
+
+            mailSender.send(message);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("관리자 메일 전송 실패: " + e.getMessage());
+        }
+    }
+
+    public String buildAdminNotificationBody(String senderName, String message, String targetUrl) {
+        String redirectUrl = domainUrl + "/redirect?url=" + targetUrl;
+        return """
+    <div style="font-family: 'Noto Sans KR', sans-serif; color: #333;">
+        <img src='cid:matchonLogo' style='width: 120px; margin-bottom: 20px;' alt='MatchOn Logo'/>
+        <h2 style="color: #005bac;">[🔔 관리자 알림]</h2>
+        <p><strong>%s</strong>님의 활동에 대한 알림입니다:</p>
+
+        <div style="padding: 14px 20px; background-color: #f0f0f0; border-left: 4px solid #005bac; margin: 20px 0; font-size: 16px;">
+            <strong>%s</strong>
+        </div>
+
+        <p>관련 내용을 아래 버튼을 눌러 확인해 주세요.</p>
+        <p>
+            <a href="%s" style="display:inline-block; margin-top:10px; background-color:#005bac; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">🔍 바로 가기</a>
+        </p>
+
+        <hr style="margin-top: 30px;">
+        <p style="font-size: 13px; color: #888;">본 메일은 관리자에게 발송된 자동 알림입니다.</p>
+    </div>
+    """.formatted(senderName, message, redirectUrl);
+    }
 }

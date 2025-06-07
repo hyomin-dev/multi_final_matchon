@@ -1,6 +1,7 @@
 package com.multi.matchon.member.repository;
 
 import com.multi.matchon.member.domain.Member;
+import com.multi.matchon.member.domain.MemberRole;
 import com.multi.matchon.member.dto.res.ResTeamInfoDto;
 import com.multi.matchon.team.domain.Team;
 import jakarta.persistence.LockModeType;
@@ -56,4 +57,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByMemberEmailAndIsDeletedFalse(String senderEmail);
 
     List<Member> findAllByTeam(Team team);
+
+    List<Member> findByMemberRoleAndIsDeletedFalse(MemberRole role);
 }
