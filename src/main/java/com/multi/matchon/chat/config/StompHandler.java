@@ -74,6 +74,7 @@ public class StompHandler implements ChannelInterceptor {
 
             log.info("connect 토큰 검증 완료");
 
+            //return null;
 
         }else if(StompCommand.SUBSCRIBE == accessor.getCommand()){
 
@@ -103,6 +104,8 @@ public class StompHandler implements ChannelInterceptor {
 //                throw new CustomException("Chat 해당 채팅방에 참여자가 아닙니다.");
 //            }
 
+            //return null;
+
         }else if(StompCommand.SEND == accessor.getCommand()){
             log.info("SEND Stage");
 //            String destination = accessor.getDestination();
@@ -112,12 +115,20 @@ public class StompHandler implements ChannelInterceptor {
 //            if(3==3)
 //                throw new MessagingException("blockException"); // 프론트 측에 보낼 수 있다.
 
+              //return null;
+
         }else if(StompCommand.UNSUBSCRIBE == accessor.getCommand()){
             log.info("UNSUBSCRIBE Stage");
+            //return null;
+
         }else if(StompCommand.DISCONNECT == accessor.getCommand()){
             log.info("DISCONNECT Stage");
             authContext.remove();
+            //return null;
+
         }
+        //return null;
+
         return message;
     }
 }

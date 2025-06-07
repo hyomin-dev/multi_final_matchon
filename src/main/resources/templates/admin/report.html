@@ -30,35 +30,42 @@
     <tr th:each="report, stat : ${reports}">
         <td th:text="${(currentPage != null ? currentPage : 0) * 5 + stat.index + 1}">1</td>
         <td th:text="${report.reportType}">BOARD</td>
-        <td th:text="${report.targetWriterName}">Name</td>
+        <td th:text="${report.targetWriterName}" class="target-writer-name">Name</td>
         <td th:text="${report.reporterName}">홍길동</td>
         <td th:text="${report.reasonType}">욕설/비방</td>
         <td th:text="${report.reason}">사유</td>
         <td th:text="${#temporals.format(report.createdDate, 'yyyy-MM-dd HH:mm')}">날짜</td>
         <td>
-            <a th:if="${report.reportType == 'BOARD'}"
+            <span th:if="${!report.targetExists}">삭제됨</span>
+
+            <a th:if="${report.reportType == 'BOARD' and report.targetExists}"
                th:href="@{'/community/' + ${report.boardId}}" class="view-link">게시글</a>
-            <a th:if="${report.reportType == 'COMMENT'}"
+
+            <a th:if="${report.reportType == 'COMMENT' and report.targetExists}"
                th:href="@{'/community/' + ${report.boardId} + '?highlight=' + ${report.targetId}}"
                class="view-link">댓글</a>
         </td>
         <td>
             <div class="ban-controls" th:if="${!report.targetIsAdmin}">
-                <button type="button"
-                        th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 7)'"
-                        class="ban-btn"
-                        th:attr="data-member-id=${report.targetMemberId}">7일</button>
+                <!-- 정지 버튼들 → suspended == false일 때만 렌더링 -->
+                <th:block th:if="${!report.suspended}">
+                    <button type="button"
+                            th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 7)'"
+                            class="ban-btn"
+                            th:attr="data-member-id=${report.targetMemberId}">7일</button>
 
-                <button type="button"
-                        th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 30)'"
-                        class="ban-btn"
-                        th:attr="data-member-id=${report.targetMemberId}">30일</button>
+                    <button type="button"
+                            th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', 30)'"
+                            class="ban-btn"
+                            th:attr="data-member-id=${report.targetMemberId}">30일</button>
 
-                <button type="button"
-                        th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', null)'"
-                        class="ban-btn"
-                        th:attr="data-member-id=${report.targetMemberId}">영구</button>
+                    <button type="button"
+                            th:onclick="'suspendUser(event, ' + ${report.targetMemberId} + ', null)'"
+                            class="ban-btn"
+                            th:attr="data-member-id=${report.targetMemberId}">영구</button>
+                </th:block>
 
+                <!-- 해제 버튼 → suspended == true일 때만 렌더링 -->
                 <button type="button"
                         th:if="${report.suspended}"
                         th:onclick="'unsuspendUser(event, ' + ${report.targetMemberId} + ')'"
@@ -111,7 +118,8 @@
             .then(res => {
                 if (res.ok) {
                     alert("회원 정지가 완료되었습니다.");
-                    markAsSuspended(memberId);
+                    // 🔄 상태 동기화를 위해 새로고침
+                    location.reload();
                 } else {
                     res.json().then(data => {
                         alert(data.message || "정지 실패");

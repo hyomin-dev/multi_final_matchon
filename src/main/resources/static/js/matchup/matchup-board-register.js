@@ -1,22 +1,18 @@
 let myMannerTemperature;
 
 document.addEventListener("DOMContentLoaded",async ()=>{
-    //getSportsType(); // 종목 가져옴
     getTeam(); // 현재 사용자의 팀 정보를 가져옴
     setCurrentParticipant();
+    myMannerTemperature = await getMyMannerTemperature();
     setMannerTemperature();
 
-    const cancelBtn = document.querySelector(".cancel-btn");
     const form = document.querySelector("form");
     form.addEventListener("submit", (event)=>{
         submitCheck(event)
         }
     )
-    cancelBtn.addEventListener("click",()=>{
-        window.history.back();
-    })
 
-    myMannerTemperature = await getMyMannerTemperature();
+
 })
 
 function submitCheck(e){
@@ -99,7 +95,7 @@ function submitCheck(e){
         alert("경기 방식 소개를 입력하세요");
         e.preventDefault();
     } else{
-        alert("submit");
+        alert("글 작성이 완료되었습니다.");
     }
 }
 
@@ -114,8 +110,7 @@ async function getTeam(){
         credentials: "include"
     });
     if(!response.ok){
-        //throw new Error(`HTTP error! Status:${response.status}`)
-        //alert("MATCHUP 글 작성은 소속팀이 있어야 합니다.")
+
         let reply = confirm("Matchup 게시글에 글 작성을 하기 위해서는 소속팀이 있어야 합니다. 팀 등록을 하시겠습니까?");
         if(reply)
             window.location.href = "/team/team/register";
@@ -124,13 +119,12 @@ async function getTeam(){
     }
 
     const data = await response.json();
-    // if(data.data.trim()==='' || data.data===null){
-    //
-    // }
-    //team.value=data.data.teamName;
-    //console.log(data.data.teamName);
+
     teamName.value = data.data.teamName;
-    teamIntro.value = data.data.teamIntro;
+    if(data.data.teamIntro!=='')
+        teamIntro.value = data.data.teamIntro;
+    else
+        teamIntro.value = "팀 소개를 입력하세요";
 
 }
 
@@ -149,11 +143,9 @@ function getAddress() {
             } else { // 사용자가 지번 주소를 선택했을 경우(J)
                 addr = data.jibunAddress;
             }
-
             document.querySelector("#sportsFacilityAddress").value = addr;
             // 커서를 상세주소 필드로 이동한다.
             document.querySelector("#sportsFacilityAddress").focus();
-
         }
     }).open();
 }
@@ -187,16 +179,27 @@ function setMannerTemperature(){
 }
 
 async function getMyMannerTemperature(){
-    const response  = await fetch(`/member/search/my-temperature`,{
-        method: "GET",
-        credentials: "include"
-    })
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
+    try{
+        const response  = await fetch(`/member/search/my-temperature`,{
+            method: "GET",
+            credentials: "include"
+        })
+        if(!response.ok){
+            throw new Error(`HTTP error! Status:${response.status}`)
+        }
+        const data = await response.json();
+        document.querySelector("#temp-tabel").textContent +=`(내 온도: ${data.data})`;
+        return data.data;
+    }catch(err){
+        console.log(err);
+    }
 
-    return data.data;
+}
 
-
-
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
 }

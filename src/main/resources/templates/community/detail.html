@@ -20,6 +20,15 @@
             <div class="post-header-actions">
                 <a th:href="@{/community}" class="back-link">← 목록으로</a>
                 <div class="post-action-right">
+
+                    <div th:if="${#authentication.principal.member.memberRole.name() == 'ADMIN'}" class="admin-delete-wrapper">
+                        <button type="button"
+                                class="admin-delete-button"
+                                th:onclick="'deletePost(' + ${board.id} + ')'">
+                            🛑 관리자 삭제
+                        </button>
+                    </div>
+
                     <div th:if="${board.member.id == #authentication.principal.member.id}">
                         <button type="button" class="board-delete-button"
                                 th:onclick="'deletePost(' + ${board.id} + ')'">✖ 삭제
@@ -49,7 +58,10 @@
             <div th:if="${attachments != null and !attachments.isEmpty()}" class="attachment-box">
                 <strong>첨부파일</strong>
                 <ul>
-                    <li th:each="att : ${attachments}">
+                    <li th:each="att : ${attachments}" class="attachment-item">
+
+                        <img th:src="@{/img/attach-file.png}" alt="첨부 아이콘" class="attachment-icon"/>
+
                         <a th:href="@{/community/download-force/{filename}(filename=${att.savedName})}"
                            th:text="${att.originalName}"></a>
                     </li>
@@ -80,6 +92,12 @@
                         <span th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">작성일</span>
                     </small>
                     <div class="comment-actions">
+                        <button type="button" class="admin-delete-button"
+                                th:if="${#authentication.principal.member.memberRole.name() == 'ADMIN'}"
+                                th:data-comment-id="${comment.id}"
+                                th:data-board-id="${board.id}">
+                            🛑 관리자 삭제
+                        </button>
                         <button type="button" class="btn-comment-delete"
                                 th:data-comment-id="${comment.id}"
                                 th:data-board-id="${board.id}"
@@ -287,6 +305,31 @@
             }
         }
     });
+
+    document.addEventListener("click", function (e) {
+        if (e.target.matches(".admin-delete-button") && e.target.hasAttribute("data-comment-id")) {
+            const commentId = e.target.dataset.commentId;
+            const boardId = e.target.dataset.boardId;
+            const token = localStorage.getItem("accessToken");
+
+            if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+            fetch(`/community/${boardId}/comments/${commentId}`, {
+                method: "DELETE",
+                headers: {'Authorization': 'Bearer ' + token}
+            }).then(res => {
+                if (res.ok) {
+                    e.target.closest("li").remove();
+                } else {
+                    alert("댓글 삭제 실패");
+                }
+            }).catch(err => {
+                console.error("관리자 댓글 삭제 오류:", err);
+                alert("오류가 발생했습니다.");
+            });
+        }
+    });
+
 </script>
 </body>
 </html>

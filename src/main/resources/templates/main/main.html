@@ -7,9 +7,11 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/login/login.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common/header.css}">
 </head>
 
 <body>
+<div id="header-detail-dto" th:data-login-email="${#authentication.name}"></div>
 <div class="hero">
 
     <div class="navbar">
@@ -27,8 +29,34 @@
         </div>
         <div class="icons">
             <img id="chat-icon" src="/img/chat-white.png">
-            <img src="/img/bell-white.png">
+
+            <div style="position: relative; display: inline-block;">
+                <img src="/img/bell-white.png" id="openMiniDrawerBtn" style="cursor: pointer;">
+                <span id="notificationBadge" style="
+                position: absolute;
+                top: 0px;
+                right: 0px;
+                background: red;
+                color: white;
+                border-radius: 50%;
+                font-size: 12px;
+                width: 18px;
+                height: 18px;
+                text-align: center;
+                line-height: 18px;
+                display: none;">
+                0
+            </span>
+
+                <div class="mini-drawer" id="miniDrawer">
+                    <div class="mini-drawer-header">
+                        <h4>알림</h4>
+                        <button class="close-mini" id="closeMiniDrawerBtn">&times;</button>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="auth">
             <a id="btn-login" th:href="@{/login}" class="btn">LOGIN</a>
             <a id="btn-signup" th:href="@{/signup}" class="btn">SIGN UP</a>
@@ -251,6 +279,9 @@
     }
 </script>
 <script th:src="@{/js/aibot/aichatbot.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/webstomp-client@1/dist/webstomp.min.js"></script>
+<script th:src="@{/js/common/header.js}"></script>
 
 </body>
 </html>

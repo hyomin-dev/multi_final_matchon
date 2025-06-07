@@ -41,8 +41,8 @@ public class ResTeamDto {
 
     private String starRatingVisual; // ✅ Add this field
 
-    private Long leaderId;
 
+    private Long leaderId;
 
     public static ResTeamDto from(Team team, String imageUrl, double averageRating) {
         return ResTeamDto.builder()
