@@ -26,4 +26,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 """)
     Optional<ChatRoom> findTeamGroupChatRoom(@Param("teamId") Long teamId);
 
+
 }

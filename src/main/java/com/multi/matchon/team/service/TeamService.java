@@ -497,6 +497,7 @@ public class TeamService {
         member.setTeam(team);
         memberRepository.save(member); // 명시적으로 저장 (선택사항이지만 안전)
 
+
         ChatRoom teamGroupChatRoom = Optional.ofNullable(team.getChatRoom())
                 .filter(ChatRoom::getIsGroupChat)
                 .orElseThrow(() -> new IllegalStateException("해당 팀의 채팅방이 존재하지 않습니다."));

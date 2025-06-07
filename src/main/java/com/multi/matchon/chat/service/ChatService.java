@@ -347,14 +347,18 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public Long findTeamChatRoomByTeamId(Long teamId) {
+
         return chatRoomRepository.findTeamGroupChatRoom(teamId)
+
                 .orElseThrow(() -> new CustomException("팀 채팅방이 존재하지 않습니다."))
                 .getId();
     }
 
     public List<ResMyChatListDto> findRelevantRoomsForLeader(Long leaderId, Long teamId) {
         List<ChatRoom> privateChats = chatParticipantRepository.findAllPrivateChatsForLeader(leaderId);
+
         Optional<ChatRoom> groupChatOpt = chatRoomRepository.findTeamGroupChatRoom(teamId);
+
 
         groupChatOpt.ifPresent(privateChats::add); // ✅ 그룹 채팅방 추가
 
