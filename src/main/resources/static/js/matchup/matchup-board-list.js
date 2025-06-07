@@ -60,19 +60,32 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 })
 
 async function loadItems(page, sportsType='', region='', dateFilter='', availableFilter=false){
-    const response = await fetch(`/matchup/board/list?page=${page-1}&sportsType=${sportsType}&region=${region}&date=${dateFilter}&availableFilter=${availableFilter}`,{
+    let items = [];
+    let pageInfo = {
+        page: 0,
+        totalPages: 1
+    };
 
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data);
-    const items = data.data.items;
-    const pageInfo = data.data.pageInfo;
-    //console.log(pageInfo);
-    console.log(items);
+    try{
+        const response = await fetch(`/matchup/board/list?page=${page-1}&sportsType=${sportsType}&region=${region}&date=${dateFilter}&availableFilter=${availableFilter}`,{
+
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data);
+        items = data.data.items;
+        pageInfo = data.data.pageInfo;
+        //console.log(pageInfo);
+
+    } catch (err){
+        console.log(err);
+    }
+
+
+    //console.log(items);
 
     renderList(items);
     renderPagination(pageInfo,sportsType, region, dateFilter, availableFilter);
@@ -98,7 +111,7 @@ function renderList(items){
         const card = document.createElement("tr");
         card.innerHTML = `
                         <td>${item.boardId}</td>
-                        <td class="truncate">${item.writerName}</td>
+                        <td class="truncate-writer">${item.writerName}</td>
                         <td>${setSportsType(item.sportsTypeName)}</td>
                         <td class="truncate">${item.sportsFacilityAddress}</td>
                         <td>📅 ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
@@ -111,6 +124,7 @@ function renderList(items){
                         </td>
                         <td><button class="btn-detail" onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'">상세보기</button></td>                   
                         `;
+        markIfPastMatchdatetime(card, item);
         boardArea.appendChild(card);
 
     })
@@ -239,17 +253,20 @@ function checkStatus(item){
 
 
 async function getMyMannerTemperature(){
-
-    const response  = await fetch(`/member/search/my-temperature`,{
-        method: "GET",
-        credentials: "include"
-    })
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-
-    return data.data;
-
+    try{
+        const response  = await fetch(`/member/search/my-temperature`,{
+            method: "GET",
+            credentials: "include"
+        })
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        return data.data;
+    }catch (err){
+        console.log(err);
+        //alert("매너 온도 조회에 실패하여 기본값으로 처리되었습니다.");
+        return 20;
+    }
 }
 
 function setButton(){
@@ -287,8 +304,26 @@ function setSportsType(sportsTypeName){
     }
 }
 
+/*경기 시작 시간이 지났다면 회색으로 표현*/
+function markIfPastMatchdatetime(card, item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+   if(matchDate<now){
+       const tds = card.querySelectorAll("td");
+       tds.forEach(td =>{
+           td.style.backgroundColor = "lightgray";
+       })
+   }
 
+}
 
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
 
 
 

@@ -146,41 +146,6 @@ label[for="availableOnly"], label:has(#availableOnly) {
     background-color: royalblue;
 }
 
-/*.topbar-buttons button:hover {*/
-/*    transform: translateY(-2px);*/
-/*    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);*/
-/*}*/
-
-/* 각각 색상 다르게 */
-/*.btn-write {*/
-/*    background-color: #004080;*/
-/*}*/
-/*.btn-write:hover {*/
-/*    background-color: #003060;*/
-/*}*/
-
-/*.btn-my-board {*/
-/*    background-color: #007a00;*/
-/*}*/
-/*.btn-my-board:hover {*/
-/*    background-color: #005a00;*/
-/*}*/
-
-/*.btn-my-request {*/
-/*    background-color: #9b59b6;*/
-/*}*/
-/*.btn-my-request:hover {*/
-/*    background-color: #7a3c99;*/
-/*}*/
-
-/*.btn-my-match {*/
-/*    background-color: #e67e22;*/
-/*}*/
-/*.btn-my-match:hover {*/
-/*    background-color: #cf711c;*/
-/*}*/
-
-
 /* ===== 게시판 테이블 ===== */
 .board-table {
     width: 100%;
@@ -231,22 +196,7 @@ label[for="availableOnly"], label:has(#availableOnly) {
 .col-detail {width:10%}
 
 
-/*!* 상세 버튼 개선 *!*/
-/*.detail {*/
-/*    margin-top: 0.5rem;*/
-/*    !*align-self: flex-start;*!*/
-/*    background-color: #004080;*/
-/*    color: white;*/
-/*    border: none;*/
-/*    border-radius: 6px;*/
-/*    padding: 6px 12px;*/
-/*    cursor: pointer;*/
-/*    font-weight: bold;*/
-/*    transition: background-color 0.2s ease;*/
-/*}*/
-/*.detail:hover {*/
-/*    background-color: #003060;*/
-/*}*/
+
 
 /* ===== 페이징 ===== */
 #paging-container button {
@@ -290,7 +240,14 @@ label[for="availableOnly"], label:has(#availableOnly) {
 }
 
 .truncate {
-    width: 327px;           /* 너비 고정 */
+    width: 320px;           /* 너비 고정 */
+    white-space: nowrap;    /* 줄바꿈 없음 */
+    overflow: hidden;       /* 넘친 부분 숨김 */
+    text-overflow: ellipsis; /* 말줄임표 (...) 표시 */
+}
+
+.truncate-writer {
+    width: 120px;           /* 너비 고정 */
     white-space: nowrap;    /* 줄바꿈 없음 */
     overflow: hidden;       /* 넘친 부분 숨김 */
     text-overflow: ellipsis; /* 말줄임표 (...) 표시 */

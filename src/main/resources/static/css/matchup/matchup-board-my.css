@@ -21,7 +21,6 @@
 }
 
 
-
 /* 필터 */
 #filter {
     display: flex;
@@ -319,7 +318,7 @@ label[for="availableOnly"], label:has(#availableOnly) {
 }
 
 .truncate {
-    width: 327px;           /* 너비 고정 */
+    width: 320px;           /* 너비 고정 */
     white-space: nowrap;    /* 줄바꿈 없음 */
     overflow: hidden;       /* 넘친 부분 숨김 */
     text-overflow: ellipsis; /* 말줄임표 (...) 표시 */

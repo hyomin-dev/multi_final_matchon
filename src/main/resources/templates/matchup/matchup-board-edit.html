@@ -16,7 +16,6 @@
 <div id="wrap">
     <h2 class="page-title">MATCHUP 글 수정하기</h2>
     <div id="matchup-board-edit-dto"
-         th:data-board-id="${resMatchupBoardDto.boardId}"
          th:data-sports-type-name="${resMatchupBoardDto.sportsTypeName}"
          th:data-current-participant-count="${resMatchupBoardDto.currentParticipantCount}"
          th:data-max-participants="${resMatchupBoardDto.maxParticipants}"
@@ -135,14 +134,14 @@
             <div class="form-group">
                 <label>
                     경기 방식 소개
-                    <textarea cols="30" rows="5" th:field="*{matchDescription}" required maxlength="1000">
+                    <textarea th:field="*{matchDescription}" required maxlength="1000">
                     </textarea>
                 </label>
             </div>
 
             <div class="btn-group">
                 <button type="submit" >저장</button>
-                <button type="button" class="cancel-btn">취소</button>
+                <button type="button" class="cancel-btn" onclick="goBack()">취소</button>
             </div>
         </form>
     </div>

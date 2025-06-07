@@ -29,19 +29,22 @@ async function setContent(){
     setButton(matchDatetime, writerEmail, loginEmail, currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature);
 
 
-    const response = await fetch(`/matchup/attachment/presigned-url?saved-name=${savedName}`,{
-        method: "GET",
-        credentials: "include"
+
+    try{
+        const response = await fetch(`/matchup/attachment/presigned-url?saved-name=${savedName}`,{
+            method: "GET",
+            credentials: "include"
         })
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data.data);
-    document.querySelector("#reservationUrl").addEventListener("click",()=>{
-        window.open(data.data,"_blank");
-    });
-
-
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data.data);
+        document.querySelector("#reservationUrl").addEventListener("click",()=>{
+            window.open(data.data,"_blank");
+        });
+    }catch (err){
+        console.log(err);
+    }
 
     //아래는 CORS 막아놔서 안됨
     // const response2 = await fetch(data.data);
@@ -50,10 +53,8 @@ async function setContent(){
     // const data2 = await response2.json();
     // console.log(data2);
 
+
 }
-
-
-
 
 function drawMap(address, sportsFacilityName){
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div
@@ -218,6 +219,15 @@ function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCoun
 
     }
 }
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
+
 
 
 

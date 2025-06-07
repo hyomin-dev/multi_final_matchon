@@ -41,19 +41,19 @@ public class MatchupRatingController {
     }
 
 
-    /*
-    * 매너 온도 평가 하기
-    * 평가 하는 사람이 실제 평가자가 맞는지 체크
-    * 실제 평가가 진행되지 않았는지 체크
-    * */
-    @GetMapping("/rating/register")
-    public ModelAndView showRatingRegisterPage(@RequestParam("boardId") Long boardId, @RequestParam("evalId") Long evalId, @RequestParam("targetId") Long targetId, @AuthenticationPrincipal CustomUser user, ModelAndView mv){
-        ResMatchupRatingDto resMatchupRatingDto = matchupRatingService.findResMatchupRatingDto(boardId, evalId, targetId, user);
-
-        mv.setViewName("matchup/matchup-rating-register");
-        mv.addObject("resMatchupRatingDto", resMatchupRatingDto);
-        return mv;
-    }
+//    /*
+//    * 매너 온도 평가 하기
+//    * 평가 하는 사람이 실제 평가자가 맞는지 체크
+//    * 실제 평가가 진행되지 않았는지 체크
+//    * */
+//    @GetMapping("/rating/register")
+//    public ModelAndView showRatingRegisterPage(@RequestParam("boardId") Long boardId, @RequestParam("evalId") Long evalId, @RequestParam("targetId") Long targetId, @AuthenticationPrincipal CustomUser user, ModelAndView mv){
+//        ResMatchupRatingDto resMatchupRatingDto = matchupRatingService.findResMatchupRatingDto(boardId, evalId, targetId, user);
+//
+//        mv.setViewName("matchup/matchup-rating-register");
+//        mv.addObject("resMatchupRatingDto", resMatchupRatingDto);
+//        return mv;
+//    }
 
     /*
     * 평가자가 입력한 form을 받는 메서드
@@ -111,19 +111,19 @@ public class MatchupRatingController {
         PageResponseDto<ResMatchupRatingListDto> pageResponseDto = matchupRatingService.findAllMyRatings(pageRequest, user, boardId);
         return ResponseEntity.ok((ApiResponse.ok(pageResponseDto)));
     }
-
-    /*
-    * 평가한 매너온도 보여주는 사이트
-    * */
-    @GetMapping("/rating/detail")
-    public ModelAndView showRatingDetailPage(@RequestParam("boardId") Long boardId, @RequestParam("evalId") Long evalId, @RequestParam("targetId") Long targetId, ModelAndView mv){
-        ResMatchupRatingDto resMatchupRatingDto = matchupRatingService.findDetailResMatchupRatingDto(boardId, evalId, targetId);
-
-        mv.addObject("resMatchupRatingDto",resMatchupRatingDto);
-        mv.setViewName("matchup/matchup-rating-detail");
-        return mv;
-
-    }
+//
+//    /*
+//    * 평가한 매너온도 보여주는 사이트
+//    * */
+//    @GetMapping("/rating/detail")
+//    public ModelAndView showRatingDetailPage(@RequestParam("boardId") Long boardId, @RequestParam("evalId") Long evalId, @RequestParam("targetId") Long targetId, ModelAndView mv){
+//        ResMatchupRatingDto resMatchupRatingDto = matchupRatingService.findDetailResMatchupRatingDto(boardId, evalId, targetId);
+//
+//        mv.addObject("resMatchupRatingDto",resMatchupRatingDto);
+//        mv.setViewName("matchup/matchup-rating-detail");
+//        return mv;
+//
+//    }
 
 
     // 수정

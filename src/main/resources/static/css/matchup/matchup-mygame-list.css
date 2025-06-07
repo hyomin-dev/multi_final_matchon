@@ -75,63 +75,12 @@
 
 /* ===== 테이블 열 너비 설정 ===== */
 .col-type {width:5%}
-.col-sports-facility-address{width:20%}
+.col-sports-facility-address{width:25%}
 .col-match-date {width:20%}
 .col-quota {width: 7%}
 .col-detail {width: 10%}
 .col-eval {width: 10%}
 
-/*!* 경기 카드 스타일 *!*/
-/*.matchup-card {*/
-/*    background-color: #fff;*/
-/*    border: 1px solid #ddd;*/
-/*    border-radius: 10px;*/
-/*    padding: 1.2rem;*/
-/*    margin-bottom: 1rem;*/
-/*    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);*/
-/*    transition: transform 0.2s ease;*/
-/*}*/
-
-/*.matchup-card:hover {*/
-/*    transform: translateY(-2px);*/
-/*}*/
-
-/*!* 카드 내부 레이아웃 *!*/
-/*.card-content {*/
-/*    display: flex;*/
-/*    justify-content: space-between;*/
-/*    align-items: flex-start;*/
-/*    flex-wrap: wrap;*/
-/*    gap: 1rem;*/
-/*}*/
-
-/*.left-info {*/
-/*    display: flex;*/
-/*    flex-direction: row;   !* ✅ 가로 배치 *!*/
-/*    flex-wrap: wrap;       !* ✅ 줄 넘어가면 다음 줄로 *!*/
-/*    gap: 1.2rem;           !* ✅ 항목 간 간격 *!*/
-/*    font-size: 0.95rem;*/
-/*    align-items: center;*/
-/*}*/
-
-/*!* 경기장 정보 길이 제한 *!*/
-/*.truncate {*/
-/*    width: 300px;*/
-/*    white-space: nowrap;*/
-/*    overflow: hidden;*/
-/*    text-overflow: ellipsis;*/
-/*}*/
-
-/*!* 경기 평가 링크 *!*/
-/*.matchup-card a {*/
-/*    color: #0077cc;*/
-/*    font-weight: bold;*/
-/*    text-decoration: underline;*/
-/*}*/
-
-/*.matchup-card a:hover {*/
-/*    color: #005fa3;*/
-/*}*/
 
 /* ===== 페이징 ===== */
 #paging-container button {

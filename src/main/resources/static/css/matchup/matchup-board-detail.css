@@ -30,6 +30,7 @@ form label {
 .form-group {
     margin-bottom: 2px;
 }
+
 .readonly-box,
 input,
 textarea,
@@ -88,6 +89,7 @@ select:focus {
     background-color: #fff;
 }
 
+/*버튼 설정*/
 .button-group{
     display: flex;
     justify-content: center;
@@ -104,11 +106,26 @@ select:focus {
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    margin: 0 10px;
+    margin: 5px;
 }
 
 .button-group a.btn:hover {
     background-color: royalblue;
+}
+
+/*삭제 버튼*/
+#deleteBtn {
+    padding: 8px 15px;
+    background-color: white;
+    color: #f44336;
+    border: 2px solid #f44336;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#deleteBtn:hover {
+    background-color: mistyrose;
 }
 
 /* 지도 */
@@ -118,6 +135,7 @@ select:focus {
     border: 1px solid #ccc;
     border-radius: 6px;
     margin-top: 0.5rem;
+    margin-bottom: 20px;
 }
 
 .truncate {

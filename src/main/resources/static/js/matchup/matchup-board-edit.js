@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     const editDto = document.querySelector("#matchup-board-edit-dto");
 
-    const boardId = Number(editDto.dataset.boardId);
     const sportsTypeName = editDto.dataset.sportsTypeName;
     const currentParticipantCount = Number(editDto.dataset.currentParticipantCount);
     const maxParticipants = Number(editDto.dataset.maxParticipants);
@@ -10,23 +9,18 @@ document.addEventListener("DOMContentLoaded",()=>{
     const originalName = editDto.dataset.originalName;
     const savedName = editDto.dataset.savedName;
     const myMannerTemperature = Number(editDto.dataset.myMannerTemperature);
-    const loginMember = editDto.dataset.loginMember;
 
     setSportsType(sportsTypeName); // 종목 가져옴
     void setReservationFile(originalName, savedName);
     setMaxParticipants(currentParticipantCount, maxParticipants);
     setMannerTemperature(minMannerTemperature);
     setButton();
+    autoResize();
 
     const form = document.querySelector("form");
     form.addEventListener("submit", (e)=>{
         submitCheck(e, myMannerTemperature);
     })
-
-    const cancelBtn = document.querySelector(".cancel-btn");
-    cancelBtn.addEventListener("click",()=>{
-        history.back();
-    });
 
 })
 
@@ -269,3 +263,21 @@ function setButton(){
     });
 
 }
+
+function autoResize() {
+    const allTextarea = document.querySelectorAll('textarea');
+    allTextarea.forEach(el =>{
+        el.style.height = 'auto';  // 초기화
+        el.style.height = el.scrollHeight + 'px';  // 실제 내용에 맞춤
+    });
+}
+
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
+

@@ -14,6 +14,21 @@ public class ResMatchupRatingListDto {
 
     private String targetName;
 
+    // 받은 경우
+
+    private Long receivedEvalId;
+
+    private Long receivedTargetId;
+
+    private Integer receivedMannerScore;
+
+    private Integer recievedSkillScore;
+
+    private String receivedReview;
+
+    private Boolean isCompletedReceive;
+
+
     // 보낸 경우
 
     private Long sendedEvalId;
@@ -28,19 +43,7 @@ public class ResMatchupRatingListDto {
 
     private Boolean isCompletedSend;
 
-    // 받은 경우
 
-    private Long receivedEvalId;
-
-    private Long receivedTargetId;
-
-    private Integer receivedMannerScore;
-
-    private Integer recievedSkillScore;
-
-    private String receivedReview;
-
-    private Boolean isCompletedReceive;
 
     public ResMatchupRatingListDto(Long boardId, String evalName, String targetName,
                                    Long sendedEvalId, Long sendedTargetId,Integer sendedMannerScore, Integer sendedSkillScore, String sendedReview, Boolean isCompletedSend,

@@ -19,16 +19,8 @@
     </div>
     <h2 class="page-title">MATCHUP 나의 경기 참가 이력</h2>
 
-<!--    <div class="match-info" th:object="${resMatchupBoardOverviewDto}">-->
-<!--        <p>종목: <span th:text="*{sportsTypeName}">SOCCER</span></p>-->
-<!--        <p class="truncate">경기장: <span th:text="*{sportsFacilityName}"></span></p>-->
-<!--        <p class="truncate">주소: <span th:text="*{sportsFacilityAddress}"></span></p>-->
-<!--        <p>📅 날짜: <span id="match-date"></span></p>-->
-<!--        <p id="match-status"></p>-->
-<!--        <p>( <span th:text="*{currentParticipantCount}"></span> / <span th:text="*{maxParticipants}"></span> )</p>-->
-<!--    </div>-->
     <div class="topbar-buttons">
-        <button class="back-btn" onclick="location.href='/matchup/board/my'">뒤로가기</button>
+        <button class="back-btn" onclick="goBack()">뒤로가기</button>
     </div>
 
     <table class="board-table">

@@ -56,6 +56,11 @@ select:focus {
     outline: none;
 }
 
+textarea{
+    overflow: hidden;
+    resize: none;
+}
+
 /*===========================================*/
 /*읽기 전용*/
 #teamName{

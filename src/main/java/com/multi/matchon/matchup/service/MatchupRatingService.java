@@ -295,7 +295,7 @@ public class MatchupRatingService {
         /*
          * 작성자에게 알림 보내기
          * */
-        notificationService.sendNotification(target , "[평가 알림]"+user.getMember().getMemberName()+"님으로 부터 매너 온도 평가가 도착했습니다. 확인해보세요.", "/matchup/rating/detail?"+"boardId="+reqMatchupRatingDto.getBoardId()+"&evalId="+user.getMember().getId()+"&targetId="+target.getId());
+        notificationService.sendNotification(target , "[평가 알림]"+user.getMember().getMemberName()+"님으로 부터 매너 온도 평가가 도착했습니다. 확인해보세요.", "/matchup/rating/page?"+"boardId="+reqMatchupRatingDto.getBoardId());
 
 
 

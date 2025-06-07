@@ -4,18 +4,27 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 
 async function loadItems(page){
-    const response = await fetch(`/matchup/mygame/list?page=${page-1}`,{
+    let items = [];
+    let pageInfo = {
+        page: 0,
+        totalPages: 1
+    };
+    try{
+        const response = await fetch(`/matchup/mygame/list?page=${page-1}`,{
 
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data);
-    const items = data.data.items;
-    const pageInfo = data.data.pageInfo;
-    //console.log(pageInfo);
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data);
+        items = data.data.items;
+        pageInfo = data.data.pageInfo;
+        //console.log(pageInfo);
+    }catch (err){
+        console.log(err);
+    }
 
     renderList(items);
     renderPagination(pageInfo);
@@ -183,6 +192,14 @@ function setSportsType(sportsTypeName){
     }else{
         return `
                 <span style="color: #e67e22;">FUTSAL</span>
-                `
+                `    }
+}
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
     }
 }
+
