@@ -106,13 +106,4 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
 """)
     List<ChatRoom> findAllPrivateChatsForLeader(@Param("leaderId") Long leaderId);
 
-    // 2. 팀 그룹 채팅방
-    @Query("""
-    SELECT cr
-    FROM ChatRoom cr
-    WHERE cr.teamId = :teamId
-      AND cr.isGroupChat = true
-      AND cr.isDeleted = false
-""")
-    Optional<ChatRoom> findGroupChatByTeamId(@Param("teamId") Long teamId);
 }

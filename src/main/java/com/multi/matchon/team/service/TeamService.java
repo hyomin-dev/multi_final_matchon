@@ -145,7 +145,6 @@ public class TeamService {
         ChatRoom teamChatRoom = ChatRoom.builder()
                 .isGroupChat(true)
                 .chatRoomName("Team Chat - " + savedTeam.getTeamName() + " - " + identifierChatRoomName)
-                .teamId(savedTeam.getId())
                 .build();
         chatRoomRepository.save(teamChatRoom);
 
@@ -498,8 +497,8 @@ public class TeamService {
         member.setTeam(team);
         memberRepository.save(member); // 명시적으로 저장 (선택사항이지만 안전)
 
-        // ✅✅ [NEW] Add to group chat room
-        ChatRoom teamGroupChatRoom = chatRoomRepository.findByTeamIdAndIsGroupChatTrue(team.getId())
+        ChatRoom teamGroupChatRoom = Optional.ofNullable(team.getChatRoom())
+                .filter(ChatRoom::getIsGroupChat)
                 .orElseThrow(() -> new IllegalStateException("해당 팀의 채팅방이 존재하지 않습니다."));
 
         chatService.addParticipantToRoom(teamGroupChatRoom, member); // 👈 add member to chat
