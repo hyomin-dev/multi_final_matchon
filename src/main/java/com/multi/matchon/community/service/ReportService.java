@@ -1,8 +1,6 @@
 package com.multi.matchon.community.service;
 
-import com.multi.matchon.community.domain.ReasonType;
-import com.multi.matchon.community.domain.Report;
-import com.multi.matchon.community.domain.ReportType;
+import com.multi.matchon.community.domain.*;
 import com.multi.matchon.community.dto.res.ReportResponse;
 import com.multi.matchon.community.repository.BoardRepository;
 import com.multi.matchon.community.repository.CommentRepository;
@@ -79,39 +77,38 @@ public class ReportService {
 
         if (report.getReportType() == ReportType.BOARD) {
             targetMember = boardRepository.findById(report.getTargetId())
-                    .map(board -> board.getMember())
+                    .map(Board::getMember)
                     .orElse(null);
         } else if (report.getReportType() == ReportType.COMMENT) {
             targetMember = commentRepository.findById(report.getTargetId())
-                    .map(comment -> comment.getMember())
+                    .map(Comment::getMember)
                     .orElse(null);
         }
 
-        boolean exists = false;
+        boolean exists = switch (report.getReportType()) {
+            case BOARD -> boardRepository.existsById(report.getTargetId());
+            case COMMENT -> commentRepository.existsById(report.getTargetId());
+        };
 
-        if (report.getReportType() == ReportType.BOARD) {
-            exists = boardRepository.existsById(report.getTargetId());
-        } else if (report.getReportType() == ReportType.COMMENT) {
-            exists = commentRepository.existsById(report.getTargetId());
-        }
+        boolean isSuspended = targetMember != null && targetMember.isSuspended();
 
         return ReportResponse.builder()
                 .id(report.getId())
                 .reportType(report.getReportType().name())
-                .boardId(resolveBoardId(report))
+                .boardId(boardId)
                 .targetId(report.getTargetId())
                 .targetWriterName(targetWriterName)
                 .reporterName(report.getReporter().getMemberName())
                 .reasonType(report.getReasonType().getLabel())
                 .reason(report.getReason())
                 .createdDate(report.getCreatedDate())
-                .boardId(boardId)
                 .targetMemberId(targetMember != null ? targetMember.getId() : null)
-                .suspended(targetMember != null && targetMember.isSuspended())
+                .suspended(isSuspended)
                 .targetIsAdmin(targetMember != null && targetMember.getMemberRole().name().equals("ADMIN"))
                 .targetExists(exists)
                 .build();
     }
+
 
 
     /**

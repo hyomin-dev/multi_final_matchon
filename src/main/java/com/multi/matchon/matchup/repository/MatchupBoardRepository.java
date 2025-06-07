@@ -265,5 +265,15 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             from MatchupBoard t1
             where t1.isDeleted =false and t1.writer=:loginMember and t1.id=:boardId and t1.matchDatetime<CURRENT_TIMESTAMP and t1.isRatingInitialized=false
             """)
-    Optional<MatchupBoard> findByBoardIDAndMemberAndIsRatingInitializedFalse(@Param("boardId") Long boardId,@Param("loginMember") Member loginMember);
+    Optional<MatchupBoard> findByBoardIDAndMemberAndMatchDatetimeIsRatingInitializedFalse(@Param("boardId") Long boardId,@Param("loginMember") Member loginMember);
+
+    @Query("""
+            select
+               t1
+            from MatchupBoard t1
+            where t1.isDeleted =false and t1.matchDatetime<CURRENT_TIMESTAMP and t1.isRatingInitialized=false
+            """)
+    List<MatchupBoard> findByMatchDatetimeAndIsRatingInitializedFalse();
+
+
 }

@@ -183,7 +183,19 @@ function appendMessage(msg, loginEmail) {
     if(!isSystemMsg){
         const msgDiv = document.createElement('div');
         msgDiv.className = 'chat-message ' + (msg.senderEmail === loginEmail ? 'sent' : 'received');
-        msgDiv.innerHTML = `<strong>${msg.senderName}:</strong> ${msg.content}`;
+        const time = new Date(msg.createdDate).toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        msgDiv.innerHTML = `
+                <strong>${msg.senderName}:</strong><br/>
+                ${msg.content}
+                <span class="chat-timestamp">${time}</span>
+                `;
         chatBox.appendChild(msgDiv);
         lastSystemMessage = null;
     }
