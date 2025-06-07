@@ -1,5 +1,8 @@
 package com.multi.matchon.team.service;
 
+import com.multi.matchon.chat.domain.ChatRoom;
+import com.multi.matchon.chat.repository.ChatRoomRepository;
+import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.team.domain.Review;
@@ -85,6 +88,8 @@ public class TeamService {
     private final TeamMemberRepository teamMemberRepository;
     private final TeamJoinRequestRepository teamJoinRequestRepository;
     private final ResponseRepository responseRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatService chatService;
 
     @PersistenceContext
     private EntityManager em;
@@ -134,6 +139,22 @@ public class TeamService {
                 .createdPerson(member.getMemberEmail())
                 .build();
         Team savedTeam = teamRepository.save(newTeam);
+
+        // ⬇️ INSERT BELOW ⬇️
+        String identifierChatRoomName = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        ChatRoom teamChatRoom = ChatRoom.builder()
+                .isGroupChat(true)
+                .chatRoomName("Team Chat - " + savedTeam.getTeamName() + " - " + identifierChatRoomName)
+                .teamId(savedTeam.getId())
+                .build();
+        chatRoomRepository.save(teamChatRoom);
+
+        // ✅ Link chat room to team
+        savedTeam.setChatRoom(teamChatRoom);  // this assumes you have a chatRoom field
+        teamRepository.save(savedTeam);       // save the relationship
+
+        chatService.addParticipantToRoom(teamChatRoom, member);
+
 
         // Add creator as team member (leader)
 
@@ -476,6 +497,12 @@ public class TeamService {
         // ✅ member 테이블에 team_id 업데이트
         member.setTeam(team);
         memberRepository.save(member); // 명시적으로 저장 (선택사항이지만 안전)
+
+        // ✅✅ [NEW] Add to group chat room
+        ChatRoom teamGroupChatRoom = chatRoomRepository.findByTeamIdAndIsGroupChatTrue(team.getId())
+                .orElseThrow(() -> new IllegalStateException("해당 팀의 채팅방이 존재하지 않습니다."));
+
+        chatService.addParticipantToRoom(teamGroupChatRoom, member); // 👈 add member to chat
 
     }
 
