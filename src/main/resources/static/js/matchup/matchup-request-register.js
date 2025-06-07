@@ -43,7 +43,7 @@ function submitCheck(e, matchDatetime){
         alert("경기 시작 시간이 지나 등록할 수 없습니다.");
         e.preventDefault();
     }else{
-        alert("submit");
+        alert("요청 등록이 완료되었습니다.");
     }
 }
 
@@ -76,7 +76,7 @@ function drawMap(address, sportsFacilityName){
 
             // 인포윈도우로 장소에 대한 설명을 표시합니다
             var infowindow = new kakao.maps.InfoWindow({
-                content: '<div style="width:150px;text-align:center;padding:6px 0;">'+sportsFacilityName+'</div>'
+                content: '<div class="truncateMap" style="width:150px;text-align:center;padding:6px 0;">'+sportsFacilityName+'</div>'
             });
             infowindow.open(map, marker);
 
@@ -120,7 +120,7 @@ function calTime(matchDatetime, matchDuration){
     else
         endHour = startHour+hourNum+extraHour;
 
-    matchDateEle.textContent = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
+    matchDateEle.value = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
 
 }
 
@@ -136,5 +136,14 @@ function setParticipantCount(currentParticipantCount, maxParticipants){
         participantCountEle.appendChild(option);
         if(i===1)
             option.selected = true;
+    }
+}
+
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
     }
 }

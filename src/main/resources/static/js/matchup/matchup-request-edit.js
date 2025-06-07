@@ -27,16 +27,13 @@ document.addEventListener("DOMContentLoaded",()=>{
     calTime(matchDatetime, matchDuration);
     setParticipantCount(currentParticipantCount, maxParticipants, participantCount);
     manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime);
+    autoResize();
 
     const form = document.querySelector("form");
     form.addEventListener("submit",(e)=>{
         submitCheck(e, matchDatetime);
     })
 
-    const cancel = document.querySelector(".delete-btn");
-    cancel.addEventListener("click",()=>{
-        history.back();
-    })
 
 })
 
@@ -56,7 +53,7 @@ function submitCheck(e, matchDatetime){
         alert("경기 시작 시간이 지나 수정할 수 없습니다.");
         e.preventDefault();
     }else{
-        alert("submit");
+        alert("요청 수정이 완료되었습니다.");
     }
 
 }
@@ -90,7 +87,7 @@ function drawMap(address, sportsFacilityName){
 
             // 인포윈도우로 장소에 대한 설명을 표시합니다
             var infowindow = new kakao.maps.InfoWindow({
-                content: '<div style="width:150px;text-align:center;padding:6px 0;">'+sportsFacilityName+'</div>'
+                content: '<div class="truncateMap" style="width:150px;text-align:center;padding:6px 0;">'+sportsFacilityName+'</div>'
             });
             infowindow.open(map, marker);
 
@@ -134,7 +131,7 @@ function calTime(matchDatetime, matchDuration){
     else
         endHour = startHour+hourNum+extraHour;
 
-    matchDateEle.textContent = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
+    matchDateEle.value = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
 
 }
 
@@ -175,28 +172,28 @@ function manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupC
         (matchupStatus ===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===false) ||
         (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted ===false)
     ){
-        statusEle.textContent =  "승인 대기";
+        statusEle.value =  "승인 대기";
     }
     // 2. 참가 요청 삭제
     else if(
         (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===true) ||
         (matchupStatus===Status.PENDING && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===true)
     ){
-        statusEle.textContent =  "요청 취소됨";
+        statusEle.value =  "요청 취소됨";
     }
     // 3. 참가 요청 승인
     else if(
         (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===0 && isDeleted===false)||
         (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===0 && isDeleted===false)
     ){
-        statusEle.textContent = "승인됨";
+        statusEle.value = "승인됨";
     }
     // 4. 참가 요청 반려
     else if(
         (matchupStatus === Status.DENIED && matchupRequestSubmittedCount ===1 && matchupCancelSubmittedCount ===0 && isDeleted ===false) ||
         (matchupStatus === Status.DENIED && matchupRequestSubmittedCount ===2 && matchupCancelSubmittedCount ===0 && isDeleted ===false)
     ){
-        statusEle.textContent = "반려됨";
+        statusEle.value = "반려됨";
     }
     // 8. 승인 취소 요청을 했으나 경기 시간이 지나 자동 참가 처리
     else if(
@@ -206,29 +203,46 @@ function manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupC
             (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===1 && matchupCancelSubmittedCount ===1 && isDeleted===false)
         )
     ){
-        statusEle.textContent = "자동 참가"
+        statusEle.value = "자동 참가"
     }
     // 5. 승인 취소 요청 상태
     else if(
         (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===2 && matchupCancelSubmittedCount ===1 && isDeleted===false) ||
         (matchupStatus === Status.CANCELREQUESTED && matchupRequestSubmittedCount ===1 && matchupCancelSubmittedCount ===1 && isDeleted===false)
     ){
-        statusEle.textContent = "승인 취소 요청";
+        statusEle.value = "승인 취소 요청";
     }
     // 6. 승인 취소 요청이 승인
     else if(
         (matchupStatus===Status.CANCELREQUESTED && matchupRequestSubmittedCount === 2 && matchupCancelSubmittedCount===1 && isDeleted===true) ||
         (matchupStatus===Status.CANCELREQUESTED && matchupRequestSubmittedCount === 1 && matchupCancelSubmittedCount===1 && isDeleted===true)
     ){
-        statusEle.textContent = "취소 요청 승인";
+        statusEle.value = "취소 요청 승인";
     }
     // 7. 승인 취소 요청이 반려
     else if(
         (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===2 && matchupCancelSubmittedCount===1 && isDeleted ===false) ||
         (matchupStatus===Status.APPROVED && matchupRequestSubmittedCount===1 && matchupCancelSubmittedCount===1 && isDeleted ===false)
     ){
-        statusEle.textContent = "취소 요청 반려";
+        statusEle.value = "취소 요청 반려";
     }else{
-        statusEle.textContent = "서버 오류";
+        statusEle.value = "서버 오류";
+    }
+}
+
+function autoResize() {
+    const allTextarea = document.querySelectorAll('textarea');
+    allTextarea.forEach(el =>{
+        el.style.height = 'auto';  // 초기화
+        el.style.height = el.scrollHeight + 'px';  // 실제 내용에 맞춤
+    });
+}
+
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
     }
 }

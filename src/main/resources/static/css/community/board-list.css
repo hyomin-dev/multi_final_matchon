@@ -1,24 +1,24 @@
-/* 게시글 목록 테이블 */
+/* ===== 게시판 테이블 ===== */
 .board-table {
     width: 90%;
     margin: 30px auto;
-    border-collapse: separate; /* 강조를 위해 변경 */
+    border-collapse: separate;
     border-spacing: 0;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 더 뚜렷하게 */
     table-layout: fixed;
-    border: 2px solid #3498db; /* 테두리 강조 */
+    background: #fff;
+    border: 2px solid dodgerblue;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .board-table th,
 .board-table td {
     padding: 16px 18px;
-    border-bottom: 1px solid #ddd;
     text-align: center;
     font-size: 15px;
     word-wrap: break-word;
+    border-bottom: 1px solid #ddd;
 }
 
 .board-table th {
@@ -32,17 +32,17 @@
 }
 
 .board-table tr:hover {
-    background-color: #e1f3ff; /* 더 진한 hover 배경 */
+    background-color: #e1f3ff;
 }
 
-/* 열 너비 설정 */
-.col-no { width: 8%; }
+/* ===== 테이블 열 너비 설정 ===== */
+.col-no       { width: 8%; }
 .col-category { width: 14%; }
-.col-title { width: 44%; }
-.col-author { width: 14%; }
-.col-date { width: 20%; }
+.col-title    { width: 44%; }
+.col-author   { width: 14%; }
+.col-date     { width: 20%; }
 
-/* 상단 카테고리 및 버튼 영역 */
+/* ===== 상단 바 (카테고리 + 버튼) ===== */
 .board-top-bar {
     width: 90%;
     margin: 20px auto 10px auto;
@@ -52,7 +52,6 @@
 }
 
 .category-select-box {
-    width: 90%;
     display: flex;
     justify-content: flex-start;
     padding-left: 10px;
@@ -64,15 +63,56 @@
     padding: 10px 14px;
     font-size: 15px;
     font-weight: 500;
-    color: #2c3e50;
+    color: darkslategray;
     background-color: #f9f9f9;
-    border: 2px solid #3498db;
+    border: 2px solid dodgerblue;
     border-radius: 6px;
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-/* 페이지네이션 */
+/* ===== 게시글 제목 링크 ===== */
+.board-title-link {
+    color: darkslategray;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.board-title-link:hover {
+    color: #1c7ed6;
+    text-decoration: underline;
+}
+
+/* ===== 고정글(공지글) 강조 ===== */
+.pinned-row,
+.pinned-row td {
+    background-color: lavenderblush;
+    font-weight: bold;
+}
+
+.notice-cell {
+    color: red;
+}
+
+.pinned-icon {
+    color: red;
+    margin-right: 4px;
+}
+
+/* 댓글 수 배지 */
+.comment-count {
+    margin-left: 4px;
+    color: mediumseagreen;
+    font-size: 0.9em;
+}
+
+/* ===== 페이지네이션 ===== */
 .pagination {
     text-align: center;
     margin: 30px 0;
@@ -96,48 +136,3 @@
 .pagination a:hover {
     background-color: #e0e0e0;
 }
-
-/* 게시글 제목 링크 */
-.board-title-link {
-    color: #2c3e50;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-    display: inline-block;
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.board-title-link:hover {
-    color: #1c7ed6;
-    text-decoration: underline;
-}
-
-/* 고정글(공지글) 강조 행 스타일 */
-.pinned-row {
-    background-color: lavenderblush;
-    font-weight: bold;
-}
-
-.pinned-row td {
-    background-color: lavenderblush;
-}
-
-/* 공지 표시 셀 스타일 */
-table.board-table .notice-cell { color: red; }
-
-/* 📌 아이콘 스타일 */
-.pinned-icon {
-    color: red;
-    margin-right: 4px;
-}
-
-.comment-count {
-    margin-left: 4px;
-    color: mediumseagreen;
-    font-size: 0.9em;
-}
-
-

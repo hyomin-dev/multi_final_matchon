@@ -5,6 +5,7 @@ const tooltip = document.getElementById("tooltip");
 let selectedCell = null;
 let selectedDate = null;
 let today = new Date();
+today.setHours(0, 0, 0, 0); // 오늘 기준 자정으로 설정
 let currentYear = today.getFullYear();
 let currentMonth = today.getMonth();
 
@@ -28,8 +29,6 @@ const regionLabels = {
     "CHUNGCHEONG_REGION": "충청권",
     "GANGWON_REGION": "강원권"
 };
-
-
 
 async function renderCalendar(year, month) {
     calendar.innerHTML = "";
@@ -59,9 +58,12 @@ async function renderCalendar(year, month) {
         cell.classList.add("day-cell");
 
         const dateObj = new Date(year, month, day);
+        dateObj.setHours(0, 0, 0, 0);
         const localDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-        if (dateObj.toDateString() === new Date().toDateString()) {
+        const isPast = dateObj < today;
+
+        if (dateObj.toDateString() === today.toDateString()) {
             cell.classList.add("today");
         }
 
@@ -94,7 +96,6 @@ async function renderCalendar(year, month) {
                     tooltip.style.display = 'block';
                 });
 
-
                 label.addEventListener("mousemove", (event) => {
                     tooltip.style.left = event.pageX + 10 + 'px';
                     tooltip.style.top = event.pageY + 10 + 'px';
@@ -107,13 +108,19 @@ async function renderCalendar(year, month) {
             });
         }
 
-        cell.addEventListener("click", () => {
-            if (userRole !== "HOST") return;
-            if (selectedCell) selectedCell.classList.remove("selected");
-            cell.classList.add("selected");
-            selectedCell = cell;
-            selectedDate = localDateStr;
-        });
+        // ✅ 과거 날짜 비활성화
+        if (!isPast) {
+            cell.addEventListener("click", () => {
+                if (userRole !== "HOST") return;
+                if (selectedCell) selectedCell.classList.remove("selected");
+                cell.classList.add("selected");
+                selectedCell = cell;
+                selectedDate = localDateStr;
+            });
+        } else {
+            cell.style.opacity = "0.5";
+            cell.style.pointerEvents = "none";
+        }
 
         calendar.appendChild(cell);
     }
@@ -133,6 +140,18 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function submitSelectedDate() {
-    if (!selectedDate) return alert("날짜를 선택해주세요.");
+    if (!selectedDate) {
+        alert("날짜를 선택해주세요.");
+        return;
+    }
+
+    const selected = new Date(selectedDate);
+    selected.setHours(0, 0, 0, 0);
+
+    if (selected < today) {
+        alert("📅 과거 날짜에는 대회를 등록할 수 없습니다.");
+        return;
+    }
+
     window.location.href = `/event/new?selectedDate=${selectedDate}`;
 }

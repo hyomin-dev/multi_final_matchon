@@ -21,24 +21,35 @@
          th:data-max-participants="${resMatchupBoardOverviewDto.maxParticipants}"
     >
     </div>
-    <h1>MATCHUP board에 요청온 request 목록</h1>
-    <div class="back-btn-wrapper">
-        <button class="back-btn" onclick="location.href='/matchup/board/my'">뒤로가기</button>
+    <h2 class="page-title">MATCHUP 게시글의 참가 요청 목록</h2>
+    <div class="topbar-buttons">
+        <button class="back-btn" onclick="goBack()">뒤로가기</button>
     </div>
-    <div class="match-info" th:object="${resMatchupBoardOverviewDto}">
-        <p>종목: <span th:text="*{sportsTypeName}">SOCCER</span></p>
-        <p class="truncate">경기장: <span th:text="*{sportsFacilityName}"></span></p>
-        <p class="truncate">주소: <span th:text="*{sportsFacilityAddress}"></span></p>
-        <p>📅 날짜: <span id="match-date"></span></p>
-        <p id="match-status"></p>
-        <p>( <span th:text="*{currentParticipantCount}"></span> / <span th:text="*{maxParticipants}"></span> )</p>
-    </div>
-
+    <table class="match-info-table" th:object="${resMatchupBoardOverviewDto}">
+        <tr>
+            <td class="col-match-info-sports-type"><strong>종목:</strong> <span th:text="*{sportsTypeName}">FUTSAL</span></td>
+            <td class="col-match-info-writer truncate-write"><strong>작성자:</strong> <sapn th:text="*{writerName}"></sapn></td>
+            <td class="col-match-info-address truncate-address"><strong>주소:</strong> <span th:text="*{sportsFacilityAddress}"></span></td>
+            <td class="col-match-info-match-date"><strong>📅 날짜:</strong> <span id="match-date"></span></td>
+            <td class="col-match-info-status"><strong>상태:</strong>  <span id="match-status"></span></td>
+            <td class="col-match-info-participants"><strong>정원:</strong> ( <span th:text="*{currentParticipantCount}"></span> / <span th:text="*{maxParticipants}"></span> )</td>
+        </tr>
+    </table>
     <hr>
 
-    <div id="request-container">
-
-    </div>
+    <table class="board-table">
+        <thead>
+        <tr>
+            <th class="col-applicant">신청자</th>
+            <th class="col-self-intro">자기소개</th>
+            <th class="col-participants">신청 인원</th>
+            <th class="col-request-status">요청 상태</th>
+            <th class="col-request-cancel-count">요청 통계</th>
+            <th class="col-action">요청 처리</th>
+        </tr>
+        </thead>
+        <tbody id="request-container"></tbody>
+    </table>
 
     <div id="paging-container">
 

@@ -133,6 +133,10 @@
 
 
 <div id="leader-flag" th:data-leader="${isTeamLeader}"></div>
+<!-- Team metadata -->
+<input type="hidden" id="teamId" th:value="${team.teamId}">
+<input type="hidden" id="teamLeaderId" th:value="${teamLeaderId}">
+<input type="hidden" id="userRole" th:value="${userRole}"> <!-- e.g., 'LEADER', 'MEMBER', 'GUEST' -->
 <div th:replace="~{common/footer::footer}"></div>
 
 <script th:inline="javascript">
@@ -182,7 +186,7 @@
                 loadAllReviews();
             });
         }
-        const teamId = /*[[${team.teamId}]]*/ '';
+        const teamId = document.getElementById('teamId').value;
         const deleteBtn = document.querySelector('.btn-delete');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', function () {
@@ -699,6 +703,52 @@
                 loadJoinRequests(); // 👈 load requests list for team leader
             } else {
                 joinRequestSection.style.display = 'block'; // normal user sees the form
+            }
+        });
+
+        const tabChat = document.getElementById('tab-chat');
+
+        tabChat.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const role = document.getElementById('userRole').value;
+            const teamId = document.getElementById('teamId').value;
+            const leaderId = document.getElementById('teamLeaderId').value;
+            console.log("👀 leaderId:", leaderId);
+
+            if (role === 'LEADER') {
+                window.location.href = "/chat/my/rooms";
+            } else if (role === 'MEMBER') {
+                try {
+                    const res = await fetch(`/chat/group/room-id?teamId=${teamId}`);
+                    if (!res.ok) throw new Error("채팅방을 찾을 수 없습니다");
+
+                    const data = await res.json();
+                    console.log("📦 Group chat response:", data);
+
+                    const roomId = data.data; // ✅ based on actual response format
+                    console.log("✅ Group chat room ID:", roomId);
+
+                    if (!roomId) throw new Error("채팅방 ID를 불러올 수 없습니다.");
+                    window.location.href = `/chat/group/room?roomId=${roomId}`;
+                } catch (err) {
+                    alert("채팅방 이동 중 오류 발생: " + err.message);
+                }
+            } else {
+                try {
+                    const response = await fetch(`/chat/room/private?receiverId=${leaderId}`);
+                    if (!response.ok) throw new Error("1:1 채팅방 요청 실패");
+
+                    const data = await response.json(); // ✅ properly parse the JSON object
+                    console.log("🧾 Full backend response object:", data);
+
+                    const roomId = data.data; // ✅ fix here!
+                    console.log("✅ Room ID from backend:", roomId); // ✅ log the actual value
+
+                    if (!roomId) throw new Error("채팅방 ID를 불러올 수 없습니다.");
+                    window.location.href = `/chat/my/room?roomId=${roomId}`;
+                } catch (err) {
+                    alert("채팅방 연결 실패: " + err.message);
+                }
             }
         });
 

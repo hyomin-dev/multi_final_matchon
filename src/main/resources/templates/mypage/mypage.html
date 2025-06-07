@@ -228,6 +228,11 @@
                 <div class="right-info">
                     <p>마이온도: <span th:text="${myTemperature} + ' °C'"></span></p>
                     <p>소속팀: <span th:text="${teamName}"></span></p>
+                    <div class="form-row">
+                        <label for="emailAgreementCheckboxUser">이메일 수신 동의:</label>
+                        <input type="checkbox" id="emailAgreementCheckboxUser"
+                               th:checked="${emailAgreement} ? 'checked' : null">
+                    </div>
                     <div class="submit-btn-container">
                         <button onclick="submitMypage()">수정하기</button>
                     </div>
@@ -243,6 +248,11 @@
                 <input type="text" id="hostNameInput" th:value="${hostName}" placeholder="기관명 입력" />
                 <button type="button" onclick="submitHostName()">등록</button>
                 <button type="button" id="scheduleButton">대회 등록하러 가기</button>
+                <div class="form-row">
+                    <label for="emailAgreementCheckboxHost">이메일 수신 동의:</label>
+                    <input type="checkbox" id="emailAgreementCheckboxHost"
+                           th:checked="${emailAgreement} ? 'checked' : null">
+                </div>
             </div>
 
         </div>
@@ -314,6 +324,31 @@
             if (!hostName || hostName.trim().toLowerCase() !== hostNameInput.toLowerCase()) return alert("등록 버튼을 먼저 누르세요.");
             location.href = "/schedule";
         });
+
+        const checkboxUser = document.getElementById("emailAgreementCheckboxUser");
+        checkboxUser?.addEventListener("change", () => {
+            const checked = checkboxUser.checked;
+            updateEmailAgreement(checked);
+        });
+
+        const checkboxHost = document.getElementById("emailAgreementCheckboxHost");
+        checkboxHost?.addEventListener("change", () => {
+            const checked = checkboxHost.checked;
+            updateEmailAgreement(checked);
+        });
+
+        function updateEmailAgreement(checked) {
+            fetch("/mypage/email-agreement", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ emailAgreement: checked })
+            }).then(res => {
+                if (res.ok) alert("메일 수신 설정이 변경되었습니다.");
+                else res.text().then(msg => alert("변경 실패: " + msg));
+            });
+        }
     });
 
     function triggerUpload() {

@@ -58,16 +58,16 @@ public class MatchupBoardService {
     public void registerMatchupBoard(ReqMatchupBoardDto reqMatchupBoardDto, CustomUser user) {
 
 
-        // 게시글을 24시간에 3번만 작성할 수 있도록 검사
+        // 게시글을 24시간에 2번만 작성할 수 있도록 검사
         Long numberOfTodayMatchupBoards = matchupBoardRepository.countTodayMatchupBoards(user.getMember().getId(), LocalDateTime.now().minusHours(24));
-        if(numberOfTodayMatchupBoards>=3){
-            throw new CustomException("Matchup 게시글은 하루에 3번만 작성할 수 있습니다.");
+        if(numberOfTodayMatchupBoards>=2){
+            throw new CustomException("Matchup 게시글은 하루에 2번만 작성할 수 있습니다.");
         }
 
         // Matchup Board 생성하면서 group chat 생성
         MatchupBoard newMatchupBoard = MatchupBoard.builder()
                 .writer(user.getMember())
-                .sportsType(sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardDto.getSportsTypeName())).orElseThrow(()-> new IllegalArgumentException("Matchup"+reqMatchupBoardDto.getSportsTypeName()+"는 에서 지원하지 않는 종목입니다.")))
+                .sportsType(sportsTypeRepository.findBySportsTypeName(SportsTypeName.valueOf(reqMatchupBoardDto.getSportsTypeName())).orElseThrow(()-> new CustomException("Matchup "+reqMatchupBoardDto.getSportsTypeName()+"는 에서 지원하지 않는 종목입니다.")))
                 .reservationAttachmentEnabled(true)
                 .teamIntro(reqMatchupBoardDto.getTeamIntro())
                 .sportsFacilityName(reqMatchupBoardDto.getSportsFacilityName())
@@ -81,6 +81,8 @@ public class MatchupBoardService {
                 .chatRoom(chatService.registerGroupChatRoom(user.getMember()))
                 .build();
         MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
+
+        //경기장 예약 내역 S3에 업로드
         matchupService.insertFile(reqMatchupBoardDto.getReservationFile(), matchupBoard);
     }
 
@@ -93,7 +95,7 @@ public class MatchupBoardService {
     * Matchup 게시글 수정하기 페이지로 나갈 정보
     * */
     @Transactional(readOnly = true)
-    public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId) {
+    public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId, CustomUser user) {
 
         MatchupBoard matchupBoard = matchupBoardRepository.findMatchupBoardByBoardId(boardId).orElseThrow(()->new CustomException("Matchup"+boardId +"번 게시글이 존재하지 않습니다."));
 
@@ -117,7 +119,7 @@ public class MatchupBoardService {
                 .currentParticipantCount(matchupBoard.getCurrentParticipantCount())
                 .maxParticipants(matchupBoard.getMaxParticipants())
                 .minMannerTemperature(matchupBoard.getMinMannerTemperature())
-                .myMannerTemperature(matchupBoard.getWriter().getMyTemperature()) //matchupBoard.getMember().getMyTemperature()
+                .myMannerTemperature(user.getMember().getMyTemperature()) //matchupBoard.getMember().getMyTemperature()
                 .matchDescription(matchupBoard.getMatchDescription())
                 .originalName(attachments.get(0).getOriginalName())
                 .savedName(attachments.get(0).getSavedName())
@@ -199,12 +201,15 @@ public class MatchupBoardService {
     public void updateBoard(ReqMatchupBoardEditDto reqMatchupBoardEditDto, CustomUser user) {
         MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(reqMatchupBoardEditDto.getBoardId()).orElseThrow(()->new CustomException("Matchup"+reqMatchupBoardEditDto.getBoardId()+"번 게시글이 없습니다."));
 
+        // 경기 시작 시간이 지난 경우
         if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now()))
             throw new CustomException("Matchup 경기 시작 시간이 지나 수정할 수 없습니다.");
 
+        // 수정하려는 시간이 현재보다 과거인 경우
         if(reqMatchupBoardEditDto.getMatchDatetime().isBefore(LocalDateTime.now()))
             throw new CustomException("Matchup 경기 시작 시간은 현재 시간 이후만 가능합니다.");
 
+        //모집인원 체크
         if(findMatchupBoard.getCurrentParticipantCount()>reqMatchupBoardEditDto.getMaxParticipants())
             throw new CustomException("Matchup 총 모집 인원은 현재 모집된 인원 이상이여야 합니다.");
 
@@ -234,6 +239,7 @@ public class MatchupBoardService {
 
     /*
     * Matchup 게시글 삭제하기
+    * S3 파일은 삭제안함, soft delete라
     * */
     @Transactional
     public void softDeleteMatchupBoard(Long boardId) {

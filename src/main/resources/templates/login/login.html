@@ -55,6 +55,11 @@
 </body>
 <!--  정지 메시지 스크립트 -->
 <script th:inline="javascript">
+    const redirectAfterLogin = /*[[${redirectUrl}]]*/ '';
+    if (redirectAfterLogin) {
+        localStorage.setItem("loginRedirectUrl", decodeURIComponent(redirectAfterLogin));
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
     const date = urlParams.get('date');

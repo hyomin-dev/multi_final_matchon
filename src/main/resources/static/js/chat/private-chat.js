@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     setStompClient();
     //메시지 보낼 때 설정
     setSend(roomId);
+
     //연결 해제 설정
     setDisconnects(roomId);
 
@@ -80,7 +81,7 @@ function connect(token, roomId, loginEmail) {
             (error) => {
                 console.error("STOMP 연결 실패");
                 showErrorPage(error?.headers?.message || "Chat STOMP 연결 실패");
-                reject(error); // 실패 시
+                //reject(error); // 실패 시
             }
         );
     });
@@ -121,6 +122,7 @@ function setDisconnects(roomId) {
             if (stompClient && stompClient.connected) {
                 stompClient.unsubscribe(`/topic/${roomId}`);
                 stompClient.disconnect();
+
             }
         }
     });
@@ -165,7 +167,19 @@ function appendMessage(msg, loginEmail) {
     if(!isSystemMsg){
         const msgDiv = document.createElement('div');
         msgDiv.className = 'chat-message ' + (msg.senderEmail === loginEmail ? 'sent' : 'received');
-        msgDiv.innerHTML = `<strong>${msg.senderName}:</strong> ${msg.content}`;
+        const time = new Date(msg.createdDate).toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        msgDiv.innerHTML = `
+                <strong>${msg.senderName}:</strong><br/>
+                ${msg.content}
+                <span class="chat-timestamp">${time}</span>
+                `;
         chatBox.appendChild(msgDiv);
         lastSystemMessage = null;
     }
