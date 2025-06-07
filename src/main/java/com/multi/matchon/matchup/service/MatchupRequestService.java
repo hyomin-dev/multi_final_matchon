@@ -84,6 +84,9 @@ public class MatchupRequestService {
             throw new CustomException("Matchup 경기 시작 시간이 지나 참가 요청할 수 없습니다.");
         }
 
+        if(findMatchupBoard.getMinMannerTemperature()>user.getMember().getMyTemperature())
+            throw new CustomException("Matchup 최소 매너 온도를 충족하지 못해 참가 요청을 할 수 없습니다.");
+
 
         if(findMatchupBoard.getCurrentParticipantCount()>findMatchupBoard.getMaxParticipants()){
             throw new CustomException("Matchup 현재 모집 인원을 초과해서 참가 요청을 할 수 없습니다.");
@@ -170,6 +173,9 @@ public class MatchupRequestService {
         if(reqMatchupRequestDto.getMatchDatetime().isBefore(LocalDateTime.now())){
             throw new CustomException("Matchup 경기 시작 시간이 지나 참가 요청할 수 없습니다.");
         }
+
+
+        //인원 수 체크
 
         return reqMatchupRequestDto;
     }

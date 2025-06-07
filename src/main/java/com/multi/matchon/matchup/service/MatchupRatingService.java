@@ -290,7 +290,11 @@ public class MatchupRatingService {
 
         Double changeTemp = (reqMatchupRatingDto.getMannerScore()*0.14+ reqMatchupRatingDto.getSkillScore()*0.06 -0.4) *0.01;
 
-        target.updateMyTemperature(changeTemp);
+        Double newMyTemperature = user.getMember().getMyTemperature() +changeTemp;
+        if(newMyTemperature<30.0)
+            newMyTemperature = 30.0;
+
+        target.updateMyTemperature(newMyTemperature);
 
         /*
          * 작성자에게 알림 보내기

@@ -32,10 +32,64 @@ form label {
     margin-bottom: 2px;
 }
 
-.readonly-box,
-input,
-textarea,
-select {
+
+/*.readonly-box,*/
+/*input,*/
+/*textarea,*/
+/*select {*/
+/*    width: 100%;*/
+/*    padding: 12px 14px;*/
+/*    font-size: 14px;*/
+/*    border: 1px solid #ccc;*/
+/*    border-radius: 6px;*/
+/*    margin-bottom: 20px;*/
+/*    background-color: #fafafa;*/
+/*    box-sizing: border-box;*/
+/*    transition: border-color 0.3s, box-shadow 0.3s;*/
+/*}*/
+
+/*input:focus,*/
+/*textarea:focus,*/
+/*select:focus {*/
+/*    border-color: #3498db;*/
+/*    background-color: #fff;*/
+/*    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);*/
+/*    outline: none;*/
+/*}*/
+
+
+/*board 정보*/
+#board-info input
+{
+    width: 100%;
+
+    margin-bottom: 20px;
+
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    background-color: lightblue;
+    border: 1px solid lightblue;
+    border-radius: 6px;
+    line-height: 1.4;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+#board-info input:focus{
+    border-color: #3498db;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+    outline: none;
+}
+
+/*request 정보*/
+
+#request-info textarea,
+#request-info select {
     width: 100%;
     padding: 12px 14px;
     font-size: 14px;
@@ -47,29 +101,28 @@ select {
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
+
+#request-info textarea:focus,
+#request-info select:focus {
     border-color: #3498db;
     background-color: #fff;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
     outline: none;
 }
 
-.readonly-box {
-    white-space: pre-wrap; /* 줄바꿈 및 공백 유지 */
-    min-height: 100px;
+textarea{
+    overflow: hidden;
+    resize: none;
 }
-.readonly-box.clickable{
-    cursor: pointer;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 
-}
-.readonly-box.clickable:hover {
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); /* 연하게 */
-    background-color: #fff;
-    outline: none;
+/* 지도 스타일 */
+#map {
+    width: 100%;
+    height: 350px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    margin-bottom: 20px;
 }
 
 .button-group{
@@ -95,22 +148,21 @@ select:focus {
     background-color: royalblue;
 }
 
-/* 지도 스타일 */
-#map {
-    width: 100%;
-    height: 350px;
-    border: 1px solid #ccc;
+/*취소 버튼*/
+/* ===== 버튼 ===== */
+.cancel-btn{
+    padding: 8px 15px;
+    background-color: white;
+    color: #f44336;
+    border: 2px solid #f44336;
     border-radius: 6px;
-    margin-top: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+
 }
 
-.disabled {
-    background-color: #555 !important;  /* 더 진한 회색 */
-    color: #ddd !important;
-    pointer-events: none;          /* 클릭 안 되게 */
-    cursor: not-allowed;           /* 마우스 모양 변경 */
-    opacity: 0.7;                  /* 살짝 흐리게 */
-    text-decoration: none;
+.cancel-btn:hover {
+    background-color: mistyrose;
 }
 
 .truncate {

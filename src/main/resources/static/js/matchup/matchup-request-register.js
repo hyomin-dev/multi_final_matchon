@@ -138,3 +138,12 @@ function setParticipantCount(currentParticipantCount, maxParticipants){
             option.selected = true;
     }
 }
+
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}

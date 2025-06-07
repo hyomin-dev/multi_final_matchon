@@ -95,7 +95,7 @@ public class MatchupBoardService {
     * Matchup 게시글 수정하기 페이지로 나갈 정보
     * */
     @Transactional(readOnly = true)
-    public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId) {
+    public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId, CustomUser user) {
 
         MatchupBoard matchupBoard = matchupBoardRepository.findMatchupBoardByBoardId(boardId).orElseThrow(()->new CustomException("Matchup"+boardId +"번 게시글이 존재하지 않습니다."));
 
@@ -119,7 +119,7 @@ public class MatchupBoardService {
                 .currentParticipantCount(matchupBoard.getCurrentParticipantCount())
                 .maxParticipants(matchupBoard.getMaxParticipants())
                 .minMannerTemperature(matchupBoard.getMinMannerTemperature())
-                .myMannerTemperature(matchupBoard.getWriter().getMyTemperature()) //matchupBoard.getMember().getMyTemperature()
+                .myMannerTemperature(user.getMember().getMyTemperature()) //matchupBoard.getMember().getMyTemperature()
                 .matchDescription(matchupBoard.getMatchDescription())
                 .originalName(attachments.get(0).getOriginalName())
                 .savedName(attachments.get(0).getSavedName())

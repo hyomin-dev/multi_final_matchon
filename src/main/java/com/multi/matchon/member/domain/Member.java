@@ -164,7 +164,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void updateMyTemperature(Double myTemperature){
-        this.myTemperature += myTemperature;
+        this.myTemperature = myTemperature;
     }
 
     public void setEmailAgreement(Boolean emailAgreement) {
