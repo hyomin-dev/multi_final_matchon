@@ -19,7 +19,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             select t1
             from ChatMessage t1
             join fetch t1.member
-            where t1.chatRoom = :chatRoom and t1.createdDate>=:joinedDate
+            where t1.chatRoom = :chatRoom and t1.createdDate>=:joinedDate and t1.chatRoom.isDeleted=false
             order by t1.createdDate asc
             """)
     List<ChatMessage> findByChatRoomAndJoinedDateOrderByCreatedTimeAscWithMember(@Param("chatRoom") ChatRoom chatRoom, @Param("joinedDate") LocalDateTime joinedDate);

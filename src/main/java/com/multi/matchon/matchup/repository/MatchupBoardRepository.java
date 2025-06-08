@@ -286,4 +286,5 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             where t1.isDeleted =false and t1.isNotified=false and t1.matchDatetime<=:threeHoursLater and t1.writer.isDeleted=false
             """)
     List<MatchupBoard> findUnnotifiedBoardsAtThreeHoursBeforeMatch(@Param("threeHoursLater") LocalDateTime threeHoursLater);
+
 }

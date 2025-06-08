@@ -81,6 +81,8 @@ public class MatchupBoardService {
         String identifierChatRoomName = "("+ UUID.randomUUID().toString().replace("-","").substring(0,8)+")";
 
 
+        ChatRoom chatRoom = chatService.registerGroupChatRoom(user.getMember(), chatName+identifierChatRoomName);
+
         // Matchup Board 생성하면서 group chat 생성
         MatchupBoard newMatchupBoard = MatchupBoard.builder()
                 .writer(user.getMember())
@@ -95,9 +97,10 @@ public class MatchupBoardService {
                 .maxParticipants(reqMatchupBoardDto.getMaxParticipants())
                 .minMannerTemperature(reqMatchupBoardDto.getMinMannerTemperature())
                 .matchDescription(reqMatchupBoardDto.getMatchDescription())
-                .chatRoom(chatService.registerGroupChatRoom(user.getMember(), chatName+identifierChatRoomName))
+                .chatRoom(chatRoom)
                 .build();
         MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
+        chatRoom.registerMatchupBoard(matchupBoard);
 
         //경기장 예약 내역 S3에 업로드
         matchupService.insertFile(reqMatchupBoardDto.getReservationFile(), matchupBoard);
@@ -346,7 +349,7 @@ public class MatchupBoardService {
             notificationService.sendNotification(matchupBoard.getWriter(),"[경기 예정]"+matchupBoard.getMatchDatetime()+"에 경기가 진행될 예정입니다.","/matchup/board/detail?matchup-board-id="+matchupBoard.getId());
             count++;
 
-            matchupBoard.setIsNotified(true);
+            matchupBoard.updateIsNotified(true);
         }
 
         return count;

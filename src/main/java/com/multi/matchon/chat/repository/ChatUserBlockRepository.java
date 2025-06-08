@@ -24,6 +24,7 @@ public interface ChatUserBlockRepository extends JpaRepository<ChatUserBlock, Lo
     @Query("""
             select t1
             from ChatUserBlock t1
+            join fetch t1.blocked
             where t1.blocker =:blocker
             """)
     List<ChatUserBlock> findAllByBlocker(@Param("blocker") Member blocker);

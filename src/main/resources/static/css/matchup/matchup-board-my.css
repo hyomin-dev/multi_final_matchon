@@ -153,6 +153,7 @@ label[for="availableOnly"], label:has(#availableOnly) {
     min-width: 100px;
 }
 
+.group-chat.disabled,
 .rating-setting.disabled {
     background-color: #bcbcbc;
     color: white;
@@ -162,6 +163,7 @@ label[for="availableOnly"], label:has(#availableOnly) {
 }
 
 /* 마우스 올려도 hover 효과 제거 */
+.group-chat.disabled:hover,
 .rating-setting.disabled:hover {
     background-color: #bcbcbc;
     color: white;

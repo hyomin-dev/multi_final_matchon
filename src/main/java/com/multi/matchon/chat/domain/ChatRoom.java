@@ -1,6 +1,7 @@
 package com.multi.matchon.chat.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
+import com.multi.matchon.matchup.domain.MatchupBoard;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,6 +36,9 @@ public class ChatRoom extends BaseEntity {
     @Builder.Default
     private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
+    @OneToOne(mappedBy = "chatRoom", fetch = FetchType.LAZY)
+    private MatchupBoard matchupBoard;
+
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
@@ -42,11 +46,11 @@ public class ChatRoom extends BaseEntity {
     @Column(name = "team_id")
     private Long teamId;
 
+    public void deleteChatRoom(Boolean isDeleted){
+        this.isDeleted = isDeleted;
+    }
 
-
-
-
-
-
-
+    public void registerMatchupBoard(MatchupBoard matchupBoard) {
+        this.matchupBoard = matchupBoard;
+    }
 }

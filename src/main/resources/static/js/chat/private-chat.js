@@ -118,7 +118,7 @@ function setDisconnects(roomId) {
 
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
-            fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST" });
+            fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST", credentials:"include" });
             if (stompClient && stompClient.connected) {
                 stompClient.unsubscribe(`/topic/${roomId}`);
                 stompClient.disconnect();
@@ -128,7 +128,7 @@ function setDisconnects(roomId) {
     });
 
     window.addEventListener('pagehide', () => {
-        fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST" });
+        fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST", credentials:"include" });
         if (stompClient && stompClient.connected) {
             stompClient.unsubscribe(`/topic/${roomId}`);
             stompClient.disconnect();
@@ -202,55 +202,71 @@ function scrollToBottom() {
 
 
 async function getPrivateChatRoomId(receiverId){
-    const response = await fetch(`/chat/room/private?receiverId=${receiverId}`,{
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok){
+    try{
+        const response = await fetch(`/chat/room/private?receiverId=${receiverId}`,{
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok){
+            const data = await response.json();
+            // console.log(data);
+            // console.log(data.error);
+
+            showErrorPage(data.error);
+        }
         const data = await response.json();
-        // console.log(data);
-        // console.log(data.error);
 
-        showErrorPage(data.error);
-
+        return data.data;
+    }catch (err){
+        showErrorPage("현재 채팅방 참여자가 아닙니다.");
     }
 
-    const data = await response.json();
 
-    return data.data;
+
 
 }
 
 async function checkIsRoomParticipant(roomId) {
-    const response = await fetch(`/chat/check/my/rooms?roomId=${roomId}`,{
-        method: "GET",
-        credentials: "include"
-    })
+    try{
+        const response = await fetch(`/chat/check/my/rooms?roomId=${roomId}`,{
+            method: "GET",
+            credentials: "include"
+        })
 
-    if(!response.ok){
-        const data = await response.json();
-        showErrorPage(data.error);
+        if(!response.ok){
+            const data = await response.json();
+            showErrorPage(data.error);
+        }
+    }catch (err){
+        console.error(err);
+        showErrorPage("현재 채팅방 참여자가 아닙니다.");
     }
+
 }
 
 async function getChatHistory(roomId, loginEmail) {
-    const response = await fetch(`/chat/history?roomId=${roomId}`,{
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok){
+    try{
+        const response = await fetch(`/chat/history?roomId=${roomId}`,{
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok){
+            const data = await response.json();
+            // console.log(data);
+            // console.log(data.error);
+            //showErrorPage(data.error);
+        }
         const data = await response.json();
-        // console.log(data);
-        // console.log(data.error);
-        showErrorPage(data.error);
+
+        data.data.forEach(dto =>{
+            appendMessage(dto, loginEmail);
+            scrollToBottom();
+        })
+    }catch(err){
+        console.error("가져올 이전 기록이 없습니다.");
     }
 
-    const data = await response.json();
 
-    data.data.forEach(dto =>{
-        appendMessage(dto, loginEmail);
-        scrollToBottom();
-    })
 
 }
 

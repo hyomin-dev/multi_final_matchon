@@ -1,24 +1,16 @@
+
+
 document.addEventListener("DOMContentLoaded",async ()=>{
     getMyChatRooms();
+
+    renderChatList();
 })
 
-async function getMyChatRooms(){
-    const response = await fetch("/chat/my/rooms",{
-        method: "POST",
-        credentials: "include"
-    });
 
-    if(!response.ok){
-        const error = await response.json();
-        console.log(error);
-        throw new Error(`HTTP error! Status:${response.status}`)
-
-    }
-
+async function renderChatList() {
     const chatRoomList = document.querySelector(".chat-room-list");
 
-    const items = await response.json();
-    console.log(items);
+    const items = await getMyChatRooms();
 
     if(items.data.length ===0){
         chatRoomList.innerHTML = `
@@ -43,72 +35,84 @@ async function getMyChatRooms(){
             </div>           
         `;
 
-        const enterBtn = card.querySelector(".enter-btn");
-        enterBtn.textContent = "입장";
-
-
-        const exitBtn = card.querySelector(".exit-btn");
-        if(item.isGroupChat === true){
-
-            exitBtn.textContent = "나가기";
-            exitBtn.disabled = true;
-            enterBtn.addEventListener("click",()=>{
-                window.open(`/chat/group/room?roomId=${item.roomId}`,"_black");
-            });
-
-        }
-
-        else{
-
-            if(item.isBlock===true){
-                exitBtn.textContent = "차단해제";
-                exitBtn.addEventListener("click",(e)=>{
-                    let reply = confirm("정말 차단 해제 하시겠습니까?");
-                    if(reply){
-                        window.location.href = `/chat/room/private/unblock?roomId=${item.roomId}`;
-                    }else{
-                        e.preventDefault();
-                    }
-                });
-
-               enterBtn.disabled=true;
-
-
-            }else{
-                exitBtn.textContent = "차단";
-                exitBtn.addEventListener("click",(e)=>{
-                    let reply = confirm("정말 차단 하시겠습니까?");
-                    if(reply){
-                        window.location.href = `/chat/room/private/block?roomId=${item.roomId}`;
-                    }else{
-                        e.preventDefault();
-                    }
-                });
-
-                enterBtn.addEventListener("click",()=>{
-                    window.open(`/chat/my/room?roomId=${item.roomId}`,"_black");
-                });
-
-            }
-
-        }
-
-        // enterBtn.addEventListener("click",()=>{
-        //     window.open(`/chat/my/room?roomId=${item.roomId}`,"_black");
-        // });
-        //
-        // exitBtn.addEventListener("click",(e)=>{
-        //     let reply = confirm("정말 차단하시겠습니까?");
-        //     if(reply){
-        //         window.location.href = `/chat/room/private/block?roomId=${item.roomId}`;
-        //     }else{
-        //         e.preventDefault();
-        //     }
-        // })
-
+        setButton(card,item);
         chatRoomList.appendChild(card);
 
     });
+
+}
+
+
+async function getMyChatRooms(){
+    try{
+        const response = await fetch("/chat/my/rooms",{
+            method: "POST",
+            credentials: "include"
+        });
+
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+
+
+
+        const items = await response.json();
+        //console.log(items);
+        return items;
+
+    }catch (err){
+        consolse.log(err);
+    }
+
+    return [];
+
+}
+
+function setButton(card,item){
+    const enterBtn = card.querySelector(".enter-btn");
+    enterBtn.textContent = "입장";
+
+    const exitBtn = card.querySelector(".exit-btn");
+    if(item.isGroupChat === true){
+
+        enterBtn.addEventListener("click",()=>{
+            window.open(`/chat/group/room?roomId=${item.roomId}`,"_blank","noopener,noreferrer");
+        });
+
+        exitBtn.textContent = "퇴장";
+        exitBtn.disabled = true;
+    }
+
+    else{
+
+        if(item.isBlock===true){
+            exitBtn.textContent = "해제";
+            exitBtn.addEventListener("click",(e)=>{
+                let reply = confirm("정말 차단 해제 하시겠습니까?");
+                if(reply){
+                    window.location.href = `/chat/room/private/unblock?roomId=${item.roomId}`;
+                }else{
+                    e.preventDefault();
+                }
+            });
+
+            enterBtn.disabled=true;
+
+        }else{
+            exitBtn.textContent = "차단";
+            exitBtn.addEventListener("click",(e)=>{
+                let reply = confirm("정말 차단 하시겠습니까?");
+                if(reply){
+                    window.location.href = `/chat/room/private/block?roomId=${item.roomId}`;
+                }else{
+                    e.preventDefault();
+                }
+            });
+
+            enterBtn.addEventListener("click",()=>{
+                window.open(`/chat/my/room?roomId=${item.roomId}`,"_blank","noopener,noreferrer");
+            });
+        }
+    }
 }
 
 
