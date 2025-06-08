@@ -54,7 +54,8 @@
                         <span th:text="${board.title}"></span>
                         <span class="comment-count"
                               th:if="${board.commentCount > 0}"
-                              th:text="' [' + ${board.commentCount} + ']'"></span>
+                              th:text="' [' + ${board.commentCount} + ']'">
+                        </span>
                     </a>
                 </td>
                 <td th:text="${board.authorName}"></td>
@@ -71,7 +72,8 @@
                         <span th:text="${board.title}"></span>
                         <span class="comment-count"
                               th:if="${board.commentCount > 0}"
-                              th:text="' [' + ${board.commentCount} + ']'"></span>
+                              th:text="' [' + ${board.commentCount} + ']'">
+                        </span>
                     </a>
                 </td>
                 <td th:text="${board.authorName}"></td>
@@ -82,12 +84,17 @@
 
         <div class="pagination">
             <a class="page-link"
+               th:if="${boardsPage.number > 0}"
+               th:data-page="0"
+               href="#">&laquo;</a>
+
+            <a class="page-link"
                th:if="${boardsPage.hasPrevious()}"
                th:data-page="${boardsPage.number - 1}"
                href="#">이전</a>
 
             <a class="page-link"
-               th:each="i : ${#numbers.sequence(0, boardsPage.totalPages - 1)}"
+               th:each="i : ${pageNumbers}"
                th:data-page="${i}"
                th:text="${i + 1}"
                th:classappend="${i == boardsPage.number} ? 'active' : ''"
@@ -97,6 +104,11 @@
                th:if="${boardsPage.hasNext()}"
                th:data-page="${boardsPage.number + 1}"
                href="#">다음</a>
+
+            <a class="page-link"
+               th:if="${boardsPage.number < boardsPage.totalPages - 1}"
+               th:data-page="${boardsPage.totalPages - 1}"
+               href="#">&raquo;</a>
         </div>
     </div>
 </div>
@@ -123,14 +135,12 @@
                     currentTitle.textContent = newTitle.textContent;
                 }
 
-                attachPaginationEvents(); // 새 pagination에 이벤트 다시 연결
+                attachPaginationEvents();
             });
     }
 
-    // 카테고리 변경 이벤트
     document.querySelector('.category-select')?.addEventListener('change', () => reloadBoardList(0));
 
-    // 페이지 번호 클릭 이벤트 연결
     function attachPaginationEvents() {
         document.querySelectorAll('.page-link').forEach(link => {
             link.addEventListener('click', function (e) {
