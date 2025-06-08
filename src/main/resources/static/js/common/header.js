@@ -480,13 +480,12 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
         wrapper.style.pointerEvents = "none";
         msg.style.opacity = "0.6";
 
-        if (data && typeof data.data === "string" && data.data.trim() !== "") {
+        if(data && typeof data.data === "string" && data.data.trim() !== ""){
             const go = confirm("알림 페이지로 이동하시겠습니까?");
             if (go) window.location.href = data.data;
         } else {
             alert("알림이 확인되었습니다.");
         }
-
 
         // 알림 읽으면 읽음 숫자 차감
         badge.innerText = Math.max(parseInt(badge.innerText)-1, 0);
