@@ -93,3 +93,12 @@
     margin-bottom: 4px;
     vertical-align: middle;
 }
+
+.popup-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* 텍스트와 아이콘 사이 여백 */
+    margin-bottom: 16px;
+    font-size: 1.2rem;
+}
