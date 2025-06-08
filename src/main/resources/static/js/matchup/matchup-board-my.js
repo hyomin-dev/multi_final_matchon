@@ -108,11 +108,9 @@ function renderList(items){
                          <td><button onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'" class="detail button-group">상세보기</button></td>
                          <td><button onclick="location.href='/matchup/request/board?board-id=${item.boardId}'" class="request button-group">요청 확인</button></td>
                          <td><button onclick="window.open('/chat/group/room?roomId=${item.roomId}', '_blank')" class="group-chat button-group">단체 채팅</button></td>
-                         <td><button class="rating-setting disabled button-group">평가 세팅</button></td>     
-                         
-                                            
+                         <td><button class="rating-setting disabled button-group">평가 세팅</button></td>                                
                          `;
-
+        setGroupChatButton(card,item);
         setRatingSettingButton(card, item);
         markIfPastMatchdatetime(card, item);
         boardArea.appendChild(card);
@@ -287,7 +285,6 @@ function markIfPastMatchdatetime(card, item){
             td.style.backgroundColor = "lightgray";
         })
     }
-
 }
 
 function goBack(){
@@ -296,6 +293,20 @@ function goBack(){
     } else {
         window.location.href = "/matchup/board";
     }
+}
+
+function setGroupChatButton(card,item){
+    const matchDate = new Date(item.matchDatetime);
+
+    const threeDaysLater = new Date(matchDate.getTime()+3*24*60*60*1000);
+
+    const now = new Date();
+
+    if(threeDaysLater<now){
+        card.querySelector(".group-chat").classList.add("disabled");
+        card.querySelector(".group-chat").removeAttribute("onclick");
+    }
+
 }
 
 

@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +49,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
                     (:sportsType is null or t3.sportsTypeName =:sportsType) and
                     (:matchDate is null or DATE(t2.matchDatetime) >=:matchDate) and
                     (:availableFilter is false or (:availableFilter=true and t2.matchDatetime > CURRENT_TIMESTAMP ))
-                    order by t1.modifiedDate DESC
+                    order by t1.createdDate DESC
             """)
     Page<ResMatchupRequestListDto> findAllResMatchupRequestListDtosByMemberIdAndSportsTypeAndMatchDateWithPaging(PageRequest pageRequest, @Param("memberId") Long memberId, @Param("sportsType") SportsTypeName sportsTypeName, @Param("matchDate") LocalDate matchDate, @Param("availableFilter") Boolean availableFilter);
 
@@ -165,7 +166,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             join t1.member t3
             where t1.matchupBoard.id=:boardId and
                     t2.isDeleted = false
-                    order by t1.modifiedDate DESC
+                    order by t1.createdDate DESC
             """)
     Page<ResMatchupRequestOverviewListDto> findAllResMatchupRequestOverviewListDtoByBoardIdAndSportsTypeWithPaging(PageRequest pageRequest,@Param("boardId") Long boardId);
 
@@ -218,7 +219,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             from MatchupRequest t1
             join t1.matchupBoard t2
             join fetch t1.member
-            where t2.isDeleted=false and  t2.matchDatetime < CURRENT_TIMESTAMP and
+            where t2.isDeleted=false and  t2.matchDatetime < CURRENT_TIMESTAMP and t1.member.isDeleted=false and
             (
                 (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
                 (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
@@ -250,4 +251,24 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             
             """)
     List<Member> findByBoardIdAndActiveRequests(@Param("boardId") Long boardId);
+
+
+    @Query("""
+            select t1
+            from MatchupRequest t1
+            join t1.matchupBoard t2
+            join fetch t1.member
+            where t2.isDeleted=false and t2.matchDatetime <=:threeHoursLater and t1.member.isDeleted=false and
+            (
+                 (t1.matchupStatus=com.multi.matchon.common.domain.Status.PENDING and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.PENDING and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted =false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false)
+            )
+            """)
+    List<MatchupRequest> findUnnotifiedRequestsAtThreeHoursBeforeMatch(@Param("threeHoursLater") LocalDateTime threeHoursLater);
 }
