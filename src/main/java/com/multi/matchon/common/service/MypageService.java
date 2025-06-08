@@ -65,7 +65,7 @@ public class MypageService {
         boolean isDefaultProfile = profileAttachment.isEmpty();
         String imageUrl = profileAttachment
                 .map(att -> awsS3Utils.createPresignedGetUrl(PROFILE_DIR, att.getSavedName()))
-                .orElse("/img/default-user.png");
+                .orElse("/img/common-profile.png");
 
         data.put("profileImageUrl", imageUrl);
         data.put("isDefaultProfile", isDefaultProfile);
