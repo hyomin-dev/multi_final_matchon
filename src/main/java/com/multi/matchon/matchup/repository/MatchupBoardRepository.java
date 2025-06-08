@@ -47,10 +47,10 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             select t1
             from MatchupBoard t1
             join fetch t1.sportsType
-            where t1.id=:boardId and t1.isDeleted=false and t1.writer.isDeleted=false
+            where t1.id=:boardId and t1.isDeleted=false and t1.writer.isDeleted=false and t1.writer =:loginMember and t1.matchDatetime>CURRENT_TIMESTAMP
             """
             )
-    Optional<MatchupBoard> findMatchupBoardByBoardIdAndIsDeleted(@Param("boardId") Long boardId);
+    Optional<MatchupBoard> findMatchupBoardByBoardIdAndIsDeleted(@Param("boardId") Long boardId, @Param("loginMember") Member loginMember);
 
 
     @Query("""

@@ -232,7 +232,22 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
     List<MatchupRequest> findByGameParticipantConditionAndAfterMatchupDatetime();
 
 
-
-
-
+    @Query("""
+            select t1.member
+            from MatchupRequest t1
+            join t1.matchupBoard t2
+            where t2.id =:boardId and t2.isDeleted=false and t2.matchDatetime>CURRENT_TIMESTAMP and
+            (
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.PENDING and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.PENDING and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted =false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=0 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=1 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false) or
+                (t1.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t1.matchupRequestSubmittedCount=2 and t1.matchupCancelSubmittedCount=1 and t1.isDeleted=false)
+            )
+            
+            """)
+    List<Member> findByBoardIdAndActiveRequests(@Param("boardId") Long boardId);
 }

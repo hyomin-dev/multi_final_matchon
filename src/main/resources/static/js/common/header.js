@@ -480,7 +480,7 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
         wrapper.style.pointerEvents = "none";
         msg.style.opacity = "0.6";
 
-        if (data?.data?.trim()) {
+        if (data && typeof data.data === "string" && data.data.trim() !== "") {
             const go = confirm("알림 페이지로 이동하시겠습니까?");
             if (go) window.location.href = data.data;
         } else {
