@@ -122,8 +122,8 @@ public class MatchupBoardController {
     }
 
     @GetMapping("/delete")
-    public String softDeleteBoard(@RequestParam("boardId") Long boardId){
-        matchupBoardService.softDeleteMatchupBoard(boardId);
+    public String softDeleteBoard(@RequestParam("boardId") Long boardId, @AuthenticationPrincipal CustomUser user){
+        matchupBoardService.softDeleteMatchupBoard(boardId, user);
         log.info("matchup 게시글 삭제 완료");
         return "redirect:/matchup/board/my";
     }

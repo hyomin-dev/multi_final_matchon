@@ -487,7 +487,6 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
             alert("알림이 확인되었습니다.");
         }
 
-
         // 알림 읽으면 읽음 숫자 차감
         badge.innerText = Math.max(parseInt(badge.innerText)-1, 0);
 

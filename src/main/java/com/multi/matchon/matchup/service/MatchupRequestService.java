@@ -188,6 +188,9 @@ public class MatchupRequestService {
 
     }
 
+    /*
+    * 특정 게시글에 들어온 요청 목록
+    * */
     public PageResponseDto<ResMatchupRequestOverviewListDto> findAllMatchupRequestByBoardWithPaging(PageRequest pageRequest, Long boardId) {
 
         Page<ResMatchupRequestOverviewListDto> page = matchupRequestRepository.findAllResMatchupRequestOverviewListDtoByBoardIdAndSportsTypeWithPaging(pageRequest,boardId);

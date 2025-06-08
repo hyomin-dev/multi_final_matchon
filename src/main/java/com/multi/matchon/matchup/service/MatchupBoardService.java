@@ -10,6 +10,7 @@ import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
+import com.multi.matchon.common.service.NotificationService;
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
@@ -19,6 +20,7 @@ import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardOverviewDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
+import com.multi.matchon.matchup.repository.MatchupRequestRepository;
 import com.multi.matchon.member.domain.Member;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,9 @@ public class MatchupBoardService {
     private final MatchupService matchupService;
     private final AttachmentRepository attachmentRepository;
     private final ChatService chatService;
+    private final MatchupRequestRepository matchupRequestRepository;
+    private final NotificationService notificationService;
+
 
     // 등록
 
@@ -199,7 +204,7 @@ public class MatchupBoardService {
     * */
     @Transactional
     public void updateBoard(ReqMatchupBoardEditDto reqMatchupBoardEditDto, CustomUser user) {
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(reqMatchupBoardEditDto.getBoardId()).orElseThrow(()->new CustomException("Matchup"+reqMatchupBoardEditDto.getBoardId()+"번 게시글이 없습니다."));
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(reqMatchupBoardEditDto.getBoardId(), user.getMember()).orElseThrow(()->new CustomException("Matchup"+reqMatchupBoardEditDto.getBoardId()+"번 게시글이 없습니다."));
 
         // 경기 시작 시간이 지난 경우
         if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now()))
@@ -232,6 +237,18 @@ public class MatchupBoardService {
         if(!Objects.requireNonNull(reqMatchupBoardEditDto.getReservationFile().getOriginalFilename()).isBlank()){
             matchupService.updateFile(reqMatchupBoardEditDto.getReservationFile(), findMatchupBoard);
         }
+
+        // 현재 참가 신청한 참여자들에게 게시글 수정 알리기
+        /*
+        * 보내야하는 대상:
+        * 승인 대기, 승인됨, 승인 취소 요청, 취소 요청 반려
+        * */
+
+        List<Member> applicants = matchupRequestRepository.findByBoardIdAndActiveRequests(findMatchupBoard.getId());
+        for(Member applicant: applicants){
+            notificationService.sendNotification(applicant, "[게시글 수정] 참가 요청하신 "+user.getMember().getMemberName()+"님의 게시글이 수정되었습니다.", "/matchup/board/detail?"+"matchup-board-id="+reqMatchupBoardEditDto.getBoardId());
+        }
+
     }
 
     // 삭제
@@ -242,19 +259,33 @@ public class MatchupBoardService {
     * S3 파일은 삭제안함, soft delete라
     * */
     @Transactional
-    public void softDeleteMatchupBoard(Long boardId) {
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(boardId).orElseThrow(()->new CustomException("Matchup "+boardId+"번 게시글이 없습니다."));
+    public void softDeleteMatchupBoard(Long boardId, CustomUser user) {
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(boardId, user.getMember()).orElseThrow(()->new CustomException("Matchup "+boardId+"번 게시글이 없습니다."));
 
         if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now()))
             throw new CustomException("Matchup 경기 시작 시간이 지나 삭제할 수 없습니다.");
 
 
+        // 현재 참가 신청한 참여자들에게 게시글 삭제 알리기
+        /*
+         * 보내야하는 대상:
+         * 승인 대기, 승인됨, 승인 취소 요청, 취소 요청 반려
+         * */
+        List<Member> applicants = matchupRequestRepository.findByBoardIdAndActiveRequests(findMatchupBoard.getId());
+        for(Member applicant: applicants){
+            notificationService.sendNotification(applicant, "[게시글 삭제] 참가 요청하신 "+user.getMember().getMemberName()+"님의 게시글이 삭제되었습니다.", null);
+        }
+
         findMatchupBoard.delete(true);
+
+
 
         List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
         if(findAttachments.isEmpty())
             throw new CustomException("Matchup "+BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
         findAttachments.get(0).delete(true);
+
+
 
     }
 
