@@ -43,9 +43,6 @@ public class ChatRoom extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
-    @Column(name = "team_id")
-    private Long teamId;
-
     public void deleteChatRoom(Boolean isDeleted){
         this.isDeleted = isDeleted;
     }

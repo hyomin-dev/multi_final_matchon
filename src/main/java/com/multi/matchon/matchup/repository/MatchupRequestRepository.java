@@ -49,7 +49,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
                     (:sportsType is null or t3.sportsTypeName =:sportsType) and
                     (:matchDate is null or DATE(t2.matchDatetime) >=:matchDate) and
                     (:availableFilter is false or (:availableFilter=true and t2.matchDatetime > CURRENT_TIMESTAMP ))
-                    order by t1.modifiedDate DESC
+                    order by t1.createdDate DESC
             """)
     Page<ResMatchupRequestListDto> findAllResMatchupRequestListDtosByMemberIdAndSportsTypeAndMatchDateWithPaging(PageRequest pageRequest, @Param("memberId") Long memberId, @Param("sportsType") SportsTypeName sportsTypeName, @Param("matchDate") LocalDate matchDate, @Param("availableFilter") Boolean availableFilter);
 
@@ -166,7 +166,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             join t1.member t3
             where t1.matchupBoard.id=:boardId and
                     t2.isDeleted = false
-                    order by t1.modifiedDate DESC
+                    order by t1.createdDate DESC
             """)
     Page<ResMatchupRequestOverviewListDto> findAllResMatchupRequestOverviewListDtoByBoardIdAndSportsTypeWithPaging(PageRequest pageRequest,@Param("boardId") Long boardId);
 
