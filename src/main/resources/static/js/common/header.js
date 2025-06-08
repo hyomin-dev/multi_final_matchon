@@ -396,8 +396,14 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
         if(data && typeof data.data === "string" && data.data.trim() !== ""){
             const reply = confirm("알림 페이지로 이동하시겠습니까?")
-            if(reply)
-                window.location.href = data.data;
+            if(reply){
+                if(data.data.includes("chat")){
+                    window.open(data.data,"_blank");
+                }else{
+                    window.location.href = data.data;
+                }
+            }
+
         }else{
             alert("알림이 확인되었습니다.");
         }

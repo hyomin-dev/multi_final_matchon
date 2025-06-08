@@ -121,4 +121,8 @@ public class MatchupBoard extends BaseEntity {
     public void setRatingInitialized(Boolean isRatingInitialized){
         this.isRatingInitialized = isRatingInitialized;
     }
+
+    public void setIsNotified(Boolean isNotified){
+        this.isNotified = isNotified;
+    }
 }

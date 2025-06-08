@@ -40,8 +40,9 @@ public class MatchonScheduler {
         log.info("자동 평가 세팅 갯수: {}", result);
     }
 
-//    @Scheduled(cron="0 * * * * ?")
-//    public void setMatchNotificationBeforeStart(){
-//        Integer result = matchupBoardService.notifyAllParticipantsBeforeStart();
-//    }
+    @Scheduled(cron="0 * * * * ?")
+    public void setMatchNotificationBeforeStart(){
+        Long result = matchupBoardService.notifyAllParticipantsBeforeStart();
+        log.info("경기 시작 전 자동 알림 갯수: {}",result);
+    }
 }

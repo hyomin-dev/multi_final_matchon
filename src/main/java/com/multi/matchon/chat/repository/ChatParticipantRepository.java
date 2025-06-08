@@ -29,7 +29,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             select t1
             from ChatParticipant t1
             join fetch t1.chatRoom t2
-            where t1.isDeleted=false and t1.member.id =:memberId and t1.isDeleted=false
+            where t1.isDeleted=false and t1.member.id =:memberId
             
             """)
     List<ChatParticipant> findAllByMemberIdAndIsDeletedFalse(@Param("memberId") Long memberId);

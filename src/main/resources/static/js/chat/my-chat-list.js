@@ -34,7 +34,7 @@ async function getMyChatRooms(){
         card.className = "chat-card";
 
         card.innerHTML = `
-            <div class="chat-col chat-name"><strong>${item.roomName}</strong></div>
+            <div class="chat-col chat-name"><strong>${setChatName(item.roomName)}</strong></div>
             <div class="chat-col chat-group"><strong>${expressIsGroutChat(item.isGroupChat)}</strong></div>
             <div class="chat-col chat-unread"><strong>${item.unReadCount}</strong></div>
             <div class="chat-col chat-actions">
@@ -117,5 +117,13 @@ function expressIsGroutChat(isGroupChat){
         return "그룹 채팅";
     else
         return "1대1 채팅";
+
+}
+
+function setChatName(roomName){
+    if(roomName.slice(0,1)!=="T"){
+        return roomName.slice(0,-10);
+    }else
+        return roomName;
 
 }

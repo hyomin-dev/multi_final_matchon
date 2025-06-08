@@ -52,13 +52,7 @@ public class ChatController {
     @GetMapping("/room/private")
     public ResponseEntity<ApiResponse<Long>> getPrivateChatRoom(@RequestParam Long receiverId, @AuthenticationPrincipal CustomUser user){
 
-        Long senderId = user.getMember().getId();
-        System.out.println("🔍 Creating or fetching private chat room between sender " + senderId + " and receiver " + receiverId);
-
         Long roomId = chatService.findPrivateChatRoom(receiverId, user.getMember().getId());
-
-
-        System.out.println("✅ Found or created roomId: " + roomId);
 
         return ResponseEntity.ok().body(ApiResponse.ok(roomId));
     }
@@ -80,24 +74,27 @@ public class ChatController {
     @PostMapping("/my/rooms")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getMyChatRooms(@AuthenticationPrincipal CustomUser user) {
-        List<ResMyChatListDto> chatRooms;
+        //List<ResMyChatListDto> chatRooms;
 
+        List<ResMyChatListDto> resMyChatListDtos = chatService.findAllMyChatRoom(user);
 
-        TeamMember teamMember = teamMemberRepository.findByMemberId(user.getMember().getId())
-                .orElse(null);
+        return ResponseEntity.ok().body(ApiResponse.ok(resMyChatListDtos));
 
-        boolean isLeader = teamMember != null && teamMember.getTeamLeaderStatus();
-        boolean hasTeam = user.getMember().getTeam() != null;
-
-        if (isLeader && hasTeam) {
-            Long leaderId = user.getMember().getId();
-            Long teamId = user.getMember().getTeam().getId();
-            chatRooms = chatService.findRelevantRoomsForLeader(leaderId, teamId); // ✅ filtered
-        } else {
-            chatRooms = chatService.findAllRoomsForUser(user.getMember().getId()); // fallback
-        }
-
-        return ResponseEntity.ok().body(ApiResponse.ok(chatRooms));
+//        TeamMember teamMember = teamMemberRepository.findByMemberId(user.getMember().getId())
+//                .orElse(null);
+//
+//        boolean isLeader = teamMember != null && teamMember.getTeamLeaderStatus();
+//        boolean hasTeam = user.getMember().getTeam() != null;
+//
+//        if (isLeader && hasTeam) {
+//            Long leaderId = user.getMember().getId();
+//            Long teamId = user.getMember().getTeam().getId();
+//            chatRooms = chatService.findRelevantRoomsForLeader(leaderId, teamId); // ✅ filtered
+//        } else {
+//            chatRooms = chatService.findAllRoomsForUser(user.getMember().getId()); // fallback
+//        }
+//
+//        return ResponseEntity.ok().body(ApiResponse.ok(chatRooms));
     }
 
     /*

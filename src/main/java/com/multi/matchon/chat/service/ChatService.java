@@ -11,6 +11,7 @@ import com.multi.matchon.chat.repository.*;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.exception.custom.ApiCustomException;
 import com.multi.matchon.common.exception.custom.CustomException;
+import com.multi.matchon.common.service.NotificationService;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,43 +35,45 @@ public class ChatService {
     private final MessageReadLogRepository messageReadLogRepository;
     private final ChatUserBlockRepository chatUserBlockRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
 
+    // 등록More actions
     @Transactional
     public Long findPrivateChatRoom(Long receiverId, Long senderId) {
-        System.out.println("🟡 [findPrivateChatRoom] Called with receiverId = " + receiverId + ", senderId = " + senderId);
+        // 차단 검사
 
-        Member receiver = memberRepository.findByIdAndIsDeletedFalse(receiverId)
-                .orElseThrow(() -> {
-                    System.out.println("❌ Receiver not found: " + receiverId);
-                    return new ApiCustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다.");
-                });
 
-        Member sender = memberRepository.findByIdAndIsDeletedFalse(senderId)
-                .orElseThrow(() -> {
-                    System.out.println("❌ Sender not found: " + senderId);
-                    return new ApiCustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다.");
-                });
+        Member receiver = memberRepository.findByIdAndIsDeletedFalse(receiverId).orElseThrow(()->new ApiCustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
 
-        System.out.println("✅ Receiver: " + receiver.getMemberName() + ", Sender: " + sender.getMemberName());
 
+        Member sender = memberRepository.findByIdAndIsDeletedFalse(senderId).orElseThrow(()->new ApiCustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
+
+        // 서로서로 차단했는지 확인
+
+        //Boolean isBlock = chatUserBlockRepository.isBlockByReceiver(receiver);
+
+        // 여기까지 왔다는 것은 receiverId와 senderId가 유효
         Optional<ChatRoom> chatRoom = chatParticipantRepository.findPrivateChatRoomByReceiverIdAndSenderId(receiverId, senderId);
-        if (chatRoom.isPresent()) {
-            System.out.println("📎 Existing chat room found with ID: " + chatRoom.get().getId());
+        if(chatRoom.isPresent()){
             return chatRoom.get().getId();
         }
 
-        String identifierChatRoomName = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        String identifierChatRoomName = UUID.randomUUID().toString().replace("-","").substring(0,8);
+
         ChatRoom newChatRoom = ChatRoom.builder()
                 .isGroupChat(false)
-                .chatRoomName("private chat " + receiver.getMemberName() + "---" + sender.getMemberName() + "---" + identifierChatRoomName)
+                .chatRoomName("private chat "+receiver.getMemberName()+"---" +sender.getMemberName())
+                .chatRoomName("private chat "+receiver.getMemberName()+"---" +sender.getMemberName()+"---" +identifierChatRoomName)
                 .build();
 
         chatRoomRepository.save(newChatRoom);
+
         addParticipantToRoom(newChatRoom, receiver);
         addParticipantToRoom(newChatRoom, sender);
 
-        System.out.println("🆕 New chat room created with ID: " + newChatRoom.getId());
+        //1대1 채팅 상대방에게 메시지 보내기
+        notificationService.sendNotification(receiver, "[1대1 채팅] "+sender.getMemberName()+"님이 1대1 채팅을 걸었습니다. 지금 바로 확인해보세요!. ", "/chat/my/room?"+"roomId="+newChatRoom.getId());
 
         return newChatRoom.getId();
     }
@@ -122,12 +126,12 @@ public class ChatService {
     * Matchup board 작성할 때, group chat room을 생성하는 메서드
     * */
     @Transactional
-    public ChatRoom registerGroupChatRoom(Member matchupWriter){
-        String identifierChatRoomName = UUID.randomUUID().toString().replace("-","").substring(0,8);
+    public ChatRoom registerGroupChatRoom(Member matchupWriter, String chatName){
+
 
         ChatRoom newChatRoom = ChatRoom.builder()
                 .isGroupChat(true)
-                .chatRoomName("Matchup Group Chat "+matchupWriter.getMemberName()+"---" +identifierChatRoomName)
+                .chatRoomName(chatName)
                 .build();
 
         chatRoomRepository.save(newChatRoom);
@@ -211,10 +215,11 @@ public class ChatService {
         List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoomWithMember(chatRoom);
 
         Boolean check = false;
-
+        LocalDateTime joinedDate=LocalDateTime.now();
         for(ChatParticipant c : chatParticipants){
             if(c.getMember().equals(sender)){
                 check = true;
+                joinedDate = c.getCreatedDate();
                 break;
             }
         }
@@ -222,7 +227,7 @@ public class ChatService {
         if(!check)
             throw new ApiCustomException("Chat 본인이 속하지 않은 채팅방입니다.");
 
-        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomOrderByCreatedTimeAscWithMember(chatRoom);
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomAndJoinedDateOrderByCreatedTimeAscWithMember(chatRoom,joinedDate);
         List<ResChatDto> resChatDtos = new ArrayList<>();
 
         for(ChatMessage c: chatMessages){
