@@ -53,6 +53,12 @@ select:focus {
     outline: none;
 }
 
+textarea{
+    overflow-y: auto;
+    overflow-x: hidden;
+    resize: none;
+}
+
 /*읽기 전용*/
 #teamName{
 
@@ -106,6 +112,7 @@ input[type="button"]:hover,
 button:hover{
     background-color: royalblue;
 }
+
 
 /*취소 버튼*/
 /* ===== 버튼 ===== */

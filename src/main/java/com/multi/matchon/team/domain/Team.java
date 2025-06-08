@@ -63,7 +63,7 @@ public class Team extends BaseEntity {
     private String createdPerson;
 
     @Setter
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 

@@ -63,10 +63,10 @@
 /*경기 정보 테이블 열 너비 설정*/
 .col-match-info-sports-type {width: 10%}
 .col-match-info-writer {width:10%}
-.col-match-info-address {width: 40%}
-.col-match-info-match-date {width: 20%}
-.col-match-info-status {width: 8%}
-.col-match-info-participants {width: 8%}
+.col-match-info-address {width: 30%}
+.col-match-info-match-date {width: 25%}
+.col-match-info-status {width: 12%}
+.col-match-info-participants {width: 13%}
 
 /* ===== 게시판 테이블 ===== */
 .board-table {
@@ -258,11 +258,26 @@
     padding: 2rem 0;
 }
 
+.truncate-address{
+    width: 500px;           /* 너비 고정 */
+    white-space: nowrap;    /* 줄바꿈 없음 */
+    overflow: hidden;       /* 넘친 부분 숨김 */
+    text-overflow: ellipsis; /* 말줄임표 (...) 표시 */
+}
+
+.truncate-write{
+    width: 120px;          /* 너비 고정 */
+    white-space: nowrap;    /* 줄바꿈 없음 */
+    overflow: hidden;       /* 넘친 부분 숨김 */
+    text-overflow: ellipsis; /* 말줄임표 (...) 표시 */
+}
+
 .truncate {
     width: 250px;           /* 너비 고정 */
     white-space: pre-wrap;    /* 줄바꿈과 공백 유지 + 자동 줄바꿈 */
     word-break: break-word;   /* 단어 중간이라도 줄바꿈 */
 }
+
 
 
 

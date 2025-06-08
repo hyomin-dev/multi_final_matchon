@@ -24,11 +24,10 @@
        th:data-current-participant-count="${reqMatchupRequestDto.currentParticipantCount}"
        th:data-max-participants="${reqMatchupRequestDto.maxParticipants}"
   >
-
   </div>
 
   <div class="form-container" th:object="${reqMatchupRequestDto}">
-    <form>
+    <form id="board-info">
       <div class="form-group">
         <label>
           종목
@@ -71,7 +70,7 @@
       </div>
     </form>
     <hr>
-    <form th:object="${reqMatchupRequestDto}" th:action="@{/matchup/request}" method="post" >
+    <form th:object="${reqMatchupRequestDto}" th:action="@{/matchup/request}" method="post" id="request-info">
       <input type="hidden" th:field="*{boardId}"/>
 
       <label>
@@ -86,7 +85,7 @@
 
       <div class="btn-group">
         <button type="submit">요청하기</button>
-        <button type="button" class="cancel-btn">취소하기</button>
+        <button type="button" class="cancel-btn" onclick="goBack()">취소하기</button>
       </div>
     </form>
 

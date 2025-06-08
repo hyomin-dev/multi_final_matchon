@@ -1,6 +1,7 @@
 package com.multi.matchon.common.controller;
 
 
+import com.multi.matchon.matchup.service.MatchupBoardService;
 import com.multi.matchon.matchup.service.MatchupRatingService;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.repository.MemberRepository;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @RequiredArgsConstructor
 public class MatchonScheduler {
+    private final MatchupBoardService matchupBoardService;
     private int count1=1;
     private int count2=1;
     private final MemberRepository memberRepository;
@@ -28,10 +30,18 @@ public class MatchonScheduler {
         //log.info("test1-count : {}",count1++);
     }
 
+    /*
+    * 경기 종료 후 작성자와 참가자들이 서로서로에 대해서 매너온도 평가를 할 수 있도록 자동 세팅
+    * */
     @Scheduled(cron="0 * * * * ?")
     public void setMannerTemperatureAutoSetting(){
 
         Integer result = matchupRatingService.setMannerTemperatureAutoSetting();
         log.info("자동 평가 세팅 갯수: {}", result);
     }
+
+//    @Scheduled(cron="0 * * * * ?")
+//    public void setMatchNotificationBeforeStart(){
+//        Integer result = matchupBoardService.notifyAllParticipantsBeforeStart();
+//    }
 }
