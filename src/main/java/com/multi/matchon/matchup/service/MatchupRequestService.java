@@ -84,6 +84,9 @@ public class MatchupRequestService {
             throw new CustomException("Matchup 경기 시작 시간이 지나 참가 요청할 수 없습니다.");
         }
 
+        if(findMatchupBoard.getMinMannerTemperature()>user.getMember().getMyTemperature())
+            throw new CustomException("Matchup 최소 매너 온도를 충족하지 못해 참가 요청을 할 수 없습니다.");
+
 
         if(findMatchupBoard.getCurrentParticipantCount()>findMatchupBoard.getMaxParticipants()){
             throw new CustomException("Matchup 현재 모집 인원을 초과해서 참가 요청을 할 수 없습니다.");
@@ -171,6 +174,9 @@ public class MatchupRequestService {
             throw new CustomException("Matchup 경기 시작 시간이 지나 참가 요청할 수 없습니다.");
         }
 
+
+        //인원 수 체크
+
         return reqMatchupRequestDto;
     }
 
@@ -182,6 +188,9 @@ public class MatchupRequestService {
 
     }
 
+    /*
+    * 특정 게시글에 들어온 요청 목록
+    * */
     public PageResponseDto<ResMatchupRequestOverviewListDto> findAllMatchupRequestByBoardWithPaging(PageRequest pageRequest, Long boardId) {
 
         Page<ResMatchupRequestOverviewListDto> page = matchupRequestRepository.findAllResMatchupRequestOverviewListDtoByBoardIdAndSportsTypeWithPaging(pageRequest,boardId);
@@ -400,7 +409,7 @@ public class MatchupRequestService {
                 /*
                  * 신청자에게 알림 보내기
                  * */
-                notificationService.sendNotification(findMatchupRequest.getMember() , "[참가 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청을 승인했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
+                notificationService.sendNotification(findMatchupRequest.getMember() , "[참가 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청을 승인했습니다. 단체 채팅방에 초대되었습니다. 지금 바로 확인해보세요!", "/chat/group/room?"+"roomId="+findMatchupRequest.getMatchupBoard().getChatRoom().getId());
 
             }
 
@@ -420,7 +429,7 @@ public class MatchupRequestService {
                 /*
                  * 신청자에게 알림 보내기
                  * */
-                notificationService.sendNotification(findMatchupRequest.getMember() , "[참가 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청을 승인했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
+                notificationService.sendNotification(findMatchupRequest.getMember() , "[참가 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청을 승인했습니다. 단체 채팅방에 초대되었습니다. 지금 바로 확인해보세요!", "/chat/group/room?"+"roomId="+findMatchupRequest.getMatchupBoard().getChatRoom().getId());
 
             }
         }

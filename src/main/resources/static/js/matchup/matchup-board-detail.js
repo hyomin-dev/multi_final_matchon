@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded",()=>{
         setContent();
-
 })
 
 
@@ -16,7 +15,7 @@ async function setContent(){
     const maxParticipants = Number(detailDto.dataset.maxParticipants);
     const minMannerTemperature = Number(detailDto.dataset.minMannerTemperature);
     const savedName = detailDto.dataset.savedName;
-    const myMannerTemperature = Number(detailDto.dataset.myMannerTemperature);
+    const myMannerTemperature = Number(detailDto.dataset.myMannerTemperature)||20;
     const loginEmail = detailDto.dataset.loginEmail;
     //const baseUrl = detailDto.dataset.baseUrl;
     //console.log(sportsFacilityAddress);
@@ -52,6 +51,7 @@ async function setContent(){
     //     throw new Error(`HTTP error! Status:${response.status}`)
     // const data2 = await response2.json();
     // console.log(data2);
+
 
 
 }
@@ -216,7 +216,6 @@ function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCoun
                 e.preventDefault();
             })
         }
-
     }
 }
 
@@ -227,6 +226,15 @@ function goBack(){
         window.location.href = "/matchup/board";
     }
 }
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
+
 
 
 

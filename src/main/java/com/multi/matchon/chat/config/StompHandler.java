@@ -24,7 +24,6 @@ import java.security.Principal;
 
 @Component
 @Slf4j
-
 public class StompHandler implements ChannelInterceptor {
 
 

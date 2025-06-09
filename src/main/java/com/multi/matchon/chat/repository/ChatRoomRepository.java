@@ -2,6 +2,7 @@ package com.multi.matchon.chat.repository;
 
 
 import com.multi.matchon.chat.domain.ChatRoom;
+import com.multi.matchon.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,6 +27,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     WHERE t.id = :teamId AND t.chatRoom.isGroupChat = true
 """)
     Optional<ChatRoom> findTeamGroupChatRoom(@Param("teamId") Long teamId);
+
 
 
     @Query("SELECT DISTINCT p.chatRoom FROM ChatParticipant p " +

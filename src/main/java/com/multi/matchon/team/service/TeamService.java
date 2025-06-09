@@ -156,6 +156,7 @@ public class TeamService {
                 .build();
         Team savedTeam = teamRepository.save(newTeam);
 
+
         // ⬇️ Only create chat room if team has none (safety against duplication) ⬇️
         if (savedTeam.getChatRoom() == null) {
             String identifierChatRoomName = UUID.randomUUID().toString().replace("-", "").substring(0, 8);

@@ -18,6 +18,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Component
@@ -119,7 +122,11 @@ public class JwtFilter extends OncePerRequestFilter {
         // ❗ 로그인 페이지로 리다이렉트 + 정지 사유 전달
         String redirectUrl = "/login?error=suspended";
         if (userDetails.getMember().getSuspendedUntil() != null) {
-            redirectUrl += "&date=" + userDetails.getMember().getSuspendedUntil().toLocalDate();
+            String formattedDateTime = userDetails.getMember()
+                    .getSuspendedUntil()
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME); // "2025-06-15T15:30:00"
+
+            redirectUrl += "&date=" + URLEncoder.encode(formattedDateTime, StandardCharsets.UTF_8);
         }
 
         response.sendRedirect(redirectUrl);

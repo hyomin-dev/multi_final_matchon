@@ -10,6 +10,7 @@ import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.common.repository.AttachmentRepository;
 import com.multi.matchon.common.repository.SportsTypeRepository;
+import com.multi.matchon.common.service.NotificationService;
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.domain.MatchupRequest;
 import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
@@ -19,6 +20,7 @@ import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardOverviewDto;
 import com.multi.matchon.matchup.repository.MatchupBoardRepository;
+import com.multi.matchon.matchup.repository.MatchupRequestRepository;
 import com.multi.matchon.member.domain.Member;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +50,9 @@ public class MatchupBoardService {
     private final MatchupService matchupService;
     private final AttachmentRepository attachmentRepository;
     private final ChatService chatService;
+    private final MatchupRequestRepository matchupRequestRepository;
+    private final NotificationService notificationService;
+
 
     // 등록
 
@@ -63,6 +70,18 @@ public class MatchupBoardService {
         if(numberOfTodayMatchupBoards>=2){
             throw new CustomException("Matchup 게시글은 하루에 2번만 작성할 수 있습니다.");
         }
+        //
+        // 월: reqMatchupBoardDto.getMatchDatetime().getMonthValue()
+        // 일: reqMatchupBoardDto.getMatchDatetime().getDayOfMonth()
+        // 종목: reqMatchupBoardDto.getSportsTypeName()
+        // 시/도: reqMatchupBoardDto.getSportsFacilityAddress().split(" ")[0]
+        // 시/군/구: reqMatchupBoardDto.getSportsFacilityAddress().split(" ")[1]
+        String chatName =  "작성자: " +user.getMember().getMemberName() + " [ "+ reqMatchupBoardDto.getSportsTypeName()+" "+" "+reqMatchupBoardDto.getSportsFacilityAddress().split(" ")[1]+" ] " + reqMatchupBoardDto.getMatchDatetime().getMonthValue()+" / "+ reqMatchupBoardDto.getMatchDatetime().getDayOfMonth();
+
+        String identifierChatRoomName = "("+ UUID.randomUUID().toString().replace("-","").substring(0,8)+")";
+
+
+        ChatRoom chatRoom = chatService.registerGroupChatRoom(user.getMember(), chatName+identifierChatRoomName);
 
         // Matchup Board 생성하면서 group chat 생성
         MatchupBoard newMatchupBoard = MatchupBoard.builder()
@@ -78,9 +97,10 @@ public class MatchupBoardService {
                 .maxParticipants(reqMatchupBoardDto.getMaxParticipants())
                 .minMannerTemperature(reqMatchupBoardDto.getMinMannerTemperature())
                 .matchDescription(reqMatchupBoardDto.getMatchDescription())
-                .chatRoom(chatService.registerGroupChatRoom(user.getMember()))
+                .chatRoom(chatRoom)
                 .build();
         MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
+        chatRoom.registerMatchupBoard(matchupBoard);
 
         //경기장 예약 내역 S3에 업로드
         matchupService.insertFile(reqMatchupBoardDto.getReservationFile(), matchupBoard);
@@ -95,7 +115,7 @@ public class MatchupBoardService {
     * Matchup 게시글 수정하기 페이지로 나갈 정보
     * */
     @Transactional(readOnly = true)
-    public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId) {
+    public ResMatchupBoardDto findMatchupBoardByBoardId(Long boardId, CustomUser user) {
 
         MatchupBoard matchupBoard = matchupBoardRepository.findMatchupBoardByBoardId(boardId).orElseThrow(()->new CustomException("Matchup"+boardId +"번 게시글이 존재하지 않습니다."));
 
@@ -119,7 +139,7 @@ public class MatchupBoardService {
                 .currentParticipantCount(matchupBoard.getCurrentParticipantCount())
                 .maxParticipants(matchupBoard.getMaxParticipants())
                 .minMannerTemperature(matchupBoard.getMinMannerTemperature())
-                .myMannerTemperature(matchupBoard.getWriter().getMyTemperature()) //matchupBoard.getMember().getMyTemperature()
+                .myMannerTemperature(user.getMember().getMyTemperature()) //matchupBoard.getMember().getMyTemperature()
                 .matchDescription(matchupBoard.getMatchDescription())
                 .originalName(attachments.get(0).getOriginalName())
                 .savedName(attachments.get(0).getSavedName())
@@ -199,7 +219,7 @@ public class MatchupBoardService {
     * */
     @Transactional
     public void updateBoard(ReqMatchupBoardEditDto reqMatchupBoardEditDto, CustomUser user) {
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(reqMatchupBoardEditDto.getBoardId()).orElseThrow(()->new CustomException("Matchup"+reqMatchupBoardEditDto.getBoardId()+"번 게시글이 없습니다."));
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(reqMatchupBoardEditDto.getBoardId(), user.getMember()).orElseThrow(()->new CustomException("Matchup"+reqMatchupBoardEditDto.getBoardId()+"번 게시글이 없습니다."));
 
         // 경기 시작 시간이 지난 경우
         if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now()))
@@ -232,6 +252,18 @@ public class MatchupBoardService {
         if(!Objects.requireNonNull(reqMatchupBoardEditDto.getReservationFile().getOriginalFilename()).isBlank()){
             matchupService.updateFile(reqMatchupBoardEditDto.getReservationFile(), findMatchupBoard);
         }
+
+        // 현재 참가 신청한 참여자들에게 게시글 수정 알리기
+        /*
+        * 보내야하는 대상:
+        * 승인 대기, 승인됨, 승인 취소 요청, 취소 요청 반려
+        * */
+
+        List<Member> applicants = matchupRequestRepository.findByBoardIdAndActiveRequests(findMatchupBoard.getId());
+        for(Member applicant: applicants){
+            notificationService.sendNotification(applicant, "[게시글 수정] 참가 요청하신 "+user.getMember().getMemberName()+"님의 게시글이 수정되었습니다.", "/matchup/board/detail?"+"matchup-board-id="+reqMatchupBoardEditDto.getBoardId());
+        }
+
     }
 
     // 삭제
@@ -242,19 +274,33 @@ public class MatchupBoardService {
     * S3 파일은 삭제안함, soft delete라
     * */
     @Transactional
-    public void softDeleteMatchupBoard(Long boardId) {
-        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(boardId).orElseThrow(()->new CustomException("Matchup "+boardId+"번 게시글이 없습니다."));
+    public void softDeleteMatchupBoard(Long boardId, CustomUser user) {
+        MatchupBoard findMatchupBoard = matchupBoardRepository.findMatchupBoardByBoardIdAndIsDeleted(boardId, user.getMember()).orElseThrow(()->new CustomException("Matchup "+boardId+"번 게시글이 없습니다."));
 
         if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now()))
             throw new CustomException("Matchup 경기 시작 시간이 지나 삭제할 수 없습니다.");
 
 
+        // 현재 참가 신청한 참여자들에게 게시글 삭제 알리기
+        /*
+         * 보내야하는 대상:
+         * 승인 대기, 승인됨, 승인 취소 요청, 취소 요청 반려
+         * */
+        List<Member> applicants = matchupRequestRepository.findByBoardIdAndActiveRequests(findMatchupBoard.getId());
+        for(Member applicant: applicants){
+            notificationService.sendNotification(applicant, "[게시글 삭제] 참가 요청하신 "+user.getMember().getMemberName()+"님의 게시글이 삭제되었습니다.", null);
+        }
+
         findMatchupBoard.delete(true);
+
+
 
         List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.MATCHUP_BOARD, boardId);
         if(findAttachments.isEmpty())
             throw new CustomException("Matchup "+BoardType.MATCHUP_BOARD+"타입, "+findMatchupBoard.getId()+"번에는 첨부파일이 없습니다.");
         findAttachments.get(0).delete(true);
+
+
 
     }
 
@@ -263,6 +309,54 @@ public class MatchupBoardService {
 
         return matchupBoardRepository.findResMatchupOverviewDto(boardId).orElseThrow(()->new CustomException("Matchup "+boardId+"번 게시글이 없습니다."));
     }
+
+    /*
+    * 경기 3시간 전에 참가자들에게 알림 메시지를 보내기
+    * */
+    @Transactional
+    public Long notifyAllParticipantsBeforeStart() {
+
+        // 목적: 경기 3시간 전 이고 참가자들에게 알림 보내지 않은 MatchupBoard를 모두 가져옴
+        // 알림 받는 참가자: 승인대기, 승인됨, 승인 취소 요청, 취소 요청 반려,
+
+        // 1. 현재 시간 3시간 후 LocalDatetime 세팅
+        LocalDateTime threeHoursLater = LocalDateTime.now().plusHours(3);
+
+        // 2. 알림 대상이 되는 MatchupBoard 목록을 가져옴
+        List<MatchupBoard> matchupBoardsToNotifyBeforeThreeHours = matchupBoardRepository.findUnnotifiedBoardsAtThreeHoursBeforeMatch(threeHoursLater);
+
+        if(matchupBoardsToNotifyBeforeThreeHours.isEmpty())
+            return 0L;
+
+        // 3. 알림을 받아야하는 요청 목록들을 가져옴
+
+        List<MatchupRequest> matchupRequestsToNotifyBeforeThreeHours = matchupRequestRepository.findUnnotifiedRequestsAtThreeHoursBeforeMatch(threeHoursLater);
+
+
+        // 4. 알림 보내기
+        Long count = 0L; // 알림 갯수
+        for(MatchupBoard matchupBoard: matchupBoardsToNotifyBeforeThreeHours){
+
+            //참가자들에게 보내기
+            count += matchupRequestsToNotifyBeforeThreeHours.stream()
+                    .filter(matchupreq ->matchupreq.getMatchupBoard().getId().equals(matchupBoard.getId()))
+                    .peek(matchupreq ->{
+                        notificationService.sendNotification(matchupreq.getMember(),"[경기 예정]"+matchupBoard.getMatchDatetime()+"에 경기가 진행될 예정입니다.","/matchup/board/detail?matchup-board-id="+matchupBoard.getId());
+                    })
+                    .count();
+
+            // 작성자에게 보내기
+            notificationService.sendNotification(matchupBoard.getWriter(),"[경기 예정]"+matchupBoard.getMatchDatetime()+"에 경기가 진행될 예정입니다.","/matchup/board/detail?matchup-board-id="+matchupBoard.getId());
+            count++;
+
+            matchupBoard.updateIsNotified(true);
+        }
+
+        return count;
+    }
+
+
+
     // ========================================================================================================
     //                                                    테스트 해본 코드
     // ========================================================================================================

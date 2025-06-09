@@ -23,13 +23,13 @@
     </div>
     <h2 class="page-title">MATCHUP 게시글의 참가 요청 목록</h2>
     <div class="topbar-buttons">
-        <button class="back-btn" onclick="location.href='/matchup/board/my'">뒤로가기</button>
+        <button class="back-btn" onclick="goBack()">뒤로가기</button>
     </div>
     <table class="match-info-table" th:object="${resMatchupBoardOverviewDto}">
         <tr>
             <td class="col-match-info-sports-type"><strong>종목:</strong> <span th:text="*{sportsTypeName}">FUTSAL</span></td>
-            <td class="col-match-info-writer"><strong>작성자:</strong> <sapn th:text="*{writerName}"></sapn></td>
-            <td class="col-match-info-address truncate"><strong>주소:</strong> <span th:text="*{sportsFacilityAddress}"></span></td>
+            <td class="col-match-info-writer truncate-write"><strong>작성자:</strong> <sapn th:text="*{writerName}"></sapn></td>
+            <td class="col-match-info-address truncate-address"><strong>주소:</strong> <span th:text="*{sportsFacilityAddress}"></span></td>
             <td class="col-match-info-match-date"><strong>📅 날짜:</strong> <span id="match-date"></span></td>
             <td class="col-match-info-status"><strong>상태:</strong>  <span id="match-status"></span></td>
             <td class="col-match-info-participants"><strong>정원:</strong> ( <span th:text="*{currentParticipantCount}"></span> / <span th:text="*{maxParticipants}"></span> )</td>
