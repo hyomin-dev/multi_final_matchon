@@ -26,13 +26,8 @@ public class ChatParticipant extends BaseEntity {
     private ChatRoom chatRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="member_id",nullable = false)
+    @JoinColumn(name="member_id")
     private Member member;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name="chat_role")
-    @Builder.Default
-    private ChatRole chatRole = ChatRole.MEMBER;
 
     @Column(name="is_deleted")
     @Builder.Default

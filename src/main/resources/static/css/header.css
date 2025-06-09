@@ -96,10 +96,9 @@
 /* 미니 알림창 */
 .mini-drawer {
 
-
     position: absolute;
-    top: 100%;
-    left: 50%;
+    top: 120%;
+    left: 10%;
     transform: translateX(-50%);
     width: 280px;
     background-color: white;

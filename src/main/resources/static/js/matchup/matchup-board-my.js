@@ -94,6 +94,7 @@ function renderList(items){
 
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
+        const endDate = new Date(item.matchEndtime)
 
         const card = document.createElement("tr");
         card.innerHTML = `
@@ -101,7 +102,7 @@ function renderList(items){
                          <td>${setSportsType(item.sportsTypeName)}</td> 
                          <td class="truncate">${item.sportsFacilityAddress}</td>
                          <td>📅 ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
-                                ${calTime(item, date.getHours(), date.getMinutes())}</td>
+                                ${endDate.getHours()}시 ${endDate.getMinutes()}분</td>
                          <td>${checkStatus(item)}</td>
                          <td>( ${item.currentParticipantCount} / ${item.maxParticipants} )</td>
                          <td> ${item.minMannerTemperature}</td>                         
@@ -220,13 +221,14 @@ function calTime(item, startHour, startMinute){
 function checkStatus(item){
 
     const matchDate = new Date(item.matchDatetime);
+    const endMatchDate = new Date(item.matchEndtime);
     const now = new Date();
-    const durationParts = item.matchDuration.split(":");
-    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+    // const durationParts = item.matchDuration.split(":");
+    // const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
 
-    if(matchDate <now && now <= matchEnd)
+    if(matchDate <now && now <= endMatchDate)
         return "경기 진행";
-    else if(matchEnd<now)
+    else if(endMatchDate<now)
         return "경기 종료";
     else if(item.currentParticipantCount >= item.maxParticipants)
         return "모집 완료";
@@ -236,13 +238,14 @@ function checkStatus(item){
 
 function setRatingSettingButton(card, item){
     const matchDate = new Date(item.matchDatetime);
+    const endMatchDate = new Date(item.matchEndtime);
     const now = new Date();
 
-    const durationParts = item.matchDuration.split(":");
-    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+    // const durationParts = item.matchDuration.split(":");
+    // const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
 
 
-    if(matchEnd<now &&  !item.isRatingInitialized) {
+    if(endMatchDate<now &&  !item.isRatingInitialized) {
         card.querySelector(".rating-setting").classList.remove("disabled");
         card.querySelector(".rating-setting").addEventListener("click",async ()=>{
             try{
