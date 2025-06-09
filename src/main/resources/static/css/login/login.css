@@ -69,4 +69,12 @@
     text-decoration: underline;
 }
 
+/* login.css */
+#suspendMessage {
+    color: red;
+    font-weight: bold;
+    margin: 10px 10px;
+}
+
+
 

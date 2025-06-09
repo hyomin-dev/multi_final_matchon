@@ -69,37 +69,34 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
-    const date = urlParams.get('date');
+    const dateParam = urlParams.get('date');
 
     if (error === 'suspended') {
-        const message = date
-            ? `계정이 정지되었습니다. 복구일: ${date}`
-            : `계정이 정지되었습니다.`;
-        document.getElementById('suspendMessage').textContent = message;
+        let message = "계정이 정지되었습니다.";
+        if (dateParam) {
+            try {
+                const restoreDate = new Date(dateParam);
+                const formatted = restoreDate.toLocaleString("ko-KR", {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                message = `계정이 정지되었습니다. 복구일: ${formatted}`;
+            } catch (e) {
+                // fallback
+                message = `계정이 정지되었습니다. 복구일: ${dateParam}`;
+            }
+        }
+
+        const suspendEl = document.getElementById('suspendMessage');
+        suspendEl.textContent = message;
+        suspendEl.style.color = "red";
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("openResetPopup").addEventListener("click", function (e) {
-            e.preventDefault();
-            document.getElementById("popupOverlay").style.display = "block";
-            document.getElementById("resetPopup").style.display = "block";
-        });
 
-        window.closeResetPopup = function () {
-            document.getElementById("popupOverlay").style.display = "none";
-            document.getElementById("resetPopup").style.display = "none";
-        };
-
-        window.closeChangePopup = function () {
-            document.getElementById("popupOverlay").style.display = "none";
-            document.getElementById("changePasswordPopup").style.display = "none";
-        };
-
-        document.getElementById("popupOverlay").addEventListener("click", function () {
-            closeResetPopup();
-            closeChangePopup();
-        });
-    });
 </script>
 </body>
 </html>
