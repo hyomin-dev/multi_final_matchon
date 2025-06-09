@@ -20,9 +20,7 @@ public class ReportService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
-    /**
-     * 신고 접수 처리
-     */
+    //신고 접수 처리
     public void report(ReportType type, Long targetId, String reason, ReasonType reasonType, Member reporter) {
         boolean alreadyReported = reportRepository
                 .findByReportTypeAndTargetIdAndReporter(type, targetId, reporter)
@@ -58,9 +56,7 @@ public class ReportService {
     }
 
 
-    /**
-     * 전체 신고 목록 조회 (비페이징)
-     */
+    //전체 신고 목록 조회 (비페이징)
     public List<ReportResponse> getAllReports() {
         List<Report> reports = reportRepository.findAll(Sort.by(Sort.Direction.DESC, "createdDate"));
         return reports.stream()
@@ -68,9 +64,7 @@ public class ReportService {
                 .toList();
     }
 
-    /**
-     * 페이징된 신고 목록 조회
-     */
+    //페이징된 신고 목록 조회
     public Page<Report> findAll(Pageable pageable) {
         return reportRepository.findAll(pageable);
     }
@@ -81,9 +75,7 @@ public class ReportService {
     }
 
 
-    /**
-     * Report → ReportResponse 변환
-     */
+    //Report → ReportResponse 변환
     private ReportResponse convertToResponse(Report report) {
         String targetWriterName = resolveTargetWriterName(report);
         Long boardId = resolveBoardId(report);
@@ -126,9 +118,7 @@ public class ReportService {
 
 
 
-    /**
-     * 신고 대상 작성자 이름 조회
-     */
+    //신고 대상 작성자 이름 조회
     private String resolveTargetWriterName(Report report) {
         if (report.getReportType() == ReportType.BOARD) {
             return boardRepository.findById(report.getTargetId())
@@ -143,9 +133,7 @@ public class ReportService {
     }
 
 
-    /**
-     * 댓글의 경우 해당 댓글이 포함된 게시글 ID 조회
-     */
+    //댓글의 경우 해당 댓글이 포함된 게시글 ID 조회
     private Long resolveBoardId(Report report) {
         if (report.getReportType() == ReportType.BOARD) {
             return report.getTargetId();
@@ -156,4 +144,27 @@ public class ReportService {
         }
         return null;
     }
+
+    public Page<ReportResponse> getPagedReportsFiltered(Pageable pageable, ReportType reportType, ReasonType reasonType) {
+        Page<Report> reportPage = reportRepository.findByReportTypeAndReasonTypeWithPaging(reportType, reasonType, pageable);
+        return reportPage.map(this::convertToResponse);
+    }
+
+    public Page<ReportResponse> getPagedReportsWithFilter(Pageable pageable, ReportType reportType, ReasonType reasonType) {
+        Page<Report> reportPage;
+
+        if (reportType != null && reasonType != null) {
+            reportPage = reportRepository.findByReportTypeAndReasonType(reportType, reasonType, pageable);
+        } else if (reportType != null) {
+            reportPage = reportRepository.findByReportType(reportType, pageable);
+        } else if (reasonType != null) {
+            reportPage = reportRepository.findByReasonType(reasonType, pageable);
+        } else {
+            reportPage = reportRepository.findAll(pageable);
+        }
+
+        return reportPage.map(this::convertToResponse);
+    }
+
+
 }

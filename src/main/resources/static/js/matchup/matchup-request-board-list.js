@@ -14,12 +14,12 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     boardId = Number(detailDto.dataset.boardId);
 
     const matchDatetime = detailDto.dataset.matchDatetime;
-    const matchDuration = detailDto.dataset.matchDuration;
+    const matchEndtime = detailDto.dataset.matchEndtime;
     const currentParticipantCount = detailDto.dataset.currentParticipantCount;
     const maxParticipants = detailDto.dataset.maxParticipants;
 
-    calTime(matchDatetime, matchDuration);
-    checkMatchStatus(matchDatetime, matchDuration);
+    calTime(matchDatetime, matchEndtime);
+    checkMatchStatus(matchDatetime, matchEndtime);
 
 
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
@@ -173,11 +173,12 @@ function renderPagination(pageInfo){
 
 }
 
-function calTime(matchDatetime, matchDuration){
+function calTime(matchDatetime, matchEndtime){
     //console.log(matchDatetime);
     //console.log(matchDuration);
 
     const date = new Date(matchDatetime);
+    const end = new Date(matchEndtime);
     //console.log(date);
     const matchDateEle = document.querySelector("#match-date");
 
@@ -187,42 +188,46 @@ function calTime(matchDatetime, matchDuration){
     const startHour = date.getHours();
     const startMinutes = date.getMinutes();
 
+    const endHour = end.getHours();
+    const endMinutes = end.getMinutes();
 
-    const [hour, minute, second] = matchDuration.split(":");
-    const hourNum = parseInt(hour, 10);
-    const minuteNum = parseInt(minute,10);
 
-    let extraHour = 0
-    let endMinute = 0;
+    // const [hour, minute, second] = matchDuration.split(":");
+    // const hourNum = parseInt(hour, 10);
+    // const minuteNum = parseInt(minute,10);
+    //
+    // let extraHour = 0
+    // let endMinute = 0;
+    //
+    // if(date.getMinutes()+minuteNum>=60){
+    //     extraHour = 1;
+    //     endMinute = (date.getMinutes()+minuteNum)%60;
+    // }else{
+    //     endMinute = date.getMinutes()+minuteNum;
+    // }
+    //
+    // if(startHour+hourNum+extraHour>=24)
+    //     endHour = (startHour+hourNum+extraHour) %24;
+    // else
+    //     endHour = startHour+hourNum+extraHour;
 
-    if(date.getMinutes()+minuteNum>=60){
-        extraHour = 1;
-        endMinute = (date.getMinutes()+minuteNum)%60;
-    }else{
-        endMinute = date.getMinutes()+minuteNum;
-    }
-
-    if(startHour+hourNum+extraHour>=24)
-        endHour = (startHour+hourNum+extraHour) %24;
-    else
-        endHour = startHour+hourNum+extraHour;
-
-    matchDateEle.textContent = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
+    matchDateEle.textContent = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinutes}분`
 
 }
 
-function checkMatchStatus(matchDatetime, matchDuration){
+function checkMatchStatus(matchDatetime, matchEndtime){
 
     const matchStatusEle = document.querySelector("#match-status");
 
     const matchDate = new Date(matchDatetime);
+    const endMatchDate = new Date(matchEndtime);
     const now = new Date();
-    const durationParts = matchDuration.split(":");
-    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+    // const durationParts = matchDuration.split(":");
+    // const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
 
-    if(matchDate <=now && now <= matchEnd)
+    if(matchDate <=now && now <= endMatchDate)
         matchStatusEle.innerHTML = "경기 진행";
-    else if(matchEnd<now)
+    else if(endMatchDate<now)
         matchStatusEle.textContent = "경기 종료";
     else
         matchStatusEle.textContent =  "경기 시작전";

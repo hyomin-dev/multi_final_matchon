@@ -23,6 +23,8 @@
          th:data-original-name="${resMatchupBoardDto.originalName}"
          th:data-saved-name="${resMatchupBoardDto.savedName}"
          th:data-my-manner-temperature="${resMatchupBoardDto.myMannerTemperature}"
+         th:data-match-datetime = "${resMatchupBoardDto.matchDatetime}"
+         th:data-match-endtime = "${resMatchupBoardDto.matchEndtime}"
     >
     </div>
     <div class="form-container">
@@ -96,21 +98,7 @@
             <div class="form-group">
                 <label>
                     경기 날짜
-                    <!--                <input type="datetime-local" value="2025-05-21T15:30" required>-->
-                    <input type="datetime-local" id="matchDatetime" th:value="*{matchDatetime}" name="matchDatetime" required>
-                </label>
-            </div>
-            <div class="form-group">
-                <label>
-                    경기 진행 시간
-                    <select id="matchDuration" name="matchDuration" required>
-                        <option th:value="'00:30:00'"  th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 30}">30분</option>
-                        <option th:value="'01:00:00'"  th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 60}">1시간</option>
-                        <option th:value="'01:30:00'"  th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 90}">1시간 30분</option>
-                        <option th:value="'02:00:00'" th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 120}">2시간</option>
-                        <option th:value="'02:30:00'" th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 150}">2시간 30분</option>
-                        <option th:value="'03:00:00'" th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 180}">3시간</option>
-                    </select>
+                    <input type="text" id="matchDate" readonly>
                 </label>
             </div>
             <div class="form-group">
@@ -126,10 +114,10 @@
                 </label>
             </div>
             <div class="form-group">
-                <label>
-                    하한 매너 온도
-                    <select th:field="*{minMannerTemperature}" required></select>
-                </label>
+                <label id="minMannerTemperatureLabel">하한 매너 온도</label>
+
+                <select th:field="*{minMannerTemperature}" required></select>
+
             </div>
             <div class="form-group">
                 <label>

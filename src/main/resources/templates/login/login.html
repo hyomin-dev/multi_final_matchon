@@ -72,37 +72,48 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
-    const date = urlParams.get('date');
+    const dateParam = urlParams.get('date');
 
     if (error === 'suspended') {
-        const message = date
-            ? `계정이 정지되었습니다. 복구일: ${date}`
-            : `계정이 정지되었습니다.`;
-        document.getElementById('suspendMessage').textContent = message;
+        const suspendEl = document.getElementById('suspendMessage');
+        suspendEl.innerHTML = ''; // 초기화
+
+        // 첫 줄: 계정이 정지되었습니다.
+        const mainLine = document.createElement("div");
+        mainLine.textContent = "계정이 정지되었습니다.";
+        mainLine.style.color = "red";
+        mainLine.style.fontWeight = "bold";
+        suspendEl.appendChild(mainLine);
+
+        // 둘째 줄: 복구일 표시
+        if (dateParam) {
+            try {
+                const restoreDate = new Date(dateParam);
+                const formatted = restoreDate.toLocaleString("ko-KR", {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
+                const dateLine = document.createElement("div");
+                dateLine.textContent = `복구일: ${formatted}`;
+                dateLine.style.color = "red";
+                dateLine.style.marginTop = "4px";
+                dateLine.style.fontWeight = "bold";
+                suspendEl.appendChild(dateLine);
+            } catch (e) {
+                const fallbackLine = document.createElement("div");
+                fallbackLine.textContent = `복구일: ${dateParam}`;
+                fallbackLine.style.color = "red";
+                fallbackLine.style.fontWeight = "bold";
+                suspendEl.appendChild(fallbackLine);
+            }
+        }
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("openResetPopup").addEventListener("click", function (e) {
-            e.preventDefault();
-            document.getElementById("popupOverlay").style.display = "block";
-            document.getElementById("resetPopup").style.display = "block";
-        });
-
-        window.closeResetPopup = function () {
-            document.getElementById("popupOverlay").style.display = "none";
-            document.getElementById("resetPopup").style.display = "none";
-        };
-
-        window.closeChangePopup = function () {
-            document.getElementById("popupOverlay").style.display = "none";
-            document.getElementById("changePasswordPopup").style.display = "none";
-        };
-
-        document.getElementById("popupOverlay").addEventListener("click", function () {
-            closeResetPopup();
-            closeChangePopup();
-        });
-    });
 </script>
 </body>
 </html>

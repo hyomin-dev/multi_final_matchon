@@ -29,11 +29,12 @@
                         </button>
                     </div>
 
-                    <div th:if="${board.member.id == #authentication.principal.member.id}">
+                    <div th:if="${board.member.id == #authentication.principal.member.id and #authentication.principal.member.memberRole.name() != 'ADMIN'}">
                         <button type="button" class="board-delete-button"
                                 th:onclick="'deletePost(' + ${board.id} + ')'">✖ 삭제
                         </button>
                     </div>
+
                     <div th:if="${board.member.id != #authentication.principal.member.id}">
                         <button type="button" class="report-button"
                                 th:onclick="'openReportModal(\'BOARD\', ' + ${board.id} + ')'">⚠ 게시글 신고
@@ -101,9 +102,10 @@
                         <button type="button" class="btn-comment-delete"
                                 th:data-comment-id="${comment.id}"
                                 th:data-board-id="${board.id}"
-                                th:if="${comment.member.id == #authentication.principal.member.id}">
+                                th:if="${comment.member.id == #authentication.principal.member.id and #authentication.principal.member.memberRole.name() != 'ADMIN'}">
                             ✖ 삭제
                         </button>
+
                         <button type="button" class="report-button"
                                 th:if="${comment.member.id != #authentication.principal.member.id}"
                                 th:onclick="'openReportModal(\'COMMENT\', ' + ${comment.id} + ')'">

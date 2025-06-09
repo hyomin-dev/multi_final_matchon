@@ -3,7 +3,6 @@ package com.multi.matchon.chat.repository;
 
 import com.multi.matchon.chat.domain.ChatParticipant;
 import com.multi.matchon.chat.domain.ChatRoom;
-import com.multi.matchon.chat.dto.res.ResGroupChatParticipantListDto;
 import com.multi.matchon.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -68,22 +67,12 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             """)
     Boolean isRoomParticipantByChatRoomAndMember(@Param("chatRoom") ChatRoom chatRoom,@Param("sender") Member sender);
 
-
-//    @Query("""
-//            select
-//             t1
-//             from ChatParticipant t1
-//             join fetch t1.member t2
-//             where t1.chatRoom.id =:roomId and t2!=:my and t1.chatRole=com.multi.matchon.chat.domain.ChatRole.MEMBER
-//            """)
-//    Optional<ChatParticipant> findByRoomIdAndMy(@Param("roomId") Long roomId,@Param("my") Member my);
-
         @Query("""
             select
              t1
              from ChatParticipant t1
              join fetch t1.member t2
-             where t1.isDeleted=false and t1.chatRoom.id =:roomId and t1.chatRole=com.multi.matchon.chat.domain.ChatRole.MEMBER and t1.chatRoom.isGroupChat=false and t2 !=:blocker
+             where t1.isDeleted=false and t1.chatRoom.id =:roomId and t1.chatRoom.isGroupChat=false and t2 !=:blocker
             """)
 
     Optional<ChatParticipant> findByRoomIdAndMemberAndRoleMember(@Param("roomId") Long roomId,@Param("blocker") Member blocker);
@@ -107,6 +96,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
       AND cp.chatRoom.isGroupChat = false
 """)
     List<ChatRoom> findAllPrivateChatsForLeader(@Param("leaderId") Long leaderId);
+
 
     @Query("""
             select 
@@ -137,4 +127,5 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             where t1.isDeleted =false and t2.isDeleted=false and t3.matchDatetime<=:thresholdTime and t2.isGroupChat=true
             """)
     List<ChatParticipant> findAfterThreeDaysOfMatchWithChatParticipantAndChatRoom(@Param("thresholdTime") LocalDateTime thresholdTime);
+
 }

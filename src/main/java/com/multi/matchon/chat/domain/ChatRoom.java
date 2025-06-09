@@ -50,4 +50,5 @@ public class ChatRoom extends BaseEntity {
     public void registerMatchupBoard(MatchupBoard matchupBoard) {
         this.matchupBoard = matchupBoard;
     }
+
 }

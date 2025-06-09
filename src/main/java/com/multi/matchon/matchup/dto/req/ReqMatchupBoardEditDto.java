@@ -39,15 +39,6 @@ public class ReqMatchupBoardEditDto {
     @Size(max=100, message = "경기장 주소는 1~100자 내에 입력되어야합니다.")
     private String sportsFacilityAddress;
 
-    @NotNull(message ="경기 날짜를 입력해야합니다.")
-    @Future(message = "경기 시작 시간은 현재 시간 이후만 가능합니다.")
-    private LocalDateTime matchDatetime;
-
-    @NotNull(message = "경기 진행 시간을 입력해야합니다.")
-//    @Min(value=30)
-//    @Max(value=180)
-    private LocalTime matchDuration;
-
     @NotNull(message = "현재 참가 인원을 입력해야합니다.")
     @Min(value = 1)
     @Max(value = 30)
