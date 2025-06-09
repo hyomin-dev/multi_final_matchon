@@ -567,6 +567,8 @@ public class ChatService {
                 .toList();
     }
 
+  
+
     public List<ResMyChatListDto> findOnlyPrivateChats(Long memberId) {
         List<ChatRoom> privateRooms = chatRoomRepository.findPrivateChatsByMemberId(memberId);
 
