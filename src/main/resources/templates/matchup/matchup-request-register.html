@@ -20,7 +20,7 @@
        th:data-sports-facility-name = "${reqMatchupRequestDto.sportsFacilityName}"
        th:data-sports-facility-address="${reqMatchupRequestDto.sportsFacilityAddress}"
        th:data-match-datetime="${reqMatchupRequestDto.matchDatetime}"
-       th:data-match-duration="${reqMatchupRequestDto.matchDuration}"
+       th:data-match-endtime="${reqMatchupRequestDto.matchEndtime}"
        th:data-current-participant-count="${reqMatchupRequestDto.currentParticipantCount}"
        th:data-max-participants="${reqMatchupRequestDto.maxParticipants}"
   >
@@ -72,6 +72,8 @@
     <hr>
     <form th:object="${reqMatchupRequestDto}" th:action="@{/matchup/request}" method="post" id="request-info">
       <input type="hidden" th:field="*{boardId}"/>
+      <input type="hidden" th:field="*{matchDatetime}">
+      <input type="hidden" th:field="*{matchEndtime}">
 
       <label>
         소개

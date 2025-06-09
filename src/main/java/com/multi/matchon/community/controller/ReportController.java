@@ -54,28 +54,43 @@ public class ReportController {
     // 관리자용 신고 목록 페이지 (GET /admin/reports/page)
     @GetMapping("/admin/reports/page")
     @PreAuthorize("hasRole('ADMIN')")
-    public String reportManagePage(@RequestParam(defaultValue = "0") int page, Model model) {
+    public String reportManagePage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) ReportType reportType,
+            @RequestParam(required = false) ReasonType reasonType,
+            Model model
+    ) {
         Pageable pageable = PageRequest.of(page, 5, Sort.by("createdDate").descending());
-        Page<ReportResponse> reportPage = reportService.getPagedReports(pageable);
+        Page<ReportResponse> reportPage = reportService.getPagedReportsWithFilter(pageable, reportType, reasonType);
 
         model.addAttribute("reportPage", reportPage);
         model.addAttribute("reports", reportPage.getContent());
         model.addAttribute("currentPage", page);
+        model.addAttribute("reportType", reportType != null ? reportType.name() : "");
+        model.addAttribute("reasonType", reasonType != null ? reasonType.name() : "");
         return "admin/report";
     }
+
 
 
     // fragment 요청 (GET /admin/reports/reportBody)
     @GetMapping("/admin/reports/reportBody")
     @PreAuthorize("hasRole('ADMIN')")
-    public String getReportBodyFragment(@RequestParam(defaultValue = "0") int page, Model model) {
+    public String getReportBodyFragment(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(required = false) ReportType reportType,
+                                        @RequestParam(required = false) ReasonType reasonType,
+                                        Model model) {
+
         Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Page<ReportResponse> reportPage = reportService.getPagedReports(pageable);
+        Page<ReportResponse> reportPage = reportService.getPagedReportsFiltered(pageable, reportType, reasonType);
 
         model.addAttribute("reportPage", reportPage);
         model.addAttribute("reports", reportPage.getContent());
         model.addAttribute("currentPage", page);
+        model.addAttribute("selectedReportType", reportType);
+        model.addAttribute("selectedReasonType", reasonType);
 
         return "admin/report :: reportBody, pagination";
     }
+
 }

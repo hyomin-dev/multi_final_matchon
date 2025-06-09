@@ -33,7 +33,7 @@ public class ResMatchupRequestDto {
 
     private LocalDateTime matchDatetime;
 
-    private LocalTime matchDuration;
+    private LocalDateTime matchEndtime;
 
     private Integer currentParticipantCount;
 
@@ -51,7 +51,7 @@ public class ResMatchupRequestDto {
 
     private Boolean isDeleted;
 
-    public ResMatchupRequestDto(String boardWriterEmail, String boardWriter,String applicantEmail, String applicant, Long boardId, Long requestId , SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants, Integer participantCount, String selfIntro, Status matchupStatus, Integer matchupRequestSubmittedCount, Integer matchupCancelSubmittedCount, Boolean isDeleted
+    public ResMatchupRequestDto(String boardWriterEmail, String boardWriter,String applicantEmail, String applicant, Long boardId, Long requestId , SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalDateTime matchEndtime, Integer currentParticipantCount, Integer maxParticipants, Integer participantCount, String selfIntro, Status matchupStatus, Integer matchupRequestSubmittedCount, Integer matchupCancelSubmittedCount, Boolean isDeleted
 ) {
         this.boardWriter = boardWriter;
         this.applicant = applicant;
@@ -60,7 +60,7 @@ public class ResMatchupRequestDto {
         this.sportsFacilityName = sportsFacilityName;
         this.sportsFacilityAddress = sportsFacilityAddress;
         this.matchDatetime = matchDatetime;
-        this.matchDuration = matchDuration;
+        this.matchEndtime = matchEndtime;
         this.participantCount = participantCount;
         this.matchupStatus = matchupStatus;
         this.selfIntro = selfIntro;

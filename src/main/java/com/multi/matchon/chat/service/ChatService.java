@@ -97,7 +97,6 @@ public class ChatService {
     public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
 
         ChatParticipant chatParticipant = ChatParticipant.builder()
-                .chatRoom(chatRoom) // 양방향 쓸것이기 때문에 없앰
                 .member(member)
                 .build();
 
@@ -585,7 +584,6 @@ public class ChatService {
 
         @Transactional
         public Integer removeGroupChatsAfterThreeDaysOfMatch () {
-
             //현재 시간 보다 3일 전 시간 구하기
             LocalDateTime thresholdTime = LocalDateTime.now().minusDays(3);
 
@@ -648,4 +646,5 @@ public class ChatService {
     }
 
 }
+
 

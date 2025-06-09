@@ -363,7 +363,7 @@ async function initParticipantList(){
         }
         const card = document.createElement("div");
         card.innerHTML=`
-                      <div class="member-name">${index+1}. ${item.memberName}</div>
+                      <div class="member-name">${index+2}. ${item.memberName}</div>
                       <div class="button-group">
                           <button class="enter-btn btn">입장</button>
                           <button class="exit-btn btn"></button>

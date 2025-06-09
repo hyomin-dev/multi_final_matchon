@@ -104,8 +104,8 @@ public class MatchupRequestController {
 
     // 참가자: 참가 요청 수정
     @PostMapping("/edit")
-    public String editMatchupRequest(@Valid @ModelAttribute ReqMatchupRequestEditDto reqMatchupRequestEditDto, @RequestParam("request-id") Long requestId){
-        matchupRequestService.updateMatchupRequest(reqMatchupRequestEditDto, requestId);
+    public String editMatchupRequest(@Valid @ModelAttribute ReqMatchupRequestEditDto reqMatchupRequestEditDto, @RequestParam("request-id") Long requestId, @AuthenticationPrincipal CustomUser user){
+        matchupRequestService.updateMatchupRequest(reqMatchupRequestEditDto, requestId, user);
         return "redirect:/matchup/request/my";
     }
 
