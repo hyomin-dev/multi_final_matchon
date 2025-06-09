@@ -56,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
                 .memberRole(MemberRole.USER)
                 .myTemperature(36.5)
                 .pictureAttachmentEnabled(true)
+                .emailAgreement(Boolean.TRUE.equals(dto.getEmailAgreement()))
                 .isDeleted(false)
                 .build();
 
@@ -92,6 +93,7 @@ public class AuthServiceImpl implements AuthService {
                 .memberName(dto.getName())
                 .memberRole(MemberRole.HOST)
                 .pictureAttachmentEnabled(true)
+                .emailAgreement(Boolean.TRUE.equals(dto.getEmailAgreement()))
                 .isDeleted(false)
                 .build();
 

@@ -1,51 +1,90 @@
 .navbar {
     display: flex;
-    justify-content: space-between;
-    padding: 0px 32px;
-    height: 200px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 4px 24px;
+    background-color: white;
 }
 
-.logo{
-    position: relative;
-    top:-30px;
-    height: 250px;
+/* 세 영역 구분 */
+.navbar-left {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
 }
 
-.navbar .center a{
-    display: inline-block;
-    margin: 27px 10px;
+.navbar-center {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 70px;
+}
+
+.navbar-right {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 32px;
+}
+
+/* 로고 */
+.logo {
+    height: 100px;
+    max-height: 100px;
+    padding: 4px 24px;
+    margin: 0;
+}
+
+/* 중앙 메뉴 */
+.navbar-center a {
     color: black;
     font-weight: bold;
     text-decoration: none;
-    font-size:24px;
+    font-size: 20px;
 }
 
-.navbar .icons img{
-    display: inline-block;
-    color: black;
-    font-weight: bold;
-    text-decoration: none;
-    margin: 27px 15px;
+/* 아이콘 (채팅, 알림) */
+.navbar .icons {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-right: 16px;
+}
+
+/* 아이콘 이미지 */
+.navbar .icons img {
+    height: 26px;
     cursor: pointer;
 }
 
-.navbar .auth a{
-    display: inline-block;
+/* 로그인/마이/로그아웃 버튼 */
+.navbar .auth {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.navbar .auth a {
     color: black;
     font-weight: bold;
     text-decoration: none;
-    margin: 17px 15px;
+    /* margin 제거 */
 }
 
-.auth .btn{
-    padding: 20px 30px;
+.auth .btn {
+    padding: 14px 24px;
     border: solid black 1px;
     border-radius: 10px;
+    font-size: 14px;
 }
 
-.blue_hr{
-    border-top: 10px solid #255E93;
 
+
+.blue_hr {
+    border-top: 6px solid #255E93;
+    margin-top: 6px;
 }
 
 
@@ -59,8 +98,8 @@
 
 
     position: absolute;
-    top: 40%;
-    left: 60%;
+    top: 100%;
+    left: 50%;
     transform: translateX(-50%);
     width: 280px;
     background-color: white;
@@ -70,8 +109,6 @@
     padding: 15px;
     display: none;
     z-index: 9999;
-
-    /* ✅ 아래 추가 */
     max-height: 300px;        /* 내용이 많아질 때 제한 높이 */
     overflow-y: auto;         /* 내부 스크롤 활성화 */
 }
@@ -99,7 +136,7 @@
     justify-content: flex-start;
     flex-direction: column; /* 아래로 쌓기 */
     align-items: flex-start;
-    padding: 6px 10px;
+    padding: 10px;
     border-bottom: 1px solid #eee;
     font-size: 0.8rem;
     cursor: pointer;
@@ -188,5 +225,54 @@
 .notification.clicked {
     background-color: #e0e0e0;
     color: #999;
+}
 
+
+/* ===== 반응형 ===== */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+    }
+
+    .logo {
+        height: 70px;
+        margin-bottom: 8px;
+    }
+
+    .navbar-center {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+        align-items: center;
+    }
+
+    .navbar-center a {
+        font-size: 16px;
+        padding: 2px 4px;
+    }
+
+    .navbar .icons {
+        justify-content: center;
+        gap: 12px;
+        margin: 10px 0;
+    }
+
+    .navbar .icons img {
+        height: 22px;
+    }
+
+    .navbar .auth {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .auth .btn {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
 }
