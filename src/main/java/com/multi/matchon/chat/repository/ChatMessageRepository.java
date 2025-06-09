@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -18,8 +19,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             select t1
             from ChatMessage t1
             join fetch t1.member
-            where t1.chatRoom = :chatRoom
-            
+            where t1.chatRoom = :chatRoom and t1.createdDate>=:joinedDate and t1.chatRoom.isDeleted=false
+            order by t1.createdDate asc
             """)
-    List<ChatMessage> findByChatRoomOrderByCreatedTimeAscWithMember(@Param("chatRoom") ChatRoom chatRoom);
+    List<ChatMessage> findByChatRoomAndJoinedDateOrderByCreatedTimeAscWithMember(@Param("chatRoom") ChatRoom chatRoom, @Param("joinedDate") LocalDateTime joinedDate);
 }

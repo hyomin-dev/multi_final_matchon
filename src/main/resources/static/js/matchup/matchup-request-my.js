@@ -114,9 +114,11 @@ function renderList(items){
                 </td>               
                 <td><button class="group-chat disabled button-group">단체 채팅</button></td>
                 `;
-        boardArea.appendChild(card);
+
         markIfPastMatchdatetime(card, item);
         setGroupChatButton(card, item);
+        boardArea.appendChild(card);
+
 
     })
 }
@@ -316,10 +318,14 @@ function manageRequestInfo(item){
 function setGroupChatButton(card, item){
     const matchDate = new Date(item.matchDatetime);
     const now = new Date();
+    const threeDaysLater = new Date(matchDate.getTime()+3*24*60*60*1000);
+
 
     const groupChatBtn = card.querySelector(".group-chat");
-
-    if(
+    if(threeDaysLater<now){
+        groupChatBtn.classList.add("disabled");
+    }
+    else if(
         // 1. 참가 요청 후 승인 대기
         (item.matchupStatus ===Status.PENDING && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount===0 && item.isDeleted===false) ||
         (item.matchupStatus===Status.PENDING && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount===0 && item.isDeleted ===false) ||
@@ -369,7 +375,7 @@ function setGroupChatButton(card, item){
 
         groupChatBtn.classList.remove("disabled");
         groupChatBtn.addEventListener("click",()=>{
-            window.open(`/chat/group/room?roomId=${item.roomId}`,"_blank");
+            window.open(`/chat/group/room?roomId=${item.roomId}`,"_blank","noopener,noreferrer");
         })
 
 

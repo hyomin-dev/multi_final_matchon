@@ -36,6 +36,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,6 +70,18 @@ public class MatchupBoardService {
         if(numberOfTodayMatchupBoards>=2){
             throw new CustomException("Matchup 게시글은 하루에 2번만 작성할 수 있습니다.");
         }
+        //
+        // 월: reqMatchupBoardDto.getMatchDatetime().getMonthValue()
+        // 일: reqMatchupBoardDto.getMatchDatetime().getDayOfMonth()
+        // 종목: reqMatchupBoardDto.getSportsTypeName()
+        // 시/도: reqMatchupBoardDto.getSportsFacilityAddress().split(" ")[0]
+        // 시/군/구: reqMatchupBoardDto.getSportsFacilityAddress().split(" ")[1]
+        String chatName =  "작성자: " +user.getMember().getMemberName() + " [ "+ reqMatchupBoardDto.getSportsTypeName()+" "+" "+reqMatchupBoardDto.getSportsFacilityAddress().split(" ")[1]+" ] " + reqMatchupBoardDto.getMatchDatetime().getMonthValue()+" / "+ reqMatchupBoardDto.getMatchDatetime().getDayOfMonth();
+
+        String identifierChatRoomName = "("+ UUID.randomUUID().toString().replace("-","").substring(0,8)+")";
+
+
+        ChatRoom chatRoom = chatService.registerGroupChatRoom(user.getMember(), chatName+identifierChatRoomName);
 
         // Matchup Board 생성하면서 group chat 생성
         MatchupBoard newMatchupBoard = MatchupBoard.builder()
@@ -83,9 +97,10 @@ public class MatchupBoardService {
                 .maxParticipants(reqMatchupBoardDto.getMaxParticipants())
                 .minMannerTemperature(reqMatchupBoardDto.getMinMannerTemperature())
                 .matchDescription(reqMatchupBoardDto.getMatchDescription())
-                .chatRoom(chatService.registerGroupChatRoom(user.getMember()))
+                .chatRoom(chatRoom)
                 .build();
         MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
+        chatRoom.registerMatchupBoard(matchupBoard);
 
         //경기장 예약 내역 S3에 업로드
         matchupService.insertFile(reqMatchupBoardDto.getReservationFile(), matchupBoard);
@@ -294,6 +309,54 @@ public class MatchupBoardService {
 
         return matchupBoardRepository.findResMatchupOverviewDto(boardId).orElseThrow(()->new CustomException("Matchup "+boardId+"번 게시글이 없습니다."));
     }
+
+    /*
+    * 경기 3시간 전에 참가자들에게 알림 메시지를 보내기
+    * */
+    @Transactional
+    public Long notifyAllParticipantsBeforeStart() {
+
+        // 목적: 경기 3시간 전 이고 참가자들에게 알림 보내지 않은 MatchupBoard를 모두 가져옴
+        // 알림 받는 참가자: 승인대기, 승인됨, 승인 취소 요청, 취소 요청 반려,
+
+        // 1. 현재 시간 3시간 후 LocalDatetime 세팅
+        LocalDateTime threeHoursLater = LocalDateTime.now().plusHours(3);
+
+        // 2. 알림 대상이 되는 MatchupBoard 목록을 가져옴
+        List<MatchupBoard> matchupBoardsToNotifyBeforeThreeHours = matchupBoardRepository.findUnnotifiedBoardsAtThreeHoursBeforeMatch(threeHoursLater);
+
+        if(matchupBoardsToNotifyBeforeThreeHours.isEmpty())
+            return 0L;
+
+        // 3. 알림을 받아야하는 요청 목록들을 가져옴
+
+        List<MatchupRequest> matchupRequestsToNotifyBeforeThreeHours = matchupRequestRepository.findUnnotifiedRequestsAtThreeHoursBeforeMatch(threeHoursLater);
+
+
+        // 4. 알림 보내기
+        Long count = 0L; // 알림 갯수
+        for(MatchupBoard matchupBoard: matchupBoardsToNotifyBeforeThreeHours){
+
+            //참가자들에게 보내기
+            count += matchupRequestsToNotifyBeforeThreeHours.stream()
+                    .filter(matchupreq ->matchupreq.getMatchupBoard().getId().equals(matchupBoard.getId()))
+                    .peek(matchupreq ->{
+                        notificationService.sendNotification(matchupreq.getMember(),"[경기 예정]"+matchupBoard.getMatchDatetime()+"에 경기가 진행될 예정입니다.","/matchup/board/detail?matchup-board-id="+matchupBoard.getId());
+                    })
+                    .count();
+
+            // 작성자에게 보내기
+            notificationService.sendNotification(matchupBoard.getWriter(),"[경기 예정]"+matchupBoard.getMatchDatetime()+"에 경기가 진행될 예정입니다.","/matchup/board/detail?matchup-board-id="+matchupBoard.getId());
+            count++;
+
+            matchupBoard.updateIsNotified(true);
+        }
+
+        return count;
+    }
+
+
+
     // ========================================================================================================
     //                                                    테스트 해본 코드
     // ========================================================================================================
