@@ -48,13 +48,14 @@ function renderList(items){
 
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
+        const end = new Date(item.matchEndtime);
         const card = document.createElement("tr");
         card.className = "matchup-card";
         card.innerHTML = `
                          <td>${setSportsType(item.sportsTypeName)}</td>
                          <td class="truncate">${item.sportsFacilityAddress}</td>
                          <td>📅 ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
-                                ${calTime(item, date.getHours(), date.getMinutes())}</td>
+                                ${end.getHours()}시 ${end.getMinutes()}분</td>
                          <td>( ${item.currentParticipantCount} / ${item.maxParticipants} )</td>
                          <td><button onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'" class="button-group">상세보기</button></td>
                          <td><button class="button-group" id="rating-btn">경기평가</button></td>

@@ -54,8 +54,8 @@ public class MatchupBoard extends BaseEntity {
     @Column(name="match_datetime",nullable = false)
     private LocalDateTime matchDatetime;
 
-    @Column(name="match_duration",nullable = false)
-    private LocalTime matchDuration;
+    @Column(name="match_endtime",nullable = false)
+    private LocalDateTime matchEndtime;
 
     @Column(name="current_participant_count",nullable = false)
     private Integer currentParticipantCount;
@@ -70,7 +70,7 @@ public class MatchupBoard extends BaseEntity {
     private String matchDescription;
 
     @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="chat_room_id",nullable = false)
+    @JoinColumn(name="chat_room_id")
     private ChatRoom chatRoom;
 
     @Column(name="is_rating_initialized")

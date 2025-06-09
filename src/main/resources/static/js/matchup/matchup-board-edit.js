@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const savedName = editDto.dataset.savedName;
     const myMannerTemperature = Number(editDto.dataset.myMannerTemperature);
     const matchDatetime = editDto.dataset.matchDatetime;
-    const matchDuration = editDto.dataset.matchDuration;
+    const matchEndtime = editDto.dataset.matchEndtime;
 
     // console.log(matchDatetime)
     // console.log(matchDuration)
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     setSportsType(sportsTypeName); // 종목 가져옴
     void setReservationFile(originalName, savedName);
-    setDate(matchDatetime, matchDuration);
+    setDate(matchDatetime, matchEndtime);
     setMaxParticipants(currentParticipantCount, maxParticipants);
     setMannerTemperature(minMannerTemperature, myMannerTemperature);
     setButton();
@@ -283,31 +283,32 @@ function goBack(){
     }
 }
 
-function setDate(matchDatetime, matchDuration) {
+function setDate(matchDatetime, matchEndtime) {
     const matchDateEle = document.querySelector("#matchDate");
 
     const date = new Date(matchDatetime);
+    const endDate = new Date(matchEndtime);
 
-    const [hour, minute, second] = matchDuration.split(":");
-    const hourNum = parseInt(hour, 10);
-    const minuteNum = parseInt(minute,10);
-    let extraHour = 0
-    let endMinute = 0;
-    if(date.getMinutes()+minuteNum>=60){
-        extraHour = 1;
-        endMinute = (date.getMinutes()+minuteNum)%60;
-    }else{
-        endMinute = date.getMinutes()+minuteNum;
-    }
+    // const [hour, minute, second] = matchDuration.split(":");
+    // const hourNum = parseInt(hour, 10);
+    // const minuteNum = parseInt(minute,10);
+    // let extraHour = 0
+    // let endMinute = 0;
+    // if(date.getMinutes()+minuteNum>=60){
+    //     extraHour = 1;
+    //     endMinute = (date.getMinutes()+minuteNum)%60;
+    // }else{
+    //     endMinute = date.getMinutes()+minuteNum;
+    // }
+    //
+    // if(date.getHours()+hourNum+extraHour>=24)
+    //     endHour = (date.getHours()+hourNum+extraHour) %24;
+    // else
+    //     endHour = date.getHours()+hourNum+extraHour;
+    //
+    // let endTime =  `${endHour}시 ${endMinute}분`
 
-    if(date.getHours()+hourNum+extraHour>=24)
-        endHour = (date.getHours()+hourNum+extraHour) %24;
-    else
-        endHour = date.getHours()+hourNum+extraHour;
-
-    let endTime =  `${endHour}시 ${endMinute}분`
-
-    matchDateEle.value =  `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 -${endTime}`;
+    matchDateEle.value =  `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 -${endDate.getHours()}시 ${endDate.getMinutes()}분`;
 
 
 
