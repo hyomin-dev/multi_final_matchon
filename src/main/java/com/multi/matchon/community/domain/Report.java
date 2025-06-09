@@ -38,4 +38,18 @@ public class Report extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReasonType reasonType;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean suspended = false;
+
+    @Column(name = "target_is_admin", nullable = false)
+    @Builder.Default
+    private boolean targetIsAdmin = false;
+
+    @Column(name = "target_member_id")
+    private Long targetMemberId;
+
+    @Column(name = "target_writer_name", length = 100)
+    private String targetWriterName;
 }

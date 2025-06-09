@@ -6,6 +6,8 @@ import com.multi.matchon.team.domain.Team;
 import com.multi.matchon.member.domain.Member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,4 +26,11 @@ public interface TeamJoinRequestRepository extends JpaRepository<TeamJoinRequest
     List<TeamJoinRequest> findByTeamIdAndJoinRequestStatus(Long teamId, Status status);
 
     boolean existsByMemberAndTeamAndIsDeletedFalse(Member member, Team team);
+
+    @Query("""
+    SELECT COUNT(r)
+    FROM TeamJoinRequest r
+    WHERE r.team.id = :teamId AND r.joinRequestStatus = com.multi.matchon.common.domain.Status.PENDING AND r.isDeleted = false
+""")
+    int countPendingByTeamId(@Param("teamId") Long teamId);
 }

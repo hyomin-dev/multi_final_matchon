@@ -32,16 +32,31 @@ public class ReportService {
             throw new IllegalStateException("이미 신고한 대상입니다.");
         }
 
+        // 신고 대상 작성자 정보 조회
+        Member targetMember = switch (type) {
+            case BOARD -> boardRepository.findById(targetId)
+                    .map(Board::getMember)
+                    .orElseThrow(() -> new IllegalArgumentException("대상 게시글이 존재하지 않습니다."));
+            case COMMENT -> commentRepository.findById(targetId)
+                    .map(Comment::getMember)
+                    .orElseThrow(() -> new IllegalArgumentException("대상 댓글이 존재하지 않습니다."));
+        };
+
         Report report = Report.builder()
                 .reportType(type)
                 .targetId(targetId)
                 .reason(reason)
                 .reasonType(reasonType)
                 .reporter(reporter)
+                .suspended(targetMember.isSuspended())
+                .targetIsAdmin(targetMember.getMemberRole().name().equals("ADMIN"))
+                .targetMemberId(targetMember.getId())
+                .targetWriterName(targetMember.getMemberName()) // ✅ 추가
                 .build();
 
         reportRepository.save(report);
     }
+
 
     /**
      * 전체 신고 목록 조회 (비페이징)

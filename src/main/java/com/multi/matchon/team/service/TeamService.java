@@ -1,5 +1,8 @@
 package com.multi.matchon.team.service;
 
+import com.multi.matchon.chat.domain.ChatRoom;
+import com.multi.matchon.chat.repository.ChatRoomRepository;
+import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.team.domain.Review;
@@ -69,6 +72,7 @@ public class TeamService {
 
     @PostConstruct
     public void init() {
+        this.S3_URL = S3BaseUrl; // ✅ Proper value assignment
         this.FILE_URL = S3_URL;
     }
 
@@ -85,6 +89,8 @@ public class TeamService {
     private final TeamMemberRepository teamMemberRepository;
     private final TeamJoinRequestRepository teamJoinRequestRepository;
     private final ResponseRepository responseRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatService chatService;
 
     @PersistenceContext
     private EntityManager em;
@@ -123,7 +129,22 @@ public class TeamService {
         }
         // Check if the user already has an active team
 
+        List<PositionName> positions = reqTeamDto.getRecruitingPositions().stream()
+                .map(pos -> {
+                    System.out.println("⛳ Parsing position string: [" + pos + "]");
 
+                    try {
+                        return PositionName.valueOf(pos.trim());
+                    } catch (IllegalArgumentException e) {
+                        throw new IllegalArgumentException("포지션 정보 오류: " + pos);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        boolean exists = teamRepository.existsByTeamNameAndIsDeletedFalse(reqTeamDto.getTeamName());
+        if (exists) {
+            throw new IllegalArgumentException("이미 존재하는 팀 이름입니다.");
+        }
 
         Team newTeam = Team.builder()
                 .teamName(reqTeamDto.getTeamName())
@@ -134,6 +155,27 @@ public class TeamService {
                 .createdPerson(member.getMemberEmail())
                 .build();
         Team savedTeam = teamRepository.save(newTeam);
+
+
+        // ⬇️ Only create chat room if team has none (safety against duplication) ⬇️
+        if (savedTeam.getChatRoom() == null) {
+            String identifierChatRoomName = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+            ChatRoom teamChatRoom = ChatRoom.builder()
+                    .isGroupChat(true)
+                    .chatRoomName("Team Chat - " + savedTeam.getTeamName() + " - " + identifierChatRoomName)
+                    .build();
+
+            chatRoomRepository.save(teamChatRoom);
+
+            savedTeam.setChatRoom(teamChatRoom);
+            teamRepository.save(savedTeam); // update team with linked room
+
+            chatService.addParticipantToRoom(teamChatRoom, member); // add leader
+        }else {
+            // ✅ Fallback: just add participant to existing chat room
+            chatService.addParticipantToRoom(savedTeam.getChatRoom(), member);
+        }
+
 
         // Add creator as team member (leader)
 
@@ -151,17 +193,13 @@ public class TeamService {
                 .setParameter("email", user.getUsername())
                 .executeUpdate();
 
-
-        for (String posName : reqTeamDto.getRecruitingPositions()) {
-
-            PositionName enumValue = PositionName.valueOf(posName.trim());
-            Positions position = positionsRepository.findByPositionName(enumValue)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid position name: " + posName));
+        for (PositionName positionName : positions) {
+            Positions position = positionsRepository.findByPositionName(positionName)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid position name: " + positionName));
 
             RecruitingPosition rp = RecruitingPosition.builder()
                     .team(savedTeam)
                     .positions(position)
-
                     .build();
 
             recruitingPositionRepository.save(rp);
@@ -193,22 +231,47 @@ public class TeamService {
     }
 
     public void updateFile(MultipartFile multipartFile, Team findTeamBoard) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            log.warn("⚠️ No file provided for team update.");
+            return;
+        }
+
         String fileName = UUID.randomUUID().toString().replace("-", "");
+        String extension = multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf("."));
+        String fullSavedName = fileName + extension;
 
         List<Attachment> findAttachments = attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.TEAM, findTeamBoard.getId());
-        if (findAttachments.isEmpty())
-            throw new IllegalArgumentException(BoardType.TEAM + "타입, " + findTeamBoard.getId() + "번에는 첨부파일이 없습니다.");
 
-        findAttachments.get(0).update(multipartFile.getOriginalFilename(), fileName + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf(".")), FILE_DIR);
+        if (findAttachments.isEmpty()) {
+            // 📌 No file yet: insert new attachment
+            Attachment newAttachment = Attachment.builder()
+                    .boardType(BoardType.TEAM)
+                    .boardNumber(findTeamBoard.getId())
+                    .fileOrder(0)
+                    .originalName(multipartFile.getOriginalFilename())
+                    .savedName(fullSavedName)
+                    .savePath(FILE_DIR)
+                    .build();
 
-        attachmentRepository.save(findAttachments.get(0));
+            awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
+            attachmentRepository.save(newAttachment);
+            return;
+        }
 
-        awsS3Utils.deleteFile(FILE_DIR, fileName);
+        // ♻️ Existing file: update it
+        Attachment attachment = findAttachments.get(0);
+        String oldFileName = attachment.getSavedName();
 
+        attachment.update(
+                multipartFile.getOriginalFilename(),
+                fullSavedName,
+                FILE_DIR
+        );
+
+        attachmentRepository.save(attachment);
+
+        awsS3Utils.deleteFile(FILE_DIR, oldFileName);
         awsS3Utils.saveFile(FILE_DIR, fileName, multipartFile);
-
-
-
     }
 
     public PageResponseDto<ResTeamDto> findAllWithPaging(
@@ -354,7 +417,7 @@ public class TeamService {
                 .stream()
                 .map(review -> {
                     Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(review);
-                    return ResReviewDto.from(review, response.orElse(null));
+                    return ResReviewDto.from(review, response.orElse(null), attachmentRepository, awsS3Utils);
                 })
                 .collect(Collectors.toList());
     }
@@ -393,7 +456,7 @@ public class TeamService {
                 .filter(r -> r.getMember().getMemberEmail().equals(userEmail))
                 .map(review -> {
                     Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(review);
-                    return ResReviewDto.from(review, response.orElse(null));
+                    return ResReviewDto.from(review, response.orElse(null), attachmentRepository, awsS3Utils);
                 })
                 .collect(Collectors.toList());
     }
@@ -476,6 +539,13 @@ public class TeamService {
         // ✅ member 테이블에 team_id 업데이트
         member.setTeam(team);
         memberRepository.save(member); // 명시적으로 저장 (선택사항이지만 안전)
+
+
+        ChatRoom teamGroupChatRoom = Optional.ofNullable(team.getChatRoom())
+                .filter(ChatRoom::getIsGroupChat)
+                .orElseThrow(() -> new IllegalStateException("해당 팀의 채팅방이 존재하지 않습니다."));
+
+        chatService.addParticipantToRoom(teamGroupChatRoom, member); // 👈 add member to chat
 
     }
 
@@ -648,7 +718,7 @@ public class TeamService {
         return reviews.stream()
                 .map(r -> {
                     Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(r);
-                    return ResReviewDto.from(r, response.orElse(null));
+                    return ResReviewDto.from(r, response.orElse(null), attachmentRepository, awsS3Utils);
                 })
                 .collect(Collectors.toList());
     }
@@ -668,7 +738,7 @@ public class TeamService {
 
         return reviewRepository.findReviewsByTeamId(teamId).stream()
                 .map(r -> responseRepository.findByReviewAndIsDeletedFalse(r)
-                        .map(resp -> ResReviewDto.from(r, resp))
+                        .map(resp -> ResReviewDto.from(r, resp, attachmentRepository, awsS3Utils))
                         .orElse(null))
                 .filter(r -> r != null)
                 .collect(Collectors.toList());
@@ -769,6 +839,7 @@ public class TeamService {
 
         return ResJoinRequestDetailDto.builder()
                 .requestId(joinRequest.getId())
+                .applicantId(requester.getId()) // ✅ Inject applicant's ID
                 .nickname(requester.getMemberName())
                 .position(
                         requester.getPositions() != null
@@ -824,6 +895,9 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
 
         Team team = member.getTeam();
+        if (team == null) {
+            throw new IllegalArgumentException("소속된 팀이 없습니다."); // This will trigger the alert
+        }
         Optional<Attachment> attachment = attachmentRepository.findLatestAttachment(BoardType.TEAM, team.getId());
 
         String imageUrl = attachment
@@ -863,6 +937,30 @@ public class TeamService {
         }).collect(Collectors.toList());
     }
 
+    public PageResponseDto<ResReviewDto> getPagedReviews(Long teamId, PageRequest pageRequest) {
+        Page<Review> page = reviewRepository.findByTeamId(teamId, pageRequest);
+
+        List<ResReviewDto> dtoList = page.getContent().stream()
+                .map(review -> {
+                    Optional<Response> response = responseRepository.findByReviewAndIsDeletedFalse(review);
+                    return ResReviewDto.from(review, response.orElse(null), attachmentRepository, awsS3Utils);
+                })
+                .toList();
+
+        PageResponseDto.PageInfoDto pageInfo = PageResponseDto.PageInfoDto.builder()
+                .page(page.getNumber())
+                .size(page.getNumberOfElements())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .isFirst(page.isFirst())
+                .isLast(page.isLast())
+                .build();
+
+        return new PageResponseDto<>(dtoList, pageInfo); // ✅ now correct
+    }
+    public int countPendingJoinRequests(Long teamId) {
+        return teamJoinRequestRepository.countPendingByTeamId(teamId);
+    }
 }
 
 //    public PageResponseDto<ResTeamDto> findAllWithPaging(

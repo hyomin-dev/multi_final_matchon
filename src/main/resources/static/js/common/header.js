@@ -261,14 +261,21 @@ async function initSideBar(){
 }
 
 async function getUnreadNoti(){
-    const response = await fetch("/notification/get/unread");
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
+    try{
+        const response = await fetch("/notification/get/unread");
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
 
-    const data = await response.json();
+        //console.log(data);
+        return data.data;
+    }catch (err){
+        console.error(err);
+        return [];
+    }
 
-    //console.log(data);
-    return data.data;
+
+
 
 }
 
@@ -310,14 +317,18 @@ async function initSideBar(){
 }
 
 async function getUnreadNoti(){
-    const response = await fetch("/notification/get/unread");
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
+    try{
+        const response = await fetch("/notification/get/unread");
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
 
-    const data = await response.json();
-
-    //console.log(data);
-    return data.data;
+        //console.log(data);
+        return data.data;
+    }catch(err){
+        console.error(err);
+        return [];
+    }
 
 }
 
@@ -381,25 +392,34 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
 
     msg.addEventListener("click",async ()=>{
-        const response = await fetch(`/notification/update/unread?notificationId=${notificationId}`,{
-            method: "GET",
-            credentials: "include"
-        });
-        if(!response.ok)
-            throw new Error(`HTTP error! Status:${response.status}`);
+        try{
+            const response = await fetch(`/notification/update/unread?notificationId=${notificationId}`,{
+                method: "GET",
+                credentials: "include"
+            });
+            if(!response.ok)
+                throw new Error(`HTTP error! Status:${response.status}`);
 
-        const data = await response.json();
+            const data = await response.json();
 
-        wrapper.classList.add("clicked");
-        msg.style.pointerEvents = "none"; // 클릭 자체를 비활성화
-        msg.style.opacity = "0.6"; // 시각적으로도 회색 느낌
+            wrapper.classList.add("clicked");
+            msg.style.pointerEvents = "none"; // 클릭 자체를 비활성화
+            msg.style.opacity = "0.6"; // 시각적으로도 회색 느낌
 
-        if(data && typeof data.data === "string" && data.data.trim() !== ""){
-            const reply = confirm("알림 페이지로 이동하시겠습니까?")
-            if(reply)
-                window.location.href = data.data;
-        }else{
-            alert("알림이 확인되었습니다.");
+            if(data && typeof data.data === "string" && data.data.trim() !== ""){
+                const reply = confirm("알림 페이지로 이동하시겠습니까?")
+                if(reply){
+                    if(data.data.includes("chat")) {
+                        window.open(data.data, "_blank","noopener,noreferrer");
+                    }else{
+                        window.location.href = data.data;
+                    }
+                }
+            }else{
+                alert("알림이 확인되었습니다.");
+            }
+        }catch (err){
+            console.log(err);
         }
     });
 }
@@ -470,27 +490,38 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
     badge.style.display = 'inline-block';
 
     wrapper.addEventListener("click", async () => {
-        const res = await fetch(`/notification/update/unread?notificationId=${notificationId}`, {
-            method: "GET",
-            credentials: "include"
-        });
-        const data = await res.json();
+        try{
+            const res = await fetch(`/notification/update/unread?notificationId=${notificationId}`, {
+                method: "GET",
+                credentials: "include"
+            });
+            if(!res.ok)
+                throw new Error(`HTTP error! Status:${res.status}`);
 
-        wrapper.classList.add("clicked");
-        wrapper.style.pointerEvents = "none";
-        msg.style.opacity = "0.6";
+            const data = await res.json();
 
-        if (data?.data?.trim()) {
-            const go = confirm("알림 페이지로 이동하시겠습니까?");
-            if (go) window.location.href = data.data;
-        } else {
-            alert("알림이 확인되었습니다.");
+            wrapper.classList.add("clicked");
+            wrapper.style.pointerEvents = "none";
+            msg.style.opacity = "0.6";
+
+            if(data && typeof data.data === "string" && data.data.trim() !== ""){
+                const go = confirm("알림 페이지로 이동하시겠습니까?");
+                if (go){
+                    if(data.data.includes("chat")){
+                        window.open(data.data,"_blank","noopener,noreferrer");
+                    }else{
+                        window.location.href = data.data;
+                    }
+                }
+            } else {
+                alert("알림이 확인되었습니다.");
+            }
+
+            // 알림 읽으면 읽음 숫자 차감
+            badge.innerText = Math.max(parseInt(badge.innerText)-1, 0);
+        }catch (err){
+            console.error(err);
         }
-
-
-        // 알림 읽으면 읽음 숫자 차감
-        badge.innerText = Math.max(parseInt(badge.innerText)-1, 0);
-
     });
 }
 

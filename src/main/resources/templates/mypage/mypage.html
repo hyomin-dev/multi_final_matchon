@@ -6,27 +6,25 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}">
+
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
+            background-color: #fff;
         }
 
-        #wrap {
-            max-width: 700px;
+        .mypage-container {
+            background-color: #fff;
+            display: flex;
+            max-width: 1280px;
             margin: 50px auto;
-            padding: 30px;
-            background: #f9f9f9;
-            border-radius: 16px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            gap: 40px;
+            padding: 0 20px;
         }
 
-        #wrap h1 {
-            font-size: 24px;
-            font-weight: 700;
+        .mypage-sidebar {
+            flex: 0 0 220px;
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #2e5c9a;
-            padding-bottom: 8px;
         }
 
         .profile-img {
@@ -34,152 +32,232 @@
             height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            display: block;
-            margin: 20px auto;
+            margin-bottom: 15px;
             border: 3px solid #ccc;
-            background-color: #fff;
         }
 
-        .button-group {
+        .button-group-vertical {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             gap: 10px;
-            margin-bottom: 20px;
         }
 
-        button {
-            background-color: #2e5c9a;
+        .button-group-vertical button {
+            background-color: dodgerblue;
             color: white;
             font-weight: bold;
             border: none;
-            padding: 8px 16px;
+            padding: 8px 12px;
             border-radius: 8px;
+            font-size: 14px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.3s;
         }
 
-        button:hover {
-            background-color: #204275;
+        .button-group-vertical button:hover {
+            background-color: royalblue;
         }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="password"],
-        select {
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #aaa;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            box-sizing: border-box;
-        }
-
-        .user-info-box {
-            display: flex;
-            justify-content: space-between;
-            gap: 30px;
-            margin-bottom: 30px;
-            padding: 0 10px;
-        }
-
-        .left-info {
+        .mypage-main {
             flex: 1;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
 
-        .right-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: flex-start;
-            margin-top: 20px;
+        .mypage-main h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #2e5c9a;
+            padding-bottom: 10px;
         }
 
-        .right-info p {
+        .mypage-table table {
             width: 100%;
-            text-align: right;
-            margin-bottom: 12px;
+            border-collapse: collapse;
         }
 
-        .form-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            gap: 10px;
-        }
-
-        .form-row label {
-            white-space: nowrap;
+        .mypage-table th, .mypage-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
             font-size: 14px;
         }
 
-        .form-row select {
-            width: 180px;
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #aaa;
-            border-radius: 6px;
+        .mypage-table th {
+            background-color: #f3f6fa;
+            width: 150px;
+            font-weight: 600;
         }
 
         .submit-btn-container {
-            margin-top: 10px;
+            margin-top: 20px;
             text-align: right;
-            padding: 0 10px;
         }
 
-        .host-input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .host-input-group label {
-            white-space: nowrap;
-            font-size: 14px;
-        }
-
-        .host-input-group input[type="text"] {
-            width: 200px;
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #aaa;
+        .submit-btn-container button {
+            background-color: dodgerblue;
+            color: white;
+            padding: 10px 20px;
+            border: none;
             border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s;
         }
 
-        .host-input-group button {
-            padding: 8px 12px;
-            font-size: 14px;
+        .submit-btn-container button:hover {
+            background-color: royalblue;
         }
 
-        #withdrawSection {
-            text-align: center;
-        }
-
-        #withdrawPopup input {
-            width: 80%;
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ccc;
+        .category-select {
+            width: 160px;
+            height: 35px;
+            padding: 6px 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: darkslategray;
+            background-color: #f9f9f9;
+            border: 2px solid dodgerblue;
             border-radius: 6px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .category-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        }
+
+        .withdraw-section {
+            margin-top: auto;
+            padding-top: 30px;
         }
 
         .danger-btn {
+            padding: 8px 15px;
             background-color: white;
-            color: #d32f2f;
-            border: 2px solid #d32f2f;
+            color: red;
+            border: 2px solid red;
+            border-radius: 6px;
             font-weight: bold;
-            padding: 8px 16px;
-            border-radius: 8px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: background-color 0.2s ease;
         }
 
         .danger-btn:hover {
-            background-color: #d32f2f;
+            background-color: mistyrose;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px 24px;
+            border-radius: 12px;
+            width: 380px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            border-top: 5px solid #e53935;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content h3 {
+            margin: 0 0 20px 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #e53935;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px 0;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-buttons button:first-child {
+            background-color: #e53935;
             color: white;
+        }
+
+        .modal-buttons button:first-child:hover {
+            background-color: #c62828;
+        }
+
+        .modal-buttons button:last-child {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .modal-buttons button:last-child:hover {
+            background-color: #ebebeb;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        /* 탈퇴 팝업 전용 스타일 */
+        .report-modal-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #e53935;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .report-icon {
+            width: 22px;
+            height: 22px;
+        }
+
+        .withdraw-message {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .withdraw-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            font-size: 14px;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -187,91 +265,91 @@
 
 <div th:replace="~{common/header::header}"></div>
 
-<div id="wrap">
-    <h1>마이페이지</h1>
+<!-- 마이페이지 본문 -->
+<div class="mypage-container">
+    <aside class="mypage-sidebar">
+        <img th:src="${profileImageUrl}" src="/img/common-profile.png"
+             alt="프로필 이미지"
+             class="profile-img"
+             onerror="this.onerror=null;this.src='/img/common-profile.png';"/>
 
-    <img th:src="${profileImageUrl}" src="/img/default-user.png"
-         alt="프로필 이미지"
-         class="profile-img"
-         onerror="this.onerror=null;this.src='/img/default-user.png';"/>
+        <form id="profileUploadForm" enctype="multipart/form-data">
+            <input type="file" id="profileImageInput" name="profileImage" style="display: none;" />
+        </form>
 
-    <form id="profileUploadForm" enctype="multipart/form-data">
-        <input type="file" id="profileImageInput" name="profileImage" style="display: none;" />
-    </form>
+        <div class="button-group-vertical">
+            <button type="button" onclick="triggerUpload()"
+                    th:text="${isDefaultProfile} ? '사진 등록' : '사진 수정'"></button>
 
-    <div class="button-group">
-        <button type="button" onclick="triggerUpload()"
-                th:text="${isDefaultProfile} ? '사진 등록' : '사진 수정'"></button>
-
-        <div th:unless="${isDefaultProfile}">
-            <button type="button" onclick="deleteProfile()">사진 삭제</button>
-        </div>
-    </div>
-
-    <div th:switch="${memberRole}">
-        <div th:case="'USER'">
-            <div class="user-info-box">
-                <div class="left-info">
-                    <p>이름: <span th:text="${memberName}"></span></p>
-
-                    <div class="form-row">
-                        <label for="timeSelect">활동 시간대:</label>
-                        <select id="timeSelect"></select>
-                    </div>
-
-                    <div class="form-row">
-                        <label for="positionSelect">포지션:</label>
-                        <select id="positionSelect"></select>
-                    </div>
-                </div>
-
-                <div class="right-info">
-                    <p>마이온도: <span th:text="${myTemperature} + ' °C'"></span></p>
-                    <p>소속팀: <span th:text="${teamName}"></span></p>
-                    <div class="form-row">
-                        <label for="emailAgreementCheckboxUser">이메일 수신 동의:</label>
-                        <input type="checkbox" id="emailAgreementCheckboxUser"
-                               th:checked="${emailAgreement} ? 'checked' : null">
-                    </div>
-                    <div class="submit-btn-container">
-                        <button onclick="submitMypage()">수정하기</button>
-                    </div>
-                </div>
+            <div th:unless="${isDefaultProfile}">
+                <button type="button" onclick="deleteProfile()">사진 삭제</button>
             </div>
         </div>
 
-        <div th:case="'HOST'">
-            <p>이름: <span th:text="${memberName}"></span></p>
+        <div class="withdraw-section">
+            <h3>회원 탈퇴</h3>
+            <button type="button" class="danger-btn" onclick="openWithdrawPopup()">탈퇴하기</button>
+        </div>
+    </aside>
 
-            <div class="host-input-group">
-                <label for="hostNameInput">주최 기관 이름:</label>
-                <input type="text" id="hostNameInput" th:value="${hostName}" placeholder="기관명 입력" />
-                <button type="button" onclick="submitHostName()">등록</button>
-                <button type="button" id="scheduleButton">대회 등록하러 가기</button>
-                <div class="form-row">
-                    <label for="emailAgreementCheckboxHost">이메일 수신 동의:</label>
-                    <input type="checkbox" id="emailAgreementCheckboxHost"
-                           th:checked="${emailAgreement} ? 'checked' : null">
+    <main class="mypage-main">
+        <h1>마이페이지</h1>
+
+        <div th:switch="${memberRole}">
+            <div th:case="'USER'" class="mypage-table">
+                <table>
+                    <tr><th>이름</th><td th:text="${memberName}"></td></tr>
+                    <tr><th>활동 시간대</th><td><select id="timeSelect" class="category-select"></select></td></tr>
+                    <tr><th>포지션</th><td><select id="positionSelect" class="category-select"></select></td></tr>
+                    <tr><th>마이온도</th><td th:text="${myTemperature} + ' °C'"></td></tr>
+                    <tr><th>소속팀</th><td th:text="${teamName}"></td></tr>
+                    <tr>
+                        <th>이메일 수신 동의</th>
+                        <td><input type="checkbox" id="emailAgreementCheckbox"
+                                   th:checked="${emailAgreement} ? 'checked' : null"></td>
+                    </tr>
+                </table>
+                <div class="submit-btn-container">
+                    <button onclick="submitMypage()">수정하기</button>
                 </div>
             </div>
 
+            <div th:case="'HOST'" class="mypage-table">
+                <table>
+                    <tr><th>이름</th><td th:text="${memberName}"></td></tr>
+                    <tr>
+                        <th>주최 기관 이름</th>
+                        <td>
+                            <input type="text" id="hostNameInput" th:value="${hostName}" placeholder="기관명 입력" />
+                            <button type="button" onclick="submitHostName()">등록</button>
+                            <button type="button" id="scheduleButton">대회 등록하러 가기</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- 탈퇴 팝업 -->
+<div id="withdrawModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="report-modal-title">
+            <img src="/img/warning2.png" alt="경고" class="report-icon" />
+            회원 탈퇴
+        </div>
+        <p class="withdraw-message">탈퇴하시려면 비밀번호를 입력해주세요.</p>
+        <input type="password" id="withdrawPasswordPopup"
+               class="withdraw-input"
+               placeholder="비밀번호 입력"/>
+
+        <div class="modal-buttons">
+            <button onclick="confirmWithdraw()">확인</button>
+            <button onclick="closeWithdrawPopup()">취소</button>
         </div>
     </div>
-
-    <div id="withdrawSection">
-        <h3>회원 탈퇴</h3>
-        <button type="button" class="danger-btn" onclick="openWithdrawPopup()">탈퇴하기</button>
-    </div>
 </div>
 
-<div id="withdrawPopup"
-     style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%);
-            background:white; padding:20px; border:1px solid #ccc; z-index:1000; width:300px; text-align:center;">
-    <p>탈퇴하시려면 비밀번호를 입력해주세요.</p>
-    <input type="password" id="withdrawPasswordPopup" placeholder="비밀번호 입력"><br><br>
-    <button onclick="confirmWithdraw()" style="margin-right:10px;">확인</button>
-    <button onclick="closeWithdrawPopup()">취소</button>
-</div>
 
 <div th:replace="~{common/footer::footer}"></div>
 
@@ -325,19 +403,10 @@
             location.href = "/schedule";
         });
 
-        const checkboxUser = document.getElementById("emailAgreementCheckboxUser");
-        checkboxUser?.addEventListener("change", () => {
-            const checked = checkboxUser.checked;
-            updateEmailAgreement(checked);
-        });
-
-        const checkboxHost = document.getElementById("emailAgreementCheckboxHost");
-        checkboxHost?.addEventListener("change", () => {
-            const checked = checkboxHost.checked;
-            updateEmailAgreement(checked);
-        });
-
-        function updateEmailAgreement(checked) {
+        // 체크박스 변경 시 서버로 전송
+        const checkbox = document.getElementById("emailAgreementCheckbox");
+        checkbox?.addEventListener("change", () => {
+            const checked = checkbox.checked;
             fetch("/mypage/email-agreement", {
                 method: "PUT",
                 headers: {
@@ -348,7 +417,7 @@
                 if (res.ok) alert("메일 수신 설정이 변경되었습니다.");
                 else res.text().then(msg => alert("변경 실패: " + msg));
             });
-        }
+        });
     });
 
     function triggerUpload() {
@@ -437,11 +506,11 @@
     }
 
     function openWithdrawPopup() {
-        document.getElementById("withdrawPopup").style.display = "block";
+        document.getElementById("withdrawModal").style.display = "flex";
     }
 
     function closeWithdrawPopup() {
-        document.getElementById("withdrawPopup").style.display = "none";
+        document.getElementById("withdrawModal").style.display = "none";
     }
 
     function confirmWithdraw() {
