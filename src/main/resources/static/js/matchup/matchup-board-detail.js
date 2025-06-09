@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded",()=>{
         setContent();
-
 })
 
 
@@ -16,7 +15,7 @@ async function setContent(){
     const maxParticipants = Number(detailDto.dataset.maxParticipants);
     const minMannerTemperature = Number(detailDto.dataset.minMannerTemperature);
     const savedName = detailDto.dataset.savedName;
-    const myMannerTemperature = Number(detailDto.dataset.myMannerTemperature);
+    const myMannerTemperature = Number(detailDto.dataset.myMannerTemperature)||20;
     const loginEmail = detailDto.dataset.loginEmail;
     //const baseUrl = detailDto.dataset.baseUrl;
     //console.log(sportsFacilityAddress);
@@ -29,16 +28,22 @@ async function setContent(){
     setButton(matchDatetime, writerEmail, loginEmail, currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature);
 
 
-    const response = await fetch(`/matchup/attachment/presigned-url?saved-name=${savedName}`,{
-        method: "GET",
-        credentials: "include"
-        })
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data.data);
-    document.querySelector("#reservationUrl").href = data.data;
 
+    try{
+        const response = await fetch(`/matchup/attachment/presigned-url?saved-name=${savedName}`,{
+            method: "GET",
+            credentials: "include"
+        })
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data.data);
+        document.querySelector("#reservationUrl").addEventListener("click",()=>{
+            window.open(data.data,"_blank");
+        });
+    }catch (err){
+        console.log(err);
+    }
 
     //아래는 CORS 막아놔서 안됨
     // const response2 = await fetch(data.data);
@@ -47,10 +52,9 @@ async function setContent(){
     // const data2 = await response2.json();
     // console.log(data2);
 
+
+
 }
-
-
-
 
 function drawMap(address, sportsFacilityName){
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div
@@ -81,7 +85,7 @@ function drawMap(address, sportsFacilityName){
 
             // 인포윈도우로 장소에 대한 설명을 표시합니다
             var infowindow = new kakao.maps.InfoWindow({
-                content: '<div style="width:150px;text-align:center;padding:6px 0;">'+sportsFacilityName+'</div>'
+                content: '<div class="truncateMap" style="width:150px;text-align:center;padding:6px 0;">'+sportsFacilityName+'</div>'
             });
             infowindow.open(map, marker);
 
@@ -125,7 +129,7 @@ function calTime(matchDatetime, matchDuration){
     else
         endHour = startHour+hourNum+extraHour;
 
-    matchDateEle.textContent = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
+    matchDateEle.value = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
 
 }
 
@@ -142,26 +146,26 @@ function checkStatus(matchDatetime, matchDuration, currentParticipantCount, maxP
     const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
 
     if(matchDate <now && now <= matchEnd){
-        statusEle.textContent = "경기 진행";
+        statusEle.value = "경기 진행";
     }else if(matchEnd<now){
-        statusEle.textContent = "경기 종료";
+        statusEle.value = "경기 종료";
     }else if(writerEmail === loginEmail){
         // 경우1: 사용자가 쓴 글
         // 신청 가능 여부: 모집 중, 모집 완료, 경기 종료
 
         if(currentParticipantCount < maxParticipants)
-            statusEle.textContent =  "모집 가능";
+            statusEle.value =  "모집 가능";
         else
-            statusEle.textContent = "모집 완료";
+            statusEle.value = "모집 완료";
     }else{
         // 경우2: 다른 사람의 글
         // 신청 가능 여부: 신청 가능, 신청 마감, 입장 불가, 경기 종료
         if(minMannerTemperature>myMannerTemperature)
-            statusEle.textContent = "입장 불가";
+            statusEle.value = "입장 불가";
         else if(currentParticipantCount < maxParticipants)
-            statusEle.textContent = "신청 가능";
+            statusEle.value = "신청 가능";
         else
-            statusEle.textContent = "신청 불가";
+            statusEle.value = "신청 불가";
     }
 }
 
@@ -212,9 +216,26 @@ function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCoun
                 e.preventDefault();
             })
         }
-
     }
 }
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
+
+
 
 
 

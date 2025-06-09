@@ -23,4 +23,13 @@ public interface MessageReadLogRepository extends JpaRepository<MessageReadLog, 
             where t1.chatRoom =:chatRoom and t1.member=:sender and t1.isRead = false
             """)
     int updateMessagesRead(@Param("chatRoom") ChatRoom chatRoom,@Param("sender") Member sender);
+
+    @Query("""
+    SELECT COUNT(m)
+    FROM MessageReadLog m
+    WHERE m.chatRoom.id = :roomId
+      AND m.member.id = :userId
+      AND m.isRead = false
+""")
+    Long countUnreadMessages(@Param("roomId") Long roomId, @Param("userId") Long userId);
 }

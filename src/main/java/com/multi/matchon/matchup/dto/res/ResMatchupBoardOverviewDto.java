@@ -13,6 +13,8 @@ public class ResMatchupBoardOverviewDto {
 
     private Long boardId;
 
+    private String writerName;
+
     private SportsTypeName sportsTypeName;
 
     private String sportsFacilityName;
@@ -27,8 +29,9 @@ public class ResMatchupBoardOverviewDto {
 
     private Integer maxParticipants;
 
-    public ResMatchupBoardOverviewDto(Long boardId, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount,  Integer maxParticipants) {
+    public ResMatchupBoardOverviewDto(Long boardId, String writerName, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount,  Integer maxParticipants) {
         this.boardId = boardId;
+        this.writerName = writerName;
         this.currentParticipantCount = currentParticipantCount;
         this.matchDatetime = matchDatetime;
         this.matchDuration = matchDuration;

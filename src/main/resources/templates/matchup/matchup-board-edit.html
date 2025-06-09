@@ -9,19 +9,13 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script th:src="@{/js/matchup/matchup-board-edit.js}" defer></script>
 
-    <style>
-        a {
-            display:block;
-        }
-    </style>
 </head>
 <body>
 
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
-    <h1>MATCHUP 글 수정하기</h1>
+    <h2 class="page-title">MATCHUP 글 수정하기</h2>
     <div id="matchup-board-edit-dto"
-         th:data-board-id="${resMatchupBoardDto.boardId}"
          th:data-sports-type-name="${resMatchupBoardDto.sportsTypeName}"
          th:data-current-participant-count="${resMatchupBoardDto.currentParticipantCount}"
          th:data-max-participants="${resMatchupBoardDto.maxParticipants}"
@@ -31,94 +25,127 @@
          th:data-my-manner-temperature="${resMatchupBoardDto.myMannerTemperature}"
     >
     </div>
-    <form th:object="${resMatchupBoardDto}" th:action="@{/matchup/board/edit}" method="post" enctype="multipart/form-data" >
-        <input type="hidden" th:field="*{boardId}"/>
-        <input type="hidden" th:field="*{writerEmail}"/>
-        <input type="hidden" th:field="*{writerName}"/>
-        <input type="hidden" th:field="*{originalName}"/>
-        <input type="hidden" th:field="*{savedName}"/>
-        <input type="hidden" th:field="*{savedPath}"/>
-        <input type="hidden" th:field="*{myMannerTemperature}"/>
+    <div class="form-container">
+        <form th:object="${resMatchupBoardDto}" th:action="@{/matchup/board/edit}" method="post" enctype="multipart/form-data" >
+            <input type="hidden" th:field="*{boardId}"/>
+            <input type="hidden" th:field="*{writerEmail}"/>
+            <input type="hidden" th:field="*{writerName}"/>
+            <input type="hidden" th:field="*{originalName}"/>
+            <input type="hidden" th:field="*{savedName}"/>
+            <input type="hidden" th:field="*{savedPath}"/>
+            <input type="hidden" th:field="*{myMannerTemperature}"/>
 
-        <label>
-            종목
-            <select th:field="*{sportsTypeName}">
-                <option value="SOCCER" id="option-soccer">축구</option>
-                <option value="FUTSAL" id="option-futsal">풋살</option>
-            </select>
-        </label>
-        <label>
-            소속팀
-            <input type="text" th:field="*{teamName}" readonly>
-        </label>
-        <label>
-            팀 소개
-            <textarea cols="30" rows="5" th:field="*{teamIntro}" required maxlength="300">
-            </textarea>
-        </label>
-        <label>
-            <div>
-                <div id="reservationLoadBox">
-                    경기장 예약 내역
-                <span>
-                    <a style="display: inline" th:text="*{originalName}"></a>
-                </span>
-                </div>
-                <div id="reservationFileBox" style="display:none">
-                    경기장 예약 내역
-                    <input type="file" th:field="*{reservationFile}">
-                </div>
-                <button id="toggleBtn" type="button">파일 변경</button>
+            <div class="form-group">
+                <label>
+                    종목
+                    <select th:field="*{sportsTypeName}">
+                        <option value="SOCCER" id="option-soccer">축구</option>
+                        <option value="FUTSAL" id="option-futsal">풋살</option>
+                    </select>
+                </label>
             </div>
-        </label>
-        <label>
-            경기장명
-            <input type="text" placeholder="경기장명" th:field="*{sportsFacilityName}" required maxlength="100">
-        </label>
-        <label>
-            경기장 주소
-            <input type="text" th:field="*{sportsFacilityAddress}" required readonly maxlength="100">
-            <input type="button" onclick="getAddress()" value="주소 찾기">
-        </label>
-        <label>
-            경기 날짜
-<!--                <input type="datetime-local" value="2025-05-21T15:30" required>-->
-            <input type="datetime-local" id="matchDatetime" th:value="*{matchDatetime}" name="matchDatetime" required>
-        </label>
-        <label>
-            경기 진행 시간
-            <select id="matchDuration" name="matchDuration" required>
-                <option th:value="'00:30:00'"  th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 30}">30분</option>
-                <option th:value="'01:00:00'"  th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 60}">1시간</option>
-                <option th:value="'01:30:00'"  th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 90}">1시간 30분</option>
-                <option th:value="'02:00:00'" th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 120}">2시간</option>
-                <option th:value="'02:30:00'" th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 150}">2시간 30분</option>
-                <option th:value="'03:00:00'" th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 180}">3시간</option>
-            </select>
-        </label>
-        <label>
-            현재 참가 인원
-            <input type="text" th:field="*{currentParticipantCount}" required readonly>
-        </label>
-        <label>
-            총 모집 인원
-            <select th:field="*{maxParticipants}" required></select>
-        </label>
-        <label>
-            하한 매너 온도
-            <select th:field="*{minMannerTemperature}" required></select>
-        </label>
-        <label>
-            경기 방식 소개
-            <textarea cols="30" rows="5" th:field="*{matchDescription}" required maxlength="1000">
-            </textarea>
-        </label>
+            <div class="form-group">
+                <label>
+                    소속팀
+                    <input type="text" th:field="*{teamName}" readonly>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    팀 소개
+                    <textarea cols="30" rows="5" th:field="*{teamIntro}" required maxlength="300">
+                    </textarea>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>경기장 예약 내역</label>
 
-        <div class="btn">
-            <button type="submit" >저장하기</button>
-            <button type="button" class="back-btn">뒤로가기</button>
-        </div>
-    </form>
+                <!-- 파일 미리보기 영역 -->
+                <div id="reservationLoadBox">
+                    <span>
+                      <a id="reservationPreviewLink"
+                         class="file-link"
+                         th:text="${resMatchupBoardDto.originalName}">
+                      </a>
+                    </span>
+                </div>
+
+                <!-- 파일 업로드 영역 (초기 숨김) -->
+                <div id="reservationFileBox" style="display: none;">
+                    <input type="file" id="reservationFileInput" th:field="*{reservationFile}" />
+                </div>
+
+                <!-- 파일 변경 버튼 -->
+                <button type="button" id="toggleBtn">파일 변경</button>
+            </div>
+            <div class="form-group">
+                <label>
+                    경기장명
+                    <input type="text" placeholder="경기장명" th:field="*{sportsFacilityName}" required maxlength="100">
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    경기장 주소
+                    <div class="address-row">
+                        <input type="text" th:field="*{sportsFacilityAddress}" placeholder="주소 찾기 버튼을 누르세요." required readonly maxlength="100">
+                        <input type="button" onclick="getAddress()" value="주소 찾기">
+                    </div>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    경기 날짜
+                    <!--                <input type="datetime-local" value="2025-05-21T15:30" required>-->
+                    <input type="datetime-local" id="matchDatetime" th:value="*{matchDatetime}" name="matchDatetime" required>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    경기 진행 시간
+                    <select id="matchDuration" name="matchDuration" required>
+                        <option th:value="'00:30:00'"  th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 30}">30분</option>
+                        <option th:value="'01:00:00'"  th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 60}">1시간</option>
+                        <option th:value="'01:30:00'"  th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 90}">1시간 30분</option>
+                        <option th:value="'02:00:00'" th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 120}">2시간</option>
+                        <option th:value="'02:30:00'" th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 150}">2시간 30분</option>
+                        <option th:value="'03:00:00'" th:selected="*{matchDuration != null and matchDuration.toSecondOfDay() / 60 == 180}">3시간</option>
+                    </select>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    현재 참가 인원
+                    <input type="text" th:field="*{currentParticipantCount}" required readonly>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    총 모집 인원
+                    <select th:field="*{maxParticipants}" required></select>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    하한 매너 온도
+                    <select th:field="*{minMannerTemperature}" required></select>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    경기 방식 소개
+                    <textarea th:field="*{matchDescription}" required maxlength="1000">
+                    </textarea>
+                </label>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" >저장</button>
+                <button type="button" class="cancel-btn" onclick="goBack()">취소</button>
+            </div>
+        </form>
+    </div>
+
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>

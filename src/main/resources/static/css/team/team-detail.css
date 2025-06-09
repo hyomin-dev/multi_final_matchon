@@ -298,6 +298,8 @@
 .review-content {
     color: #555;
     line-height: 1.5;
+    word-break: break-word;
+    white-space: pre-wrap; /* preserves line breaks if any */
 }
 
 /* Review Actions */
@@ -448,3 +450,8 @@ html, body {
     color: gold;
 }
 
+.disabled-tab {
+    color: gray !important;
+    pointer-events: auto;
+    cursor: not-allowed;
+}

@@ -56,7 +56,6 @@ public class BoardController {
                        @RequestParam(defaultValue = "0") int page,
                        Model model) {
         Pageable pageable = PageRequest.of(page, 6, Sort.by("createdDate").descending());
-
         Page<BoardListResponse> boardsPage = boardService.findBoardsWithCommentCount(category, pageable);
 
         List<BoardListResponse> pinnedPosts = boardService.findPinnedByCategory(category).stream()
@@ -66,17 +65,37 @@ public class BoardController {
                         board.getCategory().getDisplayName(),
                         board.getMember().getMemberName(),
                         board.getCreatedDate(),
-                        commentService.getCommentsByBoard(board).size(), // 또는 commentRepository.countByBoardIdAndIsDeletedFalse()
+                        commentService.getCommentsByBoard(board).size(),
                         board.isPinned()
                 ))
                 .toList();
+
+        // 페이징 버튼 계산
+        int currentPage = boardsPage.getNumber();         // 현재 페이지
+        int totalPages = boardsPage.getTotalPages();      // 전체 페이지 수
+        int pageBlockSize = 6;                            // 최대 표시할 페이지 수
+
+        int startPage = Math.max(0, currentPage - pageBlockSize / 2);
+        int endPage = Math.min(startPage + pageBlockSize - 1, totalPages - 1);
+
+        if (endPage - startPage + 1 < pageBlockSize) {
+            startPage = Math.max(0, endPage - pageBlockSize + 1);
+        }
+
+        List<Integer> pageNumbers = new ArrayList<>();
+        for (int i = startPage; i <= endPage; i++) {
+            pageNumbers.add(i);
+        }
 
         model.addAttribute("boardsPage", boardsPage);
         model.addAttribute("selectedCategory", category);
         model.addAttribute("categories", Category.values());
         model.addAttribute("pinnedPosts", pinnedPosts);
+        model.addAttribute("pageNumbers", pageNumbers);
+
         return "community/view";
     }
+
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
@@ -153,7 +172,8 @@ public class BoardController {
             }
         }
 
-        return "redirect:/community";
+        return "redirect:/community?category=" + boardRequest.getCategory().name();
+
     }
 
     @GetMapping("/{id}/edit")

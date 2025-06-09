@@ -1,6 +1,7 @@
 package com.multi.matchon.customerservice.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
+import com.multi.matchon.common.service.NotificationService;
 import com.multi.matchon.customerservice.domain.CustomerServiceType;
 import com.multi.matchon.customerservice.domain.Inquiry;
 import com.multi.matchon.customerservice.dto.req.InquiryReqDto;
@@ -24,6 +25,7 @@ import java.util.Optional;
 public class InquiryController {
 
     private final InquiryService inquiryService;
+    private final NotificationService notificationService;
 
     @GetMapping("/inquiry")
     public String listInquiries(@AuthenticationPrincipal CustomUser user,
@@ -55,6 +57,9 @@ public class InquiryController {
             return "cs/inquiry/inquiry-register";
         }
         inquiryService.saveInquiry(user.getMember().getId(), dto);
+
+        // 관리자 알림 전송
+        notificationService.notifyAdmins(user.getMember().getMemberName() + " 님이 1:1 문의를 등록했습니다.", "/admin/inquiry", user.getMember());
         return "redirect:/inquiry";
     }
 
@@ -65,8 +70,14 @@ public class InquiryController {
     }
 
     @PostMapping("/inquiry/update/{id}")
-    public String update(@PathVariable Long id, @ModelAttribute InquiryReqDto dto) {
+    public String update(@PathVariable Long id, @ModelAttribute InquiryReqDto dto, @AuthenticationPrincipal CustomUser user) {
         inquiryService.updateInquiry(id, dto);
+
+        // 사용자 이름 가져오기
+        String memberName = user.getMember().getMemberName();
+
+        // 관리자 알림
+        notificationService.notifyAdmins(user.getMember().getMemberName() + " 님의 1:1 문의가 수정되었습니다.", "/admin/inquiry/" + id, user.getMember());
         return "redirect:/inquiry";
     }
 

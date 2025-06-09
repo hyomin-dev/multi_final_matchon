@@ -84,7 +84,7 @@ VALUES
     ('user8@example.com', '$2b$12$O9catkQ.S.GJZad57FhhwupYTmC3GfmVeLcakmKtrePzGm.Need06', NULL, NULL, 'Member8', 'USER', 8, 'WEEKEND_AFTERNOON', 8, 36.1, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- password8
     ('user9@example.com', '$2b$12$fxng2YxGQJbkY4LdC9628uES33t3j4gcxU9RDstYjUs0zH3uuEiS2', NULL, NULL, 'Member9', 'USER', 9, 'WEEKEND_EVENING', 9, 35.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password9
     ('user10@example.com', '$2b$12$64F.CeDtWhfn/as6d9jTwu9dBjzolmChl9jWFfKYyfqcoAdYnz8Oy', NULL, NULL, 'Member10', 'USER', 10, 'WEEKDAY_MORNING', 10, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password10
-    ('matchon2025@gmail.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'admin', 'ADMIN', NULL, NULL, NULL, NULL, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE); -- Mathcon2025!!
+    ('matchon2025@gmail.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'admin', 'ADMIN', NULL, NULL, NULL, NULL, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE); -- Mathcon2025!!
 
 INSERT INTO refresh_token (member_id, refresh_token_data, refresh_token_expired_date, created_date)
 VALUES
