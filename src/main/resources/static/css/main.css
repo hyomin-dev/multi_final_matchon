@@ -83,7 +83,7 @@ body, html {
 /* 메인 텍스트 */
 .hero-text {
     position: relative;
-    top: 17%;
+    top: 30%;
     left: 25%;
     transform: translate(-50%, -50%);
     text-align: center;
@@ -118,8 +118,8 @@ body, html {
 /* 알림 드로어 */
 .mini-drawer {
     position: absolute;
-    top: 100%;
-    left: 50%;
+    top: 120%;
+    left: 0%;
     transform: translateX(-50%);
     width: 280px;
     background-color: white;
