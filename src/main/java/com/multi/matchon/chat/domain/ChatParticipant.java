@@ -22,7 +22,7 @@ public class ChatParticipant extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="chat_room_id",nullable = false)
+    @JoinColumn(name="chat_room_id")
     private ChatRoom chatRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
