@@ -25,7 +25,13 @@ public class ViewController {
     }
 
     @GetMapping("/login")
-    public String loginPage(){
+    public String loginPage(@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
+                            Model model) {
+        if (redirectUrl != null && !redirectUrl.trim().isEmpty() && redirectUrl.startsWith("/")) {
+            model.addAttribute("redirectUrl", redirectUrl);
+        } else {
+            model.addAttribute("redirectUrl", "");  // 기본 빈 값
+        }
         return "login/login";
     }
 

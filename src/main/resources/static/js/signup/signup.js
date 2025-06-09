@@ -7,6 +7,7 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const name = document.getElementById("name").value;
+    const emailAgreement = document.getElementById("emailAgreement").checked;
 
     // 비밀번호 유효성 검사
     const passwordError = getPasswordValidationMessage(password);
@@ -26,7 +27,7 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     }
 
     // payload 구성
-    const payload = { email, password, name };
+    const payload = { email, password, name, emailAgreement };
     if (role === "user") {
         payload.positionId = null;
     }

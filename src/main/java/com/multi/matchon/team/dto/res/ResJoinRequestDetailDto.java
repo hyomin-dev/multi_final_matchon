@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 public class ResJoinRequestDetailDto {
     private Long requestId;
+    private Long applicantId; // ✅ Add this
     private String nickname;
     private String position;
     private Double temperature;

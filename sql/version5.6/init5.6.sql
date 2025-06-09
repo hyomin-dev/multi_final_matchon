@@ -31,7 +31,8 @@ VALUES
     ('CENTRAL_ATTACKING_MIDFIELDER'),
     ('LEFT_RIGHT_WING'),
     ('STRIKER_CENTER_FORWARD'),
-    ('SECOND_STRIKER');
+    ('SECOND_STRIKER'),
+    ('LEFT_RIGHT_WINGER');
 
 
 INSERT INTO team (team_name, team_region, team_rating_average, recruitment_status, created_person,
@@ -84,8 +85,7 @@ VALUES
 
 
 INSERT INTO member (member_email, member_password, previous_password, temporary_password, member_name, member_role, position_id, preferred_time,
-                    team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
-
+    				team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
 VALUES
     ('user1@example.com', '$2b$12$XLxwreDeCJ05HT6Dfgoi2eT0LypkvILlxflUAM7UbGXg4Nx9vwnNO', NULL, NULL, 'Member1', 'USER', 1, 'WEEKEND_MORNING', 1, 35.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password1
     ('user2@example.com', '$2b$12$q6pH.HBpAqY3OWdtbErQ8.DenIlABy470AbWWtRQEXJLTTASFXA7O', NULL, NULL, 'Member2', 'USER', 2, 'WEEKEND_AFTERNOON', 2, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password2
@@ -269,35 +269,35 @@ VALUES
 INSERT INTO matchup_board (writer_id, sports_type_id, reservation_attachment_enabled, team_intro,
                            sports_facility_name, sports_facility_address, match_datetime, match_duration,
                            current_participant_count, max_participants, min_manner_temperature, match_description,
-                           chat_room_id, is_rating_initialized,created_date, created_person, modified_date, modified_person, is_deleted)
+                           chat_room_id, is_rating_initialized, is_notified,created_date, created_person, modified_date, modified_person, is_deleted)
 VALUES (1, 1, TRUE, 'Team introduction by Member1''s team.', 'Sports Center 1', 'Address 1', '2025-05-18 20:52:28',
-        '01:00:00', 3, 10, 35.9, 'Description for matchup board 1', 1, FALSE,'2025-05-17 20:52:28', 'Member1',
+        '01:00:00', 3, 10, 35.9, 'Description for matchup board 1', 1, FALSE, FALSE,'2025-05-17 20:52:28', 'Member1',
         '2025-05-17 20:52:28', 'Member1', FALSE),
        (2, 1, TRUE, 'Team introduction by Member2''s team.', 'Sports Center 2', 'Address 2', '2025-05-19 20:52:28',
-        '02:00:00', 8, 10, 37.7, 'Description for matchup board 2', 2, FALSE,'2025-05-17 20:52:28', 'Member2',
+        '02:00:00', 8, 10, 37.7, 'Description for matchup board 2', 2, FALSE, FALSE,'2025-05-17 20:52:28', 'Member2',
         '2025-05-17 20:52:28', 'Member2', FALSE),
        (3, 2, TRUE, 'Team introduction by Member3''s team.', 'Sports Center 3', 'Address 3', '2025-05-20 20:52:28',
-        '01:00:00', 2, 10, 35.3, 'Description for matchup board 3', 3, FALSE,'2025-05-17 20:52:28', 'Member3',
+        '01:00:00', 2, 10, 35.3, 'Description for matchup board 3', 3, FALSE, FALSE,'2025-05-17 20:52:28', 'Member3',
         '2025-05-17 20:52:28', 'Member3', FALSE),
        (4, 2, TRUE, 'Team introduction by Member4''s team.', 'Sports Center 4', 'Address 4', '2025-05-21 20:52:28',
-        '02:00:00', 0, 10, 35.6, 'Description for matchup board 4', 4, FALSE,'2025-05-17 20:52:28', 'Member4',
+        '02:00:00', 0, 10, 35.6, 'Description for matchup board 4', 4, FALSE, FALSE,'2025-05-17 20:52:28', 'Member4',
         '2025-05-17 20:52:28', 'Member4', FALSE),
        (5, 1, TRUE, 'Team introduction by Member5''s team.', 'Sports Center 5', 'Address 5', '2025-05-22 20:52:28',
-        '01:00:00', 5, 10, 35.9, 'Description for matchup board 5', 5, FALSE,'2025-05-17 20:52:28', 'Member5',
+        '01:00:00', 5, 10, 35.9, 'Description for matchup board 5', 5, FALSE, FALSE,'2025-05-17 20:52:28', 'Member5',
         '2025-05-17 20:52:28', 'Member5', FALSE),
        (6, 1, TRUE, 'Team introduction by Member6''s team.', 'Sports Center 6', 'Address 6', '2025-05-23 20:52:28',
-        '02:00:00', 4, 10, 37.9, 'Description for matchup board 6', 6, FALSE,'2025-05-17 20:52:28', 'Member6',
+        '02:00:00', 4, 10, 37.9, 'Description for matchup board 6', 6, FALSE, FALSE,'2025-05-17 20:52:28', 'Member6',
         '2025-05-17 20:52:28', 'Member6', FALSE),
        (7, 2, TRUE, 'Team introduction by Member7''s team.', 'Sports Center 7', 'Address 7', '2025-05-24 20:52:28',
-        '01:00:00', 1, 10, 37.9, 'Description for matchup board 7', 7, FALSE,'2025-05-17 20:52:28', 'Member7',
+        '01:00:00', 1, 10, 37.9, 'Description for matchup board 7', 7, FALSE, FALSE,'2025-05-17 20:52:28', 'Member7',
         '2025-05-17 20:52:28', 'Member7', FALSE),
        (8, 2, TRUE, 'Team introduction by Member8''s team.', 'Sports Center 8', 'Address 8', '2025-05-25 20:52:28',
-        '02:00:00', 5, 10, 37.2, 'Description for matchup board 8', 8, FALSE,'2025-05-17 20:52:28', 'Member8',
+        '02:00:00', 5, 10, 37.2, 'Description for matchup board 8', 8, FALSE, FALSE,'2025-05-17 20:52:28', 'Member8',
         '2025-05-17 20:52:28', 'Member8', FALSE),
        (9, 1, TRUE, 'Team introduction by Member9''s team.', 'Sports Center 9', 'Address 9', '2025-05-26 20:52:28',
-        '01:00:00', 6, 10, 37.7, 'Description for matchup board 9', 9, FALSE,'2025-05-17 20:52:28', 'Member9',
+        '01:00:00', 6, 10, 37.7, 'Description for matchup board 9', 9, FALSE, FALSE,'2025-05-17 20:52:28', 'Member9',
         '2025-05-17 20:52:28', 'Member9', FALSE),
-       (10, 1, TRUE, 'Team introduction by Member10''s team.', 'Sports Center 10', 'Address 10', '2025-05-27 20:52:28', '02:00:00', 1, 10, 37.8, 'Description for matchup board 10', 10, FALSE,'2025-05-17 20:52:28',
+       (10, 1, TRUE, 'Team introduction by Member10''s team.', 'Sports Center 10', 'Address 10', '2025-05-27 20:52:28', '02:00:00', 1, 10, 37.8, 'Description for matchup board 10', 10, FALSE, FALSE,'2025-05-17 20:52:28',
         'Member10', '2025-05-17 20:52:28', 'Member10', FALSE);
 
 INSERT INTO matchup_request (matchup_board_id, applicant_id, self_intro, participant_count, status,

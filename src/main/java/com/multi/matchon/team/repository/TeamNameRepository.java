@@ -54,6 +54,8 @@ public interface TeamNameRepository extends JpaRepository <Team, Long> {
 
     @Query("SELECT t FROM Team t WHERE t.isDeleted = false")
     List<Team> findAllNotDeleted();
+
+    boolean existsByTeamNameAndIsDeletedFalse(String teamName);
 }
 
 

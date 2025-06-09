@@ -30,4 +30,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
 
 
+    @Query("SELECT DISTINCT p.chatRoom FROM ChatParticipant p " +
+            "WHERE p.chatRoom.isGroupChat = false AND p.member.id = :memberId")
+    List<ChatRoom> findPrivateChatsByMemberId(@Param("memberId") Long memberId);
 }
