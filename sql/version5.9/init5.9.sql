@@ -85,19 +85,19 @@ VALUES
 
 
 INSERT INTO member (member_email, member_password, previous_password, temporary_password, member_name, member_role, position_id, preferred_time,
-                    team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
+    				team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
 VALUES
-    ('user1@example.com', '$2b$12$XLxwreDeCJ05HT6Dfgoi2eT0LypkvILlxflUAM7UbGXg4Nx9vwnNO', NULL, NULL, 'Member1', 'USER', 1, 'WEEKEND_MORNING', 1, 35.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password1
-    ('user2@example.com', '$2b$12$q6pH.HBpAqY3OWdtbErQ8.DenIlABy470AbWWtRQEXJLTTASFXA7O', NULL, NULL, 'Member2', 'USER', 2, 'WEEKEND_AFTERNOON', 2, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password2
-    ('user3@example.com', '$2b$12$Khi4Sn7FXd6XrFtO2DQXje9UKC5UZ59CMM5X1unnX0Ncp4RfV8LMC', NULL, NULL, 'Member3', 'USER', 3, 'WEEKEND_EVENING', 3, 39.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- password3
-    ('user4@example.com', '$2b$12$KgSiwAuAkWA/tU2vrk5S6.mqgsAGGMdVlGUpE6IKyVn4X3m76fqGe', NULL, NULL, 'Member4', 'USER', 4, 'WEEKDAY_MORNING', 4, 39.0, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password4
-    ('user5@example.com', '$2b$12$BLAHeM/XhFsqMahBapPpRu3u/9W4/bqTkWBPmooKUPBfX7xdyw71S', NULL, NULL, 'Member5', 'USER', 5, 'WEEKDAY_AFTERNOON', 5, 39.1, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- password5
-    ('user6@example.com', '$2b$12$IhGuAY/N8QL9kJJ2FCz/8.OKIVGI.WbcicvI2kwtvUeqyMKRXbxvi', NULL, NULL, 'Member6', 'USER', 6, 'WEEKDAY_EVENING', 6, 36.5, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password6
-    ('user7@example.com', '$2b$12$iYsymbDQPRrBz4Ui.fCnEeVR4XhpgAfimntKqchOAUqIUdStbUfku', NULL, NULL, 'Member7', 'USER', 7, 'WEEKEND_MORNING', 7, 38.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password7
-    ('user8@example.com', '$2b$12$O9catkQ.S.GJZad57FhhwupYTmC3GfmVeLcakmKtrePzGm.Need06', NULL, NULL, 'Member8', 'USER', 8, 'WEEKEND_AFTERNOON', 8, 36.1, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- password8
-    ('user9@example.com', '$2b$12$fxng2YxGQJbkY4LdC9628uES33t3j4gcxU9RDstYjUs0zH3uuEiS2', NULL, NULL, 'Member9', 'USER', 9, 'WEEKEND_EVENING', 9, 35.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password9
-    ('user10@example.com', '$2b$12$64F.CeDtWhfn/as6d9jTwu9dBjzolmChl9jWFfKYyfqcoAdYnz8Oy', NULL, NULL, 'Member10', 'USER', 10, 'WEEKDAY_MORNING', 10, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password10
-    ('matchon2025@gmail.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'admin', 'ADMIN', NULL, NULL, NULL, NULL, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE); -- Mathcon2025!!
+    ('user1@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member1', 'USER', 1, 'WEEKEND_MORNING', 1, 35.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- Mathcon2025!!
+    ('user2@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member2', 'USER', 2, 'WEEKEND_AFTERNOON', 2, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- Mathcon2025!!
+    ('user3@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member3', 'USER', 3, 'WEEKEND_EVENING', 3, 39.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- Mathcon2025!!
+    ('user4@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member4', 'USER', 4, 'WEEKDAY_MORNING', 4, 39.0, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- Mathcon2025!!
+    ('user5@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member5', 'USER', 5, 'WEEKDAY_AFTERNOON', 5, 39.1, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- Mathcon2025!!
+    ('user6@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member6', 'USER', 6, 'WEEKDAY_EVENING', 6, 36.5, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- Mathcon2025!!
+    ('user7@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member7', 'USER', 7, 'WEEKEND_MORNING', 7, 38.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- Mathcon2025!!
+    ('user8@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member8', 'USER', 8, 'WEEKEND_AFTERNOON', 8, 36.1, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, FALSE), -- Mathcon2025!!
+    ('user9@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member9', 'USER', 9, 'WEEKEND_EVENING', 9, 35.9, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- Mathcon2025!!
+    ('user10@example.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'Member10', 'USER', 10, 'WEEKDAY_MORNING', 10, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- Mathcon2025!!
+    ('matchon2025@gmail.com', '$2a$10$44Wyx23Yq2Ra1REDKpPsaesujiHxJFh..lnzrssN9tPG9jYmonEzS', NULL, NULL, 'admin', 'ADMIN', NULL, NULL, NULL, NULL, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE); -- Mathcon2025!!
 
 INSERT INTO refresh_token (member_id, refresh_token_data, refresh_token_expired_date, created_date)
 VALUES

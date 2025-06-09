@@ -6,6 +6,7 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.Attachment;
 import com.multi.matchon.common.domain.BoardType;
 import com.multi.matchon.common.domain.SportsTypeName;
+import com.multi.matchon.common.domain.Status;
 import com.multi.matchon.common.dto.res.PageResponseDto;
 import com.multi.matchon.common.exception.custom.CustomException;
 import com.multi.matchon.common.repository.AttachmentRepository;
@@ -77,10 +78,78 @@ public class MatchupBoardService {
         // 기존 경기 시간과 새로 등록하려는 경기 시간이 겹치는 지 체크, 3시 끝나고 다음 경기가 3시에 시작인 경우는 허용함
         Boolean isDuplicate = matchupBoardRepository.findByMemberAndStartTimeAndEndTime(user.getMember(),reqMatchupBoardDto.getMatchDatetime(),endTime);
 
-        if(!isDuplicate)
+        if(isDuplicate)
             throw new CustomException("Matchup 등록하신 경기 날짜는 이전에 작성하신 게시글의 경기 날짜와 겹칩니다. 확인 후 다시 작성해주세요.");
 
         // 참가 요청 내역과 비교
+
+        // 1. 내가 참가 요청한 것들 가져옴
+        // 조건: 기존 경기 시간과 새로 등록하려는 경기 시간이 겹치는 것
+        // 조건: Matchup 게시글이 삭제가 안된 것
+
+        List<MatchupRequest> duplicatedMatchupRequests = matchupRequestRepository.findByMemberAndStartTimeAndEndTime(user.getMember(),reqMatchupBoardDto.getMatchDatetime(),endTime);
+
+        // 2. 가져온 요청들 중에서 등록해도 되는 것과 등록하면 안되는 것을 구분
+        // 등록하면 안되는 상태: 승인 대기, 승인됨, 승인 취소 요청, 취소 요청 반려
+        // 등록 허용해도 되지만 추가적인 제한이 필요한 것: 요청 취소됨(재요청 불가능 하도록 제한), 반려됨(재요청 불가능 하도록 제한),
+        // 등록 허용 가능한 상태: 취소 요청 승인
+
+        for(MatchupRequest mr:duplicatedMatchupRequests){
+            //승인 대기: 다른 곳에서 겹치는 시간대에 참가 요청한 것이 있기 때문에, MatchupBoard 게시글 등록을 허용하면 안됨
+            if(
+                (mr.getMatchupStatus()== Status.PENDING && mr.getMatchupRequestSubmittedCount()==1 && mr.getMatchupCancelSubmittedCount()==0 && !mr.getIsDeleted()) ||
+                (mr.getMatchupStatus()== Status.PENDING && mr.getMatchupRequestSubmittedCount()==2 && mr.getMatchupCancelSubmittedCount()==0 && !mr.getIsDeleted())
+            ){
+                throw new CustomException("Matchup 등록하신 경기 날짜는 이전에 참가 요청하신 게시글의 경기 날짜와 겹칩니다. 확인 후 다시 작성해주세요");
+            }
+            // 요청 취소됨-1: 재요청이 가능하기 때문에, 재요청파트에서 제한을 걸어줘야됨
+            // 요청 취소됨-2: 재요청이 불가능하기 때문에, 재요청파트에서 제한을 걸지 않아도됨
+           /* else if(
+                    (mr.getMatchupStatus()== Status.PENDING && mr.getMatchupRequestSubmittedCount()==1 && mr.getMatchupCancelSubmittedCount()==0 && mr.getIsDeleted()) ||
+                    (mr.getMatchupStatus()== Status.PENDING && mr.getMatchupRequestSubmittedCount()==2 && mr.getMatchupCancelSubmittedCount()==0 && mr.getIsDeleted())
+            )
+            {
+                continue;
+            }*/
+            // 참가 요청 승인: 다른 곳에서 겹치는 시간대에 참가 요청이 승인 됐기 때문에, MatchupBoard 게시글 등록을 허용하면 안됨
+            else if(
+                    (mr.getMatchupStatus()==Status.APPROVED && mr.getMatchupRequestSubmittedCount()==1 && mr.getMatchupCancelSubmittedCount()==0 && !mr.getIsDeleted())||
+                    (mr.getMatchupStatus()==Status.APPROVED && mr.getMatchupRequestSubmittedCount()==2 && mr.getMatchupCancelSubmittedCount()==0 && !mr.getIsDeleted())
+            ){
+                throw new CustomException("Matchup 등록하신 경기 날짜는 이전에 참가 요청하신 게시글의 경기 날짜와 겹칩니다. 확인 후 다시 작성해주세요");
+            }
+            // 참가 요청 반려-1: 재요청이 가능하기 때문에, 재요청 파트에서 제한을 걸어줘야됨
+            // 참가 요청 반려-2: 재요청이 불가능하기 때문에, 재요청파트에서 제한을 걸지 않아도됨
+           /* else if(
+                    (mr.getMatchupStatus()==Status.DENIED && mr.getMatchupRequestSubmittedCount()==1 && mr.getMatchupCancelSubmittedCount()==0 && !mr.getIsDeleted())||
+                    (mr.getMatchupStatus()==Status.DENIED && mr.getMatchupRequestSubmittedCount()==2 && mr.getMatchupCancelSubmittedCount()==0 && !mr.getIsDeleted())
+            ){
+                continue;
+            }*/
+            //승인 취소 요청: 승인 취소 요청 상태이지만, 그래도 다른 곳에서 겹치는 시간대에 참가 요청이 승인 됐기 때문에, MatchupBoard 게시글 등록을 허용하면 안됨
+            else if(
+                    (mr.getMatchupStatus()==Status.CANCELREQUESTED && mr.getMatchupRequestSubmittedCount()==1 && mr.getMatchupCancelSubmittedCount()==1 && !mr.getIsDeleted())||
+                    (mr.getMatchupStatus()==Status.CANCELREQUESTED && mr.getMatchupRequestSubmittedCount()==2 && mr.getMatchupCancelSubmittedCount()==1 && !mr.getIsDeleted())
+            ){
+                throw new CustomException("Matchup 등록하신 경기 날짜는 이전에 참가 요청하신 게시글의 경기 날짜와 겹칩니다. 확인 후 다시 작성해주세요");
+            }
+            // 취소 요청 승인: 취소 요청 승인이 되어, MatchupBoard 게시글에 등록을 허용해도됨
+           /* else if(
+                    (mr.getMatchupStatus()==Status.CANCELREQUESTED && mr.getMatchupRequestSubmittedCount()==1 && mr.getMatchupCancelSubmittedCount()==1 && mr.getIsDeleted())||
+                    (mr.getMatchupStatus()==Status.CANCELREQUESTED && mr.getMatchupRequestSubmittedCount()==2 && mr.getMatchupCancelSubmittedCount()==1 && mr.getIsDeleted())
+            ){
+                continue;
+            }*/
+            // 취소 요청 반려: 다른 곳에서 겹치는 시간대에 참가 요청이 승인 됐기 때문에, MatchupBoard 게시글 등록을 허용하면 안됨
+            else if(
+                    (mr.getMatchupStatus()==Status.APPROVED && mr.getMatchupRequestSubmittedCount()==1 && mr.getMatchupCancelSubmittedCount()==1 && !mr.getIsDeleted())||
+                    (mr.getMatchupStatus()==Status.APPROVED && mr.getMatchupRequestSubmittedCount()==2 && mr.getMatchupCancelSubmittedCount()==1 && !mr.getIsDeleted())
+            ){
+                throw new CustomException("Matchup 등록하신 경기 날짜는 이전에 참가 요청하신 게시글의 경기 날짜와 겹칩니다. 확인 후 다시 작성해주세요");
+
+            }
+            // 경기 시작 이전만 고려하면 되므로 자동 참가는 고려하지 않음
+        }
 
 
 
