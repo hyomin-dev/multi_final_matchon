@@ -96,7 +96,11 @@ public class MatchupRequestService {
             throw new CustomException("Matchup 신청 하신 인원은 현재 모집원을 초과해서 신청할 수 없습니다.");
         }
 
-        // 2. boardId와 applicantId에 대응되는 request가 있는 지 판단
+        // 2.
+
+
+
+        // 3. boardId와 applicantId에 대응되는 request가 있는 지 판단
 
         Optional<MatchupRequest> findMatchupRequestOptional = matchupRequestRepository.findByMatchupBoardIdAndApplicantId(reqMatchupRequestDto.getBoardId(), user.getMember().getId());
 
@@ -126,7 +130,7 @@ public class MatchupRequestService {
         }
 
         /*
-        * 작성자에게 알림 보내기
+        * 4. 작성자에게 알림 보내기
         * */
         notificationService.sendNotification(findMatchupBoard.getWriter() , "[참가 요청]"+user.getMember().getMemberName()+"님의 참가 요청이 있습니다.", "/matchup/request/board?"+"board-id="+findMatchupBoard.getId());
 

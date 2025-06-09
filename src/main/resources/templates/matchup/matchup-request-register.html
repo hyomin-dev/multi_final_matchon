@@ -72,6 +72,8 @@
     <hr>
     <form th:object="${reqMatchupRequestDto}" th:action="@{/matchup/request}" method="post" id="request-info">
       <input type="hidden" th:field="*{boardId}"/>
+      <input type="hidden" th:field="*{matchDatetime}">
+      <input type="hidden" th:field="*{matchEndtime}">
 
       <label>
         소개

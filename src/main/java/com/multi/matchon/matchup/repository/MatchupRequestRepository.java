@@ -7,6 +7,8 @@ import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestOverviewListDto;
 import com.multi.matchon.member.domain.Member;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -271,4 +273,14 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             )
             """)
     List<MatchupRequest> findUnnotifiedRequestsAtThreeHoursBeforeMatch(@Param("threeHoursLater") LocalDateTime threeHoursLater);
+
+
+    @Query("""
+            select t1
+            from MatchupRequest t1
+            join t1.matchupBoard t2
+            where t1.member=:loginMember and t2.isDeleted =false and
+            (:startTime<t2.matchEndtime and :endTime > t2.matchDatetime )
+            """)
+    List<MatchupRequest> findByMemberAndStartTimeAndEndTime(@Param("loginMember") Member loginMember,@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
 }

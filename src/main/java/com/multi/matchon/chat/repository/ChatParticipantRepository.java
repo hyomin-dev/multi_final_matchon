@@ -124,7 +124,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             from ChatParticipant t1
             join fetch t1.chatRoom t2
             join t2.matchupBoard t3
-            where t1.isDeleted =false and t2.isDeleted=false and t3.matchDatetime<=:thresholdTime and t2.isGroupChat=true
+            where t1.isDeleted =false and t2.isDeleted=false and t3.matchEndtime<=:thresholdTime and t2.isGroupChat=true
             """)
     List<ChatParticipant> findAfterThreeDaysOfMatchWithChatParticipantAndChatRoom(@Param("thresholdTime") LocalDateTime thresholdTime);
 
