@@ -33,14 +33,8 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
 
             alert("로그인 성공!");
 
-            setTimeout(() => {
-                window.location.href = redirect;
-                localStorage.removeItem("loginRedirectUrl");
-            }, 300);
+            window.location.href = "/main";
         })
-        .catch(err => {
-            alert("에러: " + err.message);
-        });
 });
 
 // 로그인 페이지 진입 시 팝업 조건 확인

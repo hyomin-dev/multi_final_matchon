@@ -2,10 +2,7 @@ package com.multi.matchon.stadium.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
@@ -43,6 +40,10 @@ public class Stadium extends BaseEntity {
     private Double latitude;
     private Double longitude;
 
+    @Transient
+    @Setter
+    private double distance;
+
     public String getFullImageUrl() {
         String regionFolder = switch (stadiumRegion) {
             case "경기도" -> "gyeonggi";
@@ -55,4 +56,6 @@ public class Stadium extends BaseEntity {
         return "https://matchon-seongeun-bucket.s3.eu-north-1.amazonaws.com/stadium/region/"
                 + regionFolder + "/" + imageUrl;
     }
+
+
 }
