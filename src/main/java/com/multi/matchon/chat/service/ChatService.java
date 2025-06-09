@@ -355,17 +355,24 @@ public class ChatService {
     }
 
     public List<ResMyChatListDto> findRelevantRoomsForLeader(Long leaderId, Long teamId) {
+        // 1️⃣ Fetch private chats
         List<ChatRoom> privateChats = chatParticipantRepository.findAllPrivateChatsForLeader(leaderId);
 
+        // 2️⃣ Fetch the team group chat room (if any)
         Optional<ChatRoom> groupChatOpt = chatRoomRepository.findTeamGroupChatRoom(teamId);
 
+        // 3️⃣ Combine all relevant rooms
+        List<ChatRoom> allRelevantRooms = new ArrayList<>(privateChats);
+        groupChatOpt.ifPresent(allRelevantRooms::add); // ✅ safe add
 
-        groupChatOpt.ifPresent(privateChats::add); // ✅ 그룹 채팅방 추가
+        // 4️⃣ Convert to DTOs
+        Member leader = memberRepository.findById(leaderId)
+                .orElseThrow(() -> new IllegalArgumentException("리더 정보를 찾을 수 없습니다."));
 
-        return privateChats.stream()
+        return allRelevantRooms.stream()
                 .map(room -> {
                     boolean isBlocked = chatUserBlockRepository.isBlocked(room.getId(), leaderId);
-                    long unreadCount = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(room, memberRepository.findById(leaderId).orElseThrow());
+                    long unreadCount = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(room, leader);
                     return ResMyChatListDto.from(room, leaderId, isBlocked, unreadCount);
                 })
                 .toList();
@@ -409,5 +416,43 @@ public class ChatService {
         }
 
         return resMyChatListDtos;
+    }
+    public List<ResMyChatListDto> findOnlyTeamChatRooms(Long memberId, Long teamId) {
+        if (teamId == null) return Collections.emptyList();
+
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
+                .orElseThrow(() -> new CustomException("해당 회원이 존재하지 않습니다."));
+
+        // Fetch group chat room for the team
+        Optional<ChatRoom> teamGroupRoomOpt = chatRoomRepository.findTeamGroupChatRoom(teamId);
+
+        // Collect to list (just one in this case)
+        List<ChatRoom> relevantRooms = new ArrayList<>();
+        teamGroupRoomOpt.ifPresent(relevantRooms::add);
+
+        // ✅ Deduplicate by ChatRoom ID just in case
+        Set<Long> seenRoomIds = new HashSet<>();
+
+        return relevantRooms.stream()
+                .filter(room -> seenRoomIds.add(room.getId())) // prevents duplicates
+                .map(room -> {
+                    boolean isBlocked = chatUserBlockRepository.isBlocked(room.getId(), memberId);
+                    long unreadCount = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(room, member);
+                    return ResMyChatListDto.from(room, memberId, isBlocked, unreadCount);
+                })
+                .toList();
+    }
+
+    public List<ResMyChatListDto> findOnlyPrivateChats(Long memberId) {
+        List<ChatRoom> privateRooms = chatRoomRepository.findPrivateChatsByMemberId(memberId);
+
+        return privateRooms.stream()
+                .map(room -> {
+                    Long unReadCount = messageReadLogRepository.countUnreadMessages(memberId, room.getId());
+                    boolean isBlocked = chatUserBlockRepository.isBlocked(memberId, room.getId());
+
+                    return ResMyChatListDto.from(room, memberId, isBlocked, unReadCount);
+                })
+                .collect(Collectors.toList());
     }
 }

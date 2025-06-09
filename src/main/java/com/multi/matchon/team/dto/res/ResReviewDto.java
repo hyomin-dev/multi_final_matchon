@@ -1,5 +1,9 @@
 package com.multi.matchon.team.dto.res;
 
+import com.multi.matchon.common.domain.BoardType;
+import com.multi.matchon.common.repository.AttachmentRepository;
+import com.multi.matchon.common.util.AwsS3Utils;
+import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.team.domain.Response;
 import com.multi.matchon.team.domain.Review;
 import lombok.Builder;
@@ -19,10 +23,17 @@ public class ResReviewDto {
     private LocalDateTime respondedAt;
 
     private Long responseId;
+    private String profileImageUrl;
 
 
 
-    public static ResReviewDto from(Review review, Response response) {
+    public static ResReviewDto from(Review review, Response response, AttachmentRepository attachmentRepository, AwsS3Utils awsS3Utils) {
+        Member reviewer = review.getMember();
+
+        String profileImageUrl = attachmentRepository.findLatestAttachment(BoardType.MEMBER, reviewer.getId())
+                .map(attachment -> awsS3Utils.createPresignedGetUrl("attachments/profile/", attachment.getSavedName()))
+                .orElse("/img/default-user.png");
+
         return ResReviewDto.builder()
                 .id(review.getId()) // ✅ THIS too!
                 .reviewerName(review.getMember().getMemberName())
@@ -34,6 +45,7 @@ public class ResReviewDto {
 
                 .responseId(response != null ? response.getId() : null) // ✅ ADD THIS
 
+                .profileImageUrl(profileImageUrl) // ✅ Set it here
                 .build();
     }
 }

@@ -14,6 +14,7 @@ import org.checkerframework.checker.units.qual.C;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -164,4 +165,33 @@ public class ChatController {
     }
     // 삭제
 
+    @PostMapping("/my/rooms/team")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getMyTeamChatRooms(@AuthenticationPrincipal CustomUser user) {
+        Long memberId = user.getMember().getId();
+        Long teamId = user.getMember().getTeam() != null ? user.getMember().getTeam().getId() : null;
+
+        List<ResMyChatListDto> chatRooms = chatService.findOnlyTeamChatRooms(memberId, teamId);
+
+        return ResponseEntity.ok().body(ApiResponse.ok(chatRooms));
+    }
+
+    @GetMapping("/my/rooms/team/view")
+    public String viewMyTeamChatRooms(Model model, @AuthenticationPrincipal CustomUser user) {
+        Long memberId = user.getMember().getId();
+        Long teamId = user.getMember().getTeam() != null ? user.getMember().getTeam().getId() : null;
+
+        List<ResMyChatListDto> teamRooms = chatService.findOnlyTeamChatRooms(memberId, teamId);
+        model.addAttribute("teamRooms", teamRooms);
+
+        return "chat/team-chat-rooms"; // ✅ Create this Thymeleaf template
+    }
+
+    @PostMapping("/my/rooms/private")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getPrivateChats(@AuthenticationPrincipal CustomUser user) {
+        Long memberId = user.getMember().getId();
+        List<ResMyChatListDto> privateRooms = chatService.findOnlyPrivateChats(memberId); // you implement this
+        return ResponseEntity.ok(ApiResponse.ok(privateRooms));
+    }
 }
