@@ -162,10 +162,10 @@ function connect(token, loginEmail) {
                     //const body = JSON.parse(message.body);
 
                     //openbtn.src = "/img/bell-ring-black.png";
-                   //console.log(message);
-                   const messageBody = JSON.parse(message.body);
-                   console.log(messageBody);
-                   console.log(messageBody.notificationMessage);
+                    //console.log(message);
+                    const messageBody = JSON.parse(message.body);
+                    console.log(messageBody);
+                    console.log(messageBody.notificationMessage);
 
                     createNotiStructure(messageBody.notificationId, messageBody.notificationMessage, messageBody.createdDate);
 
@@ -242,40 +242,16 @@ function onError(error){
     }
 }
 
-async function initSideBar(){
-    const openBtn = document.getElementById('openMiniDrawerBtn');
-    const closeBtn = document.getElementById('closeMiniDrawerBtn');
-    const miniDrawer = document.getElementById('miniDrawer');
-
-    openBtn.onclick = () => miniDrawer.style.display = 'block';
-    closeBtn.onclick = () => miniDrawer.style.display = 'none';
-
-    window.addEventListener("click", e => {
-        if (!miniDrawer.contains(e.target) && e.target !== openBtn) {
-            miniDrawer.style.display = 'none';
-        }
-    });
-
-    const notifications = await getUnreadNoti();
-    setUnreadNoti(notifications);
-}
 
 async function getUnreadNoti(){
-    try{
-        const response = await fetch("/notification/get/unread");
-        if(!response.ok)
-            throw new Error(`HTTP error! Status:${response.status}`)
-        const data = await response.json();
+    const response = await fetch("/notification/get/unread");
+    if(!response.ok)
+        throw new Error(`HTTP error! Status:${response.status}`)
 
-        //console.log(data);
-        return data.data;
-    }catch (err){
-        console.error(err);
-        return [];
-    }
+    const data = await response.json();
 
-
-
+    //console.log(data);
+    return data.data;
 
 }
 
@@ -315,23 +291,6 @@ async function initSideBar(){
         }
     });
 }
-
-async function getUnreadNoti(){
-    try{
-        const response = await fetch("/notification/get/unread");
-        if(!response.ok)
-            throw new Error(`HTTP error! Status:${response.status}`)
-        const data = await response.json();
-
-        //console.log(data);
-        return data.data;
-    }catch(err){
-        console.error(err);
-        return [];
-    }
-
-}
-
 
 
 // function setUnreadNoti(notifications){
@@ -392,34 +351,25 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
 
     msg.addEventListener("click",async ()=>{
-        try{
-            const response = await fetch(`/notification/update/unread?notificationId=${notificationId}`,{
-                method: "GET",
-                credentials: "include"
-            });
-            if(!response.ok)
-                throw new Error(`HTTP error! Status:${response.status}`);
+        const response = await fetch(`/notification/update/unread?notificationId=${notificationId}`,{
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`);
 
-            const data = await response.json();
+        const data = await response.json();
 
-            wrapper.classList.add("clicked");
-            msg.style.pointerEvents = "none"; // 클릭 자체를 비활성화
-            msg.style.opacity = "0.6"; // 시각적으로도 회색 느낌
+        wrapper.classList.add("clicked");
+        msg.style.pointerEvents = "none"; // 클릭 자체를 비활성화
+        msg.style.opacity = "0.6"; // 시각적으로도 회색 느낌
 
-            if(data && typeof data.data === "string" && data.data.trim() !== ""){
-                const reply = confirm("알림 페이지로 이동하시겠습니까?")
-                if(reply){
-                    if(data.data.includes("chat")) {
-                        window.open(data.data, "_blank","noopener,noreferrer");
-                    }else{
-                        window.location.href = data.data;
-                    }
-                }
-            }else{
-                alert("알림이 확인되었습니다.");
-            }
-        }catch (err){
-            console.log(err);
+        if(data && typeof data.data === "string" && data.data.trim() !== ""){
+            const reply = confirm("알림 페이지로 이동하시겠습니까?")
+            if(reply)
+                window.location.href = data.data;
+        }else{
+            alert("알림이 확인되었습니다.");
         }
     });
 }
@@ -490,40 +440,26 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
     badge.style.display = 'inline-block';
 
     wrapper.addEventListener("click", async () => {
-        try{
-            const res = await fetch(`/notification/update/unread?notificationId=${notificationId}`, {
-                method: "GET",
-                credentials: "include"
-            });
-            if(!res.ok)
-                throw new Error(`HTTP error! Status:${res.status}`);
+        const res = await fetch(`/notification/update/unread?notificationId=${notificationId}`, {
+            method: "GET",
+            credentials: "include"
+        });
+        const data = await res.json();
 
-            const data = await res.json();
+        wrapper.classList.add("clicked");
+        wrapper.style.pointerEvents = "none";
+        msg.style.opacity = "0.6";
 
-            wrapper.classList.add("clicked");
-            wrapper.style.pointerEvents = "none";
-            msg.style.opacity = "0.6";
-
-            if(data && typeof data.data === "string" && data.data.trim() !== ""){
-                const go = confirm("알림 페이지로 이동하시겠습니까?");
-                if (go){
-                    if(data.data.includes("chat")){
-                        window.open(data.data,"_blank","noopener,noreferrer");
-                    }else{
-                        window.location.href = data.data;
-                    }
-                }
-            } else {
-                alert("알림이 확인되었습니다.");
-            }
-
-            // 알림 읽으면 읽음 숫자 차감
-            badge.innerText = Math.max(parseInt(badge.innerText)-1, 0);
-        }catch (err){
-            console.error(err);
+        if (data?.data?.trim()) {
+            const go = confirm("알림 페이지로 이동하시겠습니까?");
+            if (go) window.location.href = data.data;
+        } else {
+            alert("알림이 확인되었습니다.");
         }
+
+
+        // 알림 읽으면 읽음 숫자 차감
+        badge.innerText = Math.max(parseInt(badge.innerText)-1, 0);
+
     });
 }
-
-
-
