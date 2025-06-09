@@ -134,7 +134,7 @@ public class MatchupRatingService {
     public Integer setMannerTemperatureAutoSetting() {
 
 
-        // 평가 대상이 되는 MatchupBoard를 모두 가져옴
+        // 경기가 종료된 MatchupBoard를 모두 가져옴
         List<MatchupBoard> ratingMatchupBoards = matchupBoardRepository.findByMatchDatetimeAndIsRatingInitializedFalse();
 
         // 평가세팅할 MatchupBoard가 없으면 0 반환, MatchupRequest 조회 안함
@@ -146,10 +146,6 @@ public class MatchupRatingService {
         List<MatchupRating> matchupRatings = new ArrayList<>();
 
         for(MatchupBoard ratingMatchupBoard: ratingMatchupBoards){
-
-            // 경기 종료가 안되었으면 평가 세팅 안되도록
-            if(LocalDateTime.now().isBefore(ratingMatchupBoard.getMatchEndtime()))
-                continue;
 
             // 경기가 종료된 MatchupBoard에 대응되는 request 추출
             List<MatchupRequest> matchupRequestsWithBoard = matchupRequests.stream()

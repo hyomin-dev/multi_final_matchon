@@ -74,10 +74,13 @@ public class MatchupBoardService {
         //내가 등록하고자 하는 경기날짜가 기존에 내가 작성한 게시글에서 경기 시간과 겹치는 지 체크
         LocalDateTime endTime = reqMatchupBoardDto.getMatchDatetime().plusHours(reqMatchupBoardDto.getMatchDuration()/60).plusMinutes(reqMatchupBoardDto.getMatchDuration()%60);
 
-        Long duplicatedMatchupBoardNum = matchupBoardRepository.findByMemberAndStartTimeAndEndTime(user.getMember(),reqMatchupBoardDto.getMatchDatetime(),endTime);
+        // 기존 경기 시간과 새로 등록하려는 경기 시간이 겹치는 지 체크, 3시 끝나고 다음 경기가 3시에 시작인 경우는 허용함
+        Boolean isDuplicate = matchupBoardRepository.findByMemberAndStartTimeAndEndTime(user.getMember(),reqMatchupBoardDto.getMatchDatetime(),endTime);
 
-        if(duplicatedMatchupBoardNum>0)
-            throw new CustomException("Matchup 이전에 작성하신 게시글의 경기 날짜와 겹치는 시간이 있습니다. 확인 후 다시 작성해주세요.");
+        if(!isDuplicate)
+            throw new CustomException("Matchup 등록하신 경기 날짜는 이전에 작성하신 게시글의 경기 날짜와 겹칩니다. 확인 후 다시 작성해주세요.");
+
+        // 참가 요청 내역과 비교
 
 
 
@@ -104,15 +107,15 @@ public class MatchupBoardService {
                 .sportsFacilityName(reqMatchupBoardDto.getSportsFacilityName())
                 .sportsFacilityAddress(reqMatchupBoardDto.getSportsFacilityAddress())
                 .matchDatetime(reqMatchupBoardDto.getMatchDatetime())
-                .matchEndtime(reqMatchupBoardDto.getMatchDatetime().plusHours(reqMatchupBoardDto.getMatchDuration()/60).plusMinutes(reqMatchupBoardDto.getMatchDuration()%60))
+                .matchEndtime(endTime)
                 .currentParticipantCount(reqMatchupBoardDto.getCurrentParticipantCount())
                 .maxParticipants(reqMatchupBoardDto.getMaxParticipants())
                 .minMannerTemperature(reqMatchupBoardDto.getMinMannerTemperature())
                 .matchDescription(reqMatchupBoardDto.getMatchDescription())
-                .chatRoom(chatRoom)
+                //.chatRoom(chatRoom)
                 .build();
         MatchupBoard matchupBoard = matchupBoardRepository.save(newMatchupBoard);
-        chatRoom.registerMatchupBoard(matchupBoard);
+        matchupBoard.changeChatRoom(chatRoom);
 
         //경기장 예약 내역 S3에 업로드
         matchupService.insertFile(reqMatchupBoardDto.getReservationFile(), matchupBoard);
