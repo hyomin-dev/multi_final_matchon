@@ -191,3 +191,85 @@ body, html {
 .bell-shake {
     animation: bell-ring 0.6s ease-in-out;
 }
+
+.popup {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    animation: fadeInScale 0.3s ease-out;
+}
+
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.popup h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.popup input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.popup input[type="password"]:focus {
+    border-color: #28a745;
+    outline: none;
+}
+
+.popup button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background: #28a745;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.popup button[type="submit"]:hover {
+    background: #218838;
+}
+
+.popup .success-msg {
+    font-size: 13px;
+    margin-top: 10px;
+    color: #dc3545;
+}
+
+.popup-close-btn {
+    display: none; /* 닫기 버튼 숨기기 */
+}
+
+#changePasswordForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#changePasswordForm input[type="password"],
+#changePasswordForm button[type="submit"] {
+    width: 100%;
+    max-width: 280px;
+    box-sizing: border-box;
+}
