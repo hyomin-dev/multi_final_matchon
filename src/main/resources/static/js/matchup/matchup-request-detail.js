@@ -600,6 +600,12 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
     }
 }
 
-
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
 
 

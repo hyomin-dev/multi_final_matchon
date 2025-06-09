@@ -52,9 +52,9 @@ public class MatchupBoardController {
     // 게시글 상세 조회
 
     @GetMapping("/detail")
-    public ModelAndView getMatchupBoardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv){
+    public ModelAndView getMatchupBoardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
         log.info("matchup-board-id: {}",boardId);
-        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId);
+        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId, user);
         mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-detail");
         return mv;
@@ -104,8 +104,8 @@ public class MatchupBoardController {
     * Matchup 게시글 수정하기 페이지로 이동
     * */
     @GetMapping("/edit")
-    public ModelAndView showMatchupBoardEditPage(@RequestParam("boardId") Long boardId, ModelAndView mv){
-        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId);
+    public ModelAndView showMatchupBoardEditPage(@RequestParam("boardId") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
+        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId, user);
         mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-edit");
         return mv;
@@ -122,8 +122,8 @@ public class MatchupBoardController {
     }
 
     @GetMapping("/delete")
-    public String softDeleteBoard(@RequestParam("boardId") Long boardId){
-        matchupBoardService.softDeleteMatchupBoard(boardId);
+    public String softDeleteBoard(@RequestParam("boardId") Long boardId, @AuthenticationPrincipal CustomUser user){
+        matchupBoardService.softDeleteMatchupBoard(boardId, user);
         log.info("matchup 게시글 삭제 완료");
         return "redirect:/matchup/board/my";
     }

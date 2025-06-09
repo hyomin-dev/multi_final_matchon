@@ -27,18 +27,28 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
 
 async function loadItems(page){
-    const response = await fetch(`/matchup/request/board/list?page=${page-1}&board-id=${boardId}`,{
+    let items = [];
+    let pageInfo = {
+        page: 0,
+        totalPages: 1
+    };
+    try{
+        const response = await fetch(`/matchup/request/board/list?page=${page-1}&board-id=${boardId}`,{
 
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data);
-    const items = data.data.items;
-    const pageInfo = data.data.pageInfo;
-    //console.log(pageInfo);
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data);
+        items = data.data.items;
+        pageInfo = data.data.pageInfo;
+        //console.log(pageInfo);
+    }catch(err){
+        console.error(err);
+    }
+
 
     renderList(items);
     renderPagination(pageInfo);
@@ -73,11 +83,13 @@ function renderList(items){
                         <td class="button-group">
                             <button id="approvedBtn">참가 요청 승인</button>
                             <button id="deniedBtn">참가 요청 반려</button><br/>
+                            <hr style="width: 90%; margin-left: 0;">
                             <button id="approveWithdrawRequestBtn">취소 요청 승인</button>
                             <button id="denyWithdrawRequestBtn">취소 요청 반려</button>
                         </td>
                         `;
         setDecision(card,item);
+        markIfPastMatchdatetime(card, item);
         requestArea.appendChild(card);
 
     })
@@ -289,7 +301,6 @@ function manageRequestInfo(item){
     }else{
         return "서버 오류";
     }
-
 }
 
 function setDecision(card,item){
@@ -309,7 +320,6 @@ function setDecision(card,item){
         now = new Date();
         if(matchDate<now){
             e.preventDefault();
-            e.target.href = "#";
             e.target.classList.add("disabled");
             alert("경기 시작 시간이 지나 승인을 할 수 없습니다.");
         }else{
@@ -321,7 +331,6 @@ function setDecision(card,item){
         now = new Date();
         if(matchDate<now){
             e.preventDefault();
-            e.target.href = "#";
             e.target.classList.add("disabled");
             alert("경기 시작 시간이 지나 반려를 할 수 없습니다.");
         }else{
@@ -333,7 +342,6 @@ function setDecision(card,item){
         now = new Date();
         if(matchDate<now){
             e.preventDefault();
-            e.target.href = "#";
             e.target.classList.add("disabled");
             alert("경기 시작 시간이 지나 취소 요청 승인을 할 수 없습니다.");
         }else{
@@ -345,7 +353,6 @@ function setDecision(card,item){
         now = new Date();
         if(matchDate<now){
             e.preventDefault();
-            e.target.href = "#";
             e.target.classList.add("disabled");
             alert("경기 시작 시간이 지나 취소 요청 반려를 할 수 없습니다.");
         }else{
@@ -354,7 +361,23 @@ function setDecision(card,item){
     })
 
     // 참가 요청에 대한 승인/반려
-    if(
+    if(matchDate<now){
+        // 참가 승인 불가능
+        approvedBtn.classList.add("disabled");
+
+        // 참가 반려 불가능
+        deniedBtn.classList.add("disabled");
+
+        //취소 승인 불가능
+        approveWithdrawRequestBtn.classList.add("disabled");
+        //approveWithdrawRequestBtn.href = "#";
+
+        //취소 반려 불가능
+
+        denyWithdrawRequestBtn.classList.add("disabled");
+        //denyWithdrawRequestBtn.href = "#";
+    }
+    else if(
         (item.matchupStatus===Status.PENDING && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount ===0 && item.isDeleted===false)||
         (item.matchupStatus===Status.PENDING && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount ===0 && item.isDeleted===false)
     ){
@@ -428,6 +451,27 @@ function setDecision(card,item){
 
         // 취소 반려 가능
 
+    }
+}
+
+/*경기 시작 시간이 지났다면 회색으로 표현*/
+function markIfPastMatchdatetime(card, item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+    if(matchDate<now){
+        const tds = card.querySelectorAll("td");
+        tds.forEach(td =>{
+            td.style.backgroundColor = "lightgray";
+        })
+    }
+
+}
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
     }
 }
 

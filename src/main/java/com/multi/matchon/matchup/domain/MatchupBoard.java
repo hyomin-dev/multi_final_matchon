@@ -77,6 +77,10 @@ public class MatchupBoard extends BaseEntity {
     @Builder.Default
     private Boolean isRatingInitialized = false;
 
+    @Column(name="is_notified")
+    @Builder.Default
+    private Boolean isNotified = false;
+
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;

@@ -47,4 +47,6 @@ public class ChatRoom extends BaseEntity {
 
 
 
+
+
 }

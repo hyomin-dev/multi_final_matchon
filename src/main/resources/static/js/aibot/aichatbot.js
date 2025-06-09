@@ -73,7 +73,10 @@ function appendMessage(text, isUser = false, bold = false) {
     time.className = "timestamp";
     time.textContent = new Date().toTimeString().substring(0, 5);
 
-    const formattedText = bold ? `<b>${escapeHtml(text)}</b>` : escapeHtml(text);
+    const formattedText = isUser
+        ? (bold ? `<b>${escapeHtml(text)}</b>` : escapeHtml(text))
+        : text;
+
     content.innerHTML = formattedText;
 
     if (!isUser) {
@@ -107,7 +110,6 @@ function escapeHtml(str) {
 function appendBotMessage(text) {
     appendMessage(text, false);
 }
-
 function appendUserMessage(text, bold = false) {
     appendMessage(text, true, bold);
 }
@@ -130,6 +132,8 @@ function sendChip(text) {
 
 // 서버에 질문 전송 → 답변 수신
 function fetchBotReply(message) {
+    appendBotMessage("입력 중...");
+
     fetch("/api/aichat", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
@@ -139,16 +143,18 @@ function fetchBotReply(message) {
         .then(res => res.json())
         .then(data => {
             const reply = data.reply;
-            if (message.includes("종료")) {
-                appendBotMessage("상담을 종료합니다.");
+            const chatBox = document.getElementById("chat-box");
+            const messages = chatBox.querySelectorAll(".bot .msg-content");
+            if (messages.length > 0) {
+                messages[messages.length - 1].innerHTML = reply;
+            }
 
-                // 부모 페이지의 모달 닫기
+            if (message.includes("종료")) {
+                const modal = parent.document.getElementById("chatbot-modal");
                 setTimeout(() => {
-                    const modal = parent.document.getElementById("chatbot-modal");
                     if (modal) modal.style.display = "none";
                 }, 1500);
-            } else {
-                appendBotMessage(reply);
             }
         });
 }
+

@@ -27,16 +27,13 @@ document.addEventListener("DOMContentLoaded",()=>{
     calTime(matchDatetime, matchDuration);
     setParticipantCount(currentParticipantCount, maxParticipants, participantCount);
     manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime);
+    autoResize();
 
     const form = document.querySelector("form");
     form.addEventListener("submit",(e)=>{
         submitCheck(e, matchDatetime);
     })
 
-    const cancel = document.querySelector(".delete-btn");
-    cancel.addEventListener("click",()=>{
-        history.back();
-    })
 
 })
 
@@ -230,5 +227,22 @@ function manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupC
         statusEle.value = "취소 요청 반려";
     }else{
         statusEle.value = "서버 오류";
+    }
+}
+
+function autoResize() {
+    const allTextarea = document.querySelectorAll('textarea');
+    allTextarea.forEach(el =>{
+        el.style.height = 'auto';  // 초기화
+        el.style.height = el.scrollHeight + 'px';  // 실제 내용에 맞춤
+    });
+}
+
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
     }
 }
