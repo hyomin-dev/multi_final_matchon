@@ -100,9 +100,7 @@ public class MatchupBoard extends BaseEntity {
         this.maxParticipants = maxParticipants;
         this.minMannerTemperature = minMannerTemperature;
         this.matchDescription = matchDescription;
-
     }
-
 
     public void delete(boolean isDeleted) {
         this.isDeleted = isDeleted;
@@ -124,4 +122,9 @@ public class MatchupBoard extends BaseEntity {
         this.isNotified = isNotified;
     }
 
+    public void changeChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
+        if(chatRoom.getMatchupBoard()!=this)
+            this.chatRoom.updateMatchupBoard(this);
+    }
 }

@@ -47,7 +47,7 @@ public class ChatRoom extends BaseEntity {
         this.isDeleted = isDeleted;
     }
 
-    public void registerMatchupBoard(MatchupBoard matchupBoard) {
+    public void updateMatchupBoard(MatchupBoard matchupBoard){
         this.matchupBoard = matchupBoard;
     }
 

@@ -196,7 +196,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
                t1
             from MatchupBoard t1
             join fetch t1.writer
-            where t1.isDeleted =false and t1.matchDatetime<CURRENT_TIMESTAMP and t1.isRatingInitialized=false and t1.writer.isDeleted=false
+            where t1.isDeleted =false and t1.matchEndtime<CURRENT_TIMESTAMP and t1.isRatingInitialized=false and t1.writer.isDeleted=false
             """)
     List<MatchupBoard> findByMatchDatetimeAndIsRatingInitializedFalse();
 
@@ -210,9 +210,13 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
     List<MatchupBoard> findUnnotifiedBoardsAtThreeHoursBeforeMatch(@Param("threeHoursLater") LocalDateTime threeHoursLater);
 
     @Query("""
-            select count(t1)
+            select case
+                        when count(t1) >0 then true
+                        else false
+                    end
             from MatchupBoard t1
-            where t1.isDeleted =false and t1.matchDatetime between :startTime and :endTime and t1.writer=:loginMember
+            where t1.isDeleted =false and t1.writer=:loginMember and
+            (:startTime<t1.matchEndtime and :endTime > t1.matchDatetime )
             """)
-    Long findByMemberAndStartTimeAndEndTime(@Param("loginMember") Member loginMember,@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
+    Boolean findByMemberAndStartTimeAndEndTime(@Param("loginMember") Member loginMember,@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
 }
