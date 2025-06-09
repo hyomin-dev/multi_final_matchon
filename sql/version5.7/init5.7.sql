@@ -31,7 +31,8 @@ VALUES
     ('CENTRAL_ATTACKING_MIDFIELDER'),
     ('LEFT_RIGHT_WING'),
     ('STRIKER_CENTER_FORWARD'),
-    ('SECOND_STRIKER');
+    ('SECOND_STRIKER'),
+    ('LEFT_RIGHT_WINGER');
 
 
 INSERT INTO team (team_name, team_region, team_rating_average, recruitment_status, created_person,
@@ -84,8 +85,7 @@ VALUES
 
 
 INSERT INTO member (member_email, member_password, previous_password, temporary_password, member_name, member_role, position_id, preferred_time,
-                    team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
-
+    				team_id, my_temperature, picture_attachment_enabled, is_temporary_password, suspended_until, created_date, modified_date, is_deleted, email_agreement)
 VALUES
     ('user1@example.com', '$2b$12$XLxwreDeCJ05HT6Dfgoi2eT0LypkvILlxflUAM7UbGXg4Nx9vwnNO', NULL, NULL, 'Member1', 'USER', 1, 'WEEKEND_MORNING', 1, 35.8, TRUE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password1
     ('user2@example.com', '$2b$12$q6pH.HBpAqY3OWdtbErQ8.DenIlABy470AbWWtRQEXJLTTASFXA7O', NULL, NULL, 'Member2', 'USER', 2, 'WEEKEND_AFTERNOON', 2, 36.9, FALSE, FALSE, NULL, '2025-05-17 20:52:28', '2025-05-17 20:52:28', FALSE, TRUE), -- password2
@@ -187,28 +187,44 @@ VALUES (1, 'PENDING', 'Member1', '2025-05-17 20:52:28', 'Member1', '2025-05-17 2
        (9, 'PENDING', 'Member9', '2025-05-17 20:52:28', 'Member9', '2025-05-17 20:52:28', FALSE),
        (10, 'DENIED', 'Member10', '2025-05-17 20:52:28', 'Member10', '2025-05-17 20:52:28', FALSE);
 
-INSERT INTO board (title, content, board_attachment_enabled, created_person, created_date, modified_person,
-                   modified_date, category, is_deleted, writer)
-VALUES ('Board Post 1', 'Content of board post 1', FALSE, 'Member1', '2025-05-17 20:52:28', 'Member1',
-        '2025-05-17 20:52:28', 'ANNOUNCEMENT', FALSE, 1),
-       ('Board Post 2', 'Content of board post 2', FALSE, 'Member2', '2025-05-17 20:52:28', 'Member2',
-        '2025-05-17 20:52:28', 'FREEBOARD', FALSE, 2),
-       ('Board Post 3', 'Content of board post 3', FALSE, 'Member3', '2025-05-17 20:52:28', 'Member3',
-        '2025-05-17 20:52:28', 'INFORMATION', FALSE, 3),
-       ('Board Post 4', 'Content of board post 4', FALSE, 'Member4', '2025-05-17 20:52:28', 'Member4',
-        '2025-05-17 20:52:28', 'ANNOUNCEMENT', FALSE, 4),
-       ('Board Post 5', 'Content of board post 5', FALSE, 'Member5', '2025-05-17 20:52:28', 'Member5',
-        '2025-05-17 20:52:28', 'FREEBOARD', FALSE, 5),
-       ('Board Post 6', 'Content of board post 6', FALSE, 'Member6', '2025-05-17 20:52:28', 'Member6',
-        '2025-05-17 20:52:28', 'INFORMATION', FALSE, 6),
-       ('Board Post 7', 'Content of board post 7', FALSE, 'Member7', '2025-05-17 20:52:28', 'Member7',
-        '2025-05-17 20:52:28', 'ANNOUNCEMENT', FALSE, 7),
-       ('Board Post 8', 'Content of board post 8', FALSE, 'Member8', '2025-05-17 20:52:28', 'Member8',
-        '2025-05-17 20:52:28', 'FREEBOARD', FALSE, 8),
-       ('Board Post 9', 'Content of board post 9', TRUE, 'Member9', '2025-05-17 20:52:28', 'Member9',
-        '2025-05-17 20:52:28', 'INFORMATION', FALSE, 9),
-       ('Board Post 10', 'Content of board post 10', TRUE, 'Member10', '2025-05-17 20:52:28', 'Member10',
-        '2025-05-17 20:52:28', 'ANNOUNCEMENT', FALSE, 10);
+IINSERT INTO board (title, content, board_attachment_enabled, created_person, created_date,
+                   modified_person, modified_date, category, is_deleted, pinned, writer)
+VALUES
+    ('Board Post 1', 'Content 1', TRUE, 'Member1', '2025-06-01 10:12:34', 'Member1', '2025-06-01 10:12:34', 'ANNOUNCEMENT', FALSE, FALSE, 1),
+    ('Board Post 2', 'Content 2', FALSE, 'Member2', '2025-06-01 10:12:34', 'Member2', '2025-06-01 10:12:34', 'FREEBOARD', FALSE, FALSE, 2),
+    ('Board Post 3', 'Content 3', TRUE, 'Member3', '2025-06-01 10:12:34', 'Member3', '2025-06-01 10:12:34', 'INFORMATION', FALSE, FALSE, 3),
+    ('Board Post 4', 'Content 4', FALSE, 'Member4', '2025-06-01 10:12:34', 'Member4', '2025-06-01 10:12:34', 'FOOTBALL_TALK', FALSE, FALSE, 4),
+    ('Board Post 5', 'Content 5', TRUE, 'Member5', '2025-06-01 10:12:34', 'Member5', '2025-06-01 10:12:34', 'ANNOUNCEMENT', FALSE, FALSE, 5),
+    ('Board Post 6', 'Content 6', FALSE, 'Member6', '2025-06-01 10:12:34', 'Member6', '2025-06-01 10:12:34', 'FREEBOARD', FALSE, FALSE, 6),
+    ('Board Post 7', 'Content 7', TRUE, 'Member7', '2025-06-01 10:12:34', 'Member7', '2025-06-01 10:12:34', 'INFORMATION', FALSE, FALSE, 7),
+    ('Board Post 8', 'Content 8', FALSE, 'Member8', '2025-06-01 10:12:34', 'Member8', '2025-06-01 10:12:34', 'FOOTBALL_TALK', FALSE, FALSE, 8),
+    ('Board Post 9', 'Content 9', TRUE, 'Member9', '2025-06-01 10:12:34', 'Member9', '2025-06-01 10:12:34', 'ANNOUNCEMENT', FALSE, FALSE, 9),
+    ('Board Post 10', 'Content 10', FALSE, 'Member10', '2025-06-01 10:12:34', 'Member10', '2025-06-01 10:12:34', 'FREEBOARD', FALSE, FALSE, 10);
+
+INSERT INTO report (report_type, target_id, reporter_id, reason, reason_type,
+                    suspended, target_is_admin, target_member_id, target_writer_name,
+                    created_date, created_person, modified_date, modified_person)
+VALUES
+    ('BOARD', 1, 2, '욕설이 포함되어 있습니다.', 'ABUSE', FALSE, FALSE, 1, 'Member1', '2025-06-01 10:12:34', 'Member2', '2025-06-01 10:12:34', 'Member2'),
+    ('BOARD', 2, 3, '상업적 광고 링크가 포함됨.', 'ADVERTISEMENT', FALSE, FALSE, 2, 'Member2', '2025-06-01 10:12:34', 'Member3', '2025-06-01 10:12:34', 'Member3'),
+    ('COMMENT', 3, 4, '같은 내용 반복 도배.', 'SPAM', FALSE, FALSE, 3, 'Member3', '2025-06-01 10:12:34', 'Member4', '2025-06-01 10:12:34', 'Member4'),
+    ('BOARD', 4, 5, '게시판 성격에 맞지 않는 내용.', 'IRRELEVANT', FALSE, FALSE, 4, 'Member4', '2025-06-01 10:12:34', 'Member5', '2025-06-01 10:12:34', 'Member5'),
+    ('COMMENT', 5, 6, '무의미한 글을 반복적으로 작성함.', 'SPAM', FALSE, FALSE, 5, 'Member5', '2025-06-01 10:12:34', 'Member6', '2025-06-01 10:12:34', 'Member6'),
+    ('MEMBER', 6, 7, '지속적인 욕설과 비방 행위.', 'ABUSE', FALSE, FALSE, 6, 'Member6', '2025-06-01 10:12:34', 'Member7', '2025-06-01 10:12:34', 'Member7'),
+    ('BOARD', 7, 8, '광고성 이벤트 참여 유도.', 'ADVERTISEMENT', FALSE, FALSE, 7, 'Member7', '2025-06-01 10:12:34', 'Member8', '2025-06-01 10:12:34', 'Member8'),
+    ('COMMENT', 8, 9, '카테고리에 어울리지 않는 질문.', 'IRRELEVANT', FALSE, FALSE, 8, 'Member8', '2025-06-01 10:12:34', 'Member9', '2025-06-01 10:12:34', 'Member9'),
+    ('BOARD', 9, 10, '기타 부적절한 사유로 신고합니다.', 'ETC', FALSE, FALSE, 9, 'Member9', '2025-06-01 10:12:34', 'Member10', '2025-06-01 10:12:34', 'Member10'),
+    ('MEMBER', 10, 1, '관리자 권한 남용 의심', 'ETC', FALSE, TRUE, NULL, '관리자', '2025-06-01 10:12:34', 'Member1', '2025-06-01 10:12:34', 'Member1'),
+    ('BOARD', 1, 4, '비방성 내용 포함.', 'ABUSE', FALSE, FALSE, 1, 'Member1', '2025-06-01 10:30:00', 'Member4', '2025-06-01 10:30:00', 'Member4'),
+    ('COMMENT', 2, 5, '같은 문장을 반복해서 답변.', 'SPAM', FALSE, FALSE, 2, 'Member2', '2025-06-01 10:31:00', 'Member5', '2025-06-01 10:31:00', 'Member5'),
+    ('BOARD', 3, 6, '광고성 내용 반복.', 'ADVERTISEMENT', FALSE, FALSE, 3, 'Member3', '2025-06-01 10:32:00', 'Member6', '2025-06-01 10:32:00', 'Member6'),
+    ('COMMENT', 4, 7, '게시판 성격과 무관한 질문입니다.', 'IRRELEVANT', FALSE, FALSE, 4, 'Member4', '2025-06-01 10:33:00', 'Member7', '2025-06-01 10:33:00', 'Member7'),
+    ('MEMBER', 5, 8, '비속어 및 명예훼손성 발언.', 'ABUSE', FALSE, FALSE, 5, 'Member5', '2025-06-01 10:34:00', 'Member8', '2025-06-01 10:34:00', 'Member8'),
+    ('BOARD', 6, 9, '상품 구매 유도 게시글입니다.', 'ADVERTISEMENT', FALSE, FALSE, 6, 'Member6', '2025-06-01 10:35:00', 'Member9', '2025-06-01 10:35:00', 'Member9'),
+    ('COMMENT', 7, 10, '불필요한 댓글 반복.', 'SPAM', FALSE, FALSE, 7, 'Member7', '2025-06-01 10:36:00', 'Member10', '2025-06-01 10:36:00', 'Member10'),
+    ('MEMBER', 8, 1, '지속적인 규칙 위반.', 'ETC', FALSE, FALSE, 8, 'Member8', '2025-06-01 10:37:00', 'Member1', '2025-06-01 10:37:00', 'Member1'),
+    ('BOARD', 9, 2, '부적절한 이미지 포함.', 'IRRELEVANT', FALSE, FALSE, 9, 'Member9', '2025-06-01 10:38:00', 'Member2', '2025-06-01 10:38:00', 'Member2'),
+    ('MEMBER', 10, 3, '운영자 권한을 남용하고 있음.', 'ETC', FALSE, TRUE, NULL, '관리자', '2025-06-01 10:39:00', 'Member3', '2025-06-01 10:39:00', 'Member3');
 
 INSERT INTO comment (board_id, member_id, content, created_person, created_date, modified_person, modified_date,
                      is_deleted)
@@ -269,35 +285,35 @@ VALUES
 INSERT INTO matchup_board (writer_id, sports_type_id, reservation_attachment_enabled, team_intro,
                            sports_facility_name, sports_facility_address, match_datetime, match_duration,
                            current_participant_count, max_participants, min_manner_temperature, match_description,
-                           chat_room_id, is_rating_initialized,created_date, created_person, modified_date, modified_person, is_deleted)
+                           chat_room_id, is_rating_initialized, is_notified,created_date, created_person, modified_date, modified_person, is_deleted)
 VALUES (1, 1, TRUE, 'Team introduction by Member1''s team.', 'Sports Center 1', 'Address 1', '2025-05-18 20:52:28',
-        '01:00:00', 3, 10, 35.9, 'Description for matchup board 1', 1, FALSE,'2025-05-17 20:52:28', 'Member1',
+        '01:00:00', 3, 10, 35.9, 'Description for matchup board 1', 1, FALSE, FALSE,'2025-05-17 20:52:28', 'Member1',
         '2025-05-17 20:52:28', 'Member1', FALSE),
        (2, 1, TRUE, 'Team introduction by Member2''s team.', 'Sports Center 2', 'Address 2', '2025-05-19 20:52:28',
-        '02:00:00', 8, 10, 37.7, 'Description for matchup board 2', 2, FALSE,'2025-05-17 20:52:28', 'Member2',
+        '02:00:00', 8, 10, 37.7, 'Description for matchup board 2', 2, FALSE, FALSE,'2025-05-17 20:52:28', 'Member2',
         '2025-05-17 20:52:28', 'Member2', FALSE),
        (3, 2, TRUE, 'Team introduction by Member3''s team.', 'Sports Center 3', 'Address 3', '2025-05-20 20:52:28',
-        '01:00:00', 2, 10, 35.3, 'Description for matchup board 3', 3, FALSE,'2025-05-17 20:52:28', 'Member3',
+        '01:00:00', 2, 10, 35.3, 'Description for matchup board 3', 3, FALSE, FALSE,'2025-05-17 20:52:28', 'Member3',
         '2025-05-17 20:52:28', 'Member3', FALSE),
        (4, 2, TRUE, 'Team introduction by Member4''s team.', 'Sports Center 4', 'Address 4', '2025-05-21 20:52:28',
-        '02:00:00', 0, 10, 35.6, 'Description for matchup board 4', 4, FALSE,'2025-05-17 20:52:28', 'Member4',
+        '02:00:00', 0, 10, 35.6, 'Description for matchup board 4', 4, FALSE, FALSE,'2025-05-17 20:52:28', 'Member4',
         '2025-05-17 20:52:28', 'Member4', FALSE),
        (5, 1, TRUE, 'Team introduction by Member5''s team.', 'Sports Center 5', 'Address 5', '2025-05-22 20:52:28',
-        '01:00:00', 5, 10, 35.9, 'Description for matchup board 5', 5, FALSE,'2025-05-17 20:52:28', 'Member5',
+        '01:00:00', 5, 10, 35.9, 'Description for matchup board 5', 5, FALSE, FALSE,'2025-05-17 20:52:28', 'Member5',
         '2025-05-17 20:52:28', 'Member5', FALSE),
        (6, 1, TRUE, 'Team introduction by Member6''s team.', 'Sports Center 6', 'Address 6', '2025-05-23 20:52:28',
-        '02:00:00', 4, 10, 37.9, 'Description for matchup board 6', 6, FALSE,'2025-05-17 20:52:28', 'Member6',
+        '02:00:00', 4, 10, 37.9, 'Description for matchup board 6', 6, FALSE, FALSE,'2025-05-17 20:52:28', 'Member6',
         '2025-05-17 20:52:28', 'Member6', FALSE),
        (7, 2, TRUE, 'Team introduction by Member7''s team.', 'Sports Center 7', 'Address 7', '2025-05-24 20:52:28',
-        '01:00:00', 1, 10, 37.9, 'Description for matchup board 7', 7, FALSE,'2025-05-17 20:52:28', 'Member7',
+        '01:00:00', 1, 10, 37.9, 'Description for matchup board 7', 7, FALSE, FALSE,'2025-05-17 20:52:28', 'Member7',
         '2025-05-17 20:52:28', 'Member7', FALSE),
        (8, 2, TRUE, 'Team introduction by Member8''s team.', 'Sports Center 8', 'Address 8', '2025-05-25 20:52:28',
-        '02:00:00', 5, 10, 37.2, 'Description for matchup board 8', 8, FALSE,'2025-05-17 20:52:28', 'Member8',
+        '02:00:00', 5, 10, 37.2, 'Description for matchup board 8', 8, FALSE, FALSE,'2025-05-17 20:52:28', 'Member8',
         '2025-05-17 20:52:28', 'Member8', FALSE),
        (9, 1, TRUE, 'Team introduction by Member9''s team.', 'Sports Center 9', 'Address 9', '2025-05-26 20:52:28',
-        '01:00:00', 6, 10, 37.7, 'Description for matchup board 9', 9, FALSE,'2025-05-17 20:52:28', 'Member9',
+        '01:00:00', 6, 10, 37.7, 'Description for matchup board 9', 9, FALSE, FALSE,'2025-05-17 20:52:28', 'Member9',
         '2025-05-17 20:52:28', 'Member9', FALSE),
-       (10, 1, TRUE, 'Team introduction by Member10''s team.', 'Sports Center 10', 'Address 10', '2025-05-27 20:52:28', '02:00:00', 1, 10, 37.8, 'Description for matchup board 10', 10, FALSE,'2025-05-17 20:52:28',
+       (10, 1, TRUE, 'Team introduction by Member10''s team.', 'Sports Center 10', 'Address 10', '2025-05-27 20:52:28', '02:00:00', 1, 10, 37.8, 'Description for matchup board 10', 10, FALSE, FALSE,'2025-05-17 20:52:28',
         'Member10', '2025-05-17 20:52:28', 'Member10', FALSE);
 
 INSERT INTO matchup_request (matchup_board_id, applicant_id, self_intro, participant_count, status,

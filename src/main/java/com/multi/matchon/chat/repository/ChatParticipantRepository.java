@@ -108,6 +108,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
 """)
     List<ChatRoom> findAllPrivateChatsForLeader(@Param("leaderId") Long leaderId);
 
+
     @Query("""
             select 
             t1
@@ -137,4 +138,5 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             where t1.isDeleted =false and t2.isDeleted=false and t3.matchDatetime<=:thresholdTime and t2.isGroupChat=true
             """)
     List<ChatParticipant> findAfterThreeDaysOfMatchWithChatParticipantAndChatRoom(@Param("thresholdTime") LocalDateTime thresholdTime);
+
 }
