@@ -66,30 +66,31 @@ public class MatchupBoardService {
     public void registerMatchupBoard(ReqMatchupBoardDto reqMatchupBoardDto, CustomUser user) {
 
 
-        // 게시글을 24시간에 2번만 작성할 수 있도록 검사
+        // 1. 게시글을 24시간에 2번만 작성할 수 있도록 검사
         Long numberOfTodayMatchupBoards = matchupBoardRepository.countTodayMatchupBoards(user.getMember().getId(), LocalDateTime.now().minusHours(24));
         if(numberOfTodayMatchupBoards>=2){
             throw new CustomException("Matchup 게시글은 하루에 2번만 작성할 수 있습니다.");
         }
 
-        //내가 등록하고자 하는 경기날짜가 기존에 내가 작성한 게시글에서 경기 시간과 겹치는 지 체크
+        // 2. 내가 등록하고자 하는 경기날짜가 기존에 내가 작성한 게시글에서 경기 시간과 겹치는 지 체크
+        // 기존 경기 시간과 새로 등록하려는 경기 시간이 겹치는 지 체크, 3시 끝나고 다음 경기가 3시에 시작인 경우는 허용함
         LocalDateTime endTime = reqMatchupBoardDto.getMatchDatetime().plusHours(reqMatchupBoardDto.getMatchDuration()/60).plusMinutes(reqMatchupBoardDto.getMatchDuration()%60);
 
-        // 기존 경기 시간과 새로 등록하려는 경기 시간이 겹치는 지 체크, 3시 끝나고 다음 경기가 3시에 시작인 경우는 허용함
+
         Boolean isDuplicate = matchupBoardRepository.findByMemberAndStartTimeAndEndTime(user.getMember(),reqMatchupBoardDto.getMatchDatetime(),endTime);
 
         if(isDuplicate)
             throw new CustomException("Matchup 등록하신 경기 날짜는 이전에 작성하신 게시글의 경기 날짜와 겹칩니다. 확인 후 다시 작성해주세요.");
 
-        // 참가 요청 내역과 비교
+        // 3. 참가 요청 내역과 비교
 
-        // 1. 내가 참가 요청한 것들 가져옴
+        // 3-1. 내가 참가 요청한 것들 가져옴
         // 조건: 기존 경기 시간과 새로 등록하려는 경기 시간이 겹치는 것
         // 조건: Matchup 게시글이 삭제가 안된 것
 
         List<MatchupRequest> duplicatedMatchupRequests = matchupRequestRepository.findByMemberAndStartTimeAndEndTime(user.getMember(),reqMatchupBoardDto.getMatchDatetime(),endTime);
 
-        // 2. 가져온 요청들 중에서 등록해도 되는 것과 등록하면 안되는 것을 구분
+        // 3-2. 가져온 요청들 중에서 등록해도 되는 것과 등록하면 안되는 것을 구분
         // 등록하면 안되는 상태: 승인 대기, 승인됨, 승인 취소 요청, 취소 요청 반려
         // 등록 허용해도 되지만 추가적인 제한이 필요한 것: 요청 취소됨(재요청 불가능 하도록 제한), 반려됨(재요청 불가능 하도록 제한),
         // 등록 허용 가능한 상태: 취소 요청 승인

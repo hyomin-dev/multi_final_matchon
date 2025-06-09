@@ -125,9 +125,8 @@ function expressIsGroutChat(isGroupChat){
 }
 
 function setChatName(roomName){
-    if(roomName.slice(0,1)!=="T"){
-        return roomName.slice(0,-10);
-    }else
-        return roomName;
+
+    return roomName.slice(0,-10);
+
 
 }
