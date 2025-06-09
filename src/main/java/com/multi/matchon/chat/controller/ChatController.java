@@ -1,6 +1,7 @@
 package com.multi.matchon.chat.controller;
 
 import com.multi.matchon.chat.dto.res.ResChatDto;
+import com.multi.matchon.chat.dto.res.ResGroupChatParticipantListDto;
 import com.multi.matchon.chat.dto.res.ResMyChatListDto;
 import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
@@ -52,14 +53,7 @@ public class ChatController {
     @GetMapping("/room/private")
     public ResponseEntity<ApiResponse<Long>> getPrivateChatRoom(@RequestParam Long receiverId, @AuthenticationPrincipal CustomUser user){
 
-        Long senderId = user.getMember().getId();
-        System.out.println("🔍 Creating or fetching private chat room between sender " + senderId + " and receiver " + receiverId);
-
         Long roomId = chatService.findPrivateChatRoom(receiverId, user.getMember().getId());
-
-
-        System.out.println("✅ Found or created roomId: " + roomId);
-
         return ResponseEntity.ok().body(ApiResponse.ok(roomId));
     }
 
@@ -80,24 +74,27 @@ public class ChatController {
     @PostMapping("/my/rooms")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getMyChatRooms(@AuthenticationPrincipal CustomUser user) {
-        List<ResMyChatListDto> chatRooms;
+        //List<ResMyChatListDto> chatRooms;
 
+        List<ResMyChatListDto> resMyChatListDtos = chatService.findAllMyChatRoom(user);
 
-        TeamMember teamMember = teamMemberRepository.findByMemberId(user.getMember().getId())
-                .orElse(null);
+        return ResponseEntity.ok().body(ApiResponse.ok(resMyChatListDtos));
 
-        boolean isLeader = teamMember != null && teamMember.getTeamLeaderStatus();
-        boolean hasTeam = user.getMember().getTeam() != null;
-
-        if (isLeader && hasTeam) {
-            Long leaderId = user.getMember().getId();
-            Long teamId = user.getMember().getTeam().getId();
-            chatRooms = chatService.findRelevantRoomsForLeader(leaderId, teamId); // ✅ filtered
-        } else {
-            chatRooms = chatService.findAllRoomsForUser(user.getMember().getId()); // fallback
-        }
-
-        return ResponseEntity.ok().body(ApiResponse.ok(chatRooms));
+//        TeamMember teamMember = teamMemberRepository.findByMemberId(user.getMember().getId())
+//                .orElse(null);
+//
+//        boolean isLeader = teamMember != null && teamMember.getTeamLeaderStatus();
+//        boolean hasTeam = user.getMember().getTeam() != null;
+//
+//        if (isLeader && hasTeam) {
+//            Long leaderId = user.getMember().getId();
+//            Long teamId = user.getMember().getTeam().getId();
+//            chatRooms = chatService.findRelevantRoomsForLeader(leaderId, teamId); // ✅ filtered
+//        } else {
+//            chatRooms = chatService.findAllRoomsForUser(user.getMember().getId()); // fallback
+//        }
+//
+//        return ResponseEntity.ok().body(ApiResponse.ok(chatRooms));
     }
 
     /*
@@ -123,7 +120,6 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
-
     /*
     * 특정 group chat room 페이지 이동
     * */
@@ -134,8 +130,18 @@ public class ChatController {
         return mv;
     }
 
-    //수정
+    /*
+    * 그룹 채팅방 참가자 불러오기
+    * */
+    @GetMapping("/group/participants")
+    @ResponseBody ResponseEntity<ApiResponse<List<ResGroupChatParticipantListDto>>> getGroupChatAllParticipant(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
+        List<ResGroupChatParticipantListDto> resGroupChatParticipantListDtos = chatService.findGroupChatAllParticipant(roomId, user);
+        return ResponseEntity.ok(ApiResponse.ok(resGroupChatParticipantListDtos));
+    }
 
+
+
+    //수정
     @PostMapping("/room/read")
     @ResponseBody
     public ResponseEntity<?> readAllMessage(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
@@ -143,18 +149,36 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
+
+    // 1대1 채팅에서 상대방을 차단
     @GetMapping("/room/private/block")
     public String blockUser(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
         chatService.blockUser(roomId, user);
         return "redirect:/chat/my/rooms";
     }
 
+    //api용, 1대1 채팅에서 상대방을 차단
+    @GetMapping("/room/private/api/block")
+    @ResponseBody
+    public ResponseEntity<?> blockUserWithApi(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user) {
+        chatService.blockUserWithApi(roomId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    // 1대1 채팅에서 상대방을 차단해제
     @GetMapping("/room/private/unblock")
     public String unblockUser(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
         chatService.unblockUser(roomId, user);
         return "redirect:/chat/my/rooms";
     }
 
+    //api용, 1대1 채팅에서 상대방을 차단해제
+    @GetMapping("/room/private/api/unblock")
+    @ResponseBody
+    public ResponseEntity<?> unblockUserWithApi(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user) {
+        chatService.unblockUserWithApi(roomId, user);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping("/group/room-id")
     @ResponseBody
@@ -163,5 +187,6 @@ public class ChatController {
         return ResponseEntity.ok(ApiResponse.ok(roomId));
     }
     // 삭제
+
 
 }

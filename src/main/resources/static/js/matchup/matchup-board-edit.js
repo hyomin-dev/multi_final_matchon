@@ -181,14 +181,16 @@ function getAddress(){
 function setMaxParticipants(currentParticipantCount, maxParticipants){
 
     const selectMax = document.querySelector("#maxParticipants");
-
-    for(let i=currentParticipantCount; i<=30;i++){
+    //alert(maxParticipants);
+    for(let i=currentParticipantCount; i<=31;i++){
         const option = document.createElement("option");
         option.value = i;
         option.textContent = i;
-        selectMax.appendChild(option);
         if(i===maxParticipants)
             option.selected = true;
+            //alert(i);
+
+        selectMax.appendChild(option);
     }
 }
 
