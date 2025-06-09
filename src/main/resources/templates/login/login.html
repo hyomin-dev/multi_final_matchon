@@ -64,8 +64,10 @@
 
 <script th:inline="javascript">
     const redirectAfterLogin = /*[[${redirectUrl}]]*/ '';
-    if (redirectAfterLogin) {
+    if (redirectAfterLogin && redirectAfterLogin !== '/signup') {
         localStorage.setItem("loginRedirectUrl", decodeURIComponent(redirectAfterLogin));
+    } else {
+        localStorage.removeItem("loginRedirectUrl"); // 회원가입 등에서 들어온 경우 제거
     }
 
     const urlParams = new URLSearchParams(window.location.search);

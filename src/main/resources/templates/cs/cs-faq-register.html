@@ -1,80 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!-- 관리자 권한인 게정만 등록, 수정, 삭제 가능 / 사용자는 조회만 가능 -->
     <title>FAQ 등록</title>
+<!--    관리자만 가능! 사용자는 조회만 가능! -->
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
-
-    <style>
-        .write-box {
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            width: 600px;
-            padding: 0;
-            margin: 40px auto;
-            font-family: Arial, sans-serif;
-        }
-
-        .write-box input[type="text"] {
-            width: 100%;
-            border: none;
-            padding: 15px;
-            font-size: 16px;
-            border-bottom: 1px solid #aaa;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        .write-box textarea {
-            width: 100%;
-            height: 200px;
-            border: none;
-            padding: 15px;
-            font-size: 16px;
-            resize: none;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        .write-box input::placeholder,
-        .write-box textarea::placeholder {
-            color: #aaa;
-        }
-
-        .titlefaq {
-            text-align: center;
-        }
-
-        .compleate {
-            float: right;
-            margin-top: 10px;
-            padding: 8px 16px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .compleate:hover {
-            background-color: #0056b3;
-        }
-
-        .filter-cs {
-            width: 600px;
-            margin: 0 auto;
-        }
-
-        .all-list {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-    </style>
+<!--    스타일은 따로 css로 빼놨음 -->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/faq/faq-register.css}">
 </head>
 <body>
 
@@ -86,25 +19,33 @@
     <form th:action="@{/faq/register}" method="post">
         <div class="filter-cs">
 
+            <div class="write-box">
+                <label>제목</label>
+                <input type="text" name="faqTitle" maxlength="100" required />
+            </div>
 
-            <select class="all-list" name="faqCategory" required>
-                <option value="" disabled selected>카테고리 선택</option>
+            <div class="write-box">
+            <label for="faqCategory">카테고리</label>
+            <select class="all-list" name="faqCategory" id="faqCategory" required>
+                <option value="" disabled selected>-- 선택하세요 --</option>
                 <option value="TUTORIAL">이용방법</option>
                 <option value="ACCOUNT">계정</option>
                 <option value="TEAM_GUEST">Team / Guest</option>
                 <option value="REPORT">신고</option>
                 <option value="MANNER_TEMPERATURE">매너온도</option>
             </select>
+        </div>
 
 
-            <div class="write-box">
-                <input type="text" name="faqTitle" placeholder="제목을 입력 해 주세요.." required />
-                <textarea name="faqContent" placeholder="내용을 입력 해 주세요...." required></textarea>
+        <div class="write-box">
+            <label for="faqContent">내용</label>
+            <textarea name="faqContent" id="faqContent" placeholder="내용을 입력 해 주세요...." required></textarea>
+        </div>
+
+            <div class="button-box">
+                <button type="submit" class="compleate">등록</button>
+                <button type="button" class="cancel-btn" onclick="location.href='/cs'">취소</button>
             </div>
-
-            <button type="button" onclick="location.href='/cs'">메뉴로 돌아가기</button>
-
-            <button type="submit" class="compleate">작성 완료</button>
         </div>
     </form>
 </div>

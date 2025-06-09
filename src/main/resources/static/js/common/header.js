@@ -162,10 +162,10 @@ function connect(token, loginEmail) {
                     //const body = JSON.parse(message.body);
 
                     //openbtn.src = "/img/bell-ring-black.png";
-                   //console.log(message);
-                   const messageBody = JSON.parse(message.body);
-                   console.log(messageBody);
-                   console.log(messageBody.notificationMessage);
+                    //console.log(message);
+                    const messageBody = JSON.parse(message.body);
+                    console.log(messageBody);
+                    console.log(messageBody.notificationMessage);
 
                     createNotiStructure(messageBody.notificationId, messageBody.notificationMessage, messageBody.createdDate);
 
@@ -260,23 +260,20 @@ async function initSideBar(){
     setUnreadNoti(notifications);
 }
 
-async function getUnreadNoti(){
-    try{
+
+async function getUnreadNoti() {
+    try {
         const response = await fetch("/notification/get/unread");
-        if(!response.ok)
+        if (!response.ok)
             throw new Error(`HTTP error! Status:${response.status}`)
         const data = await response.json();
 
         //console.log(data);
         return data.data;
-    }catch (err){
+    } catch (err) {
         console.error(err);
         return [];
     }
-
-
-
-
 }
 
 function onError(error){
@@ -331,7 +328,6 @@ async function getUnreadNoti(){
     }
 
 }
-
 
 
 // function setUnreadNoti(notifications){
@@ -524,6 +520,3 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
         }
     });
 }
-
-
-

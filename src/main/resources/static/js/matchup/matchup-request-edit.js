@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const sportsFacilityName = registerDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = registerDto.dataset.sportsFacilityAddress;
     const matchDatetime = registerDto.dataset.matchDatetime;
-    const matchDuration = registerDto.dataset.matchDuration;
+    const matchEndtime = registerDto.dataset.matchEndtime;
     const currentParticipantCount = Number(registerDto.dataset.currentParticipantCount);
     const maxParticipants = Number(registerDto.dataset.maxParticipants);
     const participantCount = Number(registerDto.dataset.participantCount);
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 
     drawMap(sportsFacilityAddress, sportsFacilityName);
-    calTime(matchDatetime, matchDuration);
+    calTime(matchDatetime, matchEndtime);
     setParticipantCount(currentParticipantCount, maxParticipants, participantCount);
     manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime);
     autoResize();
@@ -97,11 +97,12 @@ function drawMap(address, sportsFacilityName){
     });
 }
 
-function calTime(matchDatetime, matchDuration){
+function calTime(matchDatetime, matchEndtime){
     // console.log(matchDatetime);
     // console.log(matchDuration);
 
     const date = new Date(matchDatetime);
+    const end = new Date(matchEndtime);
     //console.log(date);
     const matchDateEle = document.querySelector("#match-date");
 
@@ -111,27 +112,30 @@ function calTime(matchDatetime, matchDuration){
     const startHour = date.getHours();
     const startMinutes = date.getMinutes();
 
+    const endHour = end.getHours();
+    const endMinutes = end.getMinutes();
 
-    const [hour, minute, second] = matchDuration.split(":");
-    const hourNum = parseInt(hour, 10);
-    const minuteNum = parseInt(minute,10);
 
-    let extraHour = 0
-    let endMinute = 0;
+    // const [hour, minute, second] = matchDuration.split(":");
+    // const hourNum = parseInt(hour, 10);
+    // const minuteNum = parseInt(minute,10);
+    //
+    // let extraHour = 0
+    // let endMinute = 0;
+    //
+    // if(date.getMinutes()+minuteNum>=60){
+    //     extraHour = 1;
+    //     endMinute = (date.getMinutes()+minuteNum)%60;
+    // }else{
+    //     endMinute = date.getMinutes()+minuteNum;
+    // }
+    //
+    // if(startHour+hourNum+extraHour>=24)
+    //     endHour = (startHour+hourNum+extraHour) %24;
+    // else
+    //     endHour = startHour+hourNum+extraHour;
 
-    if(date.getMinutes()+minuteNum>=60){
-        extraHour = 1;
-        endMinute = (date.getMinutes()+minuteNum)%60;
-    }else{
-        endMinute = date.getMinutes()+minuteNum;
-    }
-
-    if(startHour+hourNum+extraHour>=24)
-        endHour = (startHour+hourNum+extraHour) %24;
-    else
-        endHour = startHour+hourNum+extraHour;
-
-    matchDateEle.value = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
+    matchDateEle.value = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinutes}분`
 
 }
 

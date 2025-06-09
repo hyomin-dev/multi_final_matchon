@@ -17,24 +17,6 @@ import java.util.Optional;
 
 public interface MatchupRatingRepository extends JpaRepository<MatchupRating, Long> {
 
-/*    @Query("""
-            select new com.multi.matchon.matchup.dto.res.ResMatchupMyGameListDto(
-            t1.id,
-            t1.matchDatetime,
-            t1.matchDuration,
-            t1.sportsType.sportsTypeName,
-            t1.sportsFacilityName,
-            t1.sportsFacilityAddress,
-            t1.isRatingInitialized
-            )
-            from MatchupBoard t1
-            left join MatchupRequest t2
-            where (t1.isDeleted=false and t1.matchDatetime >CURRENT_TIMESTAMP) and
-            ( t1.writer=:loginMember
-            or t2.member=:loginMember)
-            order by t1.matchDatetime desc
-            """)
-    Page<ResMatchupMyGameListDto> findAllMyGames(Pageable pageable, @Param("loginMember") Member loginMember);*/
 
     @Query("""
             select
@@ -42,7 +24,7 @@ public interface MatchupRatingRepository extends JpaRepository<MatchupRating, Lo
             new com.multi.matchon.matchup.dto.res.ResMatchupMyGameListDto(
             t2.id,
             t2.matchDatetime,
-            t2.matchDuration,
+            t2.matchEndtime,
             t2.sportsType.sportsTypeName,
             t2.sportsFacilityName,
             t2.sportsFacilityAddress,
