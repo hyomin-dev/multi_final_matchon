@@ -72,8 +72,8 @@
 /* login.css */
 #suspendMessage {
     color: red;
-    font-weight: bold;
-    margin: 10px 10px;
+    font-weight: 600;
+    margin-bottom: 10px;
 }
 
 
