@@ -24,11 +24,14 @@ public interface TeamNameRepository extends JpaRepository <Team, Long> {
     AND (:positionName IS NULL OR p.positionName = :positionName)
     AND (:region IS NULL OR t.teamRegion = :region)
     AND (:rating IS NULL OR t.teamRatingAverage >= :rating)
+    AND (:recruitmentStatus IS NULL OR t.recruitmentStatus = :recruitmentStatus)
+    
 """)
     Page<Team> findWithRatingFilter(
             @Param("positionName") PositionName positionName,
             @Param("region") RegionType region,
             @Param("rating") Double rating,
+            @Param("recruitmentStatus") Boolean recruitmentStatus,
             Pageable pageable);
 
 
@@ -39,11 +42,13 @@ public interface TeamNameRepository extends JpaRepository <Team, Long> {
     WHERE t.isDeleted = false AND (
         (:positionName IS NULL OR p.positionName = :positionName)
         AND (:region IS NULL OR t.teamRegion = :region)
+        AND (:recruitmentStatus IS NULL OR t.recruitmentStatus = :recruitmentStatus)
     )
 """)
     Page<Team> findWithoutRatingFilter(
             @Param("positionName") PositionName positionName,
             @Param("region") RegionType region,
+            @Param("recruitmentStatus") Boolean recruitmentStatus,
             Pageable pageable
     );
 
