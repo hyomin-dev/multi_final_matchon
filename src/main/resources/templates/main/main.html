@@ -108,6 +108,7 @@
         <button type="button" onclick="closeChangePopup()" style="margin-top: 10px; width: 100%; padding: 8px;">닫기</button>
     </div>
 
+
     <!-- ===== FOOTER ===== -->
     <footer class="footer">
         matchon2025@gmail.com | 02-123-123
@@ -115,8 +116,10 @@
 </div>
 
 <!-- ===== SCRIPT ===== -->
+<script th:src="@{/js/aibot/aichatbot.js}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
         // 로그인 상태에 따른 버튼 표시
         fetch('/auth/check', {
             method: 'GET',
@@ -222,6 +225,7 @@
             });
         }
 
+
         const launcher = document.getElementById("chatbot-launcher");
         const modal = document.getElementById("chatbot-modal");
         const closeBtn = document.getElementById("chatbot-close");
@@ -255,9 +259,6 @@
     });
 
     function logout() {
-        const dfMessenger = document.querySelector("df-messenger");
-        if (dfMessenger) dfMessenger.remove();
-
         fetch('/auth/logout', {
             method: 'POST',
             credentials: 'include'

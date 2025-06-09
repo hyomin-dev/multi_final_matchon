@@ -53,10 +53,10 @@ public class ChatService {
         // 차단 검사
 
 
-        Member receiver = memberRepository.findByIdAndIsDeletedFalse(receiverId).orElseThrow(()->new ApiCustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
+        Member receiver = memberRepository.findByIdAndIsDeletedFalse(receiverId).orElseThrow(() -> new ApiCustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
 
 
-        Member sender = memberRepository.findByIdAndIsDeletedFalse(senderId).orElseThrow(()->new ApiCustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
+        Member sender = memberRepository.findByIdAndIsDeletedFalse(senderId).orElseThrow(() -> new ApiCustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
 
         // 서로서로 차단했는지 확인
 
@@ -64,13 +64,13 @@ public class ChatService {
 
         // 여기까지 왔다는 것은 receiverId와 senderId가 유효
         Optional<ChatRoom> chatRoom = chatParticipantRepository.findPrivateChatRoomByReceiverIdAndSenderId(receiverId, senderId);
-        if(chatRoom.isPresent()){
+        if (chatRoom.isPresent()) {
             return chatRoom.get().getId();
         }
 
-        String chatName = "[ "+ receiver.getMemberName() +" & "+sender.getMemberName()+" ] 1:1 채팅";
+        String chatName = "[ " + receiver.getMemberName() + " & " + sender.getMemberName() + " ] 1:1 채팅";
 
-        String identifierChatRoomName = "("+UUID.randomUUID().toString().replace("-", "").substring(0, 8)+")";
+        String identifierChatRoomName = "(" + UUID.randomUUID().toString().replace("-", "").substring(0, 8) + ")";
 
         ChatRoom newChatRoom = ChatRoom.builder()
                 .isGroupChat(false)
@@ -85,19 +85,18 @@ public class ChatService {
 //        //1대1 채팅 상대방에게 메시지 보내기
 //        sendNotification(receiver, "[1대1 채팅] "+sender.getMemberName()+"님이 1대1 채팅을 걸었습니다. 지금 바로 확인해보세요!. ", "/chat/my/room?"+"roomId="+newChatRoom.getId());
 
-        evetPublisher.publishEvent(new NotificationEvent(this, receiver, "[1대1 채팅] "+sender.getMemberName()+"님이 1대1 채팅을 걸었습니다. 지금 바로 확인해보세요!.", "/chat/my/room?"+"roomId="+newChatRoom.getId()));
+        evetPublisher.publishEvent(new NotificationEvent(this, receiver, "[1대1 채팅] " + sender.getMemberName() + "님이 1대1 채팅을 걸었습니다. 지금 바로 확인해보세요!.", "/chat/my/room?" + "roomId=" + newChatRoom.getId()));
 
         return newChatRoom.getId();
     }
 
     /*
-    * 생성된 채팅방에 참여자를 추가할 때 사용
-    * */
+     * 생성된 채팅방에 참여자를 추가할 때 사용
+     * */
     @Transactional
-    public void addParticipantToRoom(ChatRoom chatRoom, Member member){
+    public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
 
         ChatParticipant chatParticipant = ChatParticipant.builder()
-                .chatRoom(chatRoom) // 양방향 쓸것이기 때문에 없앰
                 .member(member)
                 .build();
 
@@ -108,9 +107,9 @@ public class ChatService {
 
     @Transactional
     public void saveMessage(Long roomId, ResChatDto resChatDto) {
-        ChatRoom chatRoom = chatRoomRepository.findByIdAndIsDeletedFalse(roomId).orElseThrow(()->new CustomException("Chat 해당 채팅방 번호를 가진 채팅방은 존재하지 않습니다."));
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndIsDeletedFalse(roomId).orElseThrow(() -> new CustomException("Chat 해당 채팅방 번호를 가진 채팅방은 존재하지 않습니다."));
 
-        Member sender =  memberRepository.findByMemberEmailAndIsDeletedFalse(resChatDto.getSenderEmail()).orElseThrow(()->new CustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
+        Member sender = memberRepository.findByMemberEmailAndIsDeletedFalse(resChatDto.getSenderEmail()).orElseThrow(() -> new CustomException("Chat 해당 회원 번호를 가진 회원은 존재하지 않습니다."));
 
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatRoom(chatRoom)
@@ -122,7 +121,7 @@ public class ChatService {
 
         List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoomWithMember(chatRoom);
 
-        for(ChatParticipant c : chatParticipants){
+        for (ChatParticipant c : chatParticipants) {
             MessageReadLog messageReadLog = MessageReadLog.builder()
                     .chatRoom(chatRoom)
                     .member(c.getMember())
@@ -135,10 +134,10 @@ public class ChatService {
     }
 
     /*
-    * Matchup board 작성할 때, group chat room을 생성하는 메서드
-    * */
+     * Matchup board 작성할 때, group chat room을 생성하는 메서드
+     * */
     @Transactional
-    public ChatRoom registerGroupChatRoom(Member matchupWriter, String chatName){
+    public ChatRoom registerGroupChatRoom(Member matchupWriter, String chatName) {
 
 
         ChatRoom newChatRoom = ChatRoom.builder()
@@ -155,10 +154,10 @@ public class ChatService {
     }
 
     /*
-    * Matchup board에 대응 되는 group chat room에 사용자를 추가
-    * */
+     * Matchup board에 대응 되는 group chat room에 사용자를 추가
+     * */
     @Transactional
-    public void addParticipantToGroupChat(ChatRoom groupChatRoom, Member applicant){
+    public void addParticipantToGroupChat(ChatRoom groupChatRoom, Member applicant) {
         addParticipantToRoom(groupChatRoom, applicant);
     }
 
@@ -166,8 +165,8 @@ public class ChatService {
      * Matchup board에 대응 되는 group chat room에 사용자를 제거
      * */
     @Transactional
-    public void removeParticipantToGroupChat(ChatRoom groupChatRoom, Member applicant){
-        ChatParticipant removeChatParticipant = chatParticipantRepository.findByChatRoomAndMember(groupChatRoom, applicant).orElseThrow(()-> new CustomException("Matchup 해당 참여자는 그룹 채팅에 참여자가 아니에요."));
+    public void removeParticipantToGroupChat(ChatRoom groupChatRoom, Member applicant) {
+        ChatParticipant removeChatParticipant = chatParticipantRepository.findByChatRoomAndMember(groupChatRoom, applicant).orElseThrow(() -> new CustomException("Matchup 해당 참여자는 그룹 채팅에 참여자가 아니에요."));
 
         removeChatParticipant.deleteParticipant(true);
     }
@@ -190,16 +189,16 @@ public class ChatService {
 
         List<ResMyChatListDto> resMyChatListDtos = new ArrayList<>();
 
-        for(ChatParticipant c: chatParticipants){
+        for (ChatParticipant c : chatParticipants) {
             Long count = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(c.getChatRoom(), user.getMember());
             Boolean isBlock = false;
-            if(!c.getChatRoom().getIsGroupChat()){
+            if (!c.getChatRoom().getIsGroupChat()) {
                 Member opponent = c.getChatRoom().getChatParticipants().stream()
                         .filter(chatParticipant -> !chatParticipant.getMember().getId().equals(user.getMember().getId()) && !chatParticipant.getIsDeleted())
                         .findFirst()
                         .map(ChatParticipant::getMember)
                         .orElse(null);
-                if(opponent!=null)
+                if (opponent != null)
                     isBlock = blockedIds.contains(opponent.getId());
             }
 
@@ -220,29 +219,29 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public List<ResChatDto> findAllChatHistory(Long roomId, CustomUser user) {
-        ChatRoom chatRoom = chatRoomRepository.findByIdAndIsDeletedFalse(roomId).orElseThrow(()->new ApiCustomException("Chat 해당 채팅방 번호를 가진 채팅방은 존재하지 않습니다."));
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndIsDeletedFalse(roomId).orElseThrow(() -> new ApiCustomException("Chat 해당 채팅방 번호를 가진 채팅방은 존재하지 않습니다."));
 
-        Member sender =  memberRepository.findByMemberEmailAndIsDeletedFalse(user.getMember().getMemberEmail()).orElseThrow(()->new ApiCustomException("Chat 해당 회원은 존재하지 않습니다."));
+        Member sender = memberRepository.findByMemberEmailAndIsDeletedFalse(user.getMember().getMemberEmail()).orElseThrow(() -> new ApiCustomException("Chat 해당 회원은 존재하지 않습니다."));
 
         List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoomWithMember(chatRoom);
 
         Boolean check = false;
-        LocalDateTime joinedDate=LocalDateTime.now();
-        for(ChatParticipant c : chatParticipants){
-            if(c.getMember().equals(sender)){
+        LocalDateTime joinedDate = LocalDateTime.now();
+        for (ChatParticipant c : chatParticipants) {
+            if (c.getMember().equals(sender)) {
                 check = true;
                 joinedDate = c.getCreatedDate();
                 break;
             }
         }
 
-        if(!check)
+        if (!check)
             throw new ApiCustomException("Chat 본인이 속하지 않은 채팅방입니다.");
 
-        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomAndJoinedDateOrderByCreatedTimeAscWithMember(chatRoom,joinedDate);
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomAndJoinedDateOrderByCreatedTimeAscWithMember(chatRoom, joinedDate);
         List<ResChatDto> resChatDtos = new ArrayList<>();
 
-        for(ChatMessage c: chatMessages){
+        for (ChatMessage c : chatMessages) {
             ResChatDto resChatDto = ResChatDto.builder()
                     .content(c.getContent())
                     .senderEmail(c.getMember().getMemberEmail())
@@ -258,11 +257,11 @@ public class ChatService {
     @Transactional(readOnly = true)
     public void checkRoomParticipant(CustomUser user, Long roomId) {
 
-        ChatRoom chatRoom = chatRoomRepository.findByIdAndIsDeletedFalse(roomId).orElseThrow(()->new ApiCustomException("Chat 해당 채팅방 번호를 가진 채팅방은 존재하지 않습니다."));
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndIsDeletedFalse(roomId).orElseThrow(() -> new ApiCustomException("Chat 해당 채팅방 번호를 가진 채팅방은 존재하지 않습니다."));
 
-        Member sender =  memberRepository.findByIdAndIsDeletedFalse(user.getMember().getId()).orElseThrow(()->new ApiCustomException("Chat 해당 회원은 존재하지 않습니다."));
+        Member sender = memberRepository.findByIdAndIsDeletedFalse(user.getMember().getId()).orElseThrow(() -> new ApiCustomException("Chat 해당 회원은 존재하지 않습니다."));
 
-        if(!chatParticipantRepository.isRoomParticipantByChatRoomAndMember(chatRoom, sender)){
+        if (!chatParticipantRepository.isRoomParticipantByChatRoomAndMember(chatRoom, sender)) {
             throw new NotChatParticipantException("Chat 해당 채팅방에 참여자가 아닙니다.");
 
         }
@@ -279,7 +278,7 @@ public class ChatService {
     public void checkBlock(Long roomId) {
         List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoomIdWithMember(roomId);
 
-        if(chatParticipants.isEmpty())
+        if (chatParticipants.isEmpty())
             throw new CustomException("Chat 해당 채팅방은 존재하지 않습니다.");
 
 
@@ -288,11 +287,11 @@ public class ChatService {
 
 
         // 그룹 채팅이라면 더 이상 진행하지 않음
-        if(chatRoomRepository.isGroupChat(roomId))
+        if (chatRoomRepository.isGroupChat(roomId))
             return;
 
         // 한 사람이라도 차단했는지 체크
-        if (chatUserBlockRepository.isBlockByTwoMember(chatParticipants.get(0).getMember(),chatParticipants.get(1).getMember())){
+        if (chatUserBlockRepository.isBlockByTwoMember(chatParticipants.get(0).getMember(), chatParticipants.get(1).getMember())) {
 
             throw new ChatBlockException("ChatBlockException 발생");
         }
@@ -316,12 +315,12 @@ public class ChatService {
         // 전달할 Dto 생성
         List<ResGroupChatParticipantListDto> resGroupChatParticipantListDtos = new ArrayList<>();
 
-        for(ChatParticipant chatParticipant:chatParticipants){
+        for (ChatParticipant chatParticipant : chatParticipants) {
 
             //내가 차단한 참여자 인지 체크
             Boolean isBlock = false;
-            for(ChatUserBlock chatUserBlock:chatUserBlocks){
-                if(chatParticipant.getMember().getId().equals(chatUserBlock.getBlocked().getId())){
+            for (ChatUserBlock chatUserBlock : chatUserBlocks) {
+                if (chatParticipant.getMember().getId().equals(chatUserBlock.getBlocked().getId())) {
                     isBlock = true;
                     break;
                 }
@@ -329,8 +328,8 @@ public class ChatService {
 
             //나와 연결된 1대1 채팅방이 있는지 체크
             Boolean isMyPrivateChatPartner = false;
-            for(ChatParticipant myPrivateChatPartner: myPrivateChatParticipants){
-                if(chatParticipant.getMember().getId().equals(myPrivateChatPartner.getMember().getId())){
+            for (ChatParticipant myPrivateChatPartner : myPrivateChatParticipants) {
+                if (chatParticipant.getMember().getId().equals(myPrivateChatPartner.getMember().getId())) {
                     isMyPrivateChatPartner = true;
                     ResGroupChatParticipantListDto resGroupChatParticipantListDto = ResGroupChatParticipantListDto.builder()
                             .memberId(chatParticipant.getMember().getId())
@@ -345,7 +344,7 @@ public class ChatService {
                 }
             }
 
-            if(!isMyPrivateChatPartner) {
+            if (!isMyPrivateChatPartner) {
                 ResGroupChatParticipantListDto resGroupChatParticipantListDto = ResGroupChatParticipantListDto.builder()
                         .memberId(chatParticipant.getMember().getId())
                         .memberName(chatParticipant.getMember().getMemberName())
@@ -368,12 +367,12 @@ public class ChatService {
 
     @Transactional
     public void readAllMessage(Long roomId, CustomUser user) {
-        ChatRoom chatRoom = chatRoomRepository.findByIdAndIsDeletedFalse(roomId).orElseThrow(()->new ApiCustomException("Chat 해당 채팅방 번호를 가진 채팅방은 존재하지 않습니다."));
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndIsDeletedFalse(roomId).orElseThrow(() -> new ApiCustomException("Chat 해당 채팅방 번호를 가진 채팅방은 존재하지 않습니다."));
 
-        Member sender =  memberRepository.findByMemberEmailAndIsDeletedFalse(user.getMember().getMemberEmail()).orElseThrow(()->new ApiCustomException("Chat 해당 회원은 존재하지 않습니다."));
+        Member sender = memberRepository.findByMemberEmailAndIsDeletedFalse(user.getMember().getMemberEmail()).orElseThrow(() -> new ApiCustomException("Chat 해당 회원은 존재하지 않습니다."));
 
         int count = messageReadLogRepository.updateMessagesRead(chatRoom, sender);
-        log.info("읽음 처리 메시지: {}",count);
+        log.info("읽음 처리 메시지: {}", count);
 
     }
 
@@ -384,12 +383,12 @@ public class ChatService {
     @Transactional
     public void blockUser(Long roomId, CustomUser user) {
 
-        Member blocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(()->new CustomException("Chat blockUser 차단할 대상이 없습니다."));
+        Member blocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(() -> new CustomException("Chat blockUser 차단할 대상이 없습니다."));
 
         // chatUserBlock에서 자신과 상대방이 있는지 조회
-        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(),blocked);
+        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(), blocked);
 
-        if(chatUserBlock.isPresent()){
+        if (chatUserBlock.isPresent()) {
             throw new CustomException("Chat blockUser 이미 차단한 유저입니다.");
         }
 
@@ -410,12 +409,12 @@ public class ChatService {
     @Transactional
     public void blockUserWithApi(Long roomId, CustomUser user) {
 
-        Member blocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(()->new ApiCustomException("Chat blockUser 차단할 대상이 없습니다."));
+        Member blocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(() -> new ApiCustomException("Chat blockUser 차단할 대상이 없습니다."));
 
         // chatUserBlock에서 자신과 상대방이 있는지 조회
-        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(),blocked);
+        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(), blocked);
 
-        if(chatUserBlock.isPresent()){
+        if (chatUserBlock.isPresent()) {
             throw new ApiCustomException("Chat blockUser 이미 차단한 유저입니다.");
         }
 
@@ -434,16 +433,16 @@ public class ChatService {
      * 1대1 채팅에서 상대 유저를 차단해제 하는 메서드
      * */
     @Transactional
-    public void unblockUser(Long roomId, CustomUser user){
+    public void unblockUser(Long roomId, CustomUser user) {
 
-        Member unblocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(()->new CustomException("blockUser 차단할 대상이 없습니다."));
+        Member unblocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(() -> new CustomException("blockUser 차단할 대상이 없습니다."));
 
         // chatUserBlock에서 자신과 상대방이 있는지 조회
-        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(),unblocked);
+        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(), unblocked);
 
-        if(chatUserBlock.isPresent()){
+        if (chatUserBlock.isPresent()) {
             chatUserBlockRepository.delete(chatUserBlock.get());
-        }else{
+        } else {
             throw new CustomException("blockUser 차단된 유저가 없습니다.");
         }
 
@@ -452,14 +451,14 @@ public class ChatService {
     @Transactional
     public void unblockUserWithApi(Long roomId, CustomUser user) {
 
-        Member unblocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(()->new ApiCustomException("Chat blockUser 차단할 대상이 없습니다."));
+        Member unblocked = chatParticipantRepository.findByRoomIdAndMemberAndRoleMember(roomId, user.getMember()).stream().map(ChatParticipant::getMember).findFirst().orElseThrow(() -> new ApiCustomException("Chat blockUser 차단할 대상이 없습니다."));
 
         // chatUserBlock에서 자신과 상대방이 있는지 조회
-        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(),unblocked);
+        Optional<ChatUserBlock> chatUserBlock = chatUserBlockRepository.findByBlockerAndBlocked(user.getMember(), unblocked);
 
-        if(chatUserBlock.isPresent()){
+        if (chatUserBlock.isPresent()) {
             chatUserBlockRepository.delete(chatUserBlock.get());
-        }else{
+        } else {
             throw new ApiCustomException("Chat blockUser 차단된 유저가 없습니다.");
         }
     }
@@ -478,17 +477,24 @@ public class ChatService {
     }
 
     public List<ResMyChatListDto> findRelevantRoomsForLeader(Long leaderId, Long teamId) {
+        // 1️⃣ Fetch private chats
         List<ChatRoom> privateChats = chatParticipantRepository.findAllPrivateChatsForLeader(leaderId);
 
+        // 2️⃣ Fetch the team group chat room (if any)
         Optional<ChatRoom> groupChatOpt = chatRoomRepository.findTeamGroupChatRoom(teamId);
 
+        // 3️⃣ Combine all relevant rooms
+        List<ChatRoom> allRelevantRooms = new ArrayList<>(privateChats);
+        groupChatOpt.ifPresent(allRelevantRooms::add); // ✅ safe add
 
-        groupChatOpt.ifPresent(privateChats::add); // ✅ 그룹 채팅방 추가
+        // 4️⃣ Convert to DTOs
+        Member leader = memberRepository.findById(leaderId)
+                .orElseThrow(() -> new IllegalArgumentException("리더 정보를 찾을 수 없습니다."));
 
-        return privateChats.stream()
+        return allRelevantRooms.stream()
                 .map(room -> {
                     boolean isBlocked = chatUserBlockRepository.isBlocked(room.getId(), leaderId);
-                    long unreadCount = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(room, memberRepository.findById(leaderId).orElseThrow());
+                    long unreadCount = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(room, leader);
                     return ResMyChatListDto.from(room, leaderId, isBlocked, unreadCount);
                 })
                 .toList();
@@ -534,18 +540,62 @@ public class ChatService {
         return resMyChatListDtos;
     }
 
-    @Transactional
-    public Integer removeGroupChatsAfterThreeDaysOfMatch() {
+    public List<ResMyChatListDto> findOnlyTeamChatRooms(Long memberId, Long teamId) {
+        if (teamId == null) return Collections.emptyList();
 
-        //현재 시간 보다 3일 전 시간 구하기
-        LocalDateTime thresholdTime = LocalDateTime.now().minusDays(3);
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
+                .orElseThrow(() -> new CustomException("해당 회원이 존재하지 않습니다."));
 
-        List<ChatParticipant> chatParticipants = chatParticipantRepository.findAfterThreeDaysOfMatchWithChatParticipantAndChatRoom(thresholdTime);
-        for(ChatParticipant chatParticipant:chatParticipants){
-            chatParticipant.deleteParticipant(true);
-            chatParticipant.getChatRoom().deleteChatRoom(true);
-        }
+        // Fetch group chat room for the team
+        Optional<ChatRoom> teamGroupRoomOpt = chatRoomRepository.findTeamGroupChatRoom(teamId);
 
-        return chatParticipants.size();
+        // Collect to list (just one in this case)
+        List<ChatRoom> relevantRooms = new ArrayList<>();
+        teamGroupRoomOpt.ifPresent(relevantRooms::add);
+
+        // ✅ Deduplicate by ChatRoom ID just in case
+        Set<Long> seenRoomIds = new HashSet<>();
+
+        return relevantRooms.stream()
+                .filter(room -> seenRoomIds.add(room.getId())) // prevents duplicates
+                .map(room -> {
+                    boolean isBlocked = chatUserBlockRepository.isBlocked(room.getId(), memberId);
+                    long unreadCount = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(room, member);
+                    return ResMyChatListDto.from(room, memberId, isBlocked, unreadCount);
+                })
+                .toList();
     }
-}
+
+  
+
+    public List<ResMyChatListDto> findOnlyPrivateChats(Long memberId) {
+        List<ChatRoom> privateRooms = chatRoomRepository.findPrivateChatsByMemberId(memberId);
+
+        return privateRooms.stream()
+                .map(room -> {
+                    Long unReadCount = messageReadLogRepository.countUnreadMessages(memberId, room.getId());
+                    boolean isBlocked = chatUserBlockRepository.isBlocked(memberId, room.getId());
+
+                    return ResMyChatListDto.from(room, memberId, isBlocked, unReadCount);
+                })
+                .collect(Collectors.toList());
+    }
+
+
+        @Transactional
+        public Integer removeGroupChatsAfterThreeDaysOfMatch () {
+
+            //현재 시간 보다 3일 전 시간 구하기
+            LocalDateTime thresholdTime = LocalDateTime.now().minusDays(3);
+
+            List<ChatParticipant> chatParticipants = chatParticipantRepository.findAfterThreeDaysOfMatchWithChatParticipantAndChatRoom(thresholdTime);
+            for (ChatParticipant chatParticipant : chatParticipants) {
+                chatParticipant.deleteParticipant(true);
+                chatParticipant.getChatRoom().deleteChatRoom(true);
+            }
+
+            return chatParticipants.size();
+
+        }
+    }
+

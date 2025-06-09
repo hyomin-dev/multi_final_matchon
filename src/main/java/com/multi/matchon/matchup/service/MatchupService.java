@@ -13,7 +13,6 @@ import com.multi.matchon.common.repository.SportsTypeRepository;
 import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.matchup.domain.MatchupBoard;
 import com.multi.matchon.matchup.domain.MatchupRequest;
-import com.multi.matchon.matchup.dto.req.ReqMatchupBoardDto;
 import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;

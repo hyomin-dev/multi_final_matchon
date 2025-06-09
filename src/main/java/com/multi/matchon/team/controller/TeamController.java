@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +64,7 @@ public class TeamController {
         teamService.teamRegister(reqTeamDto, user);
 
         log.info("team 등록 완료");
-        return "team/team-list";
+        return "redirect:/team";
     }
     @GetMapping
     public ModelAndView showTeamListPage(ModelAndView mv){
@@ -86,7 +88,7 @@ public class TeamController {
     ){
 
         log.info("⭐ Rating Filter Received: {}", teamRatingAverage);
-        PageRequest pageRequest = PageRequest.of(page,size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
         PageResponseDto<ResTeamDto> pageResponseDto = teamService.findAllWithPaging(pageRequest, recruitingPosition, region, teamRatingAverage);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
     }
@@ -121,6 +123,10 @@ public class TeamController {
 
         mv.addObject("teamLeaderId", leader.getId());
         mv.addObject("userRole", userRole);
+
+        boolean hasTeam = user.getMember().getTeam() != null;
+        mv.addObject("hasTeam", hasTeam);
+
 
         return mv;
     }
@@ -328,6 +334,56 @@ public class TeamController {
         }
         return ResponseEntity.ok(ApiResponse.ok(myTeam));
     }
+
+    @GetMapping("/team/my")
+    public ModelAndView viewMyTeamList(@AuthenticationPrincipal CustomUser user) {
+        ModelAndView mv = new ModelAndView("team/team-list");
+        List<ResTeamDto> teams = new ArrayList<>();
+
+        try {
+            ResTeamDto myTeam = teamService.findMyTeam(user);
+            if (myTeam != null) {
+                teams.add(myTeam);
+                mv.addObject("teams", teams);
+                mv.addObject("myTeamView", true);
+            } else {
+                mv.addObject("teams", teams);
+                mv.addObject("myTeamView", true);
+            }
+        } catch (Exception e) {
+            mv.addObject("teams", teams);
+            mv.addObject("myTeamView", true);
+        }
+
+        return mv;
+    }
+    @GetMapping("/my")
+    public ModelAndView myTeamView(@AuthenticationPrincipal CustomUser user) {
+        ResTeamDto myTeam = teamService.findMyTeam(user);
+
+        ModelAndView mv = new ModelAndView("team/team-list"); // reuse team-list.html
+        mv.addObject("teams", myTeam == null ? List.of() : List.of(myTeam));
+        mv.addObject("myTeamView", true); // this triggers the "전체 목록으로 돌아가기" button
+        return mv;
+    }
+    @GetMapping("/team/{teamId}/reviews/paged")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<PageResponseDto<ResReviewDto>>> getReviewsPaged(
+            @PathVariable Long teamId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        PageResponseDto<ResReviewDto> response = teamService.getPagedReviews(teamId, pageRequest);
+        return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+    @GetMapping("/team/{teamId}/join-request/count")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Integer>> getPendingRequestCount(@PathVariable Long teamId) {
+        int count = teamService.countPendingJoinRequests(teamId);
+        return ResponseEntity.ok(ApiResponse.ok(count));
+    }
+
 
 }
 
