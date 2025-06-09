@@ -1,13 +1,11 @@
 package com.multi.matchon.team.domain;
 
 
+import com.multi.matchon.chat.domain.ChatRoom;
 import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.common.domain.Positions;
 import jakarta.persistence.*;
-        import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name="team", uniqueConstraints = {@UniqueConstraint(name="UK_team_name",columnNames = {"team_name"})
-})
+@Table(name="team")
 public class Team extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,6 +61,11 @@ public class Team extends BaseEntity {
     @Column(name = "created_person", nullable = false, columnDefinition = "VARCHAR(100)")
     private String createdPerson;
 
+    @Setter
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
     public void updateInfo(String name, String intro, RegionType region, Double rating, Boolean recruitStatus) {
         this.teamName = name;
         this.teamIntroduction = intro;
@@ -74,11 +76,6 @@ public class Team extends BaseEntity {
     public void updateRating(double averageRating) {
         this.teamRatingAverage = averageRating;
     }
-
-
-
-
-
 
 
 }

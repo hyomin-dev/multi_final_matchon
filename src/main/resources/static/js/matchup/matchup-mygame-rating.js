@@ -1,72 +1,77 @@
-
+let isListenerAttached = false;
 let boardId = '';
 document.addEventListener("DOMContentLoaded",()=>{
     const detailDto = document.querySelector("#matchup-rating-detail-dto");
     boardId = Number(detailDto.dataset.boardId);
-
+    autoResize();
     loadItems(1) // 프론트는 페이지 번호 시작을 1부터, 헷갈림
 
-
-
+    const form = document.querySelector("form");
+    form.addEventListener("submit", (event)=>{
+            submitCheck(event)
+        }
+    )
 })
 
 async function loadItems(page){
-    const response = await fetch(`/matchup/rating/list?page=${page-1}&boardId=${boardId}`,{
+    let items = [];
+    let pageInfo = {
+        page: 0,
+        totalPages: 1
+    };
 
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data);
-    const items = data.data.items;
-    const pageInfo = data.data.pageInfo;
-    //console.log(pageInfo);
+    try{
+        const response = await fetch(`/matchup/rating/list?page=${page-1}&boardId=${boardId}`,{
+
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data);
+        items = data.data.items;
+        pageInfo = data.data.pageInfo;
+        //console.log(pageInfo);
+    }catch (err){
+        console.log(err);
+    }
 
     renderList(items);
     renderPagination(pageInfo);
 
-
 }
 function renderList(items){
 
-
-    const boardArea = document.querySelector("#request-container");
-    boardArea.innerHTML = '';
+    const matchArea = document.querySelector("#match-container");
+    matchArea.innerHTML = '';
 
     if(items.length ===0){
-        boardArea.innerHTML = `
-            <div class="no-result">
-                매너 온도 평가할 대상이 없습니다.
-            </div>
-        `;
+        matchArea.innerHTML = `
+            <tr>
+                <td colspan="6" class="no-result">매너 온도 평가할 대상이 없습니다.</td>
+            </tr>            
+            `;
         return;
     }
 
-    items.forEach((item, index)=>{
+    items.forEach((item)=>{
 
-        const card = document.createElement("div");
+        const card = document.createElement("tr");
         card.className = "matchup-card";
         card.innerHTML = `
-            <div class="card-content">
-                <div class="left-info">
-                    <div><strong>평가 대상: </strong>${item.targetName}</div>          
-                </div>         
-                <div class="button-wrap">
-                    <div><strong>후기 보냄: </strong>${setIsCompletedSend(item.isCompletedSend)}</div>
-                    <button class="send-btn"></button>
-                </div>
-                <div class="button-wrap">
-                    <div><strong>후기 받음: </strong>${setIsCompletedSend(item.isCompletedReceive)}</div>
-                    <button class="receive-btn">받은 후기</button>        
-                </div>
-            </div>    
-                                            
+                    <td>${item.targetName}</td>
+                    <td>${setScore(item.isCompletedReceive,item.receivedMannerScore)}</td>
+                    <td>${setScore(item.isCompletedReceive, item.recievedSkillScore)}</td>
+                    <td><button class="received-btn">받은 후기</button></td>
+                    <td>${setScore(item.isCompletedSend,item.sendedMannerScore)}</td>
+                    <td>${setScore(item.isCompletedSend, item.sendedSkillScore)}</td>
+                    <td><button class="sended-btn">보낸 후기</button></td>                    
+                                                                        
                 `;
-        setSendBtn(card,item);
-        setReceiveBtn(card, item);
-        boardArea.appendChild(card);
+        setSendedBtn(card,item);
+        setReceivedBtn(card,item)
+        matchArea.appendChild(card);
 
     })
 }
@@ -114,7 +119,8 @@ function renderPagination(pageInfo){
         const btn = document.createElement("button");
         btn.textContent = i;
         if( i=== curPage)
-            btn.disabled = true;
+            //btn.disabled = true;
+            btn.classList.add("active");
 
         btn.addEventListener("click",()=>{
             loadItems(i);
@@ -148,45 +154,123 @@ function renderPagination(pageInfo){
 
 }
 
-function setIsCompletedSend(booleanVal){
-    if(booleanVal)
-        return "Y"
-    else
-        return "N"
-}
 
-function setSendBtn(card, item){
+function setSendedBtn(card, item){
 
-    const sendBtn = card.querySelector(".send-btn");
+    const checkReviewModalEle = document.querySelector("#checkReviewModal");
+
+    const sendReviewModalEle = document.querySelector("#sendReviewModal");
+    const sendedBtn = card.querySelector(".sended-btn");
 
     // 내가 후기 작성을 한 경우
     if(item.isCompletedSend){
-        sendBtn.textContent = "보낸 후기";
-        sendBtn.addEventListener("click",()=>{
-            window.location.href = `/matchup/rating/detail?boardId=${item.boardId}&evalId=${item.sendedEvalId}&targetId=${item.sendedTargetId}`;
-        })
+
+        sendedBtn.textContent = "보낸 후기";
+        sendedBtn.addEventListener("click",()=>{
+            checkReviewModalEle.style.display = "flex";
+            document.querySelector("#check-manner-score").value = item.sendedMannerScore;
+            document.querySelector("#check-skill-score").value = item.sendedSkillScore;
+            document.querySelector("#check-review").textContent = item.sendedReview;
+        });
+
     }else{
-        sendBtn.textContent = "후기 쓰기";
-        sendBtn.addEventListener("click",()=>{
-            window.location.href = `/matchup/rating/register?boardId=${item.boardId}&evalId=${item.sendedEvalId}&targetId=${item.sendedTargetId}`;
+        sendedBtn.textContent = "후기 작성";
+        sendedBtn.addEventListener("click",()=>{
+            // window.location.href = ;
+            sendReviewModalEle.style.display = "flex";
+            document.querySelector("#boardId").value = item.boardId;
+            document.querySelector("#evalId").value = item.sendedEvalId;
+            document.querySelector("#targetId").value = item.sendedTargetId;
+
+            document.querySelector("#sendReviewModal form").action= `/matchup/rating/register`;
+
         })
 
     }
 }
 
-function setReceiveBtn(card, item){
-    const receiveBtn = card.querySelector(".receive-btn");
+function setReceivedBtn(card, item){
 
-    // 상대방이 후기 작성을 한 경우:
+    const checkReviewModalEle = document.querySelector("#checkReviewModal");
+    const receivedBtn = card.querySelector(".received-btn");
+
+    // 상대가 후기 작성을 한 경우
     if(item.isCompletedReceive){
-        receiveBtn.addEventListener("click",()=>{
-            window.location.href = `/matchup/rating/detail?boardId=${item.boardId}&evalId=${item.receivedEvalId}&targetId=${item.receivedTargetId}`;
-        });
+        receivedBtn.addEventListener("click",()=>{
+            checkReviewModalEle.style.display = "flex";
+            document.querySelector("#check-manner-score").value = item.receivedMannerScore;
+            document.querySelector("#check-skill-score").value = item.recievedSkillScore;
+            document.querySelector("#check-review").textContent = item.receivedReview;
+        })
     }else{
-        receiveBtn.addEventListener("click",()=>{
-            alert("아직 상대방이 후기 작성을 안했습니다.");
-        });
+        receivedBtn.classList.add("disabled");
 
+    }
+}
+
+function closeCheckReviewModal(){
+    document.querySelector("#checkReviewModal").style.display = "none";
+}
+
+function closeSendReviewModal(){
+    document.querySelector("#sendReviewModal").style.display = "none";
+
+}
+
+function setScore(condition, score){
+    if(condition){
+        return score;
+    }else{
+        return "N";
+    }
+}
+
+function setReceivedReview(item){
+    if(item.isCompletedReceive){
+        return item.receivedReview;
+    }else{
+        return "상대방이 아직 후기를 작성 안했습니다.";
+    }
+}
+
+function autoResize() {
+    const allTextarea = document.querySelectorAll('textarea');
+    allTextarea.forEach(el =>{
+        el.style.height = 'auto';  // 초기화
+        el.style.height = el.scrollHeight + 'px';  // 실제 내용에 맞춤
+    });
+}
+
+
+
+
+function goBack(){
+    window.location.href = "/matchup/mygame/page";
+}
+
+
+function submitCheck(e){
+
+
+    const mannerScoreEle = document.querySelector("#mannerScore");
+
+    const skillScoreEle = document.querySelector("#skillScore");
+
+    const reviewEle = document.querySelector("#review");
+
+
+
+    if(mannerScoreEle.value ===""){
+        alert("매너 점수를 입력하세요.");
+        e.preventDefault();
+    } else if(skillScoreEle.value ===""){
+        alert("실력 점수를 입력하세요.");
+        e.preventDefault();
+    } else if(reviewEle.value ===""){
+        alert("리뷰를 입력하세요");
+        e.preventDefault();
+    } else{
+        alert("매너 후기가 전송되었습니다.");
     }
 }
 

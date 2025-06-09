@@ -44,19 +44,17 @@ public class MatchupBoardController {
 
     @PostMapping("/register")
     public String registerMatchupBoard(@Valid @ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
-        //log.info("{}", reqMatchupBoardDto);
         matchupBoardService.registerMatchupBoard(reqMatchupBoardDto, user);
-
-        log.info("matchup 게시글 등록 완료");
+        log.info("Matchup 게시글 등록 완료");
         return "redirect:/matchup/board";
     }
 
     // 게시글 상세 조회
 
     @GetMapping("/detail")
-    public ModelAndView getMatchupBoardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv){
+    public ModelAndView getMatchupBoardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
         log.info("matchup-board-id: {}",boardId);
-        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId);
+        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId, user);
         mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-detail");
         return mv;
@@ -66,11 +64,7 @@ public class MatchupBoardController {
 
     @GetMapping
     public ModelAndView showMatchupBoardPage(ModelAndView mv){
-        //PageRequest pageRequest = PageRequest.of(0,4);
-        //PageResponseDto<ResMatchupBoardListDto> pageResponseDto = matchupService.findAllWithPaging(pageRequest);
         mv.setViewName("matchup/matchup-board-list");
-        //mv.addObject("pageResponseDto",pageResponseDto);
-        messageTemplate.convertAndSendToUser("hyomin@1234.com","/notify","test1이 보냄");
         return mv;
     }
 
@@ -110,8 +104,8 @@ public class MatchupBoardController {
     * Matchup 게시글 수정하기 페이지로 이동
     * */
     @GetMapping("/edit")
-    public ModelAndView showMatchupBoardEditPage(@RequestParam("boardId") Long boardId, ModelAndView mv){
-        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId);
+    public ModelAndView showMatchupBoardEditPage(@RequestParam("boardId") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
+        ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId, user);
         mv.addObject("resMatchupBoardDto",resMatchupBoardDto);
         mv.setViewName("matchup/matchup-board-edit");
         return mv;
@@ -128,8 +122,8 @@ public class MatchupBoardController {
     }
 
     @GetMapping("/delete")
-    public String softDeleteBoard(@RequestParam("boardId") Long boardId){
-        matchupBoardService.softDeleteMatchupBoard(boardId);
+    public String softDeleteBoard(@RequestParam("boardId") Long boardId, @AuthenticationPrincipal CustomUser user){
+        matchupBoardService.softDeleteMatchupBoard(boardId, user);
         log.info("matchup 게시글 삭제 완료");
         return "redirect:/matchup/board/my";
     }
