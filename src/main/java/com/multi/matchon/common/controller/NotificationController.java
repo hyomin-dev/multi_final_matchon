@@ -4,6 +4,7 @@ package com.multi.matchon.common.controller;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.dto.res.ApiResponse;
 import com.multi.matchon.common.dto.res.ResNotificationDto;
+import com.multi.matchon.common.dto.res.ResReadNotificationDto;
 import com.multi.matchon.common.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +26,13 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    // 조회
+    // 등록
 
+
+    // 조회
+    /*
+    * 읽지 않은 메시지 조회
+    * */
     @GetMapping("/get/unread")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<ResNotificationDto>>> getUnreadNotification(@AuthenticationPrincipal CustomUser user){
@@ -35,7 +41,17 @@ public class NotificationController {
         return ResponseEntity.ok(ApiResponse.ok(resNotificationDtos));
     }
 
-    // 등록
+    /*
+    * 읽은 메시지 조회
+    * */
+    @GetMapping("/get/read")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<ResReadNotificationDto>>> getReadNotification(@AuthenticationPrincipal CustomUser user){
+        List<ResReadNotificationDto> resNotificationDtos = notificationService.findAllByMemberAndUnreadTrue(user);
+
+        return ResponseEntity.ok(ApiResponse.ok(resNotificationDtos));
+    }
+
 
 
     // 수정
