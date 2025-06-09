@@ -70,6 +70,18 @@ public class MatchupBoardService {
         if(numberOfTodayMatchupBoards>=2){
             throw new CustomException("Matchup 게시글은 하루에 2번만 작성할 수 있습니다.");
         }
+
+        //내가 등록하고자 하는 경기날짜가 기존에 내가 작성한 게시글에서 경기 시간과 겹치는 지 체크
+        LocalDateTime endTime = reqMatchupBoardDto.getMatchDatetime().plusHours(reqMatchupBoardDto.getMatchDuration()/60).plusMinutes(reqMatchupBoardDto.getMatchDuration()%60);
+
+        Long duplicatedMatchupBoardNum = matchupBoardRepository.findByMemberAndStartTimeAndEndTime(user.getMember(),reqMatchupBoardDto.getMatchDatetime(),endTime);
+
+        if(duplicatedMatchupBoardNum>0)
+            throw new CustomException("Matchup 이전에 작성하신 게시글의 경기 날짜와 겹치는 시간이 있습니다. 확인 후 다시 작성해주세요.");
+
+
+
+
         //
         // 월: reqMatchupBoardDto.getMatchDatetime().getMonthValue()
         // 일: reqMatchupBoardDto.getMatchDatetime().getDayOfMonth()
@@ -216,6 +228,7 @@ public class MatchupBoardService {
 
     /*
     * matchup board 수정
+    * 경기 시작 시간과 경기 진행 시간 수정 불가능하게 변경함
     * */
     @Transactional
     public void updateBoard(ReqMatchupBoardEditDto reqMatchupBoardEditDto, CustomUser user) {
@@ -225,9 +238,6 @@ public class MatchupBoardService {
         if(findMatchupBoard.getMatchDatetime().isBefore(LocalDateTime.now()))
             throw new CustomException("Matchup 경기 시작 시간이 지나 수정할 수 없습니다.");
 
-        // 수정하려는 시간이 현재보다 과거인 경우
-        if(reqMatchupBoardEditDto.getMatchDatetime().isBefore(LocalDateTime.now()))
-            throw new CustomException("Matchup 경기 시작 시간은 현재 시간 이후만 가능합니다.");
 
         //모집인원 체크
         if(findMatchupBoard.getCurrentParticipantCount()>reqMatchupBoardEditDto.getMaxParticipants())
@@ -241,8 +251,6 @@ public class MatchupBoardService {
                 reqMatchupBoardEditDto.getTeamIntro(),
                 reqMatchupBoardEditDto.getSportsFacilityName(),
                 reqMatchupBoardEditDto.getSportsFacilityAddress(),
-                reqMatchupBoardEditDto.getMatchDatetime(),
-                reqMatchupBoardEditDto.getMatchDuration(),
                 reqMatchupBoardEditDto.getCurrentParticipantCount(),
                 reqMatchupBoardEditDto.getMaxParticipants(),
                 reqMatchupBoardEditDto.getMinMannerTemperature(),

@@ -177,7 +177,7 @@ function setRatingButton(card, item){
     }else{
         ratingBtn.addEventListener("click",(e)=>{
             e.preventDefault();
-            alert("Matchup 게시글 작성자가 아직 매너 온도 평가 세팅을 하지 않았습니다.");
+            alert("Matchup 아직 매너 온도 평가 세팅되지 않았습니다. 경기 종료 후 다시 시도해보세요.");
         })
 
     }

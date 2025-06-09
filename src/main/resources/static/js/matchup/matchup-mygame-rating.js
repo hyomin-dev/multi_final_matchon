@@ -49,7 +49,7 @@ function renderList(items){
     if(items.length ===0){
         matchArea.innerHTML = `
             <tr>
-                <td colspan="6" class="no-result">매너 온도 평가할 대상이 없습니다.</td>
+                <td colspan="7" class="no-result">매너 온도 평가할 대상이 없습니다.</td>
             </tr>            
             `;
         return;

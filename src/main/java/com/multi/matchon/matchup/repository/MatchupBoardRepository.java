@@ -8,6 +8,8 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardOverviewDto;
 import com.multi.matchon.member.domain.Member;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -287,4 +289,10 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             """)
     List<MatchupBoard> findUnnotifiedBoardsAtThreeHoursBeforeMatch(@Param("threeHoursLater") LocalDateTime threeHoursLater);
 
+    @Query("""
+            select count(t1)
+            from MatchupBoard t1
+            where t1.isDeleted =false and t1.matchDatetime between :startTime and :endTime and t1.writer=:loginMember
+            """)
+    Long findByMemberAndStartTimeAndEndTime(@Param("loginMember") Member loginMember,@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
 }

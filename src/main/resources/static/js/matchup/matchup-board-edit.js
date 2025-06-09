@@ -1,3 +1,5 @@
+
+
 document.addEventListener("DOMContentLoaded",()=>{
 
     const editDto = document.querySelector("#matchup-board-edit-dto");
@@ -9,11 +11,18 @@ document.addEventListener("DOMContentLoaded",()=>{
     const originalName = editDto.dataset.originalName;
     const savedName = editDto.dataset.savedName;
     const myMannerTemperature = Number(editDto.dataset.myMannerTemperature);
+    const matchDatetime = editDto.dataset.matchDatetime;
+    const matchDuration = editDto.dataset.matchDuration;
+
+    // console.log(matchDatetime)
+    // console.log(matchDuration)
+
 
     setSportsType(sportsTypeName); // 종목 가져옴
     void setReservationFile(originalName, savedName);
+    setDate(matchDatetime, matchDuration);
     setMaxParticipants(currentParticipantCount, maxParticipants);
-    setMannerTemperature(minMannerTemperature);
+    setMannerTemperature(minMannerTemperature, myMannerTemperature);
     setButton();
     autoResize();
 
@@ -35,10 +44,6 @@ function submitCheck(e, myMannerTemperature){
     const sportsFacilityNameEle = document.querySelector("#sportsFacilityName");
 
     const sportsFacilityAddressEle = document.querySelector("#sportsFacilityAddress");
-
-    const matchDatetimeEle = document.querySelector("#matchDatetime");
-
-    const matchDurationEle = document.querySelector("#matchDuration");
 
     const currentParticipantCountEle = document.querySelector("#currentParticipantCount");
     //console.log(currentParticipantsCountEle.value);
@@ -66,15 +71,6 @@ function submitCheck(e, myMannerTemperature){
         e.preventDefault();
     } else if(sportsFacilityAddressEle.value ===""){
         alert("경기장 주소를 입력하세요.");
-        e.preventDefault();
-    } else if(matchDatetimeEle.value ===""){
-        alert("경기 시작 시간을 입력하세요.");
-        e.preventDefault();
-    }  else if(new Date(matchDatetimeEle.value)< new Date()){
-        alert(`경기 시작 시간은 현재 시간 이후만 가능합니다. 다시 작성해주세요.`)
-        e.preventDefault();
-    } else if(matchDurationEle.value ===""){
-        alert("경기 진행 시간을 입력하세요.");
         e.preventDefault();
     } else if(currentParticipantCountEle.value ===""){
         alert("현재 참가 인원을 입력하세요.")
@@ -194,7 +190,7 @@ function setMaxParticipants(currentParticipantCount, maxParticipants){
     }
 }
 
-function setMannerTemperature(minMannerTemperature){
+function setMannerTemperature(minMannerTemperature, myMannerTemperature){
     const selectManner = document.querySelector("#minMannerTemperature");
 
     for(let i=30;i<=40;i+=0.5){
@@ -205,6 +201,10 @@ function setMannerTemperature(minMannerTemperature){
         if(i===minMannerTemperature)
             option.selected = true;
     }
+
+    document.querySelector("#minMannerTemperatureLabel").textContent +=`(내 온도: ${myMannerTemperature})`;
+
+
 }
 
 function setButton(){
@@ -281,5 +281,35 @@ function goBack(){
     } else {
         window.location.href = "/matchup/board";
     }
+}
+
+function setDate(matchDatetime, matchDuration) {
+    const matchDateEle = document.querySelector("#matchDate");
+
+    const date = new Date(matchDatetime);
+
+    const [hour, minute, second] = matchDuration.split(":");
+    const hourNum = parseInt(hour, 10);
+    const minuteNum = parseInt(minute,10);
+    let extraHour = 0
+    let endMinute = 0;
+    if(date.getMinutes()+minuteNum>=60){
+        extraHour = 1;
+        endMinute = (date.getMinutes()+minuteNum)%60;
+    }else{
+        endMinute = date.getMinutes()+minuteNum;
+    }
+
+    if(date.getHours()+hourNum+extraHour>=24)
+        endHour = (date.getHours()+hourNum+extraHour) %24;
+    else
+        endHour = date.getHours()+hourNum+extraHour;
+
+    let endTime =  `${endHour}시 ${endMinute}분`
+
+    matchDateEle.value =  `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 -${endTime}`;
+
+
+
 }
 
