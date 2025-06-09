@@ -1,0 +1,84 @@
+.titlefaq {
+    text-align: center;
+    font-weight: 800;
+    font-size: 28px;
+    margin-top: 40px;
+}
+
+.filter-cs {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid beige;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.write-box {
+    margin-bottom: 20px;
+}
+
+.write-box label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.write-box input,
+.write-box textarea,
+.all-list {
+    width: 100%;
+    padding: 12px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.write-box textarea {
+    height: 150px;
+    resize: vertical;
+}
+
+.button-box {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.compleate,
+.cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.compleate {
+    background-color: #1c7ed6;
+    color: white;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.cancel-btn {
+    padding: 8px 15px;
+    background-color: white;
+    color: #f44336;
+    border: 2px solid #f44336;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.compleate:hover,
+.cancel-btn:hover {
+    opacity: 0.9;
+}
