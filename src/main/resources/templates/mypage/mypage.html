@@ -432,6 +432,26 @@
         }
     });
 
+    function updateEmailAgreement(checked) {
+        fetch("/mypage/email-agreement", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ emailAgreement: checked }),
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) {
+                alert("메일 수신 설정이 변경되었습니다.");
+            } else {
+                res.text().then(msg => alert("변경 실패: " + msg));
+            }
+        }).catch(err => {
+            alert("요청 중 오류가 발생했습니다: " + err.message);
+        });
+    }
+
+
     function triggerUpload() {
         const input = document.getElementById("profileImageInput");
         input.click();
