@@ -78,32 +78,40 @@ select:focus {
 button[type="submit"] {
     background-color: dodgerblue;
     color: white;
+    padding: 8px 16px;
     border: none;
-    padding: 0 18px;
+    border-radius: 8px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 button[type="submit"]:hover {
     background-color: royalblue;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
 }
 
 /* ===== 글쓰기 버튼 ===== */
 .btn-write {
     background-color: dodgerblue;
     color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: bold;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
     font-size: 15px;
-    white-space: nowrap;
-    margin-left: auto;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .btn-write:hover {
     background-color: royalblue;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
 }
 
 /* ===== 테이블 컨테이너 ===== */
