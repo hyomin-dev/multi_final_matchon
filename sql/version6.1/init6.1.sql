@@ -378,14 +378,14 @@ VALUES (1, 1, '2025-05-17 20:52:28', 'Member1', '2025-05-17 20:52:28', 'Member1'
 INSERT INTO team_member (member_id, team_id, introduction, team_leader_status)
 VALUES (1, 1, 'Hello from Member1', TRUE),
        (2, 2, 'Hello from Member2', TRUE),
-       (3, 3, 'Hello from Member3', FALSE),
-       (4, 4, 'Hello from Member4', FALSE),
-       (5, 5, 'Hello from Member5', FALSE),
-       (6, 6, 'Hello from Member6', FALSE),
-       (7, 7, 'Hello from Member7', FALSE),
-       (8, 8, 'Hello from Member8', FALSE),
-       (9, 9, 'Hello from Member9', FALSE),
-       (10, 10, 'Hello from Member10', FALSE);
+       (3, 3, 'Hello from Member3', TRUE),
+       (4, 4, 'Hello from Member4', TRUE),
+       (5, 5, 'Hello from Member5', TRUE),
+       (6, 6, 'Hello from Member6', TRUE),
+       (7, 7, 'Hello from Member7', TRUE),
+       (8, 8, 'Hello from Member8', TRUE),
+       (9, 9, 'Hello from Member9', TRUE),
+       (10, 10, 'Hello from Member10', TRUE);
 
 INSERT INTO recruiting_position (team_id, position_id)
 VALUES (1, 1),
