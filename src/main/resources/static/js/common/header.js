@@ -251,7 +251,6 @@ async function initSideBar(){
     const miniDrawer = document.getElementById('miniDrawer');
 
 
-
     const openMiniDrawerHistoryBtn = document.getElementById("openMiniDrawerHistoryBtn");
     const closeMiniDrawerBtnHistoryBtn = document.getElementById("closeMiniDrawerBtnHistoryBtn");
     const miniDrawerHistory = document.getElementById("miniDrawerHistory");
@@ -296,7 +295,6 @@ async function initSideBar(){
         miniDrawerHistory.style.display = 'none';
         miniDrawer.style.display = 'block';
     });
-
 
 
 }
