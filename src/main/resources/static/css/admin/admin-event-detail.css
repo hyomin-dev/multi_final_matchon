@@ -91,6 +91,19 @@ h2 {
     color: white;
 }
 
+.btn.delete-btn {
+    background-color: #59abee;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+.btn.delete-btn:hover {
+    background-color: #1b83c4;
+}
 
 
 

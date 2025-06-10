@@ -591,7 +591,6 @@
                         const data = await response.json();
                         if (data.success) {
                             alert('팀 가입 신청이 완료되었습니다.');
-                            joinRequestSection.style.display = 'none';
                             joinTeamForm.reset();
                         } else {
                             alert(data.message || '팀 가입 신청에 실패했습니다.');

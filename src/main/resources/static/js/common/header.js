@@ -250,11 +250,10 @@ async function initSideBar(){
     const closeBtn = document.getElementById('closeMiniDrawerBtn');
     const miniDrawer = document.getElementById('miniDrawer');
 
+
     const openMiniDrawerHistoryBtn = document.getElementById("openMiniDrawerHistoryBtn");
     const closeMiniDrawerBtnHistoryBtn = document.getElementById("closeMiniDrawerBtnHistoryBtn");
     const miniDrawerHistory = document.getElementById("miniDrawerHistory");
-
-
 
     // 초기에 읽지 않은 메시지를 가져옴
     const notifications = await getUnreadNoti();
@@ -265,12 +264,13 @@ async function initSideBar(){
     setReadNoti(readNotifications);
 
     openBtn.onclick = () => {
-        if(window.getComputedStyle(miniDrawerHistory).display ==='block'){
+        if (window.getComputedStyle(miniDrawerHistory).display === 'block') {
             miniDrawerHistory.style.display = 'none';
             miniDrawer.style.display = 'block';
-        }else{
+        } else {
             miniDrawer.style.display = 'block';
         }
+
     };
 
     closeBtn.onclick = () => {
@@ -279,21 +279,23 @@ async function initSideBar(){
 
     // 바깥 클릭 시 닫기 (선택사항)
     window.addEventListener("click", (e) => {
+
         if (!miniDrawer.contains(e.target) && e.target !== openBtn && !miniDrawerHistory.contains(e.target)) {
             miniDrawer.style.display = 'none';
             miniDrawerHistory.style.display = 'none';
         }
     });
 
-    openMiniDrawerHistoryBtn.addEventListener("click",()=>{
+    openMiniDrawerHistoryBtn.addEventListener("click", () => {
         miniDrawerHistory.style.display = 'block';
         miniDrawer.style.display = 'none';
     });
 
-    closeMiniDrawerBtnHistoryBtn.addEventListener("click",()=>{
+    closeMiniDrawerBtnHistoryBtn.addEventListener("click", () => {
         miniDrawerHistory.style.display = 'none';
         miniDrawer.style.display = 'block';
     });
+
 
 }
 
@@ -416,7 +418,7 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
     // 초기 메시지가 없는데, stopm로 새로운 메시지가 온 경우에 "새로운 알림이 없습니다." 제거
     if(!hasInitMessage)
-        miniDrawer.replaceChildren();
+        miniDrawer.replaceChildren(header);
     miniDrawer.insertBefore(wrapper, header.nextSibling);
 
     const bell = document.getElementById("openMiniDrawerBtn");

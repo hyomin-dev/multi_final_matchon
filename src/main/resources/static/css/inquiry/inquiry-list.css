@@ -231,3 +231,19 @@ td.title-cell {
     color: #aaa;
     border-color: #eee;
 }
+
+.btn-back {
+    background-color: #ccc;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 15px;
+    white-space: nowrap;
+    transition: background-color 0.3s;
+}
+
+.btn-back:hover {
+    background-color: #b3b3b3;
+}

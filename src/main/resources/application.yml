@@ -50,6 +50,7 @@ matchon:
   dialogflow-key-path: ${DIALOGFLOW_KEY_PATH}
 jwt:
   secret: ${JWT_SECRET}
+  issuer: ${JWT_ISSUER}
 
 ---
 
