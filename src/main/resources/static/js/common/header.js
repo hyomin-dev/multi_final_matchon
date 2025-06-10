@@ -250,27 +250,27 @@ async function initSideBar(){
     const closeBtn = document.getElementById('closeMiniDrawerBtn');
     const miniDrawer = document.getElementById('miniDrawer');
 
-    if (window.location.pathname.endsWith("/")) {
-        // 초기에 읽지 않은 메시지를 가져옴
-        const notifications = await getUnreadNoti();
-        setUnreadNoti(notifications);
-
-        openBtn.onclick = () => {
-            miniDrawer.style.display = 'block';
-        };
-
-        closeBtn.onclick = () => {
-            miniDrawer.style.display = 'none';
-        };
-
-        // 바깥 클릭 시 닫기 (선택사항)
-        window.addEventListener("click", (e) => {
-            if (!miniDrawer.contains(e.target) && e.target !== openBtn) {
-                miniDrawer.style.display = 'none';
-            }
-        });
-
-    }else {
+    // if (window.location.pathname.endsWith("/")) {
+    //     // 초기에 읽지 않은 메시지를 가져옴
+    //     const notifications = await getUnreadNoti();
+    //     setUnreadNoti(notifications);
+    //
+    //     openBtn.onclick = () => {
+    //         miniDrawer.style.display = 'block';
+    //     };
+    //
+    //     closeBtn.onclick = () => {
+    //         miniDrawer.style.display = 'none';
+    //     };
+    //
+    //     // 바깥 클릭 시 닫기 (선택사항)
+    //     window.addEventListener("click", (e) => {
+    //         if (!miniDrawer.contains(e.target) && e.target !== openBtn) {
+    //             miniDrawer.style.display = 'none';
+    //         }
+    //     });
+    //
+    // }else {
 
         const openMiniDrawerHistoryBtn = document.getElementById("openMiniDrawerHistoryBtn");
         const closeMiniDrawerBtnHistoryBtn = document.getElementById("closeMiniDrawerBtnHistoryBtn");
@@ -315,7 +315,7 @@ async function initSideBar(){
             miniDrawer.style.display = 'block';
         });
 
-    }
+    // }
 }
 
 async function getUnreadNoti() {
