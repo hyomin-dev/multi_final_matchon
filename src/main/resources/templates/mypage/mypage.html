@@ -296,6 +296,7 @@
         <h1>마이페이지</h1>
 
         <div th:switch="${memberRole}">
+            <!-- USER용 -->
             <div th:case="'USER'" class="mypage-table">
                 <table>
                     <tr><th>이름</th><td th:text="${memberName}"></td></tr>
@@ -305,8 +306,10 @@
                     <tr><th>소속팀</th><td th:text="${teamName}"></td></tr>
                     <tr>
                         <th>이메일 수신 동의</th>
-                        <td><input type="checkbox" id="emailAgreementCheckbox"
-                                   th:checked="${emailAgreement} ? 'checked' : null"></td>
+                        <td>
+                            <input type="checkbox" id="emailAgreementCheckboxUser"
+                                   th:checked="${emailAgreement} ? 'checked' : null">
+                        </td>
                     </tr>
                 </table>
                 <div class="submit-btn-container">
@@ -314,6 +317,7 @@
                 </div>
             </div>
 
+            <!-- HOST용 -->
             <div th:case="'HOST'" class="mypage-table">
                 <table>
                     <tr><th>이름</th><td th:text="${memberName}"></td></tr>
@@ -325,9 +329,17 @@
                             <button type="button" id="scheduleButton">대회 등록하러 가기</button>
                         </td>
                     </tr>
+                    <tr>
+                        <th>이메일 수신 동의</th>
+                        <td>
+                            <input type="checkbox" id="emailAgreementCheckboxHost"
+                                   th:checked="${emailAgreement} ? 'checked' : null">
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>
+
     </main>
 </div>
 
@@ -403,22 +415,42 @@
             location.href = "/schedule";
         });
 
-        // 체크박스 변경 시 서버로 전송
-        const checkbox = document.getElementById("emailAgreementCheckbox");
-        checkbox?.addEventListener("change", () => {
-            const checked = checkbox.checked;
-            fetch("/mypage/email-agreement", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ emailAgreement: checked })
-            }).then(res => {
-                if (res.ok) alert("메일 수신 설정이 변경되었습니다.");
-                else res.text().then(msg => alert("변경 실패: " + msg));
+        // 사용자용 체크박스 이벤트 처리
+        const checkboxUser = document.getElementById("emailAgreementCheckboxUser");
+        if (checkboxUser) {
+            checkboxUser.addEventListener("change", () => {
+                updateEmailAgreement(checkboxUser.checked);
             });
-        });
+        }
+
+        // 호스트용 체크박스 이벤트 처리
+        const checkboxHost = document.getElementById("emailAgreementCheckboxHost");
+        if (checkboxHost) {
+            checkboxHost.addEventListener("change", () => {
+                updateEmailAgreement(checkboxHost.checked);
+            });
+        }
     });
+
+    function updateEmailAgreement(checked) {
+        fetch("/mypage/email-agreement", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ emailAgreement: checked }),
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) {
+                alert("메일 수신 설정이 변경되었습니다.");
+            } else {
+                res.text().then(msg => alert("변경 실패: " + msg));
+            }
+        }).catch(err => {
+            alert("요청 중 오류가 발생했습니다: " + err.message);
+        });
+    }
+
 
     function triggerUpload() {
         const input = document.getElementById("profileImageInput");

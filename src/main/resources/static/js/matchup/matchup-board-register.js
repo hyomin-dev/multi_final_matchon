@@ -95,7 +95,13 @@ function submitCheck(e){
         alert("경기 방식 소개를 입력하세요");
         e.preventDefault();
     } else{
-        alert("글 작성이 완료되었습니다.");
+
+        let reply = confirm("경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?");
+        if(reply){
+            alert("게시글이 등록되었습니다.")
+        }else{
+            e.preventDefault();
+        }
     }
 }
 

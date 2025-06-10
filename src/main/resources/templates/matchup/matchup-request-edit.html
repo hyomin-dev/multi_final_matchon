@@ -18,7 +18,7 @@
          th:data-sports-facility-name = "${resMatchupRequestDto.sportsFacilityName}"
          th:data-sports-facility-address="${resMatchupRequestDto.sportsFacilityAddress}"
          th:data-match-datetime="${resMatchupRequestDto.matchDatetime}"
-         th:data-match-duration="${resMatchupRequestDto.matchDuration}"
+         th:data-match-endtime="${resMatchupRequestDto.matchEndtime}"
          th:data-current-participant-count="${resMatchupRequestDto.currentParticipantCount}"
          th:data-max-participants="${resMatchupRequestDto.maxParticipants}"
          th:data-participant-count="${resMatchupRequestDto.participantCount}"
@@ -94,6 +94,7 @@
         <form th:object="${resMatchupRequestDto}" th:action="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}" method="post" id="request-info">
             <input type="hidden" th:field="*{requestId}">
             <input type="hidden" th:field="*{matchDatetime}">
+            <input type="hidden" th:field="*{matchEndtime}">
             <!--        <label>-->
             <!--            소개:-->
             <!--            <textarea cols="30" rows="5" placeholder="자기 소개를 입력하세요." th:text="*{selfIntro}" th:field="*{selfIntro}" required>-->

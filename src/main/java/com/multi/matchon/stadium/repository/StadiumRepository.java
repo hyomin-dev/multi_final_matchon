@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface StadiumRepository extends JpaRepository<Stadium, Long> {
 
     // 이름 키워드 검색
@@ -15,4 +17,8 @@ public interface StadiumRepository extends JpaRepository<Stadium, Long> {
 
     // 전체 조회
     Page<Stadium> findAll(Pageable pageable);
+
+    // 주소 키워드 검색
+    List<Stadium> findByStadiumAddressContainingIgnoreCase(String keyword);
+
 }

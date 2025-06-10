@@ -64,6 +64,7 @@ textarea{
 
 /*===========================================*/
 /*읽기 전용*/
+#matchDate,
 #teamName{
 
     padding: 10px 16px;

@@ -55,8 +55,10 @@ public class MatchupRatingService {
 
         MatchupBoard ratingMatchupBoard = matchupBoardRepository.findByBoardIDAndMemberAndMatchDatetimeIsRatingInitializedFalse(boardId, user.getMember()).orElseThrow(()->new ApiCustomException("Matchup 매너 온도 평가 세팅할 게시글이 아닙니다."));
 
-        if(!calMatchEndTime(ratingMatchupBoard.getMatchDatetime(), ratingMatchupBoard.getMatchDuration()).isBefore(LocalDateTime.now()))
-            throw new ApiCustomException("Matchup 매너 온도 평가 세팅할 시간이 아닙니다.");
+        if(LocalDateTime.now().isBefore(ratingMatchupBoard.getMatchEndtime()))
+            throw new ApiCustomException("Matchup 매너 온도 평가는 경기 종료 후에만 가능합니다.");
+                //!calMatchEndTime(ratingMatchupBoard.getMatchDatetime(), ratingMatchupBoard.getMatchDuration()).isBefore(LocalDateTime.now()))
+
 
         List<MatchupRequest> matchupRequests = matchupRequestRepository.findByBoardIdAndMemberAndGameParticipantConditionAndAfterMatchupDatetime(boardId, user.getMember());
         log.info("test");
@@ -132,7 +134,7 @@ public class MatchupRatingService {
     public Integer setMannerTemperatureAutoSetting() {
 
 
-        // 평가 대상이 되는 MatchupBoard를 모두 가져옴
+        // 경기가 종료된 MatchupBoard를 모두 가져옴
         List<MatchupBoard> ratingMatchupBoards = matchupBoardRepository.findByMatchDatetimeAndIsRatingInitializedFalse();
 
         // 평가세팅할 MatchupBoard가 없으면 0 반환, MatchupRequest 조회 안함
@@ -144,10 +146,6 @@ public class MatchupRatingService {
         List<MatchupRating> matchupRatings = new ArrayList<>();
 
         for(MatchupBoard ratingMatchupBoard: ratingMatchupBoards){
-
-            // 경기 종료가 안되었으면 평가 세팅 안되도록
-            if(!calMatchEndTime(ratingMatchupBoard.getMatchDatetime(), ratingMatchupBoard.getMatchDuration()).isBefore(LocalDateTime.now()))
-                continue;
 
             // 경기가 종료된 MatchupBoard에 대응되는 request 추출
             List<MatchupRequest> matchupRequestsWithBoard = matchupRequests.stream()
@@ -308,8 +306,4 @@ public class MatchupRatingService {
         return matchupRatingRepository.findDetailResMatchupRatingDtoByBoardIdAndEvalIdAndTargetId(boardId, evalId, targetId).orElseThrow(() ->new CustomException("Matchup 등록된 평가가 없습니다."));
     }
 
-    private LocalDateTime calMatchEndTime(LocalDateTime matchStart, LocalTime matchDuration){
-        return matchStart.plusHours(matchDuration.getHour()).plusMinutes(matchDuration.getMinute());
-
-    }
 }

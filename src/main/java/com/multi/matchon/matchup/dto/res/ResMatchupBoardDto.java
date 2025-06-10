@@ -38,7 +38,7 @@ public class ResMatchupBoardDto {
 
     private LocalDateTime matchDatetime;
 
-    private LocalTime matchDuration;
+    private LocalDateTime matchEndtime;
 
     private Integer currentParticipantCount;
 
