@@ -1,6 +1,6 @@
 server:
 
-  port: ${PORT}
+  port: 8090
 
 spring:
   profiles:
