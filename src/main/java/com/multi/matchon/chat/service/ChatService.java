@@ -476,69 +476,69 @@ public class ChatService {
                 .getId();
     }
 
-    public List<ResMyChatListDto> findRelevantRoomsForLeader(Long leaderId, Long teamId) {
-        // 1️⃣ Fetch private chats
-        List<ChatRoom> privateChats = chatParticipantRepository.findAllPrivateChatsForLeader(leaderId);
+//    public List<ResMyChatListDto> findRelevantRoomsForLeader(Long leaderId, Long teamId) {
+//        // 1️⃣ Fetch private chats
+//        List<ChatRoom> privateChats = chatParticipantRepository.findAllPrivateChatsForLeader(leaderId);
+//
+//        // 2️⃣ Fetch the team group chat room (if any)
+//        Optional<ChatRoom> groupChatOpt = chatRoomRepository.findTeamGroupChatRoom(teamId);
+//
+//        // 3️⃣ Combine all relevant rooms
+//        List<ChatRoom> allRelevantRooms = new ArrayList<>(privateChats);
+//        groupChatOpt.ifPresent(allRelevantRooms::add); // ✅ safe add
+//
+//        // 4️⃣ Convert to DTOs
+//        Member leader = memberRepository.findById(leaderId)
+//                .orElseThrow(() -> new IllegalArgumentException("리더 정보를 찾을 수 없습니다."));
+//
+//        return allRelevantRooms.stream()
+//                .map(room -> {
+//                    boolean isBlocked = chatUserBlockRepository.isBlocked(room.getId(), leaderId);
+//                    long unreadCount = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(room, leader);
+//                    return ResMyChatListDto.from(room, leaderId, isBlocked, unreadCount);
+//                })
+//                .toList();
+//    }
 
-        // 2️⃣ Fetch the team group chat room (if any)
-        Optional<ChatRoom> groupChatOpt = chatRoomRepository.findTeamGroupChatRoom(teamId);
-
-        // 3️⃣ Combine all relevant rooms
-        List<ChatRoom> allRelevantRooms = new ArrayList<>(privateChats);
-        groupChatOpt.ifPresent(allRelevantRooms::add); // ✅ safe add
-
-        // 4️⃣ Convert to DTOs
-        Member leader = memberRepository.findById(leaderId)
-                .orElseThrow(() -> new IllegalArgumentException("리더 정보를 찾을 수 없습니다."));
-
-        return allRelevantRooms.stream()
-                .map(room -> {
-                    boolean isBlocked = chatUserBlockRepository.isBlocked(room.getId(), leaderId);
-                    long unreadCount = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(room, leader);
-                    return ResMyChatListDto.from(room, leaderId, isBlocked, unreadCount);
-                })
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ResMyChatListDto> findAllRoomsForUser(Long userId) {
-        Member member = memberRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new CustomException("해당 회원이 존재하지 않습니다."));
-
-        List<ChatParticipant> chatParticipants = chatParticipantRepository.findAllByMemberIdAndIsDeletedFalse(userId);
-
-        Set<Long> blockedIds = chatUserBlockRepository.findAllByBlocker(member).stream()
-                .map(chatUserBlock -> chatUserBlock.getBlocked().getId())
-                .collect(Collectors.toSet());
-
-        List<ResMyChatListDto> resMyChatListDtos = new ArrayList<>();
-
-        for (ChatParticipant c : chatParticipants) {
-            Long count = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(c.getChatRoom(), member);
-            boolean isBlock = false;
-
-            if (!c.getChatRoom().getIsGroupChat()) {
-                Member opponent = c.getChatRoom().getChatParticipants().stream()
-                        .filter(p -> !p.getMember().getId().equals(member.getId()) && !p.getIsDeleted())
-                        .findFirst()
-                        .map(ChatParticipant::getMember)
-                        .orElse(null);
-                if (opponent != null) isBlock = blockedIds.contains(opponent.getId());
-            }
-
-            ResMyChatListDto dto = ResMyChatListDto.builder()
-                    .roomId(c.getChatRoom().getId())
-                    .roomName(c.getChatRoom().getChatRoomName())
-                    .isGroupChat(c.getChatRoom().getIsGroupChat())
-                    .isBlock(isBlock)
-                    .unReadCount(count)
-                    .build();
-
-            resMyChatListDtos.add(dto);
-        }
-
-        return resMyChatListDtos;
-    }
+//    @Transactional(readOnly = true)
+//    public List<ResMyChatListDto> findAllRoomsForUser(Long userId) {
+//        Member member = memberRepository.findByIdAndIsDeletedFalse(userId)
+//                .orElseThrow(() -> new CustomException("해당 회원이 존재하지 않습니다."));
+//
+//        List<ChatParticipant> chatParticipants = chatParticipantRepository.findAllByMemberIdAndIsDeletedFalse(userId);
+//
+//        Set<Long> blockedIds = chatUserBlockRepository.findAllByBlocker(member).stream()
+//                .map(chatUserBlock -> chatUserBlock.getBlocked().getId())
+//                .collect(Collectors.toSet());
+//
+//        List<ResMyChatListDto> resMyChatListDtos = new ArrayList<>();
+//
+//        for (ChatParticipant c : chatParticipants) {
+//            Long count = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(c.getChatRoom(), member);
+//            boolean isBlock = false;
+//
+//            if (!c.getChatRoom().getIsGroupChat()) {
+//                Member opponent = c.getChatRoom().getChatParticipants().stream()
+//                        .filter(p -> !p.getMember().getId().equals(member.getId()) && !p.getIsDeleted())
+//                        .findFirst()
+//                        .map(ChatParticipant::getMember)
+//                        .orElse(null);
+//                if (opponent != null) isBlock = blockedIds.contains(opponent.getId());
+//            }
+//
+//            ResMyChatListDto dto = ResMyChatListDto.builder()
+//                    .roomId(c.getChatRoom().getId())
+//                    .roomName(c.getChatRoom().getChatRoomName())
+//                    .isGroupChat(c.getChatRoom().getIsGroupChat())
+//                    .isBlock(isBlock)
+//                    .unReadCount(count)
+//                    .build();
+//
+//            resMyChatListDtos.add(dto);
+//        }
+//
+//        return resMyChatListDtos;
+//    }
 
     public List<ResMyChatListDto> findOnlyTeamChatRooms(Long memberId, Long teamId) {
         if (teamId == null) return Collections.emptyList();
@@ -584,7 +584,6 @@ public class ChatService {
 
         @Transactional
         public Integer removeGroupChatsAfterThreeDaysOfMatch () {
-
             //현재 시간 보다 3일 전 시간 구하기
             LocalDateTime thresholdTime = LocalDateTime.now().minusDays(3);
 
@@ -597,5 +596,55 @@ public class ChatService {
             return chatParticipants.size();
 
         }
+    public List<ResMyChatListDto> findAllTeamRelatedChats(Long memberId, Long teamId) {
+        if (teamId == null) return Collections.emptyList();
+
+        Member currentUser = memberRepository.findByIdAndIsDeletedFalse(memberId)
+                .orElseThrow(() -> new CustomException("해당 회원이 존재하지 않습니다."));
+
+        // ✅ Step 1: Get all chat participations for the current user
+        List<ChatParticipant> myParticipants = chatParticipantRepository.findAllByMemberIdAndIsDeletedFalse(memberId);
+
+        // ✅ Step 2: Get all chat rooms
+        Set<ChatRoom> privateWithTeam = myParticipants.stream()
+                .map(ChatParticipant::getChatRoom)
+                .filter(room -> !room.getIsGroupChat())
+                .filter(room ->
+                        room.getChatParticipants().stream()
+                                .anyMatch(p ->
+                                        p.getMember().getTeam() != null &&
+                                                p.getMember().getTeam().getId().equals(teamId)
+                                )
+                )
+                .collect(Collectors.toSet());
+
+        // ✅ Step 3: Get team group chat room
+        chatRoomRepository.findTeamGroupChatRoom(teamId).ifPresent(privateWithTeam::add);
+
+        // ✅ Step 4: Convert to DTOs, deduplicated
+        return privateWithTeam.stream()
+                .sorted(Comparator.comparing(ChatRoom::getCreatedDate))
+                .map(room -> {
+                    boolean isBlocked = false;
+
+                    if (!room.getIsGroupChat()) {
+                        Optional<Member> opponent = room.getChatParticipants().stream()
+                                .map(ChatParticipant::getMember)
+                                .filter(member -> !member.getId().equals(memberId))
+                                .findFirst();
+
+                        if (opponent.isPresent()) {
+                            isBlocked = chatUserBlockRepository
+                                    .findByBlockerAndBlocked(currentUser, opponent.get())
+                                    .isPresent();
+                        }
+                    }
+                    long unreadCount = messageReadLogRepository.countByChatRoomAndMemberAndIsReadFalse(room, currentUser);
+                    return ResMyChatListDto.from(room, memberId, isBlocked, unreadCount);
+                })
+                .toList();
     }
+
+}
+
 
