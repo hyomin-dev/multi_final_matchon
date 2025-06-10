@@ -18,8 +18,8 @@ spring:
       s3:
         bucket: ${S3_BUCKET}
         base-url: ${S3_BASE_URL}
-      region:
-        static: ${S3_REGION}
+        region: ${S3_REGION}
+#        static:
       stack:
         auto: false
   thymeleaf:
