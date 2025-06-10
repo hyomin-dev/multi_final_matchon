@@ -5,6 +5,7 @@ import com.multi.matchon.chat.repository.ChatRoomRepository;
 import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.exception.custom.CustomException;
+import com.multi.matchon.common.service.NotificationService;
 import com.multi.matchon.team.domain.Review;
 import com.multi.matchon.team.dto.res.ResJoinRequestDetailDto;
 import com.multi.matchon.team.dto.res.ResJoinRequestDto;
@@ -91,6 +92,7 @@ public class TeamService {
     private final ResponseRepository responseRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
+    private final NotificationService notificationService;
 
     @PersistenceContext
     private EntityManager em;
@@ -278,9 +280,11 @@ public class TeamService {
             PageRequest pageRequest,
             String recruitingPosition,
             String region,
-            Double teamRatingAverage) {
+            Double teamRatingAverage,
+            Boolean recruitmentStatus) {
 
         log.info("📌 teamRatingAverage = {}", teamRatingAverage);
+        log.info("📌 recruitmentStatus = {}", recruitmentStatus);
 
         // ✅ Convert enums safely
         PositionName positionName = null;
@@ -297,10 +301,10 @@ public class TeamService {
         Page<Team> teamPage;
         if (teamRatingAverage == null) {
             log.info("📤 Calling findWithoutRatingFilter() — no 별점 filter");
-            teamPage = teamRepository.findWithoutRatingFilter(positionName, regionType, pageRequest);
+            teamPage = teamRepository.findWithoutRatingFilter(positionName, regionType, recruitmentStatus, pageRequest);
         } else {
             log.info("📤 Calling findWithRatingFilter() — rating filter = {}", teamRatingAverage);
-            teamPage = teamRepository.findWithRatingFilter(positionName, regionType, teamRatingAverage, pageRequest);
+            teamPage = teamRepository.findWithRatingFilter(positionName, regionType, teamRatingAverage, recruitmentStatus, pageRequest);
         }
 
         // ✅ Transform to DTOs with image handling
@@ -479,8 +483,12 @@ public class TeamService {
             throw new IllegalArgumentException("자기소개는 최대 200단어까지 입력할 수 있습니다.");
         }
 
-        boolean exists = teamJoinRequestRepository.existsByMemberAndTeamAndIsDeletedFalse(member, team);
-        if (exists) throw new IllegalArgumentException("이미 요청한 팀입니다.");
+        // ✅ Change starts here
+        // ✅ Strict check: any past request blocks a new one
+        boolean alreadyRequested = teamJoinRequestRepository.existsByMemberAndTeam(member, team);
+        if (alreadyRequested) {
+            throw new IllegalArgumentException("이미 요청한 팀입니다.");
+        }
 
         TeamJoinRequest joinRequest = TeamJoinRequest.builder()
                 .member(member)
@@ -491,6 +499,16 @@ public class TeamService {
                 .build();
 
         teamJoinRequestRepository.save(joinRequest);
+
+        // find the team leader
+        Member leader = teamMemberRepository.findByTeamAndTeamLeaderStatusTrue(team)
+                .orElseThrow(() -> new IllegalStateException("팀 리더를 찾을 수 없습니다."))
+                .getMember(); // 👈 FIX HERE
+
+        String message = "[팀 가입 신청] " + member.getMemberName() + "님이 팀에 가입 신청했습니다.";
+        String url = "/team/team/" + team.getId() + "/join-request/" + joinRequest.getId();
+
+        notificationService.sendNotification(leader, message, url);
     }
     @Transactional(readOnly = true)
     public List<ResJoinRequestDto> getJoinRequestsForTeam(Long teamId, CustomUser user) {
@@ -521,9 +539,30 @@ public class TeamService {
             throw new IllegalStateException("이미 처리된 요청입니다.");
         }
 
+        Member member = request.getMember(); // 가입 신청한 사용자
+
+        // 🚫 이미 팀에 속해 있는 경우
+        if (member.getTeam() != null) {
+
+            // ✅ 팀 리더 찾기
+            TeamMember leader = teamMemberRepository.findByTeamAndTeamLeaderStatusTrue(request.getTeam())
+                    .orElseThrow(() -> new IllegalStateException("팀 리더를 찾을 수 없습니다."));
+
+            // ❗ 알림을 보낼 수도 있음 (선택)
+            notificationService.sendNotification(
+                    leader.getMember(), // 팀장에게 알림 전송
+                    "[거절 자동 처리] " + member.getMemberName() + "님은 이미 다른 팀에 속해 있어 요청이 거절되었습니다.",
+                    "/team/team/" + request.getTeam().getId()
+            );
+
+            // 예외로 컨트롤러에 메시지 전달
+            throw new IllegalStateException("이미 팀이 있는 사용자 입니다.");
+        }
+
+
         request.approved();
 
-        Member member = request.getMember(); // 가입 신청한 사용자
+
         Team team = request.getTeam();       // 해당 팀
 
 
@@ -539,6 +578,12 @@ public class TeamService {
         // ✅ member 테이블에 team_id 업데이트
         member.setTeam(team);
         memberRepository.save(member); // 명시적으로 저장 (선택사항이지만 안전)
+
+        Member applicant = request.getMember();
+        String message = "[가입 승인] " + team.getTeamName() + "팀 가입이 승인되었습니다.";
+        String url = "team/team/" + team.getId(); // or /my-team if you redirect them to their team page
+
+        notificationService.sendNotification(applicant, message, url);
 
 
         ChatRoom teamGroupChatRoom = Optional.ofNullable(team.getChatRoom())
@@ -559,6 +604,13 @@ public class TeamService {
         }
 
         request.denied();
+        Member applicant = request.getMember();
+        Team team = request.getTeam();
+
+        String message = "[가입 거절] " + team.getTeamName() + "팀 가입 신청이 거절되었습니다.";
+        String url = "team/team/" + team.getId(); // optional: could just send them to team list
+
+        notificationService.sendNotification(applicant, message, url);
     }
 
     @Transactional(readOnly = true)
@@ -960,6 +1012,36 @@ public class TeamService {
     }
     public int countPendingJoinRequests(Long teamId) {
         return teamJoinRequestRepository.countPendingByTeamId(teamId);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponseDto<ResJoinRequestDto> getJoinRequestsForTeam(Long teamId, CustomUser user, PageRequest pageRequest) {
+        Team team = teamRepository.findByIdNotDeleted(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+
+        Member currentUser = memberRepository.findByMemberEmail(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        boolean isLeader = teamMemberRepository.existsByTeamAndMemberAndTeamLeaderStatusTrue(team, currentUser);
+        if (!isLeader) {
+            throw new IllegalArgumentException("팀 리더만 신청 목록을 조회할 수 있습니다.");
+        }
+
+        Page<TeamJoinRequest> requests = teamJoinRequestRepository.findByTeam(team, pageRequest);
+
+        Page<ResJoinRequestDto> dtoPage = requests.map(ResJoinRequestDto::from);
+
+        return PageResponseDto.<ResJoinRequestDto>builder()
+                .items(dtoPage.getContent())
+                .pageInfo(PageResponseDto.PageInfoDto.builder()
+                        .page(dtoPage.getNumber())
+                        .size(dtoPage.getNumberOfElements())
+                        .totalElements(dtoPage.getTotalElements())
+                        .totalPages(dtoPage.getTotalPages())
+                        .isFirst(dtoPage.isFirst())
+                        .isLast(dtoPage.isLast())
+                        .build())
+                .build();
     }
 }
 

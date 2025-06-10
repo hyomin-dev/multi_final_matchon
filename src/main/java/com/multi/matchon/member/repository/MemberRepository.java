@@ -59,4 +59,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findAllByTeam(Team team);
 
     List<Member> findByMemberRoleAndIsDeletedFalse(MemberRole role);
+
+    List<Member> findAllByTeamIdAndIsDeletedFalse(Long teamId);
 }

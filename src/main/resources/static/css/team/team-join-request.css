@@ -43,3 +43,11 @@
     background-color: #f44336;
     color: white;
 }
+
+.intro-text {
+    display: block;
+    max-width: 100%;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
