@@ -10,5 +10,6 @@ public class CommentResponse {
     private String createdDate;
     private String content;
     private Long commentId;
+    private Long memberId;
 }
 

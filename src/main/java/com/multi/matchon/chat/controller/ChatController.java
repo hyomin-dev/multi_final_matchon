@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,7 +34,7 @@ public class ChatController {
     private final ChatService chatService;
 
     // 등록
-
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/my/room")
     public ModelAndView showPrivateChatPageByRoomId(@RequestParam("roomId") Long roomId, ModelAndView mv){
         mv.setViewName("chat/private-chat");
@@ -42,6 +43,7 @@ public class ChatController {
     }
 
     // private-chat page로 이동
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/private")
     public ModelAndView showPrivateChatPageByReceiverId(@RequestParam("receiverId") Long receiverId, ModelAndView mv){
         mv.setViewName("chat/private-chat");
@@ -50,6 +52,7 @@ public class ChatController {
     }
 
     // private-chat room 생성 또는 조회
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @ResponseBody
     @GetMapping("/room/private")
     public ResponseEntity<ApiResponse<Long>> getPrivateChatRoom(@RequestParam Long receiverId, @AuthenticationPrincipal CustomUser user){
@@ -63,6 +66,7 @@ public class ChatController {
     /*
     * private chat room 페이지 이동
     * */
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/my/rooms")
     public String showMyChatRooms(){
         return "chat/my-chat-list";
@@ -72,6 +76,7 @@ public class ChatController {
     * 내가 속한 채팅방 목록 전달하는 메서드
     * */
     //팀 채팅 목록에서 팀 채팅 만 보이도록 수정
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/my/rooms")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getMyChatRooms(@AuthenticationPrincipal CustomUser user) {
@@ -101,6 +106,7 @@ public class ChatController {
     /*
     * 내가 속한 채팅방에서 대화 기록 전달하는 메서드
     * */
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/history{roomId}")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<ResChatDto>>> getChatHistory(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
@@ -112,6 +118,7 @@ public class ChatController {
     /*
     * 로그인한 유저가 지정한 roomId에 채팅 참여자 인지 체크
     * */
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/check/my/rooms")
     @ResponseBody
     public ResponseEntity<ApiResponse<?>> checkRoomParticipant(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
@@ -124,6 +131,7 @@ public class ChatController {
     /*
     * 특정 group chat room 페이지 이동
     * */
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/group/room")
     public ModelAndView showGroupChatPageByRoomId(@RequestParam("roomId") Long roomId, ModelAndView mv){
         mv.setViewName("chat/group-chat");
@@ -134,6 +142,7 @@ public class ChatController {
     /*
     * 그룹 채팅방 참가자 불러오기
     * */
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/group/participants")
     @ResponseBody ResponseEntity<ApiResponse<List<ResGroupChatParticipantListDto>>> getGroupChatAllParticipant(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
         List<ResGroupChatParticipantListDto> resGroupChatParticipantListDtos = chatService.findGroupChatAllParticipant(roomId, user);
@@ -143,6 +152,7 @@ public class ChatController {
 
 
     //수정
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/room/read")
     @ResponseBody
     public ResponseEntity<?> readAllMessage(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
@@ -152,6 +162,7 @@ public class ChatController {
 
 
     // 1대1 채팅에서 상대방을 차단
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/room/private/block")
     public String blockUser(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
         chatService.blockUser(roomId, user);
@@ -159,6 +170,7 @@ public class ChatController {
     }
 
     //api용, 1대1 채팅에서 상대방을 차단
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/room/private/api/block")
     @ResponseBody
     public ResponseEntity<?> blockUserWithApi(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user) {
@@ -167,6 +179,7 @@ public class ChatController {
     }
 
     // 1대1 채팅에서 상대방을 차단해제
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/room/private/unblock")
     public String unblockUser(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user){
         chatService.unblockUser(roomId, user);
@@ -174,6 +187,7 @@ public class ChatController {
     }
 
     //api용, 1대1 채팅에서 상대방을 차단해제
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/room/private/api/unblock")
     @ResponseBody
     public ResponseEntity<?> unblockUserWithApi(@RequestParam("roomId") Long roomId, @AuthenticationPrincipal CustomUser user) {
