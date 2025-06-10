@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ public class MatchupBoardController {
 
     // 게시글 작성하기
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/register")
     public ModelAndView showMatchupBoardRegisterPage (ModelAndView mv){
         mv.setViewName("/matchup/matchup-board-register");
@@ -42,6 +44,7 @@ public class MatchupBoardController {
         return mv;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/register")
     public String registerMatchupBoard(@Valid @ModelAttribute ReqMatchupBoardDto reqMatchupBoardDto, @AuthenticationPrincipal CustomUser user){
         matchupBoardService.registerMatchupBoard(reqMatchupBoardDto, user);
@@ -50,7 +53,7 @@ public class MatchupBoardController {
     }
 
     // 게시글 상세 조회
-
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/detail")
     public ModelAndView getMatchupBoardDetail(@RequestParam("matchup-board-id") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
         log.info("matchup-board-id: {}",boardId);
@@ -61,7 +64,7 @@ public class MatchupBoardController {
     }
 
     // 게시글 전체 목록 조회
-
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping
     public ModelAndView showMatchupBoardPage(ModelAndView mv){
         mv.setViewName("matchup/matchup-board-list");
@@ -72,6 +75,7 @@ public class MatchupBoardController {
     /*
     * 전체 Matchup 게시글 목록을 가져오는 메서드
     * */
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/list")
     @ResponseBody
     public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> listMatchupBoardByFilter(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size, @RequestParam("sportsType") String sportsType, @RequestParam("region") String region, @RequestParam("date") String date, @RequestParam("availableFilter") Boolean availableFilter, @AuthenticationPrincipal CustomUser user){
@@ -81,7 +85,7 @@ public class MatchupBoardController {
     }
 
     // 게시글 내가 작성한 글 목록 조회
-
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/my")
     public String showMyBoardPage(){
         return "matchup/matchup-board-my";
@@ -90,6 +94,7 @@ public class MatchupBoardController {
     /*
      * 내가 작성한 Matchup 게시글 목록을 가져오는 메서드
      * */
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/my/list")
     @ResponseBody
     public ResponseEntity<ApiResponse<PageResponseDto<ResMatchupBoardListDto>>> listMyMatchupBoardByFilter(@RequestParam("page") int page, @RequestParam(value="size", required = false, defaultValue = "4") int size , @AuthenticationPrincipal CustomUser user, @RequestParam("sportsType") String sportsType, @RequestParam("date") String date, @RequestParam("availableFilter") Boolean availableFilter){
@@ -103,6 +108,7 @@ public class MatchupBoardController {
     /*
     * Matchup 게시글 수정하기 페이지로 이동
     * */
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/edit")
     public ModelAndView showMatchupBoardEditPage(@RequestParam("boardId") Long boardId, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
         ResMatchupBoardDto resMatchupBoardDto = matchupBoardService.findMatchupBoardByBoardId(boardId, user);
@@ -111,6 +117,7 @@ public class MatchupBoardController {
         return mv;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/edit")
     public ModelAndView editMatchupBoard(@Valid @ModelAttribute ReqMatchupBoardEditDto reqMatchupBoardEditDto, ModelAndView mv, @AuthenticationPrincipal CustomUser user){
         matchupBoardService.updateBoard(reqMatchupBoardEditDto, user);
@@ -121,6 +128,7 @@ public class MatchupBoardController {
         return mv;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/delete")
     public String softDeleteBoard(@RequestParam("boardId") Long boardId, @AuthenticationPrincipal CustomUser user){
         matchupBoardService.softDeleteMatchupBoard(boardId, user);
