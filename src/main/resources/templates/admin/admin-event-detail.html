@@ -37,6 +37,11 @@
             <input type="hidden" name="status" value="DENIED">
             <button type="submit" class="btn deny-btn">반려</button>
         </form>
+        <th:block th:if="${statusLabel == '승인'}">
+            <form th:action="@{'/admin/event/' + ${event.id} + '/delete'}" method="post" style="display: inline;">
+                <button type="submit" class="btn delete-btn" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
+            </form>
+        </th:block>
     </div>
 </div>
 
