@@ -8,6 +8,8 @@ import com.multi.matchon.matchup.dto.req.ReqMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardListDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupBoardOverviewDto;
 import com.multi.matchon.member.domain.Member;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -65,7 +67,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             t1.sportsFacilityName,
             t1.sportsFacilityAddress,
             t1.matchDatetime,
-            t1.matchDuration,
+            t1.matchEndtime,
             t1.currentParticipantCount,
             t1.maxParticipants,
             t1.minMannerTemperature,
@@ -97,7 +99,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             t1.sportsFacilityName,
             t1.sportsFacilityAddress,
             t1.matchDatetime,
-            t1.matchDuration,
+            t1.matchEndtime,
             t1.currentParticipantCount,
             t1.maxParticipants,
             t1.minMannerTemperature,
@@ -135,7 +137,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             t1.sportsFacilityName,
             t1.sportsFacilityAddress,
             t1.matchDatetime,
-            t1.matchDuration,
+            t1.matchEndtime,
             t1.currentParticipantCount,
             t1.maxParticipants)
             from MatchupBoard t1 join t1.sportsType t2
@@ -162,7 +164,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
                 t1.sportsFacilityName,
                 t1.sportsFacilityAddress,
                 t1.matchDatetime,
-                t1.matchDuration,
+                t1.matchEndtime,
                 t1.currentParticipantCount,
                 t1.maxParticipants
             )
@@ -181,86 +183,6 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             """)
     Long countTodayMatchupBoards(@Param("memberId") Long memberId, @Param("before24") LocalDateTime before24);
 
-
-
-//    @Query("""
-//        select case
-//            when t1.isDeleted=true then false
-//            when t1.matchupStatus =com.multi.matchon.common.domain.Status.PENDING then true
-//            when t1.matchupStatus =com.multi.matchon.common.domain.Status.APPROVED then true
-//            when t1.matchupStatus =com.multi.matchon.common.domain.Status.DENIED then false
-//            else false
-//            end
-//        from MatchupRequest t1
-//        where t1.matchupBoard.id =:boardId and t1.member.id=:memberId
-//
-//        """)
-
-
-
-
-//    @Query("""
-//            select new com.multi.matchon.matchup.dto.res
-//            .ResMatchupBoardListDto(
-//            t1.id,
-//            t2.memberEmail,
-//            t3.teamName,
-//            t4.sportsTypeName,
-//            t1.sportsFacilityName,
-//            t1.sportsFacilityAddress,
-//            t1.matchDatetime,
-//            t1.matchDuration,
-//            t1.currentParticipantCount,
-//            t1.maxParticipants,
-//            t1.minMannerTemperature)
-//            from MatchupBoard t1
-//            join t1.member t2
-//            join t2.team t3
-//            join t1.sportsType t4
-//            order by t1.id DESC
-//            """)
-//    List<ResMatchupBoardListDto> findBoardListTest();
-//
-//    @Query("""
-//            select new com.multi.matchon.matchup.dto.res
-//            .ResMatchupBoardListDto(
-//            t1.id,
-//            t2.memberEmail,
-//            t3.teamName,
-//            t4.sportsTypeName,
-//            t1.sportsFacilityName,
-//            t1.sportsFacilityAddress,
-//            t1.matchDatetime,
-//            t1.matchDuration,
-//            t1.currentParticipantCount,
-//            t1.maxParticipants,
-//            t1.minMannerTemperature)
-//            from MatchupBoard t1
-//            join t1.member t2
-//            join t2.team t3
-//            join t1.sportsType t4
-//            order by t1.createdDate DESC
-//            """)
-//    Page<ResMatchupBoardListDto> findBoardListTest2(Pageable pageable);
-
-//    @Query("""
-//            select t2
-//            from MatchupBoard t1
-//            join fetch t1.matchupRequests t2
-//            where t1.isDeleted=false and t1.id=:boardId and t1.matchDatetime < CURRENT_TIMESTAMP and t1.writer=:loginMember and
-//            (
-//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t2.matchupRequestSubmittedCount=1 and t2.matchupCancelSubmittedCount=0 and t2.isDeleted=false) or
-//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t2.matchupRequestSubmittedCount=2 and t2.matchupCancelSubmittedCount=0 and t2.isDeleted=false) or
-//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t2.matchupRequestSubmittedCount=1 and t2.matchupCancelSubmittedCount=1 and t2.isDeleted=false) or
-//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.APPROVED and t2.matchupRequestSubmittedCount=2 and t2.matchupCancelSubmittedCount=1 and t2.isDeleted=false) or
-//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t2.matchupRequestSubmittedCount=1 and t2.matchupCancelSubmittedCount=1 and t2.isDeleted=false) or
-//                (t2.matchupStatus=com.multi.matchon.common.domain.Status.CANCELREQUESTED and t2.matchupRequestSubmittedCount=2 and t2.matchupCancelSubmittedCount=1 and t2.isDeleted=false)
-//            )
-//
-//            """)
-//    List<MatchupRequest> findByBoardIdAndMemberAndGameParticipantCondition(@Param("boardId") Long boardId, @Param("loginMember") Member loginMember);
-
-
     @Query("""
             select
                t1
@@ -274,7 +196,7 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
                t1
             from MatchupBoard t1
             join fetch t1.writer
-            where t1.isDeleted =false and t1.matchDatetime<CURRENT_TIMESTAMP and t1.isRatingInitialized=false and t1.writer.isDeleted=false
+            where t1.isDeleted =false and t1.matchEndtime<CURRENT_TIMESTAMP and t1.isRatingInitialized=false and t1.writer.isDeleted=false
             """)
     List<MatchupBoard> findByMatchDatetimeAndIsRatingInitializedFalse();
 
@@ -287,4 +209,14 @@ public interface MatchupBoardRepository extends JpaRepository <MatchupBoard, Lon
             """)
     List<MatchupBoard> findUnnotifiedBoardsAtThreeHoursBeforeMatch(@Param("threeHoursLater") LocalDateTime threeHoursLater);
 
+    @Query("""
+            select case
+                        when count(t1) >0 then true
+                        else false
+                    end
+            from MatchupBoard t1
+            where t1.isDeleted =false and t1.writer=:loginMember and
+            (:startTime<t1.matchEndtime and :endTime > t1.matchDatetime )
+            """)
+    Boolean findByMemberAndStartTimeAndEndTime(@Param("loginMember") Member loginMember,@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
 }

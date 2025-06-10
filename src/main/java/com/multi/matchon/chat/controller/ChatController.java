@@ -190,13 +190,13 @@ public class ChatController {
     // 삭제
 
 
-    @PostMapping("/my/rooms/team")
+    @GetMapping("/my/rooms/team")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<ResMyChatListDto>>> getMyTeamChatRooms(@AuthenticationPrincipal CustomUser user) {
         Long memberId = user.getMember().getId();
         Long teamId = user.getMember().getTeam() != null ? user.getMember().getTeam().getId() : null;
 
-        List<ResMyChatListDto> chatRooms = chatService.findOnlyTeamChatRooms(memberId, teamId);
+        List<ResMyChatListDto> chatRooms = chatService.findAllTeamRelatedChats(memberId, teamId);
 
         return ResponseEntity.ok().body(ApiResponse.ok(chatRooms));
     }
@@ -218,5 +218,21 @@ public class ChatController {
         Long memberId = user.getMember().getId();
         List<ResMyChatListDto> privateRooms = chatService.findOnlyPrivateChats(memberId); // you implement this
         return ResponseEntity.ok(ApiResponse.ok(privateRooms));
+    }
+
+    // 👉 차단 (Team Chat List 용)
+    @GetMapping("/room/private/team/block")
+    public String blockUserFromTeamChatList(@RequestParam("roomId") Long roomId,
+                                            @AuthenticationPrincipal CustomUser user) {
+        chatService.blockUser(roomId, user);
+        return "redirect:/chat/my/rooms/team/view"; // 🟦 redirect to team chat list page
+    }
+
+    // 👉 차단 해제 (Team Chat List 용)
+    @GetMapping("/room/private/team/unblock")
+    public String unblockUserFromTeamChatList(@RequestParam("roomId") Long roomId,
+                                              @AuthenticationPrincipal CustomUser user) {
+        chatService.unblockUser(roomId, user);
+        return "redirect:/chat/my/rooms/team/view"; // 🟦 same as above
     }
 }

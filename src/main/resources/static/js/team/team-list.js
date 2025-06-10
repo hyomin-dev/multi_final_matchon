@@ -5,6 +5,8 @@ function loadTeamPage(page) {
     const position = document.getElementById('recruiting-position').value;
     const ratingValue = document.getElementById('rating-filter').value;
     const rating = ratingValue === "" ? null : parseFloat(ratingValue);
+    const recruitmentStatusValue = document.getElementById('recruitmentStatus').value;
+    const recruitmentStatus = recruitmentStatusValue === "" ? null : recruitmentStatusValue;
 
     // study!! - Using URL object for proper query parameter handling
     const url = new URL(`/team/team/list`, window.location.origin);
@@ -12,7 +14,7 @@ function loadTeamPage(page) {
     if (region) url.searchParams.set("region", region);
     if (position) url.searchParams.set("recruitingPosition", position);
     if (rating !== null) url.searchParams.set("teamRatingAverage", rating);
-
+    if (recruitmentStatus !== null) url.searchParams.set("recruitmentStatus", recruitmentStatus);
     // study!! - Single fetch call with proper error handling
     fetch(url)
         .then(res => {

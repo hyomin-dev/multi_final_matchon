@@ -92,6 +92,7 @@ function renderList(items){
 
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
+        const end = new Date(item.matchEndtime);
 
         const card = document.createElement("tr");
         card.className = "matchup-card";
@@ -99,7 +100,7 @@ function renderList(items){
                 <td>${setSportsType(item.sportsTypeName)}</td>
                 <td class="truncate">${item.sportsFacilityAddress}</td>
                 <td>📅 ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
-                                ${calTime(item, date.getHours(), date.getMinutes())}</td>
+                                ${end.getHours()}시 ${end.getMinutes()}분</td>
                 <td>${checkMatchStatus(item)}</td>
                 <td>( ${item.currentParticipantCount} / ${item.maxParticipants} )</td>
                 <td>${item.participantCount}</td>
@@ -228,13 +229,14 @@ function calTime(item, startHour, startMinute){
 function checkMatchStatus(item){
 
     const matchDate = new Date(item.matchDatetime);
+    const endMatchDate = new Date(item.matchEndtime);
     const now = new Date();
-    const durationParts = item.matchDuration.split(":");
-    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+    // const durationParts = item.matchDuration.split(":");
+    // const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
 
-    if(matchDate <now && now <= matchEnd)
+    if(matchDate <now && now <= endMatchDate)
         return "경기 진행";
-    else if(matchEnd<now)
+    else if(endMatchDate<now)
         return "경기 종료";
     else
         return "경기 시작전"

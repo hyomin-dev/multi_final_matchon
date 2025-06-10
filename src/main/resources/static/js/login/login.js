@@ -5,8 +5,10 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
-
-    const storedRedirectUrl = localStorage.getItem("loginRedirectUrl") || "/main";
+    let redirect = localStorage.getItem("loginRedirectUrl");
+    if (!redirect || redirect === "null" || redirect === "undefined" || redirect === "/signup") {
+        redirect = "/main";
+    }
 
     fetch("/auth/login", {
         method: "POST",
@@ -30,15 +32,9 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
             }
 
             alert("로그인 성공!");
-            setTimeout(() => {
-                window.location.href = storedRedirectUrl;
-                localStorage.removeItem("loginRedirectUrl");
-            }, 300);
 
+            window.location.href = "/main";
         })
-        .catch(err => {
-            alert("에러: " + err.message);
-        });
 });
 
 // 로그인 페이지 진입 시 팝업 조건 확인

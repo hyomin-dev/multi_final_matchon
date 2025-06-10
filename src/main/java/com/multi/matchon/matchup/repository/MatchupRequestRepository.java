@@ -7,6 +7,8 @@ import com.multi.matchon.matchup.dto.res.ResMatchupRequestDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestListDto;
 import com.multi.matchon.matchup.dto.res.ResMatchupRequestOverviewListDto;
 import com.multi.matchon.member.domain.Member;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,7 +33,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             t2.sportsFacilityName,
             t2.sportsFacilityAddress,
             t2.matchDatetime,
-            t2.matchDuration,
+            t2.matchEndtime,
             t2.currentParticipantCount,
             t2.maxParticipants,
             t1.participantCount,
@@ -66,7 +68,7 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             t3.sportsFacilityName,
             t3.sportsFacilityAddress,
             t3.matchDatetime,
-            t3.matchDuration,
+            t3.matchEndtime,
             t3.currentParticipantCount,
             t3.maxParticipants,
             t1.participantCount,
@@ -271,4 +273,14 @@ public interface MatchupRequestRepository extends JpaRepository<MatchupRequest, 
             )
             """)
     List<MatchupRequest> findUnnotifiedRequestsAtThreeHoursBeforeMatch(@Param("threeHoursLater") LocalDateTime threeHoursLater);
+
+
+    @Query("""
+            select t1
+            from MatchupRequest t1
+            join t1.matchupBoard t2
+            where t1.member=:loginMember and t2.isDeleted =false and
+            (:startTime<t2.matchEndtime and :endTime > t2.matchDatetime )
+            """)
+    List<MatchupRequest> findByMemberAndStartTimeAndEndTime(@Param("loginMember") Member loginMember,@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
 }
