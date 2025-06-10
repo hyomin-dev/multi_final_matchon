@@ -102,22 +102,44 @@ label[for="availableOnly"], label:has(#availableOnly) {
 }
 
 
-#filterBtn{
+/* 검색 버튼 스타일 */
+#filterBtn {
     background-color: dodgerblue;
     color: white;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color 0.3s;
-}
-#filterBtn:hover{
-    background-color: royalblue;
+    transition: all 0.3s ease;
 }
 
+#filterBtn:hover {
+    background-color: royalblue;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+}
+
+.create-btn {
+    background-color: dodgerblue;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.create-btn:hover {
+    background-color: royalblue;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+}
 
 /* 이거 추가: 버튼 그룹 우측 정렬 */
 .topbar-buttons {
@@ -127,26 +149,28 @@ label[for="availableOnly"], label:has(#availableOnly) {
     justify-content: flex-end;
 }
 
-.button-group,
-.topbar-buttons button {
-    background-color: dodgerblue;
+.topbar-buttons .back-btn {
+    background-color: #888;
     color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
     font-weight: bold;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
     cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.3s;
+    transition: all 0.2s ease;
 }
 
-.button-group:hover,
-.topbar-buttons button:hover {
-    background-color: royalblue;
-
+.topbar-buttons .back-btn:hover {
+    background-color: #666;
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.topbar-buttons .back-btn:active {
+    transform: translateY(2px);
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+}
 
 .button-group,
 .disabled {
@@ -168,60 +192,6 @@ label[for="availableOnly"], label:has(#availableOnly) {
     background-color: #bcbcbc;
     color: white;
 }
-
-
-/*!* 버튼 색상 *!*/
-/*.create-btn {*/
-/*    background-color: #004080;*/
-/*    color: white;*/
-/*}*/
-/*.create-btn:hover {*/
-/*    background-color: #003060;*/
-/*    transform: translateY(-2px);*/
-/*}*/
-
-/*.back-btn {*/
-/*    background-color: #888;*/
-/*    color: white;*/
-/*}*/
-/*.back-btn:hover {*/
-/*    background-color: #666;*/
-/*    transform: translateY(-2px);*/
-/*}*/
-
-/*.group-chat {*/
-/*    background-color: #007bff;*/
-/*    color: white;*/
-/*}*/
-/*.group-chat:hover {*/
-/*    background-color: #0056b3;*/
-/*}*/
-
-/*.rating-setting {*/
-/*    background-color: #e67e22;*/
-/*    color: white;*/
-/*}*/
-/*.rating-setting:hover {*/
-/*    background-color: #cf711c;*/
-/*}*/
-
-/*.detail {*/
-/*    background-color: #004080;*/
-/*    color: white;*/
-/*}*/
-/*.detail:hover {*/
-/*    background-color: #003060;*/
-/*}*/
-
-/*.request {*/
-/*    background-color: #007a00;*/
-/*    color: white;*/
-/*}*/
-/*.request:hover {*/
-/*    background-color: #005a00;*/
-/*}*/
-
-
 
 
 
