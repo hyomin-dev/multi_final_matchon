@@ -31,6 +31,16 @@
         } else if(errorMessage.includes("blockUser")){
             alert(errorMessage);
             window.location.href="/chat/my/rooms"
+        }else if(errorMessage.includes("Unauthorization")){
+            alert(errorMessage);
+            window.location.href="/";
+        }
+        else if(errorMessage.includes(403)){
+            alert(errorMessage);
+            window.location.href ="/";
+        } else if(errorMessage.includes(401)){
+            alert(errorMessage);
+            window.location.href ="/";
         }
         else{
             alert("알 수 없는 오류로 인해 메인 페이지로 이동합니다.")

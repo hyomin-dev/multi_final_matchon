@@ -15,7 +15,7 @@ public class ResMatchupMyGameListDto {
 
     private LocalDateTime matchDatetime;
 
-    private LocalTime matchDuration;
+    private LocalDateTime matchEndtime;
 
     private SportsTypeName sportsTypeName;
 
@@ -25,15 +25,21 @@ public class ResMatchupMyGameListDto {
 
     private Boolean isRatingInitialized;
 
+    private Integer currentParticipantCount;
+
+    private Integer maxParticipants;
 
 
-    public ResMatchupMyGameListDto(Long boardId, LocalDateTime matchDatetime, LocalTime matchDuration, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, Boolean isRatingInitialized) {
+
+    public ResMatchupMyGameListDto(Long boardId, LocalDateTime matchDatetime, LocalDateTime matchEndtime, SportsTypeName sportsTypeName, String sportsFacilityName, String sportsFacilityAddress, Boolean isRatingInitialized, Integer currentParticipantCount, Integer maxParticipants) {
         this.boardId = boardId;
         this.matchDatetime = matchDatetime;
-        this.matchDuration = matchDuration;
+        this.matchEndtime = matchEndtime;
         this.sportsFacilityAddress = sportsFacilityAddress;
         this.sportsFacilityName = sportsFacilityName;
         this.sportsTypeName = sportsTypeName;
         this.isRatingInitialized = isRatingInitialized;
+        this.currentParticipantCount = currentParticipantCount;
+        this.maxParticipants = maxParticipants;
     }
 }

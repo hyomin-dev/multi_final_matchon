@@ -5,6 +5,11 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
+    let redirect = localStorage.getItem("loginRedirectUrl");
+    if (!redirect || redirect === "null" || redirect === "undefined" || redirect === "/signup") {
+        redirect = "/main";
+    }
+
     fetch("/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -27,12 +32,9 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
             }
 
             alert("로그인 성공!");
-            window.location.href = "/main";
 
+            window.location.href = "/main";
         })
-        .catch(err => {
-            alert("에러: " + err.message);
-        });
 });
 
 // 로그인 페이지 진입 시 팝업 조건 확인

@@ -18,6 +18,7 @@ public class ReqMatchupRequestDto {
     @NotNull(message = "Matchup Board ")
     private Long boardId;
 
+    private String writerName;
 
     private SportsTypeName sportsTypeName;
 
@@ -31,7 +32,7 @@ public class ReqMatchupRequestDto {
     private LocalDateTime matchDatetime;
 
 
-    private LocalTime matchDuration;
+    private LocalDateTime matchEndtime;
 
 
     private Integer currentParticipantCount;
@@ -45,14 +46,15 @@ public class ReqMatchupRequestDto {
     @NotNull
     private Integer participantCount;
 
-    public ReqMatchupRequestDto(Long boardId, SportsTypeName sportsTypeName, String sportsFacilityName,  String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount,  Integer maxParticipants){
+    public ReqMatchupRequestDto(Long boardId, String writerName, SportsTypeName sportsTypeName, String sportsFacilityName,  String sportsFacilityAddress, LocalDateTime matchDatetime, LocalDateTime matchEndtime, Integer currentParticipantCount,  Integer maxParticipants){
         this.boardId = boardId;
         this.currentParticipantCount = currentParticipantCount;
         this.matchDatetime = matchDatetime;
-        this.matchDuration = matchDuration;
+        this.matchEndtime = matchEndtime;
         this.maxParticipants = maxParticipants;
         this.sportsFacilityAddress = sportsFacilityAddress;
         this.sportsFacilityName = sportsFacilityName;
         this.sportsTypeName = sportsTypeName;
+        this.writerName = writerName;
     }
 }

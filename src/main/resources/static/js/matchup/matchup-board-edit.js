@@ -1,8 +1,9 @@
+
+
 document.addEventListener("DOMContentLoaded",()=>{
 
     const editDto = document.querySelector("#matchup-board-edit-dto");
 
-    const boardId = Number(editDto.dataset.boardId);
     const sportsTypeName = editDto.dataset.sportsTypeName;
     const currentParticipantCount = Number(editDto.dataset.currentParticipantCount);
     const maxParticipants = Number(editDto.dataset.maxParticipants);
@@ -10,23 +11,25 @@ document.addEventListener("DOMContentLoaded",()=>{
     const originalName = editDto.dataset.originalName;
     const savedName = editDto.dataset.savedName;
     const myMannerTemperature = Number(editDto.dataset.myMannerTemperature);
-    const loginMember = editDto.dataset.loginMember;
+    const matchDatetime = editDto.dataset.matchDatetime;
+    const matchEndtime = editDto.dataset.matchEndtime;
+
+    // console.log(matchDatetime)
+    // console.log(matchDuration)
+
 
     setSportsType(sportsTypeName); // 종목 가져옴
     void setReservationFile(originalName, savedName);
+    setDate(matchDatetime, matchEndtime);
     setMaxParticipants(currentParticipantCount, maxParticipants);
-    setMannerTemperature(minMannerTemperature);
+    setMannerTemperature(minMannerTemperature, myMannerTemperature);
     setButton();
+    autoResize();
 
     const form = document.querySelector("form");
     form.addEventListener("submit", (e)=>{
         submitCheck(e, myMannerTemperature);
     })
-
-    const backBtn = document.querySelector(".back-btn");
-    backBtn.addEventListener("click",()=>{
-        history.back();
-    });
 
 })
 
@@ -41,10 +44,6 @@ function submitCheck(e, myMannerTemperature){
     const sportsFacilityNameEle = document.querySelector("#sportsFacilityName");
 
     const sportsFacilityAddressEle = document.querySelector("#sportsFacilityAddress");
-
-    const matchDatetimeEle = document.querySelector("#matchDatetime");
-
-    const matchDurationEle = document.querySelector("#matchDuration");
 
     const currentParticipantCountEle = document.querySelector("#currentParticipantCount");
     //console.log(currentParticipantsCountEle.value);
@@ -73,15 +72,6 @@ function submitCheck(e, myMannerTemperature){
     } else if(sportsFacilityAddressEle.value ===""){
         alert("경기장 주소를 입력하세요.");
         e.preventDefault();
-    } else if(matchDatetimeEle.value ===""){
-        alert("경기 시작 시간을 입력하세요.");
-        e.preventDefault();
-    }  else if(new Date(matchDatetimeEle.value)< new Date()){
-        alert(`경기 시작 시간은 현재 시간 이후만 가능합니다. 다시 작성해주세요.`)
-        e.preventDefault();
-    } else if(matchDurationEle.value ===""){
-        alert("경기 진행 시간을 입력하세요.");
-        e.preventDefault();
     } else if(currentParticipantCountEle.value ===""){
         alert("현재 참가 인원을 입력하세요.")
         e.preventDefault();
@@ -101,7 +91,7 @@ function submitCheck(e, myMannerTemperature){
         alert("경기 방식 소개를 입력하세요");
         e.preventDefault();
     } else{
-        alert("submit");
+        alert("글 수정이 완료되었습니다.");
 
     }
 }
@@ -127,16 +117,30 @@ async function setReservationFile(originalName, savedName){
     const url = window.URL.createObjectURL(data2);
     const aEle = document.querySelector("#reservationLoadBox > span > a");
 
-
     aEle.href = url;
     aEle.download = originalName;
 
-    aEle.addEventListener("click",()=>{
-        setTimeout(()=>{
-            aEle.removeAttribute("href")
+
+    // 한 번 클릭만 가능하게
+    aEle.addEventListener("click", () => {
+        setTimeout(() => {
+            aEle.removeAttribute("href");
             URL.revokeObjectURL(url);
-        },500)
-    })
+            aEle.style.pointerEvents = "none";
+            aEle.style.opacity = "0.5";
+            aEle.textContent += " (다운로드 완료)";
+        }, 500);
+    }, { once: true });
+
+    // aEle.addEventListener("click",function handleClick (){
+    //     setTimeout(()=>{
+    //         aEle.removeAttribute("href")
+    //         URL.revokeObjectURL(url);
+    //         aEle.removeEventListener("click", handleClick); // 이벤트 제거
+    //         aEle.style.pointerEvents = "none";              // 클릭 불가 처리 (옵션)
+    //         aEle.style.opacity = "0.5";
+    //     },500)
+    // })
     // const aEle2 = document.createElement("a");
     // aEle2.innerHTML = "삭제하기";
     //
@@ -173,18 +177,20 @@ function getAddress(){
 function setMaxParticipants(currentParticipantCount, maxParticipants){
 
     const selectMax = document.querySelector("#maxParticipants");
-
-    for(let i=currentParticipantCount; i<=30;i++){
+    //alert(maxParticipants);
+    for(let i=currentParticipantCount; i<=31;i++){
         const option = document.createElement("option");
         option.value = i;
         option.textContent = i;
-        selectMax.appendChild(option);
         if(i===maxParticipants)
             option.selected = true;
+            //alert(i);
+
+        selectMax.appendChild(option);
     }
 }
 
-function setMannerTemperature(minMannerTemperature){
+function setMannerTemperature(minMannerTemperature, myMannerTemperature){
     const selectManner = document.querySelector("#minMannerTemperature");
 
     for(let i=30;i<=40;i+=0.5){
@@ -195,6 +201,10 @@ function setMannerTemperature(minMannerTemperature){
         if(i===minMannerTemperature)
             option.selected = true;
     }
+
+    document.querySelector("#minMannerTemperatureLabel").textContent +=`(내 온도: ${myMannerTemperature})`;
+
+
 }
 
 function setButton(){
@@ -210,26 +220,97 @@ function setButton(){
     //     window.location.href="/matchup";
     // })
 
+    // const toggleBtn = document.querySelector("#toggleBtn");
+    // const reservationLoadBox = document.querySelector("#reservationLoadBox");
+    // const reservationFileBox = document.querySelector("#reservationFileBox");
+    //
+    // toggleBtn.addEventListener("click",()=>{
+    //     const isDelete = toggleBtn.textContent === "파일 변경";
+    //
+    //     if(isDelete){
+    //         toggleBtn.textContent = "변경 취소";
+    //         reservationLoadBox.style.display = "none";
+    //         reservationFileBox.style.display = "block";
+    //         document.querySelector("#reservationFileBox > input").required = true;
+    //     }
+    //     else{
+    //         toggleBtn.textContent = "파일 변경";
+    //         reservationLoadBox.style.display = "block";
+    //         reservationFileBox.style.display = "none";
+    //         document.querySelector("#reservationFileBox > input").required = false;
+    //         document.querySelector("#reservationFileBox > input").value = '';
+    //
+    //     }
+    // })
     const toggleBtn = document.querySelector("#toggleBtn");
     const reservationLoadBox = document.querySelector("#reservationLoadBox");
     const reservationFileBox = document.querySelector("#reservationFileBox");
+    const fileInput = document.querySelector("#reservationFileInput");
 
-    toggleBtn.addEventListener("click",()=>{
-        const isDelete = toggleBtn.textContent === "파일 변경";
+    toggleBtn.addEventListener("click", () => {
+        const isChange = toggleBtn.textContent === "파일 변경";
 
-        if(isDelete){
+        if (isChange) {
             toggleBtn.textContent = "변경 취소";
             reservationLoadBox.style.display = "none";
             reservationFileBox.style.display = "block";
-            document.querySelector("#reservationFileBox > input").required = true;
-        }
-        else{
+            fileInput.required = true;
+        } else {
             toggleBtn.textContent = "파일 변경";
             reservationLoadBox.style.display = "block";
             reservationFileBox.style.display = "none";
-            document.querySelector("#reservationFileBox > input").required = false;
-            document.querySelector("#reservationFileBox > input").value = '';
-
+            fileInput.required = false;
+            fileInput.value = ""; // 초기화
         }
-    })
+    });
+
 }
+
+function autoResize() {
+    const allTextarea = document.querySelectorAll('textarea');
+    allTextarea.forEach(el =>{
+        el.style.height = 'auto';  // 초기화
+        el.style.height = el.scrollHeight + 'px';  // 실제 내용에 맞춤
+    });
+}
+
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
+
+function setDate(matchDatetime, matchEndtime) {
+    const matchDateEle = document.querySelector("#matchDate");
+
+    const date = new Date(matchDatetime);
+    const endDate = new Date(matchEndtime);
+
+    // const [hour, minute, second] = matchDuration.split(":");
+    // const hourNum = parseInt(hour, 10);
+    // const minuteNum = parseInt(minute,10);
+    // let extraHour = 0
+    // let endMinute = 0;
+    // if(date.getMinutes()+minuteNum>=60){
+    //     extraHour = 1;
+    //     endMinute = (date.getMinutes()+minuteNum)%60;
+    // }else{
+    //     endMinute = date.getMinutes()+minuteNum;
+    // }
+    //
+    // if(date.getHours()+hourNum+extraHour>=24)
+    //     endHour = (date.getHours()+hourNum+extraHour) %24;
+    // else
+    //     endHour = date.getHours()+hourNum+extraHour;
+    //
+    // let endTime =  `${endHour}시 ${endMinute}분`
+
+    matchDateEle.value =  `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 -${endDate.getHours()}시 ${endDate.getMinutes()}분`;
+
+
+
+}
+

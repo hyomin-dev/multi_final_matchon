@@ -107,15 +107,22 @@
             <option value="5">5점</option>
         </select>
 
+        <select id="recruitmentStatus" name="recruitmentStatus">
+            <option value="">모집 상태 전체</option>
+            <option value="true">모집중</option>
+            <option value="false">모집 완료</option>
+        </select>
+
+
         <button id="filterBtn">검색</button>
     </div>
 
-    <div id="team-container">
+    <div id="team-container" style="display: none;">
         <div th:each="team : ${teams}" class="team-card">
             <img th:src="${team.imageUrl}" alt="Team Image"/>
             <div class="team-info">
                 <h2 th:text="${team.teamName}">팀 이름</h2>
-                <p th:text="'지역: ' + ${team.teamRegion}">지역</p>
+                <p th:text="'지역: ' + ${team.translatedRegion}">지역</p>
                 <p>
                     별점: <span th:text="${team.teamRatingAverage} + '점'">0점</span>
                     <span class="star-rating"
@@ -124,7 +131,7 @@
     </span>
                 </p>
                 <p>DEBUG STAR: <span th:text="${team.starRatingVisual}">[nothing]</span></p>
-                <p th:text="'포지션: ' + ${team.recruitingPositions}">포지션</p>
+                <p th:text="'포지션: ' + ${#strings.listJoin(team.recruitingPositionsKorean, ', ')}">포지션</p>
                 <p th:text="${team.recruitmentStatus} ? '모집 중' : '모집 완료'">모집 상태</p>
                 <p th:text="'작성자: ' + ${team.createdBy}">작성자</p>
             </div>
@@ -134,6 +141,10 @@
     <div class="button-container">
         <a th:href="@{/team/team/register}"><button>팀 등록하기</button></a>
         <button type="button" id="myTeamBtn">내 팀 보기</button>
+
+        <button type="button" id="backToAllBtn" style="display: none;">
+            전체 목록으로 돌아가기
+        </button>
     </div>
 
     <div id="paging-container"></div>

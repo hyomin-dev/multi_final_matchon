@@ -60,19 +60,32 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 })
 
 async function loadItems(page, sportsType='', region='', dateFilter='', availableFilter=false){
-    const response = await fetch(`/matchup/board/list?page=${page-1}&sportsType=${sportsType}&region=${region}&date=${dateFilter}&availableFilter=${availableFilter}`,{
+    let items = [];
+    let pageInfo = {
+        page: 0,
+        totalPages: 1
+    };
 
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data);
-    const items = data.data.items;
-    const pageInfo = data.data.pageInfo;
-    //console.log(pageInfo);
-    console.log(items);
+    try{
+        const response = await fetch(`/matchup/board/list?page=${page-1}&sportsType=${sportsType}&region=${region}&date=${dateFilter}&availableFilter=${availableFilter}`,{
+
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data);
+        items = data.data.items;
+        pageInfo = data.data.pageInfo;
+        //console.log(pageInfo);
+
+    } catch (err){
+        console.log(err);
+    }
+
+
+    //console.log(items);
 
     renderList(items);
     renderPagination(pageInfo,sportsType, region, dateFilter, availableFilter);
@@ -85,44 +98,34 @@ function renderList(items){
 
     if(items.length ===0){
         boardArea.innerHTML = `
-            <div class="no-result">
-                현재 작성된 게시글이 없습니다.
-            </div>
+            <tr>
+                <td colspan="9" class="no-result"> 현재 작성된 게시글이 없습니다.</td>
+            </tr>           
         `;
         return;
     }
 
-
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
+        const endDate = new Date(item.matchEndtime)
 
-        const card = document.createElement("div");
-        card.className = "matchup-card";
+        const card = document.createElement("tr");
         card.innerHTML = `
-                                 
-           <div class="card-section card-writer">
-                <div><strong>작성자:</strong> ${item.writerName}</div>
-                <div><strong>팀 이름:</strong> ${item.teamName}</div>
-                <button class="detail" onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'">상세보기</button>                
-           </div>
-            
-           <div class="card-section card-match">
-                <div><strong>종목:</strong> ${item.sportsTypeName}</div>
-                <div class="truncate"><strong>경기장:</strong> ${item.sportsFacilityName}</div>
-                <div class="truncate"><strong>주소:</strong> ${item.sportsFacilityAddress}</div>
-                <div>
-                    📅 날짜: ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
-                    ${calTime(item, date.getHours(), date.getMinutes())}
-                </div>
-           </div>
-            
-            <div class="card-section card-status">
-                <div><strong>${checkStatus(item)}</strong></div>
-                <div>( ${item.currentParticipantCount} / ${item.maxParticipants} )</div>
-                <div>입장 가능 온도: ${item.minMannerTemperature}</div>
-                <div>내 매너 온도: ${myMannerTemperature}</div>
-            </div>
-                `;
+                        <td>${item.boardId}</td>
+                        <td class="truncate-writer">${item.writerName}</td>
+                        <td>${setSportsType(item.sportsTypeName)}</td>
+                        <td class="truncate">${item.sportsFacilityAddress}</td>
+                        <td>📅 ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
+                                ${endDate.getHours()}시 ${endDate.getMinutes()}분</td>
+                        <td>${checkStatus(item)}</td>
+                        <td>( ${item.currentParticipantCount} / ${item.maxParticipants} )</td>
+                        <td> 
+                            <div>입장 가능 온도: ${item.minMannerTemperature}</div>
+                            <div>현재 내 온도: ${myMannerTemperature}</div>                                      
+                        </td>
+                        <td><button class="btn-detail" onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'">상세보기</button></td>                   
+                        `;
+        markIfPastMatchdatetime(card, item);
         boardArea.appendChild(card);
 
     })
@@ -171,7 +174,8 @@ function renderPagination(pageInfo, sportsType, region, dateFilter, availableFil
         const btn = document.createElement("button");
         btn.textContent = i;
         if( i=== curPage)
-            btn.disabled = true;
+            //btn.disabled = true;
+            btn.classList.add("active");
 
         btn.addEventListener("click",()=>{
             loadItems(i,sportsType, region, dateFilter, availableFilter);
@@ -230,10 +234,17 @@ function calTime(item, startHour, startMinute){
 }
 
 function checkStatus(item){
+
     const matchDate = new Date(item.matchDatetime);
+    const endMatchDate = new Date(item.matchEndtime);
     const now = new Date();
-    if(matchDate<now)
-        return "경기 종료"
+    // const durationParts = item.matchDuration.split(":");
+    // const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+
+    if(matchDate <now && now <= endMatchDate)
+        return "경기 진행";
+    else if(endMatchDate<now)
+        return "경기 종료";
     else if(item.minMannerTemperature > myMannerTemperature)
         return "입장 불가";
     else if(item.currentParticipantCount >= item.maxParticipants)
@@ -244,17 +255,20 @@ function checkStatus(item){
 
 
 async function getMyMannerTemperature(){
-
-    const response  = await fetch(`/member/search/my-temperature`,{
-        method: "GET",
-        credentials: "include"
-    })
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-
-    return data.data;
-
+    try{
+        const response  = await fetch(`/member/search/my-temperature`,{
+            method: "GET",
+            credentials: "include"
+        })
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        return data.data;
+    }catch (err){
+        console.log(err);
+        //alert("매너 온도 조회에 실패하여 기본값으로 처리되었습니다.");
+        return 20;
+    }
 }
 
 function setButton(){
@@ -280,8 +294,38 @@ function setButton(){
     })
 }
 
+function setSportsType(sportsTypeName){
+    if(sportsTypeName ==="SOCCER"){
+        return `
+                <span style="color: #1abc9c;">SOCCER</span>
+                `
+    }else{
+        return `
+                <span style="color: #e67e22;">FUTSAL</span>
+                `
+    }
+}
 
+/*경기 시작 시간이 지났다면 회색으로 표현*/
+function markIfPastMatchdatetime(card, item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+   if(matchDate<now){
+       const tds = card.querySelectorAll("td");
+       tds.forEach(td =>{
+           td.style.backgroundColor = "lightgray";
+       })
+   }
 
+}
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
 
 
 

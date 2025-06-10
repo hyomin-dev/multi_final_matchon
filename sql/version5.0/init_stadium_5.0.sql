@@ -1,6 +1,5 @@
 use matchon;
 
-ALTER TABLE stadium auto_increment = 1;
 
 INSERT INTO stadium (stadium_name, stadium_region, stadium_address, stadium_tel, latitude, longitude)
 VALUES ('청계중앙공원 축구장', '경기도', '경기도 화성시 동탄대로시범길 133 (청계동)', '031-355-1292', 37.199989, 127.112243),

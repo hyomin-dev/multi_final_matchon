@@ -81,7 +81,7 @@ function connect(token, roomId, loginEmail) {
             (error) => {
                 console.error("STOMP 연결 실패");
                 showErrorPage(error?.headers?.message || "Chat STOMP 연결 실패");
-                reject(error); // 실패 시
+                //reject(error); // 실패 시
             }
         );
     });
@@ -118,16 +118,17 @@ function setDisconnects(roomId) {
 
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
-            fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST" });
+            fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST", credentials:"include" });
             if (stompClient && stompClient.connected) {
                 stompClient.unsubscribe(`/topic/${roomId}`);
                 stompClient.disconnect();
+
             }
         }
     });
 
     window.addEventListener('pagehide', () => {
-        fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST" });
+        fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST", credentials:"include" });
         if (stompClient && stompClient.connected) {
             stompClient.unsubscribe(`/topic/${roomId}`);
             stompClient.disconnect();
@@ -166,7 +167,19 @@ function appendMessage(msg, loginEmail) {
     if(!isSystemMsg){
         const msgDiv = document.createElement('div');
         msgDiv.className = 'chat-message ' + (msg.senderEmail === loginEmail ? 'sent' : 'received');
-        msgDiv.innerHTML = `<strong>${msg.senderName}:</strong> ${msg.content}`;
+        const time = new Date(msg.createdDate).toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        msgDiv.innerHTML = `
+                <strong>${msg.senderName}:</strong><br/>
+                ${msg.content}
+                <span class="chat-timestamp">${time}</span>
+                `;
         chatBox.appendChild(msgDiv);
         lastSystemMessage = null;
     }
@@ -189,55 +202,71 @@ function scrollToBottom() {
 
 
 async function getPrivateChatRoomId(receiverId){
-    const response = await fetch(`/chat/room/private?receiverId=${receiverId}`,{
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok){
+    try{
+        const response = await fetch(`/chat/room/private?receiverId=${receiverId}`,{
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok){
+            const data = await response.json();
+            // console.log(data);
+            // console.log(data.error);
+
+            showErrorPage(data.error);
+        }
         const data = await response.json();
-        // console.log(data);
-        // console.log(data.error);
 
-        showErrorPage(data.error);
-
+        return data.data;
+    }catch (err){
+        showErrorPage("현재 채팅방 참여자가 아닙니다.");
     }
 
-    const data = await response.json();
 
-    return data.data;
+
 
 }
 
 async function checkIsRoomParticipant(roomId) {
-    const response = await fetch(`/chat/check/my/rooms?roomId=${roomId}`,{
-        method: "GET",
-        credentials: "include"
-    })
+    try{
+        const response = await fetch(`/chat/check/my/rooms?roomId=${roomId}`,{
+            method: "GET",
+            credentials: "include"
+        })
 
-    if(!response.ok){
-        const data = await response.json();
-        showErrorPage(data.error);
+        if(!response.ok){
+            const data = await response.json();
+            showErrorPage(data.error);
+        }
+    }catch (err){
+        console.error(err);
+        showErrorPage("현재 채팅방 참여자가 아닙니다.");
     }
+
 }
 
 async function getChatHistory(roomId, loginEmail) {
-    const response = await fetch(`/chat/history?roomId=${roomId}`,{
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok){
+    try{
+        const response = await fetch(`/chat/history?roomId=${roomId}`,{
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok){
+            const data = await response.json();
+            // console.log(data);
+            // console.log(data.error);
+            //showErrorPage(data.error);
+        }
         const data = await response.json();
-        // console.log(data);
-        // console.log(data.error);
-        showErrorPage(data.error);
+
+        data.data.forEach(dto =>{
+            appendMessage(dto, loginEmail);
+            scrollToBottom();
+        })
+    }catch(err){
+        console.error("가져올 이전 기록이 없습니다.");
     }
 
-    const data = await response.json();
 
-    data.data.forEach(dto =>{
-        appendMessage(dto, loginEmail);
-        scrollToBottom();
-    })
 
 }
 

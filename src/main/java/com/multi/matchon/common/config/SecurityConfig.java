@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -37,7 +39,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/", "/main", "/signup", "/signup/**", "/login", "/auth/**", "/api/common/datacontroller/**", "/css/**", "/img/**", "/js/**", "/favicon.ico","/connect/**", "/error", "/aichat", "/api/aichat").permitAll()
+                        .requestMatchers("/", "/main", "/signup", "/signup/**", "/login", "/auth/**", "/api/common/datacontroller/**", "/css/**", "/img/**", "/js/**", "/favicon.ico","/connect/**", "/error", "/aichat", "/api/aichat", "/redirect").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 경로
                         .requestMatchers("/community/**").authenticated()//커뮤니티 작성 인증
                         .requestMatchers("/inquiry", "/inquiry/**").authenticated()

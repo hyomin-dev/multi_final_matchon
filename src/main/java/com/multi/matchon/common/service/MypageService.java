@@ -65,7 +65,7 @@ public class MypageService {
         boolean isDefaultProfile = profileAttachment.isEmpty();
         String imageUrl = profileAttachment
                 .map(att -> awsS3Utils.createPresignedGetUrl(PROFILE_DIR, att.getSavedName()))
-                .orElse("/img/default-user.png");
+                .orElse("/img/common-profile.png");
 
         data.put("profileImageUrl", imageUrl);
         data.put("isDefaultProfile", isDefaultProfile);
@@ -170,5 +170,11 @@ public class MypageService {
                     att.delete(true); // 소프트 삭제
                     attachmentRepository.save(att);
                 });
+    }
+
+    // 이메일 동의 업데이트
+    public void updateEmailAgreement(Member member, boolean agreement) {
+        member.setEmailAgreement(agreement);
+        memberRepository.save(member);
     }
 }

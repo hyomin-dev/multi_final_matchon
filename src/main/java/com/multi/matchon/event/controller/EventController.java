@@ -2,6 +2,7 @@ package com.multi.matchon.event.controller;
 
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.Status;
+import com.multi.matchon.common.service.NotificationService;
 import com.multi.matchon.event.domain.EventRegionType;
 import com.multi.matchon.event.domain.EventRequest;
 import com.multi.matchon.event.domain.HostProfile;
@@ -44,6 +45,7 @@ public class EventController {
 
     private final EventRepository eventRepository;
     private final HostProfileRepository hostProfileRepository;
+    private final NotificationService notificationService;
 
     @GetMapping("/schedule")
     public String getSchedule(@RequestParam(required = false) Integer year,
@@ -154,6 +156,8 @@ public class EventController {
                 .build();
 
         eventRepository.save(event);
+        // 관리자 알림 전송
+        notificationService.notifyAdmins(member.getMemberName() + " 님이 대회를 등록했습니다.", "/admin/event", member);
         return "redirect:/schedule";
     }
 

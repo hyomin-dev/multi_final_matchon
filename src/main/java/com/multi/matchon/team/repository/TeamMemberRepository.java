@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
     Optional<TeamMember> findByMember_IdAndTeam_Id(Long memberId, Long teamId);
     boolean existsByTeamAndMemberAndTeamLeaderStatusTrue(Team team, Member member);
+    Optional<TeamMember> findByMemberId(Long memberId);
+    Optional<TeamMember> findByTeamAndTeamLeaderStatusTrue(Team team);
+    Optional<TeamMember> findLeaderByTeam(Team team);
 }

@@ -117,3 +117,27 @@
 .message.success {
     color: #5cb85c;
 }
+
+.email-agreement-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    width: fit-content;
+    margin-left: 0;
+}
+
+.email-agreement-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+}
+
+.email-agreement-text {
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+    cursor: pointer;
+    position: relative;
+    top: -8px;
+}

@@ -1,10 +1,13 @@
 package com.multi.matchon.member.repository;
 
 import com.multi.matchon.member.domain.Member;
+import com.multi.matchon.member.domain.MemberRole;
 import com.multi.matchon.member.dto.res.ResTeamInfoDto;
 import com.multi.matchon.team.domain.Team;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -43,7 +46,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByIdAndIsDeletedFalse(Long id);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select t1
+            from Member t1
+            where t1.id=:id and t1.isDeleted=false
+            """)
+    Optional<Member> findByIdAndIsDeletedFalseWithLock(@Param("id") Long id);
+
     Optional<Member> findByMemberEmailAndIsDeletedFalse(String senderEmail);
 
     List<Member> findAllByTeam(Team team);
+
+    List<Member> findByMemberRoleAndIsDeletedFalse(MemberRole role);
+
+    List<Member> findAllByTeamIdAndIsDeletedFalse(Long teamId);
 }

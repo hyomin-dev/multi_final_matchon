@@ -4,13 +4,13 @@ document.addEventListener("DOMContentLoaded",()=>{
     const sportsFacilityName = registerDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = registerDto.dataset.sportsFacilityAddress;
     const matchDatetime = registerDto.dataset.matchDatetime;
-    const matchDuration = registerDto.dataset.matchDuration;
+    const matchEndtime = registerDto.dataset.matchEndtime;
     const currentParticipantCount = Number(registerDto.dataset.currentParticipantCount);
     const maxParticipants = Number(registerDto.dataset.maxParticipants);
 
 
     drawMap(sportsFacilityAddress, sportsFacilityName);
-    calTime(matchDatetime, matchDuration);
+    calTime(matchDatetime, matchEndtime);
     setParticipantCount(currentParticipantCount, maxParticipants);
 
     const form = document.querySelector("form");
@@ -43,7 +43,7 @@ function submitCheck(e, matchDatetime){
         alert("경기 시작 시간이 지나 등록할 수 없습니다.");
         e.preventDefault();
     }else{
-        alert("submit");
+        alert("요청 등록이 완료되었습니다.");
     }
 }
 
@@ -76,7 +76,7 @@ function drawMap(address, sportsFacilityName){
 
             // 인포윈도우로 장소에 대한 설명을 표시합니다
             var infowindow = new kakao.maps.InfoWindow({
-                content: '<div style="width:150px;text-align:center;padding:6px 0;">'+sportsFacilityName+'</div>'
+                content: '<div class="truncateMap" style="width:150px;text-align:center;padding:6px 0;">'+sportsFacilityName+'</div>'
             });
             infowindow.open(map, marker);
 
@@ -86,11 +86,12 @@ function drawMap(address, sportsFacilityName){
     });
 }
 
-function calTime(matchDatetime, matchDuration){
+function calTime(matchDatetime, matchEndtime){
     // console.log(matchDatetime);
     // console.log(matchDuration);
 
     const date = new Date(matchDatetime);
+    const end = new Date(matchEndtime);
     //console.log(date);
     const matchDateEle = document.querySelector("#match-date");
 
@@ -100,27 +101,30 @@ function calTime(matchDatetime, matchDuration){
     const startHour = date.getHours();
     const startMinutes = date.getMinutes();
 
+    const endHour = end.getHours();
+    const endMinutes = end.getMinutes();
 
-    const [hour, minute, second] = matchDuration.split(":");
-    const hourNum = parseInt(hour, 10);
-    const minuteNum = parseInt(minute,10);
 
-    let extraHour = 0
-    let endMinute = 0;
+    // const [hour, minute, second] = matchDuration.split(":");
+    // const hourNum = parseInt(hour, 10);
+    // const minuteNum = parseInt(minute,10);
+    //
+    // let extraHour = 0
+    // let endMinute = 0;
+    //
+    // if(date.getMinutes()+minuteNum>=60){
+    //     extraHour = 1;
+    //     endMinute = (date.getMinutes()+minuteNum)%60;
+    // }else{
+    //     endMinute = date.getMinutes()+minuteNum;
+    // }
+    //
+    // if(startHour+hourNum+extraHour>=24)
+    //     endHour = (startHour+hourNum+extraHour) %24;
+    // else
+    //     endHour = startHour+hourNum+extraHour;
 
-    if(date.getMinutes()+minuteNum>=60){
-        extraHour = 1;
-        endMinute = (date.getMinutes()+minuteNum)%60;
-    }else{
-        endMinute = date.getMinutes()+minuteNum;
-    }
-
-    if(startHour+hourNum+extraHour>=24)
-        endHour = (startHour+hourNum+extraHour) %24;
-    else
-        endHour = startHour+hourNum+extraHour;
-
-    matchDateEle.textContent = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
+    matchDateEle.value = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinutes}분`
 
 }
 
@@ -136,5 +140,14 @@ function setParticipantCount(currentParticipantCount, maxParticipants){
         participantCountEle.appendChild(option);
         if(i===1)
             option.selected = true;
+    }
+}
+
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
     }
 }

@@ -17,4 +17,6 @@ public class SignupRequestDto {
     @NotBlank(message = "이름은 필수입니다.")
     private String name;
 
+    private Boolean emailAgreement = false;
+
 }

@@ -247,6 +247,7 @@ VALUES	(1, 'Host1', '2025-05-17 20:52:28', '2025-05-17 20:52:28', TRUE),
 
 INSERT INTO notification (received_member_id, notification_message, target_url, is_read, created_person, modified_person)
 VALUES
+
 (1, '[매치업] 6월 6일 경기 신청이 승인되었습니다.', '/matchup/board', FALSE, 'user1@example.com', 'user1@example.com'),
 (2, '[후기 요청] 6월 7일 경기 상대를 평가해주세요.', '/matchup/board', FALSE, 'user2@example.com', 'user2@example.com'),
 (3, '[알림] 새로운 채팅 메시지가 도착했습니다.', '/matchup/board', FALSE, 'user3@example.com', 'user3@example.com'),
@@ -257,6 +258,7 @@ VALUES
 (8, '[알림] 일정이 곧 시작됩니다. 준비하세요!', '/matchup/board', FALSE, 'user8@example.com', 'user8@example.com'),
 (9, '[후기 수신] 상대방이 당신을 평가했습니다.', '/matchup/board', FALSE, 'user9@example.com', 'user9@example.com'),
 (10, '[채팅방] 새로운 참가자가 입장했습니다.', '/matchup/board', FALSE, 'user10@example.com', 'user10@example.com');
+
 
 
 
