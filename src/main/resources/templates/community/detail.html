@@ -155,9 +155,20 @@
     </div>
 </div>
 
+<div id="user-info"
+     th:attr="data-user-id=${#authentication.principal?.member?.id},
+              data-user-role=${#authentication.principal?.member?.memberRole?.name()}">
+</div>
+
 <div th:replace="~{common/footer::footer}"></div>
 
 <script>
+    const userInfoEl = document.getElementById('user-info');
+    const currentUserId = parseInt(userInfoEl.dataset.userId || '0');
+    const currentUserRole = userInfoEl.dataset.userRole || 'GUEST';
+
+    console.log("로그인 사용자:", currentUserId, currentUserRole);
+
     function formatDateTime(isoString) {
         const date = new Date(isoString);
         const yyyy = date.getFullYear();
@@ -213,14 +224,24 @@
                 const commentList = document.getElementById("commentList");
                 const newComment = document.createElement("li");
                 newComment.classList.add("highlighted");
+
+                let actionButtons = "";
+
+                if (data.memberId === currentUserId && currentUserRole !== 'ADMIN') {
+                    actionButtons += `<button type="button" class="btn-comment-delete" data-comment-id="${data.commentId}" data-board-id="${boardId}">✖ 삭제</button>`;
+                } else if (currentUserRole === 'ADMIN') {
+                    actionButtons += `<button type="button" class="admin-delete-button" data-comment-id="${data.commentId}" data-board-id="${boardId}">🛑 관리자 삭제</button>`;
+                } else {
+                    actionButtons += `<button type="button" class="report-button" onclick="openReportModal('COMMENT', ${data.commentId})">⚠ 댓글 신고</button>`;
+                }
+
                 newComment.innerHTML = `
-                <div class="comment-meta">
-                    <small> ${data.memberName} | ${formatDateTime(data.createdDate)}</small>
-                    <div class="comment-actions">
-                        <button type="button" class="btn-comment-delete" data-comment-id="${data.commentId}" data-board-id="${boardId}">삭제</button>
+                    <div class="comment-meta">
+                        <small>${data.memberName} | ${formatDateTime(data.createdDate)}</small>
+                        <div class="comment-actions">${actionButtons}</div>
                     </div>
-                </div>
-                <p>${data.content}</p>`;
+                    <p>${data.content}</p>
+                `;
                 commentList.prepend(newComment);
                 document.getElementById("commentContent").value = "";
             }).catch(err => {
@@ -230,7 +251,7 @@
     });
 
     document.addEventListener("click", function (e) {
-        if (e.target.matches(".btn-comment-delete")) {
+        if (e.target.matches(".btn-comment-delete") || e.target.matches(".admin-delete-button")) {
             const commentId = e.target.dataset.commentId;
             const boardId = e.target.dataset.boardId;
             const token = localStorage.getItem("accessToken");
@@ -244,6 +265,9 @@
                 } else {
                     alert("댓글 삭제 실패");
                 }
+            }).catch(err => {
+                console.error("댓글 삭제 오류:", err);
+                alert("오류가 발생했습니다.");
             });
         }
     });
@@ -307,31 +331,6 @@
             }
         }
     });
-
-    document.addEventListener("click", function (e) {
-        if (e.target.matches(".admin-delete-button") && e.target.hasAttribute("data-comment-id")) {
-            const commentId = e.target.dataset.commentId;
-            const boardId = e.target.dataset.boardId;
-            const token = localStorage.getItem("accessToken");
-
-            if (!confirm("댓글을 삭제하시겠습니까?")) return;
-
-            fetch(`/community/${boardId}/comments/${commentId}`, {
-                method: "DELETE",
-                headers: {'Authorization': 'Bearer ' + token}
-            }).then(res => {
-                if (res.ok) {
-                    e.target.closest("li").remove();
-                } else {
-                    alert("댓글 삭제 실패");
-                }
-            }).catch(err => {
-                console.error("관리자 댓글 삭제 오류:", err);
-                alert("오류가 발생했습니다.");
-            });
-        }
-    });
-
 </script>
 </body>
 </html>

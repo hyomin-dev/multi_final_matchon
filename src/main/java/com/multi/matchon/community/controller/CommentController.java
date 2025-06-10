@@ -44,7 +44,8 @@ public class CommentController {
                 saved.getMember().getMemberName(),
                 saved.getCreatedDate().toString(),
                 saved.getContent(),
-                saved.getId()
+                saved.getId(),
+                saved.getMember().getId()
         ));
     }
 
