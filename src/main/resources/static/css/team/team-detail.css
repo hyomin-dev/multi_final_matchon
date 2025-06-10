@@ -455,3 +455,30 @@ html, body {
     pointer-events: auto;
     cursor: not-allowed;
 }
+.badge-approve {
+    background-color: green;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.badge-deny {
+    background-color: red;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.badge-pending {
+    background-color: orange;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+.team-intro {
+    word-break: break-word;
+    white-space: pre-wrap;
+}

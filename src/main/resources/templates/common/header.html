@@ -60,22 +60,23 @@
                     text-align: center;
                     line-height: 18px;
                     display: none;">0</span>
-
-                    <div class="mini-drawer" id="miniDrawer" style="display: none;">
+                    <div class="mini-drawer" id="miniDrawer">
                         <div class="mini-drawer-header">
+                            <button class="close-mini" id="openMiniDrawerHistoryBtn">📜</button>
                             <h4>알림</h4>
                             <button class="close-mini" id="closeMiniDrawerBtn">&times;</button>
                         </div>
                     </div>
-                </div>
-                <div class="mini-drawer" id="miniDrawer">
-                    <div class="mini-drawer-header">
-                        <h4>알림</h4>
-                        <button class="close-mini" id="closeMiniDrawerBtn">&times;</button>
+                    <div class="mini-drawer-history" id="miniDrawerHistory">
+                        <div class="mini-drawer-header-history">
+                            <div></div>
+                            <h4>기존 알림</h4>
+                            <button class="close-mini-history" id="closeMiniDrawerBtnHistoryBtn">&times;</button>
+                        </div>
                     </div>
+
                 </div>
             </div>
-
 
             <!-- 로그인/로그아웃 버튼 -->
             <div class="auth">

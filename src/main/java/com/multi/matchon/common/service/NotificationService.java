@@ -5,6 +5,7 @@ import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.auth.service.MailService;
 import com.multi.matchon.common.domain.Notification;
 import com.multi.matchon.common.dto.res.ResNotificationDto;
+import com.multi.matchon.common.dto.res.ResReadNotificationDto;
 import com.multi.matchon.common.exception.custom.ApiCustomException;
 import com.multi.matchon.common.repository.NotificationRepository;
 
@@ -31,18 +32,29 @@ public class NotificationService {
     private final MailService mailService;
 
 
+    // 조회
+
+
     /*
-    * 읽지 않은 정보 가져오기
+    * 읽지 않은 정보 전달하기
     * */
     @Transactional(readOnly = true)
     public List<ResNotificationDto> findAllByMemberAndUnreadFalse(CustomUser user) {
 
         // 읽지 않은 알림 가져오기
-
        return notificationRepository.findAllByMemberAndUnreadFalse(user.getMember());
 
 
     }
+
+    /*
+    * 읽은 메시지 정보 전달하기
+    * */
+    @Transactional(readOnly = true)
+    public List<ResReadNotificationDto> findAllByMemberAndUnreadTrue(CustomUser user) {
+        return notificationRepository.findAllByMemberAndUnreadTrue(user.getMember());
+    }
+
 
     /*
      * 알림 읽음 처리
@@ -146,5 +158,7 @@ public class NotificationService {
             <a href="%s">👉 알림 바로가기</a>
             """.formatted(message, targetUrl);
     }
+
+
 }
 

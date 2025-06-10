@@ -3,6 +3,8 @@ let isSubscribed = false;
 let count = 0;
 
 let reconnectTimeout = null;
+const reconnectDelay = 5000;
+let hasInitMessage = true;
 
 document.addEventListener("DOMContentLoaded", function () {
     const detailDto = document.querySelector("#header-detail-dto");
@@ -59,6 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
     initSideBar();
 
     initStomp(loginEmail);
+
+    initHistorySideBar();
 
 });
 
@@ -164,11 +168,10 @@ function connect(token, loginEmail) {
                     //openbtn.src = "/img/bell-ring-black.png";
                     //console.log(message);
                     const messageBody = JSON.parse(message.body);
-                    console.log(messageBody);
-                    console.log(messageBody.notificationMessage);
+                    //console.log(messageBody);
+                    //console.log(messageBody.notificationMessage);
 
                     createNotiStructure(messageBody.notificationId, messageBody.notificationMessage, messageBody.createdDate);
-
 
                     //console.error("메시지 처리 중 에러", e);
                 }, { Authorization: `Bearer ${token}` });
@@ -228,7 +231,7 @@ function setDisconnects(roomId) {
         }
     });
 }
-const reconnectDelay = 5000;
+
 
 function onError(error){
     console.warn("STOMP 연결 끊어짐. 재시도 중...",error);
@@ -242,28 +245,65 @@ function onError(error){
     }
 }
 
+
 async function initSideBar(){
     const openBtn = document.getElementById('openMiniDrawerBtn');
     const closeBtn = document.getElementById('closeMiniDrawerBtn');
     const miniDrawer = document.getElementById('miniDrawer');
 
-    openBtn.onclick = () => miniDrawer.style.display = 'block';
-    closeBtn.onclick = () => miniDrawer.style.display = 'none';
+    const openMiniDrawerHistoryBtn = document.getElementById("openMiniDrawerHistoryBtn");
+    const closeMiniDrawerBtnHistoryBtn = document.getElementById("closeMiniDrawerBtnHistoryBtn");
+    const miniDrawerHistory = document.getElementById("miniDrawerHistory");
 
-    window.addEventListener("click", e => {
-        if (!miniDrawer.contains(e.target) && e.target !== openBtn) {
+
+
+    // 초기에 읽지 않은 메시지를 가져옴
+    const notifications = await getUnreadNoti();
+    setUnreadNoti(notifications);
+
+    // 초기에 읽은 메시지를 가져옴
+    const readNotifications = await getReadNoti();
+    setReadNoti(readNotifications);
+
+    openBtn.onclick = () => {
+        if(window.getComputedStyle(miniDrawerHistory).display ==='block'){
+            miniDrawerHistory.style.display = 'none';
+            miniDrawer.style.display = 'block';
+        }else{
+            miniDrawer.style.display = 'block';
+        }
+    };
+
+    closeBtn.onclick = () => {
+        miniDrawer.style.display = 'none';
+    };
+
+    // 바깥 클릭 시 닫기 (선택사항)
+    window.addEventListener("click", (e) => {
+        if (!miniDrawer.contains(e.target) && e.target !== openBtn && !miniDrawerHistory.contains(e.target)) {
             miniDrawer.style.display = 'none';
+            miniDrawerHistory.style.display = 'none';
         }
     });
 
-    const notifications = await getUnreadNoti();
-    setUnreadNoti(notifications);
-}
+    openMiniDrawerHistoryBtn.addEventListener("click",()=>{
+        miniDrawerHistory.style.display = 'block';
+        miniDrawer.style.display = 'none';
+    });
 
+    closeMiniDrawerBtnHistoryBtn.addEventListener("click",()=>{
+        miniDrawerHistory.style.display = 'none';
+        miniDrawer.style.display = 'block';
+    });
+
+}
 
 async function getUnreadNoti() {
     try {
-        const response = await fetch("/notification/get/unread");
+        const response = await fetch("/notification/get/unread",{
+            method: "get",
+            credentials: "include"
+        });
         if (!response.ok)
             throw new Error(`HTTP error! Status:${response.status}`)
         const data = await response.json();
@@ -276,83 +316,24 @@ async function getUnreadNoti() {
     }
 }
 
-function onError(error){
-    console.warn("STOMP 연결 끊어짐. 재시도 중...",error);
-
-    if(!reconnectTimeout){
-        reconnectTimeout = setTimeout(()=>{
-            connect();
-        },reconnectDelay);
-    }
-}
-
-async function initSideBar(){
-    const openBtn = document.getElementById('openMiniDrawerBtn');
-    const closeBtn = document.getElementById('closeMiniDrawerBtn');
-    const miniDrawer = document.getElementById('miniDrawer');
-
-
-    // 초기에 읽지 않은 메시지를 가져옴
-    const notifications = await getUnreadNoti();
-
-    setUnreadNoti(notifications);
-
-    openBtn.onclick = () => {
-        miniDrawer.style.display = 'block';
-    };
-
-    closeBtn.onclick = () => {
-        miniDrawer.style.display = 'none';
-    };
-
-    // 바깥 클릭 시 닫기 (선택사항)
-    window.addEventListener("click", (e) => {
-        if (!miniDrawer.contains(e.target) && e.target !== openBtn) {
-            miniDrawer.style.display = 'none';
-        }
-    });
-}
-
-async function getUnreadNoti(){
+async function getReadNoti(){
     try{
-        const response = await fetch("/notification/get/unread");
+        const response = await fetch("/notification/get/read",{
+            method: "get",
+            credentials: "include"
+        })
         if(!response.ok)
             throw new Error(`HTTP error! Status:${response.status}`)
-        const data = await response.json();
 
-        //console.log(data);
+        const data = await response.json();
+        console.log(data);
         return data.data;
+
     }catch(err){
-        console.error(err);
+        console.log(err);
         return [];
     }
-
 }
-
-
-// function setUnreadNoti(notifications){
-//     console.log(notifications);
-//
-//     if(notifications.length===0){
-//         const miniDrawer = document.getElementById('miniDrawer');
-//
-//         const wrapper = document.createElement("div");
-//         const msg = document.createElement("span");
-//
-//         wrapper.classList.add("notification");
-//         msg.textContent = "읽지 않은 알림이 없습니다.";
-//
-//         wrapper.appendChild(msg);
-//         miniDrawer.appendChild(wrapper);
-//         return;
-//     }
-//
-//     notifications.forEach(noti =>{
-//
-//         createNotiStructure(noti.notificationId, noti.notificationMessage, noti.createdDate);
-//
-//     });
-// }
 
 function formatDate(dateStr) {
     const date = new Date(dateStr);
@@ -364,80 +345,37 @@ function formatDate(dateStr) {
     return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
 }
 
-function createNotiStructure(notificationId, notificationMessage, createdDate) {
-
-    const miniDrawer = document.getElementById('miniDrawer');
-    const header = document.querySelector(".mini-drawer-header");
-
-    const wrapper = document.createElement("div");
-    const msg = document.createElement("span");
-
-
-    wrapper.classList.add("notification");
-
-    msg.textContent = notificationMessage;
-
-    const dateSpan = document.createElement("span");
-    dateSpan.classList.add("notification-date");
-    dateSpan.textContent = formatDate(createdDate);
-
-    wrapper.appendChild(msg);
-    wrapper.appendChild(dateSpan);
-    miniDrawer.appendChild(wrapper);
-    miniDrawer.insertBefore(wrapper, header.nextSibling);
-
-
-    msg.addEventListener("click",async ()=>{
-        try{
-            const response = await fetch(`/notification/update/unread?notificationId=${notificationId}`,{
-                method: "GET",
-                credentials: "include"
-            });
-            if(!response.ok)
-                throw new Error(`HTTP error! Status:${response.status}`);
-
-            const data = await response.json();
-
-            wrapper.classList.add("clicked");
-            msg.style.pointerEvents = "none"; // 클릭 자체를 비활성화
-            msg.style.opacity = "0.6"; // 시각적으로도 회색 느낌
-
-            if(data && typeof data.data === "string" && data.data.trim() !== ""){
-                const reply = confirm("알림 페이지로 이동하시겠습니까?")
-                if(reply){
-                    if(data.data.includes("chat")) {
-                        window.open(data.data, "_blank","noopener,noreferrer");
-                    }else{
-                        window.location.href = data.data;
-                    }
-                }
-            }else{
-                alert("알림이 확인되었습니다.");
-            }
-        }catch (err){
-            console.log(err);
-        }
-    });
-}
-
-
-
 function setUnreadNoti(notifications){
-    console.log(notifications);
+    //console.log(notifications);
 
     const badge = document.getElementById("notificationBadge");
     badge.innerText = 0;//notifications.length;
     badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
 
     if (notifications.length === 0) {
+        hasInitMessage = false;
         addEmptyNotification();
         return;
     }
+
 
     notifications.forEach(noti => {
         createNotiStructure(noti.notificationId, noti.notificationMessage, noti.createdDate);
     });
 }
+
+function setReadNoti(notifications){
+
+    if(notifications.length === 0 ){
+        addEmptyReadNotification();
+        return;
+    }
+
+    notifications.forEach(noti =>{
+        createReadNotiStructure(noti.notificationId, noti.notificationMessage, noti.createdDate, noti.targetUrl);
+    })
+}
+
 
 function addEmptyNotification() {
     const miniDrawer = document.getElementById('miniDrawer');
@@ -448,15 +386,16 @@ function addEmptyNotification() {
     miniDrawer.insertBefore(wrapper, header.nextSibling);
 }
 
-function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const hh = String(date.getHours()).padStart(2, '0');
-    const min = String(date.getMinutes()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+
+function addEmptyReadNotification() {
+    const miniDrawerHistory = document.getElementById('miniDrawerHistory');
+    const headerHistory = document.querySelector(".mini-drawer-header-history");
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("notification-history");
+    wrapper.innerHTML = "<span>읽은 알림이 없습니다.</span>";
+    miniDrawerHistory.insertBefore(wrapper, headerHistory.nextSibling);
 }
+
 
 function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
@@ -475,6 +414,10 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
     wrapper.appendChild(msg);
     wrapper.appendChild(dateSpan);
+
+    // 초기 메시지가 없는데, stopm로 새로운 메시지가 온 경우에 "새로운 알림이 없습니다." 제거
+    if(!hasInitMessage)
+        miniDrawer.replaceChildren();
     miniDrawer.insertBefore(wrapper, header.nextSibling);
 
     const bell = document.getElementById("openMiniDrawerBtn");
@@ -501,7 +444,7 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
             msg.style.opacity = "0.6";
 
             if(data && typeof data.data === "string" && data.data.trim() !== ""){
-                const go = confirm("알림 페이지로 이동하시겠습니까?");
+                const go = confirm("이 알림과 관련된 페이지로 이동하시겠습니까?");
                 if (go){
                     if(data.data.includes("chat")){
                         window.open(data.data,"_blank","noopener,noreferrer");
@@ -515,8 +458,56 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
 
             // 알림 읽으면 읽음 숫자 차감
             badge.innerText = Math.max(parseInt(badge.innerText)-1, 0);
+
+            // 숫자 0이면 안뜨게 함
+            badge.style.display = Number(badge.innerText) > 0 ? 'inline-block' : 'none';
+
+
         }catch (err){
             console.error(err);
         }
     });
 }
+
+function createReadNotiStructure(notificationId, notificationMessage, createdDate, targetUrl) {
+
+    const miniDrawerHistory = document.getElementById('miniDrawerHistory');
+    const headerHistory = document.querySelector(".mini-drawer-header-history");
+
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("notification-history");
+    wrapper.classList.add("clicked");
+    //wrapper.style.pointerEvents = "none";
+
+    const msg = document.createElement("span");
+    msg.textContent = notificationMessage;
+    msg.style.opacity = "0.6";
+
+
+
+    const dateSpan = document.createElement("span");
+    dateSpan.classList.add("notification-date-history");
+    dateSpan.textContent = formatDate(createdDate);
+
+    wrapper.appendChild(msg);
+    wrapper.appendChild(dateSpan);
+
+
+    miniDrawerHistory.insertBefore(wrapper, headerHistory.nextSibling);
+
+
+    wrapper.addEventListener("click", async () => {
+
+        if(typeof targetUrl === "string" && targetUrl.trim() !== ""){
+            const go = confirm("이 알림과 관련된 페이지로 이동하시겠습니까?");
+            if (go)
+                window.open(targetUrl,"_blank","noopener,noreferrer");
+
+        } else {
+            alert("이동할 페이지가 없습니다.");
+        }
+
+
+    });
+}
+

@@ -4,6 +4,8 @@
     <title>MATCHON - 팀 수정</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/team/team-register.css}">
     <script th:src="@{/js/team/team-edit.js}" defer></script>
 </head>
 <body>
@@ -22,15 +24,19 @@
             <p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
         </div>
 
-        <label for="teamName">팀명</label>
-        <input type="text" th:field="*{teamName}" id="teamName" required />
+        <label>팀명</label>
+        <input type="text" th:field="*{teamName}" maxlength="30" required />
+        <div th:if="${#fields.hasErrors('teamName')}" th:errors="*{teamName}" class="field-error"></div>
+
 
         <label>팀원 모집 여부:</label>
         <input type="radio" th:field="*{recruitmentStatus}" value="true" /> 모집 중
         <input type="radio" th:field="*{recruitmentStatus}" value="false" /> 모집 완료
 
-        <label for="teamIntroduction">팀 소개</label>
-        <textarea th:field="*{teamIntroduction}" id="teamIntroduction" rows="4"></textarea>
+        <label>팀 소개</label>
+        <textarea th:field="*{teamIntroduction}" maxlength="300" rows="4" required></textarea>
+        <div th:if="${#fields.hasErrors('teamIntroduction')}" th:errors="*{teamIntroduction}" class="field-error"></div>
+
 
         <label>팀 지역</label>
         <div class="radio-group">
