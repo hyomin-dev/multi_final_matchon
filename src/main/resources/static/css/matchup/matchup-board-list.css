@@ -116,6 +116,7 @@ label[for="availableOnly"], label:has(#availableOnly) {
     text-decoration: none;
     transition: all 0.3s ease;
 }
+
 #filterBtn:hover{
     background-color: royalblue;
     transform: translateY(-2px);
