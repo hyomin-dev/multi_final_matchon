@@ -36,7 +36,7 @@ public class MatchupBoardController {
 
     // 게시글 작성하기
 
-    @PreAuthorize("hasAuthority('ROLE_USER')")
+    //@PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/register")
     public ModelAndView showMatchupBoardRegisterPage (ModelAndView mv){
         mv.setViewName("/matchup/matchup-board-register");
