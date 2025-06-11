@@ -176,51 +176,62 @@ function checkStatus(matchDatetime, matchEndtime, currentParticipantCount, maxPa
 
 function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature ){
     const matchDate = new Date(matchDatetime);
-    const now = new Date();
+    // const now = new Date();
+    // console.log(now);
+    // console.log(matchDate<now)
+    // console.log(matchDate>now)
 
-    if(writerEmail === loginEmail && matchDate<now){ //수정하기 버튼, 삭제하기 버튼
-       const modifyBtn = document.querySelector("#modify");
+    if(writerEmail === loginEmail){ //수정하기 버튼, 삭제하기 버튼
+       const modifyBtn = document.querySelector("#modifyBtn");
        const deleteBtn = document.querySelector("#deleteBtn");
 
         modifyBtn.addEventListener("click",(e)=>{
-           alert("경기 시작 시간이 지나 수정할 수 없습니다.");
-           e.preventDefault();
-       })
+            const now = new Date();
+            if(matchDate<=now){
+                e.preventDefault();
+                modifyBtn.href = "#";
+                alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+            }
+       });
 
         deleteBtn.addEventListener("click",(e)=>{
-            alert("경기 시작 시간이 지나 삭제할 수 없습니다.");
-            e.preventDefault();
-        })
-    }else if(writerEmail !==loginEmail){ // 문의하기, 참가요청 버튼
+            const now = new Date();
+            if(matchDate<=now){
+                e.preventDefault();
+                deleteBtn.href = "#";
+                alert("경기 시작 시간이 지나 삭제할 수 없습니다.");
+            }
+        });
+    } else if(writerEmail !==loginEmail){ // 문의하기, 참가요청 버튼
         const chatBtn = document.querySelector("#chat1-1Btn");
         const requestBtn = document.querySelector("#requestBtn");
 
-        if(matchDate < now){ // 날짜 지난 경우
-            chatBtn.href = "#";
-            requestBtn.href = "#";
-
-            chatBtn.addEventListener("click",()=>{
+        chatBtn.addEventListener("click",(e)=>{
+            const now = new Date();
+            if(matchDate<=now){
+                e.preventDefault();
+                chatBtn.href = "#";
                 alert("경기 시작 시간이 지나 1대1 문의를 할 수 없습니다.")
-            })
+            }
+        });
 
-            requestBtn.addEventListener("click",()=>{
+        requestBtn.addEventListener("click",(e)=>{
+            const now = new Date();
+            if(matchDate<=now){
+                e.preventDefault();
+                requestBtn.href = "#";
                 alert("경기 시작 시간이 지나 참가 요청을 할 수 없습니다.")
-            })
-
-        }else if(currentParticipantCount >=maxParticipants){ // 참가 인원 다 찬 경우
-            requestBtn.href = "#";
-            requestBtn.addEventListener("click",(e)=>{
-                alert("현재 참가 요청 인원이 다 모집되어, 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+            }else if(minMannerTemperature>myMannerTemperature){  // 매너 온도 충족 안된 경우
                 e.preventDefault();
-            })
-
-        }else if(minMannerTemperature>myMannerTemperature){ // 매너 온도 충족 안된 경우
-            requestBtn.href = "#";
-            requestBtn.addEventListener("click",(e)=>{
+                requestBtn.href = "#";
                 alert("입장 가능 매너 온도를 충족하지 못해 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+            }else if(currentParticipantCount >=maxParticipants) {  // 참가 인원 다 찬 경우
                 e.preventDefault();
-            })
-        }
+                chatBtn.href = "#";
+                alert("현재 참가 요청 인원이 다 모집되어, 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+            }
+        });
+
     }
 }
 
@@ -231,19 +242,6 @@ function goBack(){
         window.location.href = "/matchup/board";
     }
 }
-
-function goBack(){
-    if (document.referrer) {
-        window.location.href = document.referrer;
-    } else {
-        window.location.href = "/matchup/board";
-    }
-}
-
-
-
-
-
 
 
 

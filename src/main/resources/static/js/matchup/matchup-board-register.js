@@ -198,6 +198,7 @@ async function getMyMannerTemperature(){
         return data.data;
     }catch(err){
         console.log(err);
+        return 20;
     }
 
 }
