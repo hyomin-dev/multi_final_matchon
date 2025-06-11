@@ -31,7 +31,7 @@
 
     <div class="chat-card" th:each="room : ${teamRooms}">
       <div class="chat-col chat-name" th:text="${room.roomName}">채팅방 이름</div>
-      <div class="chat-col chat-group">팀 채팅</div>
+      <div class="chat-col chat-group"><strong>${expressIsGroupChat(room.isGroupChat)}</strong></div>
       <div class="chat-col chat-unread" th:text="${room.unReadCount}">0</div>
       <div class="chat-col chat-actions">
         <a th:href="@{'/chat/my/room?roomId=' + ${room.roomId}}" class="chat-enter-btn">입장</a>

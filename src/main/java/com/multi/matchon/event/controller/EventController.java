@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.multi.matchon.common.domain.Status.*;
-
 @Controller
 @RequiredArgsConstructor
 public class EventController {

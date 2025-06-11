@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -84,12 +85,13 @@ public class TeamController {
             @RequestParam(value="size", required = false, defaultValue = "5") int size,
             @RequestParam(value = "recruitingPosition", required = false) String recruitingPosition,
             @RequestParam(value = "region", required = false) String region,
-            @RequestParam(value = "teamRatingAverage", required = false) Double teamRatingAverage
+            @RequestParam(value = "teamRatingAverage", required = false) Double teamRatingAverage,
+            @RequestParam(value = "recruitmentStatus", required = false) Boolean recruitmentStatus  // ✅ NEW
     ){
 
         log.info("⭐ Rating Filter Received: {}", teamRatingAverage);
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
-        PageResponseDto<ResTeamDto> pageResponseDto = teamService.findAllWithPaging(pageRequest, recruitingPosition, region, teamRatingAverage);
+        PageResponseDto<ResTeamDto> pageResponseDto = teamService.findAllWithPaging(pageRequest, recruitingPosition, region, teamRatingAverage, recruitmentStatus);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
     }
 
@@ -109,6 +111,14 @@ public class TeamController {
                 .orElseThrow(() -> new IllegalArgumentException("팀장 정보를 찾을 수 없습니다."));
 
         teamDto.setLeaderId(leader.getId()); // ✅ inject leaderId into the DTO
+        mv.addObject("teamLeaderId", leader.getId());
+
+
+        // 4. Determine if user is in any team
+        boolean userHasTeam = user.getMember().getTeam() != null;
+
+        // 5. Check if user is in this team (even if not a leader)
+        boolean isMemberOfThisTeam = userHasTeam && user.getMember().getTeam().getId().equals(teamId);
 
 
         // NEW: Calculate user role
@@ -121,11 +131,12 @@ public class TeamController {
             userRole = "GUEST";
         }
 
-        mv.addObject("teamLeaderId", leader.getId());
-        mv.addObject("userRole", userRole);
 
-        boolean hasTeam = user.getMember().getTeam() != null;
-        mv.addObject("hasTeam", hasTeam);
+        mv.addObject("userRole", userRole);
+        mv.addObject("hasTeam", userHasTeam);
+        mv.addObject("isLeaderOfCurrentTeam", isLeader); // 👈 for tab disabling logic
+        mv.addObject("userHasTeam", userHasTeam);         // 👈 for tab disabling logic
+
 
 
         return mv;
@@ -207,18 +218,32 @@ public class TeamController {
 
     @GetMapping("/team/{teamId}/join-requests")
     @ResponseBody
-    public ResponseEntity<ApiResponse<List<ResJoinRequestDto>>> getPendingJoinRequests(
-            @PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
+    public ResponseEntity<ApiResponse<PageResponseDto<ResJoinRequestDto>>> getPendingJoinRequests(
+            @PathVariable Long teamId, @AuthenticationPrincipal CustomUser user,  @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size) {
 
-        List<ResJoinRequestDto> requests = teamService.getJoinRequestsForTeam(teamId, user);
-        return ResponseEntity.ok(ApiResponse.ok(requests));
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        PageResponseDto<ResJoinRequestDto> pagedRequests = teamService.getJoinRequestsForTeam(teamId, user, pageRequest);
+        return ResponseEntity.ok(ApiResponse.ok(pagedRequests));
     }
 
     @PostMapping("/team/join-request/{requestId}/approve")
     @ResponseBody
     public ResponseEntity<ApiResponse<Void>> approveJoinRequest(@PathVariable Long requestId) {
-        teamService.approveJoinRequest(requestId);
-        return ResponseEntity.ok(ApiResponse.ok(null));
+        try {
+            teamService.approveJoinRequest(requestId);
+            return ResponseEntity.ok(ApiResponse.ok(null));
+        } catch (IllegalStateException e) {
+            // This is where the alert-worthy message like "이미 팀이 있는 사용자 입니다" is sent back
+            return ResponseEntity
+                    .badRequest()
+                    .body(ApiResponse.fail(e.getMessage()));
+        } catch (Exception e) {
+            // Generic fallback error
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.fail("요청 처리 중 문제가 발생했습니다."));
+        }
     }
 
     @PostMapping("/team/join-request/{requestId}/reject")

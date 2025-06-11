@@ -11,14 +11,20 @@
     <h2 class="page-title">가입 신청 상세 보기</h2>
 
     <div class="request-detail">
-        <img th:src="${joinRequest.profileImageUrl}" alt="프로필 이미지" class="profile-image"/>
+        <img th:src="${joinRequest.profileImageUrl}"
+             alt="프로필 이미지"
+             class="profile-image"
+             onerror="this.onerror=null; this.src='/img/default-user.png';"/>
 
         <h3 th:text="${joinRequest.nickname}" class="nickname">닉네임</h3>
 
         <p><strong>선호하는 포지션:</strong> <span th:text="${joinRequest.position}">미정</span></p>
         <p><strong>매너 온도:</strong> <span th:text="${joinRequest.temperature}">36.5도</span></p>
         <p><strong>선호하는 시간대:</strong> <span th:text="${joinRequest.preferredTime}">미정</span></p>
-        <p><strong>간단한 소개글:</strong> <span th:text="${joinRequest.introduction}">소개글</span></p>
+        <p>
+            <strong>간단한 소개글:</strong>
+            <span th:text="${joinRequest.introduction}" class="intro-text"></span>
+        </p>
 
         <!-- ✅ Add this hidden input for JS -->
         <input type="hidden" id="applicantId" th:value="${joinRequest.applicantId}">
@@ -50,17 +56,31 @@
         }
     });
 
-    function approveRequest(requestId) {
+    async function approveRequest(requestId) {
         if (!confirm("정말로 승인하시겠습니까?")) return;
 
-        fetch(`/team/team/join-request/${requestId}/approve`, {
-            method: 'POST'
-        }).then(res => {
-            if (!res.ok) throw new Error();
+        try {
+            const res = await fetch(`/team/team/join-request/${requestId}/approve`, {
+                method: 'POST'
+            });
+
+            const result = await res.json();
+
+            if (!res.ok || !result.success) {
+                // ❗ Show backend error message (like "이미 팀이 있는 사용자 입니다")
+                alert(result.message || "가입 승인 중 오류가 발생했습니다.");
+                return;
+            }
+
             alert("가입 요청이 승인되었습니다.");
-            window.location.href = "/team"; // 혹은 요청 목록 페이지로 리디렉션
-        }).catch(() => alert("승인에 실패했습니다."));
+            window.location.href = "/team"; // Or redirect to the request list
+
+        } catch (err) {
+            alert("승인 중 네트워크 오류가 발생했습니다.");
+            console.error(err);
+        }
     }
+
 
     function rejectRequest(requestId) {
         if (!confirm("정말로 거절하시겠습니까?")) return;

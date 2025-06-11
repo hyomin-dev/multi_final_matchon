@@ -14,16 +14,19 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final SecretKey secretKey;
+    private final String issuer;
     private final long accessTokenValidity = 60 * 60 * 1000L; // 1시간
     private final long refreshTokenValidity = 14 * 24 * 60 * 60 * 1000L; // 14일
 
-    public JwtTokenProvider(@Value("${jwt.secret}") String secret) {
+    public JwtTokenProvider(@Value("${jwt.secret}") String secret, @Value("${jwt.issuer}") String issuer) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        this.issuer = issuer;
     }
 
     public String createAccessToken(String email, MemberRole role) {
         return Jwts.builder()
                 .setSubject(email)
+                .setIssuer(issuer)
                 .claim("role", role.name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidity))
@@ -34,6 +37,7 @@ public class JwtTokenProvider {
     public String createRefreshToken(String email, MemberRole role) {
         return Jwts.builder()
                 .setSubject(email)
+                .setIssuer(issuer)
                 .claim("role", role.name()) // role 포함해야 getRoleFromToken이 null 안 됨
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))

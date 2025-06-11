@@ -17,8 +17,8 @@
             <a href="#" id="tab-reviews" th:text="${isTeamLeader} ? '후기 보기/답변' : '후기 보기/쓰기'"></a>
             <a href="#"
                id="tab-join"
-               th:classappend="${!isTeamLeader and hasTeam} ? 'disabled-tab' : null"
-               th:attr="data-disabled=${!isTeamLeader and hasTeam}">
+               th:classappend="${(!isTeamLeader) and (userHasTeam or !team.recruitmentStatus)} ? 'disabled-tab' : null"
+               th:attr="data-disabled=${(!isTeamLeader) and (userHasTeam or !team.recruitmentStatus)}">
                 <span th:text="${isTeamLeader} ? '가입 신청 관리' : '팀/가입 신청'"></span>
                 <span id="joinRequestDot"
                       th:if="${isTeamLeader and joinRequestCount > 0}"
@@ -39,7 +39,13 @@
             <div class="team-info">
                 <div class="info-box">
                     <h2>팀 소개</h2>
-                    <p th:text="${team.teamIntroduction}">팀 소개 내용</p>
+                    <p class="team-intro" th:text="${team.teamIntroduction}">팀 소개 내용</p>
+                </div>
+                <div class="info-box">
+                    <h2>모집 상태</h2>
+                    <div class="recruit-status-box">
+                        <p th:text="${team.recruitmentStatus} ? '모집중' : '모집 완료'"></p>
+                    </div>
                 </div>
                 <div class="info-box">
                     <h2>팀 활동 지역</h2>
@@ -140,13 +146,17 @@
             <!-- 팀장 전용: 가입 요청 리스트 -->
             <div id="joinRequestListSection" style="display: none;">
                 <h2>가입 요청 목록</h2>
-                <div id="joinRequestsContainer">
+                <!-- 🔧 FIXED: Use the correct ID for rendering the list -->
+                <div id="join-request-list-section"></div>
+
+                <!-- ✅ Add this for pagination -->
+                <div id="join-request-pagination" style="margin-top: 20px; text-align: center;"></div>
                     <!-- 요청들이 여기에 렌더링될 예정 -->
                 </div>
             </div>
         </div>
     </div> <!-- End of .team-content -->
-</div> <!-- End of .content-wrapper -->
+
 
 
 <div id="leader-flag" th:data-leader="${isTeamLeader}"></div>
@@ -154,6 +164,10 @@
 <input type="hidden" id="teamId" th:value="${team.teamId}">
 <input type="hidden" id="teamLeaderId" th:value="${teamLeaderId}">
 <input type="hidden" id="userRole" th:value="${userRole}"> <!-- e.g., 'LEADER', 'MEMBER', 'GUEST' -->
+<input type="hidden" id="recruitmentStatus" th:value="${team.recruitmentStatus}">
+<input type="hidden" id="isLeaderOfCurrentTeam" th:value="${isLeaderOfCurrentTeam}">
+<input type="hidden" id="userHasTeam" th:value="${userHasTeam}">
+
 <div th:replace="~{common/footer::footer}"></div>
 
 <script th:inline="javascript">
@@ -287,35 +301,95 @@
         const joinRequestSection = document.getElementById('joinRequestSection');
         const joinRequestListSection = document.getElementById('joinRequestListSection');
 
+        let currentJoinPage = 0;
 
-        function loadJoinRequests() {
-            fetch(`/team/team/${teamId}/join-requests`)
+        function loadJoinRequests(page = 0) {
+            const teamId = document.getElementById('teamId').value;
+
+            fetch(`/team/team/${teamId}/join-requests?page=${page}&size=5`)
                 .then(res => res.json())
-                .then(data => {
-                    const requests = data.data;
+                .then(result => {
+                    const data = result.data;
+                    const requests = data.items;
+                    const pageInfo = data.pageInfo;
+
+                    currentJoinPage = page;
+
+                    const container = document.getElementById('join-request-list-section');
+                    const pagination = document.getElementById('join-request-pagination');
+
                     if (!requests.length) {
-                        joinRequestListSection.innerHTML = '<p>아직 가입 신청이 없습니다.</p>';
+                        container.innerHTML = '<p>가입 요청이 없습니다.</p>';
+                        pagination.innerHTML = '';
                         return;
                     }
 
-                    joinRequestListSection.innerHTML = requests.map(r => `
+                    // ✅ ADD these mappings INSIDE this function (before rendering)
+                    const statusMap = {
+                        APPROVED: '승인',
+                        DENIED: '거절',
+                        PENDING: '대기중'
+                    };
+
+                    const statusClassMap = {
+                        APPROVED: 'badge-approve',
+                        DENIED: 'badge-deny',
+                        PENDING: 'badge-pending'
+                    };
+
+                    // ✅ Render join requests
+                    container.innerHTML = requests.map(r => `
                 <div class="request-item">
                     <p><strong>${r.applicantName}</strong> (${r.applicantEmail})</p>
                     <p>${r.introduction}</p>
-                    <button class="view-detail-btn" data-id="${r.requestId}">자세히 보기</button>
+                   <span class="${statusClassMap[r.joinRequestStatus]}">${statusMap[r.joinRequestStatus]}</span>
+                    ${r.joinRequestStatus === 'PENDING' ? `<button class="view-detail-btn" data-id="${r.requestId}">자세히 보기</button>` : ''}
                 </div>
             `).join('');
 
+                    // ✅ Bind view buttons
                     document.querySelectorAll('.view-detail-btn').forEach(btn => {
                         btn.addEventListener('click', () => {
                             const requestId = btn.dataset.id;
                             window.location.href = `/team/team/${teamId}/join-request/${requestId}`;
                         });
                     });
+
+                    // ✅ Render pagination
+                    renderJoinRequestPagination(pageInfo);
                 })
                 .catch(() => {
-                    joinRequestListSection.innerHTML = '<p>가입 요청을 불러오는 데 실패했습니다.</p>';
+                    document.getElementById('join-request-list-section').innerHTML = '<p>가입 요청을 불러오는 데 실패했습니다.</p>';
+                    document.getElementById('join-request-pagination').innerHTML = '';
                 });
+        }
+        window.loadJoinRequests = loadJoinRequests;
+
+
+        function renderJoinRequestPagination(pageInfo) {
+            const pagination = document.getElementById('join-request-pagination');
+            pagination.innerHTML = '';
+
+            const totalPages = pageInfo.totalPages;
+            const currentPage = currentJoinPage;
+
+            // ⬅ 이전
+            if (currentPage > 0) {
+                pagination.innerHTML += `<button onclick="loadJoinRequests(${currentPage - 1})">이전</button>`;
+            }
+
+            // 🔢 번호들
+            for (let i = 0; i < totalPages; i++) {
+                pagination.innerHTML += `
+            <button onclick="loadJoinRequests(${i})" ${i === currentPage ? 'style="font-weight:bold;"' : ''}>
+                ${i + 1}
+            </button>`;
+            }
+
+            // ➡ 다음
+            if (currentPage < totalPages - 1) {
+                pagination.innerHTML += `<button onclick="loadJoinRequests(${currentPage + 1})">다음</button>`;
+            }
         }
 
         function loadMyResponses() {
@@ -517,7 +591,6 @@
                         const data = await response.json();
                         if (data.success) {
                             alert('팀 가입 신청이 완료되었습니다.');
-                            joinRequestSection.style.display = 'none';
                             joinTeamForm.reset();
                         } else {
                             alert(data.message || '팀 가입 신청에 실패했습니다.');
@@ -800,23 +873,33 @@
 
             loadPagedReviews(0); // load paged reviews instead of all
         });
-
         tabJoin.addEventListener('click', (e) => {
-            const isDisabled = tabJoin.dataset.disabled === 'true';
+            e.preventDefault();
+
+            const userRole = document.getElementById('userRole')?.value;
+            const userHasTeam = document.getElementById('userHasTeam')?.value === 'true';
+            const recruitmentStatus = document.getElementById('recruitmentStatus')?.value === 'true'; // true if 모집중
+            const isDisabled = tabJoin.classList.contains('disabled-tab');
+
             if (isDisabled) {
-                alert("이미 소속된 팀이 있습니다.");
-                e.preventDefault();
+                if (userHasTeam) {
+                    alert("이미 소속된 팀이 있습니다.");
+                } else if (!recruitmentStatus) {
+                    alert("이 팀은 더 이상 팀원을 모집하지 않습니다.");
+                } else {
+                    alert("가입이 불가능한 상태입니다.");
+                }
                 return;
             }
-            e.preventDefault();
+
             clearTabs();
             tabJoin.classList.add('active');
 
             if (isTeamLeader) {
                 joinRequestListSection.style.display = 'block';
-                loadJoinRequests(); // 👈 load requests list for team leader
+                loadJoinRequests(0);
             } else {
-                joinRequestSection.style.display = 'block'; // normal user sees the form
+                joinRequestSection.style.display = 'block';
             }
         });
 

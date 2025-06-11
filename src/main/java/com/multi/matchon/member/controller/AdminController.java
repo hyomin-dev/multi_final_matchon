@@ -187,6 +187,21 @@ public class AdminController {
         return "redirect:/admin/event";
     }
 
+    @PostMapping("/event/{id}/delete")
+    @Transactional
+    public String deleteApprovedEvent(@PathVariable Long id) {
+        EventRequest event = eventRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 대회를 찾을 수 없습니다."));
+
+        // 승인 상태가 아닌 경우 삭제 불가
+        if (event.getEventStatus() != Status.APPROVED) {
+            throw new IllegalStateException("승인된 대회만 삭제할 수 있습니다.");
+        }
+
+        eventRepository.delete(event);
+        return "redirect:/admin/event";
+    }
+
     @GetMapping("/reports")
     public String redirectToReportsPage() {
         return "redirect:/admin/reports/page";

@@ -5,9 +5,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function getMyTeamChatRooms() {
     try {
         const response = await fetch("/chat/my/rooms/team", {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" }
+            method: "GET",
+            credentials: "include"
         });
 
         if (!response.ok) {
@@ -21,6 +20,9 @@ async function getMyTeamChatRooms() {
 
         const chatRoomList = document.querySelector(".chat-room-list");
 
+        // ✅ Step 1: Clear existing content to avoid duplicates
+        chatRoomList.innerHTML = "";
+
         if (!rooms || rooms.length === 0) {
             chatRoomList.innerHTML = `
                 <div class="no-result">
@@ -30,26 +32,79 @@ async function getMyTeamChatRooms() {
             return;
         }
 
-        rooms.forEach(room => {
-            const card = document.createElement("div");
-            card.className = "chat-card";
+        // ✅ ADD THIS HERE
+        function expressIsGroupChat(isGroupChat) {
+            return isGroupChat === true ? "그룹 채팅" : "1:1 채팅";
+        }
+
+        function setButton(card,item){
+            const enterBtn = card.querySelector(".enter-btn");
+            enterBtn.textContent = "입장";
+
+            const exitBtn = card.querySelector(".exit-btn");
+            if(item.isGroupChat === true){
+
+                enterBtn.addEventListener("click",()=>{
+                    window.open(`/chat/group/room?roomId=${item.roomId}`,"_blank","noopener,noreferrer");
+                });
+
+                exitBtn.textContent = "퇴장";
+                exitBtn.disabled = true;
+            }
+
+            else{
+
+                if(item.isBlock===true){
+                    exitBtn.textContent = "해제";
+                    exitBtn.addEventListener("click",(e)=>{
+                        let reply = confirm("정말 차단 해제 하시겠습니까?");
+                        if(reply){
+                            window.location.href = `/chat/room/private/team/unblock?roomId=${item.roomId}`;
+                        }else{
+                            e.preventDefault();
+                        }
+                    });
+
+                    enterBtn.disabled=true;
+
+                }else{
+                    exitBtn.textContent = "차단";
+                    exitBtn.addEventListener("click",(e)=>{
+                        let reply = confirm("정말 차단 하시겠습니까?");
+                        if(reply){
+                            window.location.href = `/chat/room/private/team/block?roomId=${item.roomId}`;
+                        }else{
+                            e.preventDefault();
+                        }
+                    });
+
+                    enterBtn.addEventListener("click",()=>{
+                        window.open(`/chat/my/room?roomId=${item.roomId}`,"_blank","noopener,noreferrer");
+                    });
+                }
+            }
+        }
+
+
+
+        // ✅ Sort rooms to always show group chat on top
+        rooms
+            .forEach(room => {
+                const card = document.createElement("div");
+                card.className = "chat-card";
 
             card.innerHTML = `
                 <div class="chat-col chat-name"><strong>${room.roomName}</strong></div>
-                <div class="chat-col chat-group"><strong>팀 채팅</strong></div>
-                <div class="chat-col chat-unread"><strong>${room.unreadCount || 0}</strong></div>
+                <div class="chat-col chat-group"><strong>${expressIsGroupChat(room.isGroupChat)}</strong></div>
+                <div class="chat-col chat-unread"><strong>${room.unReadCount || 0}</strong></div>
                 <div class="chat-col chat-actions">
                     <button class="btn enter-btn">입장</button>
+                     <button class="btn exit-btn"></button> <!-- ✅ Add this line -->
                 </div>
             `;
 
-            const enterBtn = card.querySelector(".enter-btn");
-            enterBtn.addEventListener("click", () => {
-                window.location.href = `/chat/my/room?roomId=${room.roomId}`;
-                // or open in new tab:
-                // window.open(`/chat/my/room?roomId=${room.roomId}`, "_blank");
-            });
 
+                setButton(card, room); // ✅ Add this line
             chatRoomList.appendChild(card);
         });
 

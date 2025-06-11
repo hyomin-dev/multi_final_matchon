@@ -8,7 +8,6 @@
 }
 
 /* 이거 추가: 버튼 그룹 우측 정렬 */
-
 .topbar-buttons {
     display: flex;
     gap: 0.8rem;
@@ -17,23 +16,41 @@
     margin-bottom: 2rem;
 }
 
-.button-group,
-.topbar-buttons button {
-    background-color: dodgerblue;
+/*.button-group,*/
+/*.topbar-buttons button {*/
+/*    background-color: dodgerblue;*/
+/*    color: white;*/
+/*    padding: 10px 20px;*/
+/*    border: none;*/
+/*    border-radius: 6px;*/
+/*    font-size: 15px;*/
+/*    font-weight: bold;*/
+/*    cursor: pointer;*/
+/*    text-decoration: none;*/
+/*    transition: background-color 0.3s;*/
+/*}*/
+
+/*.button-group:hover,*/
+/*.topbar-buttons button:hover{*/
+/*    background-color: royalblue;*/
+/*}*/
+
+.topbar-buttons .back-btn {
+    background-color: #888;
     color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
     font-weight: bold;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
     cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.3s;
+    transition: all 0.2s ease;
 }
 
-.button-group:hover,
-.topbar-buttons button:hover{
-    background-color: royalblue;
+.topbar-buttons .back-btn:hover {
+    background-color: #666;
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* ===== 게시판 테이블 ===== */

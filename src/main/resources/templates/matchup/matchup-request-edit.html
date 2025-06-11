@@ -94,6 +94,7 @@
         <form th:object="${resMatchupRequestDto}" th:action="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}" method="post" id="request-info">
             <input type="hidden" th:field="*{requestId}">
             <input type="hidden" th:field="*{matchDatetime}">
+            <input type="hidden" th:field="*{matchEndtime}">
             <!--        <label>-->
             <!--            소개:-->
             <!--            <textarea cols="30" rows="5" placeholder="자기 소개를 입력하세요." th:text="*{selfIntro}" th:field="*{selfIntro}" required>-->

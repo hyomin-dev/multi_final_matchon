@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/login/login.css}">
+
 </head>
 
 <body>
@@ -53,8 +54,16 @@
 
                     <div class="mini-drawer" id="miniDrawer">
                         <div class="mini-drawer-header">
+                            <button class="close-mini" id="openMiniDrawerHistoryBtn">📜</button>
                             <h4>알림</h4>
                             <button class="close-mini" id="closeMiniDrawerBtn">&times;</button>
+                        </div>
+                    </div>
+                    <div class="mini-drawer-history" id="miniDrawerHistory">
+                        <div class="mini-drawer-header-history">
+                            <div></div>
+                            <h4>기존 알림</h4>
+                            <button class="close-mini-history" id="closeMiniDrawerBtnHistoryBtn">&times;</button>
                         </div>
                     </div>
                 </div>
@@ -206,8 +215,20 @@
                     .then(msg => {
                         document.getElementById("changeResult").innerText = msg;
                         document.getElementById("changeResult").style.color = "#28a745";
+
                         setTimeout(() => {
-                            closeChangePopup();
+                            // 팝업 닫기
+                            document.getElementById("changePasswordPopup").style.display = "none";
+                            document.getElementById("popupOverlay").style.display = "none";
+
+                            // 버튼 다시 활성화
+                            document.querySelectorAll("a, button").forEach(btn => {
+                                btn.disabled = false;
+                                btn.style.pointerEvents = "auto";
+                                btn.style.opacity = "1";
+                            });
+
+                            localStorage.removeItem("showPasswordPopup");
                             window.location.reload();
                         }, 1500);
                     })
@@ -269,14 +290,32 @@
     }
 
     function openChangePasswordPopup() {
-        document.getElementById("changePasswordPopup").style.display = "block";
-        document.getElementById("popupOverlay").style.display = "block";
+        const popup = document.getElementById("changePasswordPopup");
+        const overlay = document.getElementById("popupOverlay");
+
+        popup.style.display = "block";
+        overlay.style.display = "block";
+
+        // 닫기 버튼 숨기기
+        const closeBtn = popup.querySelector("button[onclick='closeChangePopup()']");
+        if (closeBtn) closeBtn.style.display = "none";
+
+        // 다른 모든 버튼 비활성화 (팝업 내부 제외)
+        document.querySelectorAll("a, button").forEach(btn => {
+            if (!popup.contains(btn)) {
+                btn.disabled = true;
+                btn.style.pointerEvents = "none";
+                btn.style.opacity = "0.4";
+            }
+        });
+
+        // 오버레이 클릭 막기
+        overlay.style.pointerEvents = "auto";
+        overlay.style.background = "rgba(0,0,0,0.5)";
     }
 
     function closeChangePopup() {
-        document.getElementById("changePasswordPopup").style.display = "none";
-        document.getElementById("popupOverlay").style.display = "none";
-        document.getElementById("changeResult").innerText = "";
+
     }
 </script>
 <script th:src="@{/js/aibot/aichatbot.js}"></script>

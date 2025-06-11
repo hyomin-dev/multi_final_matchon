@@ -13,6 +13,14 @@ window.onload = () => {
             if (e.key === "Enter") sendMessage();
         });
     }
+
+    // 위치 권한 미리 요청
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            () => { console.log("위치 권한 허용됨"); },
+            () => { console.warn("위치 권한 거부됨"); }
+        );
+    }
 };
 
 // 챗봇 런처 및 모달 처리
@@ -21,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const modal = parent.document.getElementById("chatbot-modal");
     const closeBtn = parent.document.getElementById("chatbot-close");
 
-    // 로그인 확인
     fetch("/auth/check", { credentials: "include" })
         .then(res => {
             if (!res.ok) {
@@ -50,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// 챗봇 대화 시작
 function initChat() {
     const start = document.getElementById("chat-start");
     const ui = document.getElementById("chat-ui");
@@ -59,7 +65,6 @@ function initChat() {
     appendBotMessage("안녕하세요! MatchON 챗봇입니다! 궁금하신 내용을 선택해 주세요!");
 }
 
-// 메시지 출력
 function appendMessage(text, isUser = false, bold = false) {
     const chatBox = document.getElementById("chat-box");
     if (!chatBox) return;
@@ -95,7 +100,6 @@ function appendMessage(text, isUser = false, bold = false) {
     }, isUser ? 0 : 100);
 }
 
-// HTML 이스케이프
 function escapeHtml(str) {
     return str.replace(/[&<>"']/g, match => ({
         '&': '&amp;',
@@ -106,7 +110,6 @@ function escapeHtml(str) {
     }[match]));
 }
 
-// 봇/유저 메시지
 function appendBotMessage(text) {
     appendMessage(text, false);
 }
@@ -114,7 +117,6 @@ function appendUserMessage(text, bold = false) {
     appendMessage(text, true, bold);
 }
 
-// 전송 버튼 클릭 or 엔터
 function sendMessage() {
     const input = document.getElementById("chat-input");
     const message = input.value.trim();
@@ -124,13 +126,11 @@ function sendMessage() {
     fetchBotReply(message);
 }
 
-// 추천 버튼 클릭 시
 function sendChip(text) {
     appendUserMessage(text, true);
     fetchBotReply(text);
 }
 
-// 서버에 질문 전송 → 답변 수신
 function fetchBotReply(message) {
     appendBotMessage("입력 중...");
 
@@ -145,8 +145,62 @@ function fetchBotReply(message) {
             const reply = data.reply;
             const chatBox = document.getElementById("chat-box");
             const messages = chatBox.querySelectorAll(".bot .msg-content");
+
             if (messages.length > 0) {
                 messages[messages.length - 1].innerHTML = reply;
+            }
+
+            const isFallback = reply.includes("죄송") || reply.includes("이해하지 못했어요");
+
+            const regionMatch = message.match(/(.+?) ?근처/);
+            if (regionMatch && regionMatch[1]) {
+                const region = regionMatch[1];
+                fetch(`/api/stadiums/search?keyword=${region}`)
+                    .then(res => res.json())
+                    .then(list => {
+                        if (isFallback) {
+                            const fallbackMsg = chatBox.querySelector(".bot .msg-content");
+                            if (fallbackMsg && fallbackMsg.innerText.includes("죄송")) {
+                                fallbackMsg.closest(".message").remove();
+                            }
+                        }
+
+                        const msg = list.length > 0
+                            ? list.map(s =>
+                                `📍 <b>${s.stadiumName}</b><br>🏟️ ${s.stadiumAddress}<br>📞 ${s.stadiumTel || '정보 없음'}<br><hr>`
+                            ).join("")
+                            : `${region} 근처에 경기장이 없습니다.`;
+                        appendBotMessage(msg);
+                    });
+                return; // 매칭된 경우 중복 처리 방지
+            }
+
+            if (message.includes("내 주변 경기장")) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    fetch(`/api/stadiums/nearby?lat=${lat}&lng=${lng}`)
+                        .then(res => res.json())
+                        .then(list => {
+                            if (isFallback) {
+                                const fallbackMsg = chatBox.querySelector(".bot .msg-content");
+                                if (fallbackMsg && fallbackMsg.innerText.includes("죄송")) {
+                                    fallbackMsg.closest(".message").remove();
+                                }
+                            }
+
+                            const msg = list.length > 0
+                                ? list.map(s =>
+                                    `📍 <b>${s.stadiumName}</b><br>🏟️ ${s.stadiumAddress}<br>📞 ${s.stadiumTel || '없음'}<br><hr>`
+                                ).join("")
+                                : "❌ 근처에 경기장이 없습니다.";
+                            appendBotMessage(msg);
+                        });
+                }, function () {
+                    appendBotMessage("⚠️ 위치 정보를 가져올 수 없습니다. 위치 권한을 허용해 주세요.");
+                });
+                return; // 중복 처리 방지
             }
 
             if (message.includes("종료")) {
@@ -157,4 +211,3 @@ function fetchBotReply(message) {
             }
         });
 }
-
