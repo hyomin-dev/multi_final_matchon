@@ -12,7 +12,7 @@
 <body>
 <div th:replace="~{common/header::header}"></div>
 <div id="wrap">
-    <h1>TEAM 목록</h1>
+    <h1 class="page-title">TEAM 목록</h1>
     <div id="user-info" th:data-email="${#authentication.name}"></div>
 
     <div id="filter">
@@ -82,11 +82,13 @@
     </div>
 
     <div class="button-container">
-        <a th:href="@{/team/team/register}"><button>팀 등록하기</button></a>
-        <button type="button" id="myTeamBtn">내 팀 보기</button>
+        <a th:href="@{/team/team/register}">
+            <button class="btn-register">팀 등록하기</button>
+        </a>
+        <button type="button" id="myTeamBtn" class="btn-myteam">내 팀 보기</button>
 
-        <button type="button" id="backToAllBtn" style="display: none;">
-            전체 목록으로 돌아가기
+        <button type="button" id="backToAllBtn" class="back-list" style="display: none;">
+            전체 목록
         </button>
     </div>
 
