@@ -137,29 +137,33 @@ table tr:hover {
 }
 
 .btninquiry {
-    background-color: dodgerblue;
+    background: linear-gradient(to right, #429F6B, #22D6B2);
     color: white;
     font-weight: bold;
     padding: 8px 16px;
     border-radius: 8px;
     text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .btninquiry:hover {
-    background-color: #1c7ed6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
 }
 
 .btnsubmit {
-    background-color: #1c7ed6;
+    background: linear-gradient(to right, #FFB432, #FF7F50);
     color: white;
     font-weight: bold;
     padding: 8px 16px;
     border-radius: 8px;
     text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .btnsubmit:hover {
-    background-color: #125b9b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 193, 7, 0.3);
 }
 
 .titlefaq {
@@ -211,16 +215,19 @@ table tr:hover {
 .btn-search {
     background-color: dodgerblue;
     color: white;
-    font-weight: bold;
-    padding: 10px 14px;
-    height: 40px;
+    padding: 8px 16px;
+    margin-left: 10px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-sizing: border-box;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .btn-search:hover {
-    background-color: #1c7ed6;
+    background-color: royalblue;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
 }

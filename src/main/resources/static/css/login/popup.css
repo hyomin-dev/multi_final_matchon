@@ -1,10 +1,17 @@
 /* popup.css */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
 
 .popup-overlay {
     position: fixed;
     top: 0; left: 0;
-    width: 100%; height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.5);
+    animation: overlayFadeIn 0.3s ease forwards;
     z-index: 9999;
     display: none;
 }
@@ -13,16 +20,39 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    /*transform: translate(-50%, -50%);*/
     background: #fff;
     padding: 30px 24px;
     border-radius: 12px;
     width: 380px;
+    animation: popupFadeIn 0.3s ease forwards;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     border-top: 5px solid blueviolet;
     z-index: 10000;
     display: none;
 }
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+
 
 .popup h3 {
     font-size: 22px;

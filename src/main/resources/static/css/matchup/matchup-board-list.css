@@ -102,49 +102,80 @@ label[for="availableOnly"], label:has(#availableOnly) {
     cursor: pointer;
 }
 
+/*버튼 스타일*/
 
 #filterBtn{
     background-color: dodgerblue;
     color: white;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
 }
+
 #filterBtn:hover{
     background-color: royalblue;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
 }
 
 
-/* 이거 추가: 버튼 그룹 우측 정렬 */
-.topbar-buttons {
-    display: flex;
-    gap: 0.8rem;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
-
-.btn-detail,
+/* 공통 스타일 */
 .topbar-buttons button {
-    background-color: dodgerblue;
-    color: white;
-    padding: 10px 20px;
+    padding: 8px 16px;
+    margin: 0 4px;
     border: none;
-    border-radius: 6px;
+    border-radius: 12px;
     font-size: 15px;
-    font-weight: bold;
+    font-weight: 600;
     cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.5px;
 }
-.btn-detail:hover,
-.topbar-buttons button:hover{
-    background-color: royalblue;
+
+/* 글 작성하기 - 푸른 계열 (살짝 진한 그라데이션) */
+.btn-write {
+    background: linear-gradient(to right, #0064FF, #46AAFF);
+    color: white;
 }
+.btn-write:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+}
+
+.btn-my-board {
+    background: linear-gradient(to right, #429F6B, #22D6B2);
+    color: white;
+}
+.btn-my-board:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-my-request {
+    background: linear-gradient(to right, #FFB432, #FF7F50);
+    color: white;
+}
+.btn-my-request:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 193, 7, 0.3);
+}
+
+.btn-my-match {
+    background: linear-gradient(to right, #FF5050, #C964E2);
+    color: #fff;
+}
+.btn-my-match:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(128, 0, 128, 0.3);
+}
+
+
 
 /* ===== 게시판 테이블 ===== */
 .board-table {

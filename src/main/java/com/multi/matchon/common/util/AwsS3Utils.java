@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
@@ -95,29 +98,54 @@ public class AwsS3Utils {
         return resource;
     }
 
-    /* Create a pre-signed URL to download an object in a subsequent GET request. */
+    /* Create a pre-signed URL to download an object in a subsequent GET request. */ //임시주석 전준혁
+//    public String createPresignedGetUrl(String dirName, String savedName) {
+//
+//        // String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
+//
+//
+//        try (S3Presigner presigner = S3Presigner.create()) {
+//
+//            GetObjectRequest objectRequest = GetObjectRequest.builder()
+//                    .bucket(bucket)
+//                    .key(dirName+savedName)
+//                    .build();
+//
+//            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+//                    .signatureDuration(Duration.ofMinutes(10))  // The URL will expire in 10 minutes.
+//                    .getObjectRequest(objectRequest)
+//                    .build();
+//
+//            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+//            //log.info("Presigned URL: [{}]", presignedRequest.url().toString());
+//            //log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
+//
+//            return presignedRequest.url().toExternalForm();
+//        }
+//    }
+
     public String createPresignedGetUrl(String dirName, String savedName) {
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(
+                System.getenv("AWS_ACCESS_KEY"),
+                System.getenv("AWS_SECRET_KEY")
+        );
 
-        // String savedNameOnly = savedName.substring(0,savedName.indexOf(".")); //확장자 제거
-
-
-        try (S3Presigner presigner = S3Presigner.create()) {
+        try (S3Presigner presigner = S3Presigner.builder()
+                .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .region(Region.of(region))
+                .build()) {
 
             GetObjectRequest objectRequest = GetObjectRequest.builder()
                     .bucket(bucket)
-                    .key(dirName+savedName)
+                    .key(dirName + savedName)
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(10))  // The URL will expire in 10 minutes.
+                    .signatureDuration(Duration.ofMinutes(10))
                     .getObjectRequest(objectRequest)
                     .build();
 
-            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
-            //log.info("Presigned URL: [{}]", presignedRequest.url().toString());
-            //log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
-
-            return presignedRequest.url().toExternalForm();
+            return presigner.presignGetObject(presignRequest).url().toExternalForm();
         }
     }
 
@@ -139,10 +167,14 @@ public class AwsS3Utils {
         }
     }
 
+    @Value("${spring.cloud.aws.region.static}")
+    private String region;
+
     public String getObjectUrl(String dir, String filename, MultipartFile file) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        return "https://" + bucket + ".s3.amazonaws.com/" + dir + filename + "." + extension;
+        return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + dir + filename + "." + extension;
     }
+
 
     /**
      * 저장 경로 전체를 인자로 받아 다운로드 (예: "community/파일명.ext")
