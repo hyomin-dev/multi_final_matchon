@@ -5,17 +5,26 @@ html, body {
     background: white;
     overflow-x: hidden;
 }
-#wrap { padding: 30px 0; }
+
+#wrap {
+    padding: 0;
+}
+
 .container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 10px;
+    padding: 0;
 }
-.header { text-align: center; }
+
+.header {
+    text-align: center;
+}
+
 .region-labels {
     text-align: center;
     margin: 10px 0 20px;
 }
+
 .region-dot {
     display: inline-block;
     width: 10px;
@@ -23,12 +32,14 @@ html, body {
     border-radius: 50%;
     margin: 0 6px;
 }
+
 .month-title {
     text-align: center;
     font-size: 22px;
     font-weight: bold;
-    margin-top: 20px;
+    margin-top: 10px;
 }
+
 .register-btn {
     display: inline-block;
     width: 70px;
@@ -46,31 +57,51 @@ html, body {
     box-sizing: border-box;
 }
 
-
 .my-btn {
-    border-color: #DB778D;
-    color: #DB778D;
+    background-color: coral;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 .my-btn:hover {
-    background-color: #ffe4ec;
+    background-color: tomato;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3);
 }
-
 
 .register-event-btn {
-    border-color: #255E93;
-    color: #255E93;
+    background-color: dodgerblue;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 .register-event-btn:hover {
-    background-color: #e0ecff;
+    background-color: royalblue;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
 }
+
 
 .calendar-wrapper {
     position: relative;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 0;
 }
+
 .calendar-nav-img {
     position: absolute;
     top: 50%;
@@ -82,59 +113,77 @@ html, body {
 }
 .left-arrow { left: -40px; }
 .right-arrow { right: -40px; }
-.calendar {
+
+
+.calendar-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     width: 100%;
     max-width: 800px;
-    min-height: 720px;
+    height: 40px;
+    border-top: 2px solid #888;
+    border-bottom: 2px solid #888;
+    margin-bottom: 2px;
 }
 .day-header {
     font-weight: bold;
     text-align: center;
-    border-top: 2px solid #888;
-    border-bottom: 2px solid #888;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 40px;
+    line-height: 40px;
 }
 .day-header.sunday { color: red; }
 .day-header.saturday { color: blue; }
+
+/* 📆 날짜 셀 */
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 120px;
+    width: 100%;
+    max-width: 800px;
+    box-sizing: border-box;
+}
 .day-cell {
-    min-height: 100px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    padding-top: 6px;
+    padding: 4px 2px;
     border: 1px solid #ddd;
-    border-top: none;
+    overflow: hidden;
+    font-size: 13px;
 }
 .day-cell.today { color: steelblue; }
 .day-cell.selected { background-color: #cce5ff; }
+
 .day-number {
     font-weight: bold;
     margin-bottom: 4px;
 }
 .day-number.sunday { color: red; }
 
+
 .event-label {
     font-size: 12px;
-    padding: 6px 4px;
-    margin-top: 6px;
+    padding: 2px 4px;
+    margin-top: 4px;
     border-radius: 4px;
-    width: 90%; /* ✅ 셀 너비에 맞춤 */
+    width: 90%;
+    max-width: 100%;
+    height: 20px;
+    line-height: 16px;
     text-align: center;
     box-sizing: border-box;
     word-break: keep-all;
     color: #000;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
 .event-label:hover {
     opacity: 0.85;
 }
+
 
 #tooltip {
     position: absolute;
@@ -147,7 +196,20 @@ html, body {
     font-size: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     z-index: 1000;
-    white-space: nowrap;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 300px;
     pointer-events: none;
-    max-width: none;
 }
+
+.calendar {
+    transition: opacity 0.2s ease-in-out;
+    opacity: 1;
+}
+
+.calendar.fade-out {
+    opacity: 0;
+}
+
+
+

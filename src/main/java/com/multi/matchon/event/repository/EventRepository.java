@@ -17,14 +17,18 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<EventRequest, Long> {
-    List<EventRequest> findByEventDateBetween(LocalDate start, LocalDate end);
+    // 기본 캘린더 조회
+    List<EventRequest> findByEventDateBetweenAndIsDeletedFalse(LocalDate start, LocalDate end);
 
-    List<EventRequest> findByEventDateBetweenAndEventRegionType(LocalDate start, LocalDate end, EventRegionType region);
+    // 지역 필터 포함 캘린더 조회
+    List<EventRequest> findByEventDateBetweenAndEventRegionTypeAndIsDeletedFalse(LocalDate start, LocalDate end, EventRegionType region);
 
-    List<EventRequest> findByMember(Member member);
+    // 마이페이지, 삭제 필터 포함
+    List<EventRequest> findByMemberAndIsDeletedFalse(Member member);
 
-    Page<EventRequest> findByMember(Member member, Pageable pageable);
+    Page<EventRequest> findByMemberAndIsDeletedFalse(Member member, Pageable pageable);
 
+    // 상태 변경
     @Modifying
     @Transactional
     @Query("UPDATE EventRequest e SET e.eventStatus = :status WHERE e.id = :eventId")

@@ -132,7 +132,7 @@ public class AwsS3Utils {
 
         try (S3Presigner presigner = S3Presigner.builder()
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                .region(Region.of("eu-west-1"))
+                .region(Region.of(region))
                 .build()) {
 
             GetObjectRequest objectRequest = GetObjectRequest.builder()
@@ -167,10 +167,14 @@ public class AwsS3Utils {
         }
     }
 
+    @Value("${spring.cloud.aws.region.static}")
+    private String region;
+
     public String getObjectUrl(String dir, String filename, MultipartFile file) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        return "https://" + bucket + ".s3.amazonaws.com/" + dir + filename + "." + extension;
+        return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + dir + filename + "." + extension;
     }
+
 
     /**
      * 저장 경로 전체를 인자로 받아 다운로드 (예: "community/파일명.ext")
