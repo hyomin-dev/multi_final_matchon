@@ -89,6 +89,7 @@ body {
     background: linear-gradient(to right, #FF5050, #C964E2);
     color: #fff;
 }
+
 .profile:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(128, 0, 128, 0.3);
