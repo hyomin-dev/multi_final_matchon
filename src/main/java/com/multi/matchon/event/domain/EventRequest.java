@@ -63,5 +63,7 @@ public class EventRequest extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
-
+    public void markAsDeleted() {
+        this.isDeleted = true;
+    }
 }

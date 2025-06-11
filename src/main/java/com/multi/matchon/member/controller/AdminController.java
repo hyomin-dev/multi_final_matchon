@@ -198,7 +198,8 @@ public class AdminController {
             throw new IllegalStateException("승인된 대회만 삭제할 수 있습니다.");
         }
 
-        eventRepository.delete(event);
+        event.markAsDeleted();
+        eventRepository.save(event);
         return "redirect:/admin/event";
     }
 
