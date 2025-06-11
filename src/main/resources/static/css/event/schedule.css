@@ -48,20 +48,40 @@ html, body {
 
 
 .my-btn {
-    border-color: #DB778D;
-    color: #DB778D;
+    background-color: coral;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 .my-btn:hover {
-    background-color: #ffe4ec;
+    background-color: tomato;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3);
 }
 
 
 .register-event-btn {
-    border-color: #255E93;
-    color: #255E93;
+    background-color: dodgerblue;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 .register-event-btn:hover {
-    background-color: #e0ecff;
+    background-color: royalblue;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
 }
 
 .calendar-wrapper {

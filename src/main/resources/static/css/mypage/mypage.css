@@ -89,6 +89,7 @@ body {
     background: linear-gradient(to right, #FF5050, #C964E2);
     color: #fff;
 }
+
 .profile:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(128, 0, 128, 0.3);
@@ -114,6 +115,45 @@ body {
 
 .submit-btn-container button:hover {
     background-color: royalblue;
+}
+
+.host-submit{
+    background-color: dodgerblue;
+    color: white;
+    padding: 8px 16px;
+    margin-left: 6px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.host-submit:hover{
+    background-color: royalblue;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+}
+
+#scheduleButton {
+    background: linear-gradient(to right, #0064FF, #46AAFF);
+    color: white;
+    padding: 8px 16px;
+    margin-left: 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+#scheduleButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
 }
 
 .category-select {
