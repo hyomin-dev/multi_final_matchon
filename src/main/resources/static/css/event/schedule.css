@@ -150,6 +150,9 @@ html, body {
     word-break: keep-all;
     color: #000;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .event-label:hover {
@@ -167,7 +170,8 @@ html, body {
     font-size: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     z-index: 1000;
-    white-space: nowrap;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 300px;
     pointer-events: none;
-    max-width: none;
 }
