@@ -4,7 +4,7 @@ server:
 
 spring:
   profiles:
-    active: local
+    active: prod
   output:
     ansi:
       enabled: ALWAYS
@@ -48,7 +48,7 @@ app:
 
 matchon:
   kakao-api: ${KAKAO_API_KEY}
-  dialogflow-key-path:  ${DIALOGFLOW_KEY_PATH}
+  dialogflow-key-path:  /app/keys/dialogflow-key.json
 #  /app/keys/dialogflow-key.json
 #  ${DIALOGFLOW_KEY_PATH}
 jwt:
@@ -104,7 +104,7 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: none
-    show_sql: true
+    show_sql: false
   output:
     ansi:
       enabled: ALWAYS
