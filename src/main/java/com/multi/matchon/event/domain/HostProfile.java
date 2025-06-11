@@ -4,10 +4,7 @@ import com.multi.matchon.common.domain.BaseTimeEntity;
 import com.multi.matchon.common.domain.SportsType;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
@@ -27,7 +24,9 @@ public class HostProfile extends BaseTimeEntity {
     @JoinColumn(name="host_id",nullable = false)
     private Member member;
 
-    @Column(name="host_name", nullable = false, columnDefinition = "VARCHAR(100)")
+    // 기관명 변경용 setter
+    @Setter
+    @Column(name="host_name", nullable = true, unique = true, length = 100)
     private String hostName;
 
     @Column(name="picture_attachment_enabled",nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE CHECK (picture_attachment_enabled = TRUE)")

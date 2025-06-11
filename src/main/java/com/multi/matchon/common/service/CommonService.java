@@ -6,6 +6,7 @@ import com.multi.matchon.common.repository.SportsTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.internal.resource.S3Resource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,4 +32,5 @@ public class CommonService{
         }
         return sportsTypeDtos;
     }
+
 }

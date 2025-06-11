@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>소개</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}" />
+    <link rel="stylesheet" th:href="@{/css/introduction/intcss.css}" />
+
+    <script defer>
+        function toggleDetail(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('open');
+        }
+    </script>
+</head>
+
+<body>
+<div th:replace="~{common/header::header}"></div>
+
+<div id="wrap">
+    <h1 class="titleint">INTRODUCTION</h1>
+
+    <div class="rectangle">
+        <div class="intro-card"
+             th:each="group, iterStat : ${introductionGroup}"
+             th:onclick="|toggleDetail('group-${iterStat.index}')|">
+
+            <div class="title-row">
+                <th:block th:each="intro : ${group}">
+                    <h2 th:text="${intro.title}">제목</h2>
+                </th:block>
+            </div>
+
+            <div th:id="|group-${iterStat.index}|" class="content-row">
+                <th:block th:each="intro : ${group}">
+                    <p th:text="${intro.content}">내용</p>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/footer::footer}"></div>
+</body>
+</html>

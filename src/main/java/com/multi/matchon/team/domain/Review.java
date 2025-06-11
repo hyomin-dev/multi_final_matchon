@@ -25,6 +25,10 @@ public class Review extends BaseEntity {
     @JoinColumn(name="review_writer", nullable = false)
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
+
     @Column(name="review_rating", nullable = false)
     private Integer reviewRating;
 
@@ -34,4 +38,13 @@ public class Review extends BaseEntity {
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
+
+    public void updateReview(int rating, String content) {
+        this.reviewRating = rating;
+        this.content = content;
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
 }

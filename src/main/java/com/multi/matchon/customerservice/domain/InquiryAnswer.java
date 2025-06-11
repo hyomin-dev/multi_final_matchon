@@ -14,15 +14,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 @Table(name="inquiry_answer")
-//@Setter: JPA entity에서 setter사용은 자제, test용
+
 public class InquiryAnswer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="answer_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="inquiry_id",nullable = false)
+    @OneToOne
+    @JoinColumn(name = "inquiry_id")
     private Inquiry inquiry;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,4 +35,8 @@ public class InquiryAnswer extends BaseEntity {
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
+
+    public void markDeleted() {
+        this.isDeleted = true;
+    }
 }

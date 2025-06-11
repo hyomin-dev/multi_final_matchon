@@ -39,9 +39,15 @@ public class EventRequest extends BaseEntity {
     @Column(name="event_title",nullable = false, columnDefinition = "VARCHAR(100)")
     private String eventTitle;
 
+    @Column(name = "event_description", nullable = false, columnDefinition = "TEXT")
+    private String eventDescription;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="host_profile_id",nullable = false)
     private HostProfile hostProfile;
+
+    @Column(name="event_address", nullable = false, columnDefinition = "VARCHAR(100)")
+    private String eventAddress;
 
     @Column(name="event_method", nullable = false,columnDefinition = "VARCHAR(100)")
     private String eventMethod;

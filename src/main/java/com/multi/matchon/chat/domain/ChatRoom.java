@@ -1,12 +1,16 @@
 package com.multi.matchon.chat.domain;
 
 import com.multi.matchon.common.domain.BaseEntity;
+import com.multi.matchon.matchup.domain.MatchupBoard;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -28,13 +32,23 @@ public class ChatRoom extends BaseEntity {
     @Column(name="chat_room_name", nullable = false, columnDefinition = "VARCHAR(255)")
     private String chatRoomName;
 
+    @OneToMany(mappedBy = "chatRoom")
+    @Builder.Default
+    private List<ChatParticipant> chatParticipants = new ArrayList<>();
+
+    @OneToOne(mappedBy = "chatRoom", fetch = FetchType.LAZY)
+    private MatchupBoard matchupBoard;
+
     @Column(name="is_deleted")
     @Builder.Default
     private Boolean isDeleted=false;
 
+    public void deleteChatRoom(Boolean isDeleted){
+        this.isDeleted = isDeleted;
+    }
 
-
-
-
+    public void updateMatchupBoard(MatchupBoard matchupBoard){
+        this.matchupBoard = matchupBoard;
+    }
 
 }

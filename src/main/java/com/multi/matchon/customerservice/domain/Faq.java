@@ -1,6 +1,5 @@
 package com.multi.matchon.customerservice.domain;
 
-import com.multi.matchon.common.domain.BaseEntity;
 import com.multi.matchon.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name="faq")
 //@Setter: JPA entity에서 setter사용은 자제, test용
-public class Faq extends BaseEntity {
+public class Faq extends TimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="faq_id")
@@ -25,6 +24,7 @@ public class Faq extends BaseEntity {
     @JoinColumn(name="admin_id", nullable = false)
     private Member member;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="faq_category", nullable = false)
     private CustomerServiceType faqCategory;
 
@@ -38,4 +38,13 @@ public class Faq extends BaseEntity {
     @Builder.Default
     private Boolean isDeleted=false;
 
+    public void update(String title, String content, CustomerServiceType category) {
+        this.faqTitle = title;
+        this.faqContent = content;
+        this.faqCategory = category;
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
 }
