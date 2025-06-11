@@ -309,7 +309,9 @@
 
     function logout() {
         fetch("/auth/logout", { method: "POST", credentials: "include" })
-            .then(() => window.location.href = "/main");
+            .finally(() => {
+                window.location.href = "/main";
+            });
     }
 
     function getCookie(name) {
