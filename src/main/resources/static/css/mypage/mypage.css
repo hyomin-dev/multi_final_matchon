@@ -275,5 +275,5 @@ body {
 .button-group-vertical .delete-button:hover {
     background-color: red;
     transform: translateY(1px);
-    box-shadow: inset 0 2px 4px rgba(128, 0, 0, 0.3);
+    box-shadow: inset 0 2px 4px rgba(90, 0, 0, 0.3);
 }
