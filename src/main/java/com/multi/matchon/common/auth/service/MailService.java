@@ -78,7 +78,7 @@ public class MailService {
 
     // 이메일 본문 생성 메서드
     public String buildNotificationBody(String message, String targetUrl) {
-        String redirectUrl = domainUrl + "/redirect?url=" + targetUrl;
+        String redirectUrl = domainUrl + "/redirect?url=" + (targetUrl != null ? targetUrl : "main");;
         return """
         <div style="font-family: 'Noto Sans KR', sans-serif; color: #333;">
             <img src='cid:matchonLogo' style='width: 120px; margin-bottom: 20px;' alt='MatchOn Logo'/>
@@ -119,7 +119,7 @@ public class MailService {
     }
 
     public String buildAdminNotificationBody(String senderName, String message, String targetUrl) {
-        String redirectUrl = domainUrl + "/redirect?url=" + targetUrl;
+        String redirectUrl = domainUrl + "/redirect?url=" + (targetUrl != null ? targetUrl : "main");
         return """
     <div style="font-family: 'Noto Sans KR', sans-serif; color: #333;">
         <img src='cid:matchonLogo' style='width: 120px; margin-bottom: 20px;' alt='MatchOn Logo'/>

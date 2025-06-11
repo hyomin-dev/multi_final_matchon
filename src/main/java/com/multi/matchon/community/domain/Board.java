@@ -32,7 +32,7 @@ public class Board extends BaseEntity {
     private Boolean boardAttachmentEnabled = false;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "category", nullable = false)
+    @Column(name = "category", nullable = false, length = 30)
     @Builder.Default
     private Category category = Category.FREEBOARD;
 

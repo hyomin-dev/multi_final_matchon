@@ -15,8 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name="team", uniqueConstraints = {@UniqueConstraint(name="UK_team_name",columnNames = {"team_name"})
-})
+@Table(name="team")
 public class Team extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,7 +62,7 @@ public class Team extends BaseEntity {
     private String createdPerson;
 
     @Setter
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 

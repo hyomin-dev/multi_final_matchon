@@ -44,41 +44,21 @@ public class MatchupRatingService {
     private final MemberRepository memberRepository;
     private final NotificationService notificationService;
 
+    // 등록
 
     /*
-    * 내가 참여한 게임 목록 조회
-    * */
-    @Transactional(readOnly = true)
-    public PageResponseDto<ResMatchupMyGameListDto> findAllMyGames(PageRequest pageRequest, CustomUser user) {
-
-        Page<ResMatchupMyGameListDto> page = matchupRatingRepository.findAllMyGames(pageRequest, user.getMember());
-        return PageResponseDto.<ResMatchupMyGameListDto>builder()
-                .items(page.getContent())
-                .pageInfo(PageResponseDto.PageInfoDto.builder()
-                        .page(page.getNumber())
-                        .size(page.getNumberOfElements())
-                        .totalElements(page.getTotalElements())
-                        .totalPages(page.getTotalPages())
-                        .isFirst(page.isFirst())
-                        .isLast(page.isLast())
-                        .build())
-                .build();
-
-
-
-    }
-
-    /*
-    * 작성자가 매너 온도 평가를 위한 matchup_rating table setting하는 메서드
-    * 딱 1번만 할 수 있음
-    * */
+     * 작성자가 매너 온도 평가를 위한 matchup_rating table setting하는 메서드
+     * 딱 1번만 할 수 있음
+     * */
     @Transactional
     public void setMannerTemperatureSettingByBoardId(Long boardId, CustomUser user) {
 
         MatchupBoard ratingMatchupBoard = matchupBoardRepository.findByBoardIDAndMemberAndMatchDatetimeIsRatingInitializedFalse(boardId, user.getMember()).orElseThrow(()->new ApiCustomException("Matchup 매너 온도 평가 세팅할 게시글이 아닙니다."));
 
-        if(!calMatchEndTime(ratingMatchupBoard.getMatchDatetime(), ratingMatchupBoard.getMatchDuration()).isBefore(LocalDateTime.now()))
-            throw new ApiCustomException("Matchup 매너 온도 평가 세팅할 시간이 아닙니다.");
+        if(LocalDateTime.now().isBefore(ratingMatchupBoard.getMatchEndtime()))
+            throw new ApiCustomException("Matchup 매너 온도 평가는 경기 종료 후에만 가능합니다.");
+                //!calMatchEndTime(ratingMatchupBoard.getMatchDatetime(), ratingMatchupBoard.getMatchDuration()).isBefore(LocalDateTime.now()))
+
 
         List<MatchupRequest> matchupRequests = matchupRequestRepository.findByBoardIdAndMemberAndGameParticipantConditionAndAfterMatchupDatetime(boardId, user.getMember());
         log.info("test");
@@ -154,7 +134,7 @@ public class MatchupRatingService {
     public Integer setMannerTemperatureAutoSetting() {
 
 
-        // 평가 대상이 되는 MatchupBoard를 모두 가져옴
+        // 경기가 종료된 MatchupBoard를 모두 가져옴
         List<MatchupBoard> ratingMatchupBoards = matchupBoardRepository.findByMatchDatetimeAndIsRatingInitializedFalse();
 
         // 평가세팅할 MatchupBoard가 없으면 0 반환, MatchupRequest 조회 안함
@@ -166,10 +146,6 @@ public class MatchupRatingService {
         List<MatchupRating> matchupRatings = new ArrayList<>();
 
         for(MatchupBoard ratingMatchupBoard: ratingMatchupBoards){
-
-            // 경기 종료가 안되었으면 평가 세팅 안되도록
-            if(!calMatchEndTime(ratingMatchupBoard.getMatchDatetime(), ratingMatchupBoard.getMatchDuration()).isBefore(LocalDateTime.now()))
-                continue;
 
             // 경기가 종료된 MatchupBoard에 대응되는 request 추출
             List<MatchupRequest> matchupRequestsWithBoard = matchupRequests.stream()
@@ -222,8 +198,8 @@ public class MatchupRatingService {
             notificationService.sendNotification(ratingMatchupBoard.getWriter() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
 
             /*
-            * 신청자들에게 알림 보내기
-            * */
+             * 신청자들에게 알림 보내기
+             * */
             for(MatchupRequest mr: matchupRequestsWithBoard){
                 notificationService.sendNotification(mr.getMember() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
             }
@@ -232,8 +208,60 @@ public class MatchupRatingService {
         matchupRatingRepository.saveAll(matchupRatings);
 
         return matchupRatings.size();
+    }
 
+    /*
+     * 매너 온도 평가 등록, 마이페이지 업데이트
+     * */
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void registerMatchupRating(@Valid ReqMatchupRatingDto reqMatchupRatingDto, CustomUser user) {
 
+        if(!reqMatchupRatingDto.getEvalId().equals(user.getMember().getId()))
+            throw new CustomException("Matchup 매너온도 평가를 할 권한이 없습니다.");
+
+        MatchupRating matchupRating = matchupRatingRepository.findByBoardIdAndEvalIdAndTargetId(reqMatchupRatingDto.getBoardId(), reqMatchupRatingDto.getEvalId(), reqMatchupRatingDto.getTargetId()).orElseThrow(()->new CustomException("Matchup 이미 평가를 하셨습니다."));
+
+        matchupRating.rating(reqMatchupRatingDto.getMannerScore(), reqMatchupRatingDto.getSkillScore(), reqMatchupRatingDto.getReview(), true);
+
+        Member target =  memberRepository.findByIdAndIsDeletedFalseWithLock(reqMatchupRatingDto.getTargetId()).orElseThrow(()->new CustomException("Matchup 평가 대상 회원이 존재하지 않습니다."));
+
+//        Double sumScoreWithSigmoid = sigmoid((reqMatchupRatingDto.getMannerScore()+ reqMatchupRatingDto.getSkillScore())/10.0);
+
+        Double changeTemp = (reqMatchupRatingDto.getMannerScore()*0.14+ reqMatchupRatingDto.getSkillScore()*0.06 -0.4) *0.01;
+
+        Double newMyTemperature = user.getMember().getMyTemperature() +changeTemp;
+        if(newMyTemperature<30.0)
+            newMyTemperature = 30.0;
+
+        target.updateMyTemperature(newMyTemperature);
+
+        /*
+         * 작성자에게 알림 보내기
+         * */
+        notificationService.sendNotification(target , "[평가 알림]"+user.getMember().getMemberName()+"님으로 부터 매너 온도 평가가 도착했습니다. 확인해보세요.", "/matchup/rating/page?"+"boardId="+reqMatchupRatingDto.getBoardId());
+
+    }
+
+    // 조회
+
+    /*
+    * 내가 참여한 게임 목록 조회
+    * */
+    @Transactional(readOnly = true)
+    public PageResponseDto<ResMatchupMyGameListDto> findAllMyGames(PageRequest pageRequest, CustomUser user) {
+
+        Page<ResMatchupMyGameListDto> page = matchupRatingRepository.findAllMyGames(pageRequest, user.getMember());
+        return PageResponseDto.<ResMatchupMyGameListDto>builder()
+                .items(page.getContent())
+                .pageInfo(PageResponseDto.PageInfoDto.builder()
+                        .page(page.getNumber())
+                        .size(page.getNumberOfElements())
+                        .totalElements(page.getTotalElements())
+                        .totalPages(page.getTotalPages())
+                        .isFirst(page.isFirst())
+                        .isLast(page.isLast())
+                        .build())
+                .build();
     }
 
 
@@ -271,45 +299,11 @@ public class MatchupRatingService {
 
     }
 
-    /*
-    * 매너 온도 평가 등록, 마이페이지 업데이트
-    * */
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void registerMatchupRating(@Valid ReqMatchupRatingDto reqMatchupRatingDto, CustomUser user) {
-
-        if(!reqMatchupRatingDto.getEvalId().equals(user.getMember().getId()))
-            throw new CustomException("Matchup 매너온도 평가를 할 권한이 없습니다.");
-
-        MatchupRating matchupRating = matchupRatingRepository.findByBoardIdAndEvalIdAndTargetId(reqMatchupRatingDto.getBoardId(), reqMatchupRatingDto.getEvalId(), reqMatchupRatingDto.getTargetId()).orElseThrow(()->new CustomException("Matchup 이미 평가를 하셨습니다."));
-
-        matchupRating.rating(reqMatchupRatingDto.getMannerScore(), reqMatchupRatingDto.getSkillScore(), reqMatchupRatingDto.getReview(), true);
-
-        Member target =  memberRepository.findByIdAndIsDeletedFalseWithLock(reqMatchupRatingDto.getTargetId()).orElseThrow(()->new CustomException("Matchup 평가 대상 회원이 존재하지 않습니다."));
-
-//        Double sumScoreWithSigmoid = sigmoid((reqMatchupRatingDto.getMannerScore()+ reqMatchupRatingDto.getSkillScore())/10.0);
-
-        Double changeTemp = (reqMatchupRatingDto.getMannerScore()*0.14+ reqMatchupRatingDto.getSkillScore()*0.06 -0.4) *0.01;
-
-        target.updateMyTemperature(changeTemp);
-
-        /*
-         * 작성자에게 알림 보내기
-         * */
-        notificationService.sendNotification(target , "[평가 알림]"+user.getMember().getMemberName()+"님으로 부터 매너 온도 평가가 도착했습니다. 확인해보세요.", "/matchup/rating/page?"+"boardId="+reqMatchupRatingDto.getBoardId());
-
-
-
-    }
 
     @Transactional(readOnly = true)
-
     public ResMatchupRatingDto findDetailResMatchupRatingDto(Long boardId, Long evalId, Long targetId) {
 
         return matchupRatingRepository.findDetailResMatchupRatingDtoByBoardIdAndEvalIdAndTargetId(boardId, evalId, targetId).orElseThrow(() ->new CustomException("Matchup 등록된 평가가 없습니다."));
     }
 
-    private LocalDateTime calMatchEndTime(LocalDateTime matchStart, LocalTime matchDuration){
-        return matchStart.plusHours(matchDuration.getHour()).plusMinutes(matchDuration.getMinute());
-
-    }
 }

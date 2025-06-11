@@ -53,6 +53,12 @@ select:focus {
     outline: none;
 }
 
+textarea{
+    overflow-y: auto;
+    overflow-x: hidden;
+    resize: none;
+}
+
 /*읽기 전용*/
 #teamName{
 
@@ -107,10 +113,12 @@ button:hover{
     background-color: royalblue;
 }
 
+
 /*취소 버튼*/
 /* ===== 버튼 ===== */
 .cancel-btn {
     padding: 8px 15px;
+    margin-left: 10px;
     background-color: white;
     color: #f44336;
     border: 2px solid #f44336;

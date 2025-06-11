@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded",()=>{
         setContent();
-
 })
 
 
@@ -11,12 +10,12 @@ async function setContent(){
     const sportsFacilityName = detailDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = detailDto.dataset.sportsFacilityAddress;
     const matchDatetime = detailDto.dataset.matchDatetime;
-    const matchDuration = detailDto.dataset.matchDuration;
+    const matchEndtime = detailDto.dataset.matchEndtime;
     const currentParticipantCount = Number(detailDto.dataset.currentParticipantCount);
     const maxParticipants = Number(detailDto.dataset.maxParticipants);
     const minMannerTemperature = Number(detailDto.dataset.minMannerTemperature);
     const savedName = detailDto.dataset.savedName;
-    const myMannerTemperature = Number(detailDto.dataset.myMannerTemperature);
+    const myMannerTemperature = Number(detailDto.dataset.myMannerTemperature)||20;
     const loginEmail = detailDto.dataset.loginEmail;
     //const baseUrl = detailDto.dataset.baseUrl;
     //console.log(sportsFacilityAddress);
@@ -24,8 +23,8 @@ async function setContent(){
     //console.log(loginMemberName);
 
     drawMap(sportsFacilityAddress, sportsFacilityName);
-    calTime(matchDatetime, matchDuration);
-    checkStatus(matchDatetime, matchDuration, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature);
+    calTime(matchDatetime, matchEndtime);
+    checkStatus(matchDatetime, matchEndtime, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature);
     setButton(matchDatetime, writerEmail, loginEmail, currentParticipantCount, maxParticipants, minMannerTemperature, myMannerTemperature);
 
 
@@ -52,6 +51,7 @@ async function setContent(){
     //     throw new Error(`HTTP error! Status:${response.status}`)
     // const data2 = await response2.json();
     // console.log(data2);
+
 
 
 }
@@ -95,11 +95,12 @@ function drawMap(address, sportsFacilityName){
     });
 }
 
-function calTime(matchDatetime, matchDuration){
+function calTime(matchDatetime, matchEndtime){
     //console.log(matchDatetime);
     //console.log(matchDuration);
 
     const date = new Date(matchDatetime);
+    const endDate = new Date(matchEndtime);
     //console.log(date);
     const matchDateEle = document.querySelector("#match-date");
 
@@ -109,31 +110,34 @@ function calTime(matchDatetime, matchDuration){
     const startHour = date.getHours();
     const startMinutes = date.getMinutes();
 
+    const endHour = endDate.getHours();
+    const endMinute = endDate.getMinutes();
 
-    const [hour, minute, second] = matchDuration.split(":");
-    const hourNum = parseInt(hour, 10);
-    const minuteNum = parseInt(minute,10);
 
-    let extraHour = 0
-    let endMinute = 0;
-
-    if(date.getMinutes()+minuteNum>=60){
-        extraHour = 1;
-        endMinute = (date.getMinutes()+minuteNum)%60;
-    }else{
-        endMinute = date.getMinutes()+minuteNum;
-    }
-
-    if(startHour+hourNum+extraHour>=24)
-        endHour = (startHour+hourNum+extraHour) %24;
-    else
-        endHour = startHour+hourNum+extraHour;
+    // const [hour, minute, second] = matchDuration.split(":");
+    // const hourNum = parseInt(hour, 10);
+    // const minuteNum = parseInt(minute,10);
+    //
+    // let extraHour = 0
+    // let endMinute = 0;
+    //
+    // if(date.getMinutes()+minuteNum>=60){
+    //     extraHour = 1;
+    //     endMinute = (date.getMinutes()+minuteNum)%60;
+    // }else{
+    //     endMinute = date.getMinutes()+minuteNum;
+    // }
+    //
+    // if(startHour+hourNum+extraHour>=24)
+    //     endHour = (startHour+hourNum+extraHour) %24;
+    // else
+    //     endHour = startHour+hourNum+extraHour;
 
     matchDateEle.value = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
 
 }
 
-function checkStatus(matchDatetime, matchDuration, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature){
+function checkStatus(matchDatetime, matchEndtime, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature){
     const statusEle = document.querySelector("#status");
 
     // console.log(currentParticipantCount)
@@ -141,13 +145,14 @@ function checkStatus(matchDatetime, matchDuration, currentParticipantCount, maxP
 
     // 공통: 경기 날짜 지나면 경기종료
     const matchDate = new Date(matchDatetime);
+    const endMatchDate = new Date(matchEndtime);
     const now = new Date();
-    const durationParts = matchDuration.split(":");
-    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+    // const durationParts = matchDuration.split(":");
+    // const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
 
-    if(matchDate <now && now <= matchEnd){
+    if(matchDate <now && now <= endMatchDate){
         statusEle.value = "경기 진행";
-    }else if(matchEnd<now){
+    }else if(endMatchDate<now){
         statusEle.value = "경기 종료";
     }else if(writerEmail === loginEmail){
         // 경우1: 사용자가 쓴 글
@@ -216,7 +221,6 @@ function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCoun
                 e.preventDefault();
             })
         }
-
     }
 }
 
@@ -227,6 +231,15 @@ function goBack(){
         window.location.href = "/matchup/board";
     }
 }
+
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
+
 
 
 

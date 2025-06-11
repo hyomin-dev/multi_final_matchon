@@ -25,7 +25,13 @@ public class ViewController {
     }
 
     @GetMapping("/login")
-    public String loginPage(){
+    public String loginPage(@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
+                            Model model) {
+        if (redirectUrl != null && !redirectUrl.trim().isEmpty() && redirectUrl.startsWith("/")) {
+            model.addAttribute("redirectUrl", redirectUrl);
+        } else {
+            model.addAttribute("redirectUrl", "");  // 기본 빈 값
+        }
         return "login/login";
     }
 
@@ -53,16 +59,28 @@ public class ViewController {
 
     @GetMapping("/redirect")
     public String redirectHandler(@RequestParam("url") String url, HttpServletRequest request, Model model) {
+        // 로그인 여부 확인
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean notLoggedIn = (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken);
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            String encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8);
-            // 로그인 안된 경우 → login.html에서 JS로 이동 처리
+        // URL이 null, 비어 있을 경우 대비
+        if (url == null || url.trim().isEmpty() || "null".equalsIgnoreCase(url)) {
+            url = "/main";
+        }
+
+        // 외부 경로 차단: /로 시작하는 내부 경로만 허용
+        if (!url.startsWith("/")) {
+            url = "/main";
+        }
+
+        // 로그인 안되어 있으면 login으로
+        if (notLoggedIn) {
             model.addAttribute("redirectUrl", url);
             return "login/login";
         }
 
-        return "redirect:" + url; // 로그인된 경우에만 redirect
+        // 로그인된 경우 정상 redirect
+        return "redirect:" + url;
     }
 
 //    @GetMapping("/error/authentication")

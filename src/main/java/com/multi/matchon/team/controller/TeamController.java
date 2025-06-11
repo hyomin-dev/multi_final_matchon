@@ -17,6 +17,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +65,7 @@ public class TeamController {
         teamService.teamRegister(reqTeamDto, user);
 
         log.info("team 등록 완료");
-        return "team/team-list";
+        return "redirect:/team";
     }
     @GetMapping
     public ModelAndView showTeamListPage(ModelAndView mv){
@@ -82,12 +85,13 @@ public class TeamController {
             @RequestParam(value="size", required = false, defaultValue = "5") int size,
             @RequestParam(value = "recruitingPosition", required = false) String recruitingPosition,
             @RequestParam(value = "region", required = false) String region,
-            @RequestParam(value = "teamRatingAverage", required = false) Double teamRatingAverage
+            @RequestParam(value = "teamRatingAverage", required = false) Double teamRatingAverage,
+            @RequestParam(value = "recruitmentStatus", required = false) Boolean recruitmentStatus  // ✅ NEW
     ){
 
         log.info("⭐ Rating Filter Received: {}", teamRatingAverage);
-        PageRequest pageRequest = PageRequest.of(page,size);
-        PageResponseDto<ResTeamDto> pageResponseDto = teamService.findAllWithPaging(pageRequest, recruitingPosition, region, teamRatingAverage);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        PageResponseDto<ResTeamDto> pageResponseDto = teamService.findAllWithPaging(pageRequest, recruitingPosition, region, teamRatingAverage, recruitmentStatus);
         return ResponseEntity.ok(ApiResponse.ok(pageResponseDto));
     }
 
@@ -107,6 +111,14 @@ public class TeamController {
                 .orElseThrow(() -> new IllegalArgumentException("팀장 정보를 찾을 수 없습니다."));
 
         teamDto.setLeaderId(leader.getId()); // ✅ inject leaderId into the DTO
+        mv.addObject("teamLeaderId", leader.getId());
+
+
+        // 4. Determine if user is in any team
+        boolean userHasTeam = user.getMember().getTeam() != null;
+
+        // 5. Check if user is in this team (even if not a leader)
+        boolean isMemberOfThisTeam = userHasTeam && user.getMember().getTeam().getId().equals(teamId);
 
 
         // NEW: Calculate user role
@@ -119,8 +131,13 @@ public class TeamController {
             userRole = "GUEST";
         }
 
-        mv.addObject("teamLeaderId", leader.getId());
+
         mv.addObject("userRole", userRole);
+        mv.addObject("hasTeam", userHasTeam);
+        mv.addObject("isLeaderOfCurrentTeam", isLeader); // 👈 for tab disabling logic
+        mv.addObject("userHasTeam", userHasTeam);         // 👈 for tab disabling logic
+
+
 
         return mv;
     }
@@ -201,18 +218,32 @@ public class TeamController {
 
     @GetMapping("/team/{teamId}/join-requests")
     @ResponseBody
-    public ResponseEntity<ApiResponse<List<ResJoinRequestDto>>> getPendingJoinRequests(
-            @PathVariable Long teamId, @AuthenticationPrincipal CustomUser user) {
+    public ResponseEntity<ApiResponse<PageResponseDto<ResJoinRequestDto>>> getPendingJoinRequests(
+            @PathVariable Long teamId, @AuthenticationPrincipal CustomUser user,  @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size) {
 
-        List<ResJoinRequestDto> requests = teamService.getJoinRequestsForTeam(teamId, user);
-        return ResponseEntity.ok(ApiResponse.ok(requests));
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        PageResponseDto<ResJoinRequestDto> pagedRequests = teamService.getJoinRequestsForTeam(teamId, user, pageRequest);
+        return ResponseEntity.ok(ApiResponse.ok(pagedRequests));
     }
 
     @PostMapping("/team/join-request/{requestId}/approve")
     @ResponseBody
     public ResponseEntity<ApiResponse<Void>> approveJoinRequest(@PathVariable Long requestId) {
-        teamService.approveJoinRequest(requestId);
-        return ResponseEntity.ok(ApiResponse.ok(null));
+        try {
+            teamService.approveJoinRequest(requestId);
+            return ResponseEntity.ok(ApiResponse.ok(null));
+        } catch (IllegalStateException e) {
+            // This is where the alert-worthy message like "이미 팀이 있는 사용자 입니다" is sent back
+            return ResponseEntity
+                    .badRequest()
+                    .body(ApiResponse.fail(e.getMessage()));
+        } catch (Exception e) {
+            // Generic fallback error
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.fail("요청 처리 중 문제가 발생했습니다."));
+        }
     }
 
     @PostMapping("/team/join-request/{requestId}/reject")
@@ -328,6 +359,56 @@ public class TeamController {
         }
         return ResponseEntity.ok(ApiResponse.ok(myTeam));
     }
+
+    @GetMapping("/team/my")
+    public ModelAndView viewMyTeamList(@AuthenticationPrincipal CustomUser user) {
+        ModelAndView mv = new ModelAndView("team/team-list");
+        List<ResTeamDto> teams = new ArrayList<>();
+
+        try {
+            ResTeamDto myTeam = teamService.findMyTeam(user);
+            if (myTeam != null) {
+                teams.add(myTeam);
+                mv.addObject("teams", teams);
+                mv.addObject("myTeamView", true);
+            } else {
+                mv.addObject("teams", teams);
+                mv.addObject("myTeamView", true);
+            }
+        } catch (Exception e) {
+            mv.addObject("teams", teams);
+            mv.addObject("myTeamView", true);
+        }
+
+        return mv;
+    }
+    @GetMapping("/my")
+    public ModelAndView myTeamView(@AuthenticationPrincipal CustomUser user) {
+        ResTeamDto myTeam = teamService.findMyTeam(user);
+
+        ModelAndView mv = new ModelAndView("team/team-list"); // reuse team-list.html
+        mv.addObject("teams", myTeam == null ? List.of() : List.of(myTeam));
+        mv.addObject("myTeamView", true); // this triggers the "전체 목록으로 돌아가기" button
+        return mv;
+    }
+    @GetMapping("/team/{teamId}/reviews/paged")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<PageResponseDto<ResReviewDto>>> getReviewsPaged(
+            @PathVariable Long teamId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        PageResponseDto<ResReviewDto> response = teamService.getPagedReviews(teamId, pageRequest);
+        return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+    @GetMapping("/team/{teamId}/join-request/count")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Integer>> getPendingRequestCount(@PathVariable Long teamId) {
+        int count = teamService.countPendingJoinRequests(teamId);
+        return ResponseEntity.ok(ApiResponse.ok(count));
+    }
+
 
 }
 

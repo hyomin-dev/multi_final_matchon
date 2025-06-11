@@ -54,8 +54,8 @@ public class MatchupBoard extends BaseEntity {
     @Column(name="match_datetime",nullable = false)
     private LocalDateTime matchDatetime;
 
-    @Column(name="match_duration",nullable = false)
-    private LocalTime matchDuration;
+    @Column(name="match_endtime",nullable = false)
+    private LocalDateTime matchEndtime;
 
     @Column(name="current_participant_count",nullable = false)
     private Integer currentParticipantCount;
@@ -70,12 +70,16 @@ public class MatchupBoard extends BaseEntity {
     private String matchDescription;
 
     @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="chat_room_id",nullable = false)
+    @JoinColumn(name="chat_room_id")
     private ChatRoom chatRoom;
 
     @Column(name="is_rating_initialized")
     @Builder.Default
     private Boolean isRatingInitialized = false;
+
+    @Column(name="is_notified")
+    @Builder.Default
+    private Boolean isNotified = false;
 
     @Column(name="is_deleted")
     @Builder.Default
@@ -86,21 +90,17 @@ public class MatchupBoard extends BaseEntity {
     private List<MatchupRequest> matchupRequests = new ArrayList<>();
 
 
-    public void update(SportsType sportsType, String teamIntro, String sportsFacilityName, String sportsFacilityAddress, LocalDateTime matchDatetime, LocalTime matchDuration, Integer currentParticipantCount, Integer maxParticipants, Double minMannerTemperature, String matchDescription){
+    public void update(SportsType sportsType, String teamIntro, String sportsFacilityName, String sportsFacilityAddress, Integer currentParticipantCount, Integer maxParticipants, Double minMannerTemperature, String matchDescription){
 
         this.sportsType = sportsType;
         this.teamIntro = teamIntro;
         this.sportsFacilityName = sportsFacilityName;
         this.sportsFacilityAddress = sportsFacilityAddress;
-        this.matchDatetime = matchDatetime;
-        this.matchDuration = matchDuration;
         this.currentParticipantCount = currentParticipantCount;
         this.maxParticipants = maxParticipants;
         this.minMannerTemperature = minMannerTemperature;
         this.matchDescription = matchDescription;
-
     }
-
 
     public void delete(boolean isDeleted) {
         this.isDeleted = isDeleted;
@@ -116,5 +116,15 @@ public class MatchupBoard extends BaseEntity {
 
     public void setRatingInitialized(Boolean isRatingInitialized){
         this.isRatingInitialized = isRatingInitialized;
+    }
+
+    public void updateIsNotified(Boolean isNotified){
+        this.isNotified = isNotified;
+    }
+
+    public void changeChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
+        if(chatRoom.getMatchupBoard()!=this)
+            this.chatRoom.updateMatchupBoard(this);
     }
 }
