@@ -169,7 +169,8 @@
 </div>
 
 <!-- 카카오맵 api 키 입니다.-->
-<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a7fac0ef351b12f799117f0847bf1d23&autoload=false&libraries=clusterer,services"></script>
+<script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${@environment.getProperty('matchon.kakao-api')}+'&autoload=false&libraries=clusterer,services'"></script>
+<!--<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=`+ +&autoload=false&libraries=clusterer,services"></script>-->
 <script>
     let currentMarker = null;
 

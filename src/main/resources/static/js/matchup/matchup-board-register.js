@@ -49,6 +49,35 @@ function submitCheck(e){
 
     const matchDescriptionEle = document.querySelector("#matchDescription");
 
+
+    /*
+    * 글자 수 검사
+    * */
+    // 1. 팀 소개 글자 수 검사
+    if(isExceedCharlimit(teamIntroEle.value.length, 300)){
+        e.preventDefault();
+        alert("팀 소개는 300자 내로 작성해주세요.")
+    }
+
+    // 2. 경기장명 글자 수 검사
+    if(isExceedCharlimit(sportsFacilityNameEle.value.length, 100)){
+        e.preventDefault();
+        alert("경기장명은 100자 내로 작성해주세요.")
+    }
+
+    // 3. 경기장 주소 글자 수 검사
+    if(isExceedCharlimit(sportsFacilityAddress.value.length, 100)){
+        e.preventDefault();
+        alert("경기장 주소는 100자 내로 작성해주세요.")
+    }
+
+    // 4. 경기 방식 소개 글자 수 검사
+    if(isExceedCharlimit(sportsFacilityAddress.value.length, 1000)){
+        e.preventDefault();
+        alert("경기 방식 소개 1000자 내로 작성해주세요.")
+    }
+
+
     if(sportsTypeNameEle.value ===""){
         alert("종목을 선택하세요.");
         e.preventDefault();
@@ -98,7 +127,7 @@ function submitCheck(e){
 
         let reply = confirm("경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?");
         if(reply){
-            alert("게시글이 등록되었습니다.")
+            alert("게시글이 등록되었습니다.");
         }else{
             e.preventDefault();
         }
@@ -198,14 +227,23 @@ async function getMyMannerTemperature(){
         return data.data;
     }catch(err){
         console.log(err);
+        return 20;
     }
 
 }
 
 function goBack(){
-    if (document.referrer) {
-        window.location.href = document.referrer;
+    if (document.referrer && document.referrer !== location.href) {
+        window.history.back();
     } else {
         window.location.href = "/matchup/board";
     }
+}
+
+function isExceedCharlimit(length, limit){
+
+    if(Number(length)>Number(limit))
+        return true;
+    else
+        return false;
 }
