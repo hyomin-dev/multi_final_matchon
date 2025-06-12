@@ -49,7 +49,7 @@ public class TeamController {
 
     @GetMapping("/team/register")
     public ModelAndView teamRegister(ModelAndView mv){
-        mv.setViewName("/team/team-register");
+        mv.setViewName("team/team-register");
         mv.addObject("formActionUrl", "/team/register");
         mv.addObject("ReqTeamDto",new ReqTeamDto());
         return mv;
@@ -75,6 +75,7 @@ public class TeamController {
         mv.setViewName("team/team-list");
         mv.addObject("teams", teams);
         //mv.addObject("pageResponseDto",pageResponseDto);
+        mv.addObject("myTeamView", false); // ⬅️ explicitly hide 목록으로
         return mv;
     }
 

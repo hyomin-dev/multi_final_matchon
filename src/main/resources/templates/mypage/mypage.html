@@ -29,7 +29,7 @@
                     class="profile" th:text="${isDefaultProfile} ? '사진 등록' : '사진 수정'"></button>
 
             <div th:unless="${isDefaultProfile}">
-                <button type="button" onclick="deleteProfile()">사진 삭제</button>
+                <button type="button" class="delete-button" onclick="deleteProfile()">사진 삭제</button>
             </div>
         </div>
 
@@ -60,7 +60,7 @@
                     </tr>
                 </table>
                 <div class="submit-btn-container">
-                    <button onclick="submitMypage()">수정하기</button>
+                    <button class="edit-button" onclick="submitMypage()">수정하기</button>
                 </div>
             </div>
 
