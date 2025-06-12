@@ -197,8 +197,8 @@ function setSportsType(sportsTypeName){
 }
 
 function goBack(){
-    if (document.referrer) {
-        window.location.href = document.referrer;
+    if (document.referrer && document.referrer !== location.href) {
+        window.history.back();
     } else {
         window.location.href = "/matchup/board";
     }

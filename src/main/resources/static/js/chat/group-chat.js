@@ -147,15 +147,15 @@ function setDisconnects() {
 
     });
 
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') {
-            fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST",credentials:"include" });
-            if (stompClient && stompClient.connected) {
-                stompClient.unsubscribe(`/topic/${roomId}`);
-                stompClient.disconnect();
-            }
-        }
-    });
+    // document.addEventListener('visibilitychange', () => {
+    //     if (document.visibilityState === 'hidden') {
+    //         fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST",credentials:"include" });
+    //         if (stompClient && stompClient.connected) {
+    //             stompClient.unsubscribe(`/topic/${roomId}`);
+    //             stompClient.disconnect();
+    //         }
+    //     }
+    // });
 
     window.addEventListener('pagehide', () => {
         fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST", credentials:"include" });

@@ -137,6 +137,7 @@ function calTime(matchDatetime, matchEndtime){
 
 }
 
+
 function checkStatus(matchDatetime, matchEndtime, currentParticipantCount, maxParticipants, writerEmail, loginEmail, minMannerTemperature, myMannerTemperature){
     const statusEle = document.querySelector("#status");
 
@@ -236,8 +237,8 @@ function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCoun
 }
 
 function goBack(){
-    if (document.referrer) {
-        window.location.href = document.referrer;
+    if (document.referrer && document.referrer !== location.href) {
+        window.history.back();
     } else {
         window.location.href = "/matchup/board";
     }

@@ -95,14 +95,14 @@ public class NotificationService {
                 receiver.getMemberEmail(), "/notify", dto
         );
 
-        // 3. 이메일 수신 동의 시에만 전송
-        if (Boolean.TRUE.equals(receiver.getEmailAgreement())) {
-            mailService.sendNotificationEmail(
-                    receiver.getMemberEmail(),
-                    "[📢 알림 도착] " + message,
-                    mailService.buildNotificationBody(message, targetUrl)
-            );
-        }
+//        // 3. 이메일 수신 동의 시에만 전송
+//        if (Boolean.TRUE.equals(receiver.getEmailAgreement())) {
+//            mailService.sendNotificationEmail(
+//                    receiver.getMemberEmail(),
+//                    "[📢 알림 도착] " + message,
+//                    mailService.buildNotificationBody(message, targetUrl)
+//            );
+//        }
     }
 
     // 관리자용 알림
