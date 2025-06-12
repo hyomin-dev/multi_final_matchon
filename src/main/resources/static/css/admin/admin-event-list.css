@@ -17,18 +17,35 @@ h2 {
     display: inline-block;
     padding-bottom: 5px;
 }
-table { width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;}
+table {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    background: #fff;
+    border: 2px solid dodgerblue;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
 
 th, td {
-    padding: 10px;
-    border: 1px solid #ccc;
+    padding: 16px 18px;
     text-align: center;
-    vertical-align: middle;
-    word-break: break-word;
+    font-size: 15px;
+    word-wrap: break-word;
+    border-bottom: 1px solid #ddd;
 }
-th { background-color: #f3f3f3; }
+th {
+    background-color: #eaf4fb;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+td {
+    background-color: #ffffff;
+}
 
 .status-pending {
     background-color: #ddd;
@@ -89,7 +106,7 @@ table td:nth-child(5) {
     cursor: pointer;
 }
 .pagination a.disabled { color: #ccc; pointer-events: none; border-color: #eee; }
-.pagination a.active { background-color: #5478b2; color: white; }
+.pagination a.active { background-color: dodgerblue; color: white; }
 .detail-link { color: #0077cc; text-decoration: underline; cursor: pointer; }
 .no-data { text-align: center; padding: 30px; font-size: 16px; color: #888; }
 
