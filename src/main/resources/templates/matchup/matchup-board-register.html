@@ -20,8 +20,8 @@
                 <label>
                     종목
                     <select th:field="*{sportsTypeName}">
-                        <option value="SOCCER" selected>축구</option>
-                        <option value="FUTSAL">풋살</option>
+                        <option value="SOCCER" selected>SOCCER</option>
+                        <option value="FUTSAL">FUTSAL</option>
                     </select>
                 </label>
             </div>
@@ -33,7 +33,7 @@
             </div>
             <div class="form-group">
                 <label>
-                    팀 소개
+                    팀 소개(300자)
                     <textarea cols="30" rows="5" placeholder="팀 소개를 입력하세요." th:field="*{teamIntro}" required maxlength="300" class="truncate">
                     </textarea>
                 </label>
@@ -46,13 +46,13 @@
             </div>
             <div class="form-group">
                 <label>
-                    경기장명
+                    경기장명(100자)
                     <input type="text" placeholder="경기장명" th:field="*{sportsFacilityName}" required maxlength="100">
                 </label>
             </div>
             <div class="form-group">
                 <label>
-                    경기장 주소
+                    경기장 주소(100자)
                     <div class="address-row">
                         <input type="text" th:field="*{sportsFacilityAddress}" placeholder="주소 찾기 버튼을 누르세요." required readonly maxlength="100">
                         <input type="button" onclick="getAddress()" value="주소 찾기">
@@ -92,13 +92,13 @@
             </div>
             <div class="form-group">
                 <label>
-                    <span id="temp-tabel">하한 매너 온도</span>
+                    <span id="temp-tabel">입장 가능 매너 온도</span>
                     <select th:field="*{minMannerTemperature}" required ></select>
                 </label>
             </div>
             <div class="form-group">
                 <label>
-                    경기 방식 소개
+                    경기 방식 소개(1000자)
                     <textarea cols="30" rows="5" placeholder="경기 방식 소개" th:field="*{matchDescription}" required maxlength="1000" class="truncate">
                     </textarea>
                 </label>

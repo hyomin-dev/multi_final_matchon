@@ -348,7 +348,7 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
     modifyBtn.addEventListener("click",(e)=>{
 
         now = new Date();
-        if(matchDate<now){
+        if(matchDate<=now){
             e.preventDefault();
             e.target.href = "#";
             e.target.classList.add("disabled");
@@ -358,7 +358,7 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
 
     cancelBtn.addEventListener("click",(e)=>{
         now = new Date();
-        if(matchDate<now){
+        if(matchDate<=now){
             e.preventDefault();
             e.target.href = "#";
             e.target.classList.add("disabled");
@@ -368,7 +368,7 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
 
     retryBtn.addEventListener("click",(e)=>{
         now = new Date();
-        if(matchDate<now){
+        if(matchDate<=now){
             e.preventDefault();
             e.target.href = "#";
             e.target.classList.add("disabled");
@@ -378,7 +378,7 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
 
     withdrawBtn.addEventListener("click",(e)=>{
         now = new Date();
-        if(matchDate<now){
+        if(matchDate<=now){
             e.preventDefault();
             e.target.href = "#";
             e.target.classList.add("disabled");
@@ -605,8 +605,8 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
 }
 
 function goBack(){
-    if (document.referrer) {
-        window.location.href = document.referrer;
+    if (document.referrer && document.referrer !== location.href) {
+        window.history.back();
     } else {
         window.location.href = "/matchup/board";
     }

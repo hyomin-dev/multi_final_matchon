@@ -212,15 +212,15 @@ function setDisconnects(roomId) {
 
     });
 
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') {
-            //fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST" });
-            if (stompClient && stompClient.connected) {
-                stompClient.unsubscribe(`/notify`);
-                stompClient.disconnect();
-            }
-        }
-    });
+    // document.addEventListener('visibilitychange', () => {
+    //     if (document.visibilityState === 'hidden') {
+    //         //fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST" });
+    //         if (stompClient && stompClient.connected) {
+    //             stompClient.unsubscribe(`/notify`);
+    //             stompClient.disconnect();
+    //         }
+    //     }
+    // });
 
     window.addEventListener('pagehide', () => {
         //fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST" });
@@ -249,7 +249,6 @@ async function initSideBar(){
     const openBtn = document.getElementById('openMiniDrawerBtn');
     const closeBtn = document.getElementById('closeMiniDrawerBtn');
     const miniDrawer = document.getElementById('miniDrawer');
-
 
     const openMiniDrawerHistoryBtn = document.getElementById("openMiniDrawerHistoryBtn");
     const closeMiniDrawerBtnHistoryBtn = document.getElementById("closeMiniDrawerBtnHistoryBtn");
