@@ -517,3 +517,13 @@ html, body {
 .info-box p {
     text-align: center;
 }
+.response-text,
+.response-box .response-text,
+.review-response {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
+}
+
+
