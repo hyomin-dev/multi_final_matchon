@@ -14,27 +14,32 @@
     border-radius: 12px;
     border: 1px solid beige;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
 .write-box {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .write-box label {
-    display: block;
     font-weight: bold;
-    margin-bottom: 6px;
+    font-size: 16px;
 }
 
 .write-box input,
 .write-box textarea,
+.write-box select,
 .all-list {
     width: 100%;
     padding: 12px;
-    margin-top: 4px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 16px;
+    box-sizing: border-box;
 }
 
 .write-box textarea {
@@ -49,27 +54,21 @@
     margin-top: 20px;
 }
 
-.compleate,
+.complete,
 .cancel-btn {
     padding: 10px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    text-decoration: none;
 }
 
 .complete {
     background-color: dodgerblue;
     color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.3s ease;
 }
 
 .complete:hover {
@@ -78,26 +77,13 @@
     box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
 }
 
-
 .cancel-btn {
     background-color: #888;
     color: white;
-    font-weight: bold;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.2s ease;
 }
 
 .cancel-btn:hover {
     background-color: #666;
     transform: translateY(1px);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.compleate:hover,
-.cancel-btn:hover {
-    opacity: 0.9;
 }
