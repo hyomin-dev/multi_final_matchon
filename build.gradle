@@ -65,6 +65,8 @@ dependencies {
     //html, js, css 자동 반영
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+    implementation 'com.google.protobuf:protobuf-java:4.28.2' // ✅ 이 줄 추가!
+
 
 
 
