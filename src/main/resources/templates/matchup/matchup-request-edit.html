@@ -8,12 +8,6 @@
     <script th:src="@{/js/matchup/matchup-request-edit.js}" defer></script>
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/matchup/matchup-request-edit.css}">
-
-    <style>
-        a {
-            display:block;
-        }
-    </style>
 </head>
 <body>
 
@@ -24,7 +18,7 @@
          th:data-sports-facility-name = "${resMatchupRequestDto.sportsFacilityName}"
          th:data-sports-facility-address="${resMatchupRequestDto.sportsFacilityAddress}"
          th:data-match-datetime="${resMatchupRequestDto.matchDatetime}"
-         th:data-match-duration="${resMatchupRequestDto.matchDuration}"
+         th:data-match-endtime="${resMatchupRequestDto.matchEndtime}"
          th:data-current-participant-count="${resMatchupRequestDto.currentParticipantCount}"
          th:data-max-participants="${resMatchupRequestDto.maxParticipants}"
          th:data-participant-count="${resMatchupRequestDto.participantCount}"
@@ -36,7 +30,7 @@
     </div>
     <h2 class="page-title">MATCHUP 참가 요청 수정</h2>
     <div class="form-container">
-        <form th:object="${resMatchupRequestDto}">
+        <form th:object="${resMatchupRequestDto}" id="board-info">
             <div class="form-group">
                 <label>
                     종목
@@ -96,9 +90,11 @@
                 </label>
             </div>
         </form>
-        <form th:object="${resMatchupRequestDto}" th:action="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}" method="post" >
+        <hr>
+        <form th:object="${resMatchupRequestDto}" th:action="@{/matchup/request/edit(request-id=${resMatchupRequestDto.requestId})}" method="post" id="request-info">
             <input type="hidden" th:field="*{requestId}">
             <input type="hidden" th:field="*{matchDatetime}">
+            <input type="hidden" th:field="*{matchEndtime}">
             <!--        <label>-->
             <!--            소개:-->
             <!--            <textarea cols="30" rows="5" placeholder="자기 소개를 입력하세요." th:text="*{selfIntro}" th:field="*{selfIntro}" required>-->
@@ -125,7 +121,7 @@
 
             <div class="button-group">
                 <button type="submit" class="modify-btn btn">수정하기</button>
-                <button type="button" class="delete-btn btn">취소하기</button>
+                <button type="button" class="cancel-btn" onclick="goBack()">취소하기</button>
             </div>
 
         </form>

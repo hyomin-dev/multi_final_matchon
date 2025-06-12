@@ -57,12 +57,14 @@ select:focus {
 }
 
 textarea{
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     resize: none;
 }
 
 /*===========================================*/
 /*읽기 전용*/
+#matchDate,
 #teamName{
 
     padding: 10px 16px;

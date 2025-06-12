@@ -51,22 +51,30 @@ document.addEventListener("DOMContentLoaded",async ()=>{
 
 
 async function loadItems(page, sportsType='', dateFilter='', availableFilter=false){
-    const response = await fetch(`/matchup/request/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}&availableFilter=${availableFilter}`,{
+    let items = [];
+    let pageInfo = {
+        page: 0,
+        totalPages: 1
+    };
+    try{
+        const response = await fetch(`/matchup/request/my/list?page=${page-1}&sportsType=${sportsType}&date=${dateFilter}&availableFilter=${availableFilter}`,{
 
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok)
-        throw new Error(`HTTP error! Status:${response.status}`)
-    const data = await response.json();
-    //console.log(data);
-    const items = data.data.items;
-    const pageInfo = data.data.pageInfo;
-    //console.log(pageInfo);
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`)
+        const data = await response.json();
+        //console.log(data);
+        items = data.data.items;
+        pageInfo = data.data.pageInfo;
+        //console.log(pageInfo);
+    }catch (err){
+        console.error(err);
+    }
 
     renderList(items);
     renderPagination(pageInfo,sportsType, dateFilter, availableFilter);
-
 
 }
 function renderList(items){
@@ -76,7 +84,7 @@ function renderList(items){
     if(items.length ===0){
         boardArea.innerHTML = `
             <tr>
-                <td colspan="9" class="no-result"> 현재 참가 요청 내역이 없습니다.</td>
+                <td colspan="10" class="no-result"> 현재 참가 요청 내역이 없습니다.</td>
             </tr>           
         `;
         return;
@@ -84,6 +92,7 @@ function renderList(items){
 
     items.forEach(item=>{
         const date = new Date(item.matchDatetime);
+        const end = new Date(item.matchEndtime);
 
         const card = document.createElement("tr");
         card.className = "matchup-card";
@@ -91,7 +100,7 @@ function renderList(items){
                 <td>${setSportsType(item.sportsTypeName)}</td>
                 <td class="truncate">${item.sportsFacilityAddress}</td>
                 <td>📅 ${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시 ${date.getMinutes()}분 - 
-                                ${calTime(item, date.getHours(), date.getMinutes())}</td>
+                                ${end.getHours()}시 ${end.getMinutes()}분</td>
                 <td>${checkMatchStatus(item)}</td>
                 <td>( ${item.currentParticipantCount} / ${item.maxParticipants} )</td>
                 <td>${item.participantCount}</td>
@@ -106,8 +115,11 @@ function renderList(items){
                 </td>               
                 <td><button class="group-chat disabled button-group">단체 채팅</button></td>
                 `;
-        boardArea.appendChild(card);
+
+        markIfPastMatchdatetime(card, item);
         setGroupChatButton(card, item);
+        boardArea.appendChild(card);
+
 
     })
 }
@@ -217,13 +229,14 @@ function calTime(item, startHour, startMinute){
 function checkMatchStatus(item){
 
     const matchDate = new Date(item.matchDatetime);
+    const endMatchDate = new Date(item.matchEndtime);
     const now = new Date();
-    const durationParts = item.matchDuration.split(":");
-    const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
+    // const durationParts = item.matchDuration.split(":");
+    // const matchEnd = new Date(matchDate.getTime() + (parseInt(durationParts[0])*60+parseInt(durationParts[1])) * 60 * 1000);
 
-    if(matchDate <now && now <= matchEnd)
+    if(matchDate <now && now <= endMatchDate)
         return "경기 진행";
-    else if(matchEnd<now)
+    else if(endMatchDate<now)
         return "경기 종료";
     else
         return "경기 시작전"
@@ -307,10 +320,14 @@ function manageRequestInfo(item){
 function setGroupChatButton(card, item){
     const matchDate = new Date(item.matchDatetime);
     const now = new Date();
+    const threeDaysLater = new Date(matchDate.getTime()+3*24*60*60*1000);
+
 
     const groupChatBtn = card.querySelector(".group-chat");
-
-    if(
+    if(threeDaysLater<now){
+        groupChatBtn.classList.add("disabled");
+    }
+    else if(
         // 1. 참가 요청 후 승인 대기
         (item.matchupStatus ===Status.PENDING && item.matchupRequestSubmittedCount===1 && item.matchupCancelSubmittedCount===0 && item.isDeleted===false) ||
         (item.matchupStatus===Status.PENDING && item.matchupRequestSubmittedCount===2 && item.matchupCancelSubmittedCount===0 && item.isDeleted ===false) ||
@@ -360,7 +377,7 @@ function setGroupChatButton(card, item){
 
         groupChatBtn.classList.remove("disabled");
         groupChatBtn.addEventListener("click",()=>{
-            window.open(`/chat/group/room?roomId=${item.roomId}`,"_blank");
+            window.open(`/chat/group/room?roomId=${item.roomId}`,"_blank","noopener,noreferrer");
         })
 
 
@@ -379,6 +396,19 @@ function setSportsType(sportsTypeName){
         return `
                 <span style="color: #e67e22;">FUTSAL</span>
                 `
+    }
+}
+
+
+/*경기 시작 시간이 지났다면 회색으로 표현*/
+function markIfPastMatchdatetime(card, item){
+    const matchDate = new Date(item.matchDatetime);
+    const now = new Date();
+    if(matchDate<now){
+        const tds = card.querySelectorAll("td");
+        tds.forEach(td =>{
+            td.style.backgroundColor = "lightgray";
+        })
     }
 }
 

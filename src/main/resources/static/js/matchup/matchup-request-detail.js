@@ -20,7 +20,7 @@ function setContent(){
     const sportsFacilityName = detailDto.dataset.sportsFacilityName;
     const sportsFacilityAddress = detailDto.dataset.sportsFacilityAddress;
     const matchDatetime = detailDto.dataset.matchDatetime;
-    const matchDuration = detailDto.dataset.matchDuration;
+    const matchEndtime = detailDto.dataset.matchEndtime;
     const matchupStatus = detailDto.dataset.matchupStatus;
     const matchupRequestSubmittedCount = Number(detailDto.dataset.matchupRequestSubmittedCount);
     const matchupCancelSubmittedCount = Number(detailDto.dataset.matchupCancelSubmittedCount);
@@ -35,7 +35,7 @@ function setContent(){
 
 
     drawMap(sportsFacilityAddress, sportsFacilityName);
-    calTime(matchDatetime, matchDuration);
+    calTime(matchDatetime, matchEndtime);
     manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime);
 
    if(applicantEmail === loginMemberEmail)
@@ -84,11 +84,12 @@ function drawMap(address, sportsFacilityName){
     });
 }
 
-function calTime(matchDatetime, matchDuration){
+function calTime(matchDatetime, matchEndtime){
     //console.log(matchDatetime);
     //console.log(matchDuration);
 
     const date = new Date(matchDatetime);
+    const end = new Date(matchEndtime);
     //console.log(date);
     const matchDateEle = document.querySelector("#match-date");
 
@@ -98,27 +99,30 @@ function calTime(matchDatetime, matchDuration){
     const startHour = date.getHours();
     const startMinutes = date.getMinutes();
 
+    const endHour = end.getHours();
+    const endMinutes = end.getMinutes();
 
-    const [hour, minute, second] = matchDuration.split(":");
-    const hourNum = parseInt(hour, 10);
-    const minuteNum = parseInt(minute,10);
 
-    let extraHour = 0
-    let endMinute = 0;
+    // const [hour, minute, second] = matchDuration.split(":");
+    // const hourNum = parseInt(hour, 10);
+    // const minuteNum = parseInt(minute,10);
+    //
+    // let extraHour = 0
+    // let endMinute = 0;
+    //
+    // if(date.getMinutes()+minuteNum>=60){
+    //     extraHour = 1;
+    //     endMinute = (date.getMinutes()+minuteNum)%60;
+    // }else{
+    //     endMinute = date.getMinutes()+minuteNum;
+    // }
+    //
+    // if(startHour+hourNum+extraHour>=24)
+    //     endHour = (startHour+hourNum+extraHour) %24;
+    // else
+    //     endHour = startHour+hourNum+extraHour;
 
-    if(date.getMinutes()+minuteNum>=60){
-        extraHour = 1;
-        endMinute = (date.getMinutes()+minuteNum)%60;
-    }else{
-        endMinute = date.getMinutes()+minuteNum;
-    }
-
-    if(startHour+hourNum+extraHour>=24)
-        endHour = (startHour+hourNum+extraHour) %24;
-    else
-        endHour = startHour+hourNum+extraHour;
-
-    matchDateEle.value = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinute}분`
+    matchDateEle.value = `${month}/${day} ${startHour}시 ${startMinutes}분 - ${endHour}시 ${endMinutes}분`
 
 }
 
@@ -600,6 +604,12 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
     }
 }
 
-
+function goBack(){
+    if (document.referrer) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "/matchup/board";
+    }
+}
 
 

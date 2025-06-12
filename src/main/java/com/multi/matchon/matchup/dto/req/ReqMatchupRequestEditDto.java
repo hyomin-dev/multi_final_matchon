@@ -22,6 +22,10 @@ public class ReqMatchupRequestEditDto {
     @Future
     private LocalDateTime matchDatetime;
 
+    @NotNull
+    @Future
+    private LocalDateTime matchEndtime;
+
     @NotBlank
     private String selfIntro;
 

@@ -31,7 +31,11 @@
         } else if(errorMessage.includes("blockUser")){
             alert(errorMessage);
             window.location.href="/chat/my/rooms"
-        }else if(errorMessage.includes(403)){
+        }else if(errorMessage.includes("Unauthorization")){
+            alert(errorMessage);
+            window.location.href="/";
+        }
+        else if(errorMessage.includes(403)){
             alert(errorMessage);
             window.location.href ="/";
         } else if(errorMessage.includes(401)){

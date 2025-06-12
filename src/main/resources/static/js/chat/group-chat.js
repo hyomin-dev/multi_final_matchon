@@ -4,14 +4,14 @@ let lastSystemMessage = null;
 let chatBox = document.getElementById('chat-box');
 let messageInput = document.getElementById('messageInput');
 let sendBtn = document.getElementById('sendBtn');
-
+let loginEmail = '';
+let roomId = '';
 
 document.addEventListener("DOMContentLoaded",async ()=>{
-    let roomId = "";
+
     const detailDto = document.querySelector("#group-chat-detail-dto");
-    // if(!detailDto)
-    //     return;
-    const loginEmail = detailDto.dataset.loginEmail;
+
+    loginEmail = detailDto.dataset.loginEmail;
     roomId = Number(detailDto.dataset.roomId);
 
     const token = getJwtToken();
@@ -21,21 +21,32 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     //     roomId = Number(await getPrivateChatRoomId(receiverId));
 
     // 채팅방 참여자인지 체크
-    await checkIsRoomParticipant(roomId);
+    await checkIsRoomParticipant();
 
     // SockJs 설정
     setStompClient();
     //메시지 보낼 때 설정
-    setSend(roomId);
+    setSend();
     //연결 해제 설정
-    setDisconnects(roomId);
+    setDisconnects();
 
     // 연결 시도
-    await connect(token, roomId, loginEmail);
+    await connect(token);
     console.log("STOMP 연결 성공");
 
     // 채팅 기록
-    await getChatHistory(roomId, loginEmail);
+    await getChatHistory();
+
+    setSidePanel();
+
+    initParticipantList();
+
+    document.querySelector(".refresh-list").addEventListener("click",async ()=>{
+        await initParticipantList();
+    });
+
+
+
 
 
 })
@@ -54,7 +65,7 @@ function setStompClient() {
 
 }
 
-function connect(token, roomId, loginEmail) {
+function connect(token) {
     if(stompClient && stompClient.connected)
         return; // 중복 연결 방지
 
@@ -108,7 +119,7 @@ function connect(token, roomId, loginEmail) {
 }
 
 
-function setSend(roomId) {
+function setSend() {
     // 3. 메시지 전송
     sendBtn.addEventListener('click', ()=>{
         sendMessage(roomId);
@@ -119,7 +130,7 @@ function setSend(roomId) {
 }
 
 
-function setDisconnects(roomId) {
+function setDisconnects() {
 // 4. 나가기 전 disconnect
     window.addEventListener('beforeunload', () => {
         // fetch(`/chat/room/${roomId}/read`, { method: "POST" });
@@ -138,7 +149,7 @@ function setDisconnects(roomId) {
 
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
-            fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST" });
+            fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST",credentials:"include" });
             if (stompClient && stompClient.connected) {
                 stompClient.unsubscribe(`/topic/${roomId}`);
                 stompClient.disconnect();
@@ -147,7 +158,7 @@ function setDisconnects(roomId) {
     });
 
     window.addEventListener('pagehide', () => {
-        fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST" });
+        fetch(`/chat/room/read?roomId=${roomId}`, { method: "POST", credentials:"include" });
         if (stompClient && stompClient.connected) {
             stompClient.unsubscribe(`/topic/${roomId}`);
             stompClient.disconnect();
@@ -156,7 +167,7 @@ function setDisconnects(roomId) {
 }
 
 
-function sendMessage(roomId) {
+function sendMessage() {
     const msgText = messageInput.value.trim();
     if (!msgText) return;
 
@@ -164,11 +175,16 @@ function sendMessage(roomId) {
         content: msgText
     };
 
-    stompClient.send(`/publish/${roomId}`, JSON.stringify(content));
+    try{
+        stompClient.send(`/publish/${roomId}`, JSON.stringify(content));
+    }catch (e){
+        alert("메시지 전송에 실패했습니다.");
+    }
+
     messageInput.value = '';
 }
 
-function appendMessage(msg, loginEmail) {
+function appendMessage(msg) {
     if(msg.exceptionName === "NotChatParticipantException")
         showErrorPage(msg.content);
 
@@ -217,56 +233,77 @@ function scrollToBottom() {
 
 
 
-async function getPrivateChatRoomId(receiverId){
-    const response = await fetch(`/chat/room/private?receiverId=${receiverId}`,{
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok){
-        const data = await response.json();
-        // console.log(data);
-        // console.log(data.error);
+// async function getPrivateChatRoomId(receiverId){
+//     try{
+//         const response = await fetch(`/chat/room/private?receiverId=${receiverId}`,{
+//             method: "GET",
+//             credentials: "include"
+//         });
+//         if(!response.ok){
+//             const data = await response.json();
+//             // console.log(data);
+//             // console.log(data.error);
+//
+//             showErrorPage(data.error);
+//
+//         }
+//         const data = await response.json();
+//
+//         return data.data;
+//
+//     }catch (err){
+//         console.log(err);
+//         showErrorPage("현재 채팅방 참여자가 아닙니다.");
+//     }
+//
+//
+//
+// }
 
-        showErrorPage(data.error);
+async function checkIsRoomParticipant() {
+    try{
+        const response = await fetch(`/chat/check/my/rooms?roomId=${roomId}`,{
+            method: "GET",
+            credentials: "include"
+        })
 
+        if(!response.ok){
+            const data = await response.json();
+            showErrorPage(data.error);
+        }
+    }catch(err){
+        showErrorPage("현재 채팅방 참가자가 아닙니다.");
     }
-
-    const data = await response.json();
-
-    return data.data;
 
 }
 
-async function checkIsRoomParticipant(roomId) {
-    const response = await fetch(`/chat/check/my/rooms?roomId=${roomId}`,{
-        method: "GET",
-        credentials: "include"
-    })
+async function getChatHistory() {
+    try{
+        const response = await fetch(`/chat/history?roomId=${roomId}`,{
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok){
+            const data = await response.json();
+            // console.log(data);
+            // console.log(data.error);
+            //showErrorPage(data.error);
+        }
 
-    if(!response.ok){
         const data = await response.json();
-        showErrorPage(data.error);
-    }
-}
 
-async function getChatHistory(roomId, loginEmail) {
-    const response = await fetch(`/chat/history?roomId=${roomId}`,{
-        method: "GET",
-        credentials: "include"
-    });
-    if(!response.ok){
-        const data = await response.json();
-        // console.log(data);
-        // console.log(data.error);
-        showErrorPage(data.error);
+        data.data.forEach(dto =>{
+            appendMessage(dto, loginEmail);
+            scrollToBottom();
+        })
+
+    }catch (err){
+        console.error("가져올 이전 기록이 없습니다.");
+        return;
     }
 
-    const data = await response.json();
 
-    data.data.forEach(dto =>{
-        appendMessage(dto, loginEmail);
-        scrollToBottom();
-    })
+
 
 }
 
@@ -283,5 +320,187 @@ function showErrorPage(error){
     document.body.appendChild(form);
     form.submit();
 }
+
+function setSidePanel(){
+    const openBtn = document.querySelector("#openPanelBtn");
+    const closeBtn = document.querySelector("#closePanelBtn");
+    const panel = document.querySelector("#sidePanel");
+    //const overlay = document.querySelector("#overlay");
+
+    openBtn.addEventListener("click", () => {
+        panel.classList.add("show");
+        //overlay.classList.add("show");
+    });
+
+    closeBtn.addEventListener("click", () => {
+        panel.classList.remove("show");
+        //overlay.classList.remove("show");
+    });
+
+    // overlay.addEventListener("click", () => {
+    //     panel.classList.remove("show");
+    //     overlay.classList.remove("show");
+    // });
+}
+
+async function initParticipantList(){
+
+    const items = await getParticipantList(roomId);
+    const content = document.querySelector(".side-panel-content");
+    content.replaceChildren();
+
+
+    const myCard = document.createElement("div");
+    const myName = document.createElement("span");
+
+    myName.textContent = "1. 나";
+    myCard.appendChild(myName);
+    content.appendChild(myCard);
+
+    items.forEach((item, index)=>{
+        if(item.memberEmail===loginEmail){
+            return;
+        }
+        const card = document.createElement("div");
+        card.innerHTML=`
+                      <div class="member-name">${index+2}. ${item.memberName}</div>
+                      <div class="button-group">
+                          <button class="enter-btn btn">입장</button>
+                          <button class="exit-btn btn"></button>
+                      </div>                      
+                                                
+                        `;
+
+        setButton(card,item);
+        content.appendChild(card);
+
+    })
+}
+
+async function getParticipantList(){
+
+    try{
+        const response = await fetch(`/chat/group/participants?roomId=${roomId}`,{
+            method: "GET",
+            credentials: "include"
+        });
+        if(!response.ok)
+            throw new Error(`HTTP error! Status:${response.status}`);
+        const data = await response.json();
+
+        console.log(data);
+        return data.data;
+
+
+    }catch(err){
+        console.error(err);
+    }
+}
+
+function setButton(card,item){
+    const enterBtn = card.querySelector(".enter-btn");
+    const exitBtn = card.querySelector(".exit-btn");
+
+    //나와 연결된 1대1 채팅방이 있는 경우 and 내가 상대방을 차단한 경우
+    if(item.isMyPrivateChatPartner===true && item.isBlock===true) {
+        enterBtn.disabled = true;
+        exitBtn.textContent = "해제"
+
+        // 차단해제하는 경우
+        exitBtn.addEventListener("click",async (e)=>{
+            let reply = confirm("정말 차단 해제 하시겠습니까?");
+
+            if(reply){
+                try{
+                    const response = await fetch(`/chat/room/private/api/unblock?roomId=${item.privateRoomId}`,{
+                        method: "GET",
+                        credentials: "include"
+                    });
+                    if(!response.ok)
+                        throw new Error(`HTTP error! Status:${response.status}`);
+                    initParticipantList();
+
+                }catch (err){
+                    console.log(err);
+                }
+
+            }else{
+                e.preventDefault();
+            }
+        });
+
+
+    }else if(item.isMyPrivateChatPartner===true && item.isBlock!==true) {
+        //나와 연결된 1대1 채팅방이 있는 경우 and 내가 상대방을 차단하지 않은 경우
+        exitBtn.textContent = "차단";
+
+        enterBtn.addEventListener("click",()=>{
+            window.open(`/chat/my/room?roomId=${item.privateRoomId}`,"_blank","noopener,noreferrer");
+        });
+
+        // 차단하는 경우
+        exitBtn.addEventListener("click",async (e)=>{
+            let reply = confirm("정말 차단 하시겠습니까?");
+
+            if(reply){
+                try{
+                    const response = await fetch(`/chat/room/private/api/block?roomId=${item.privateRoomId}`,{
+                        method: "GET",
+                        credentials: "include"
+                    });
+                    if(!response.ok)
+                        throw new Error(`HTTP error! Status:${response.status}`);
+                    initParticipantList();
+
+                }catch (err){
+                    console.log(err);
+                }
+
+            }else{
+                e.preventDefault();
+            }
+        });
+
+    }else {
+        exitBtn.textContent = "차단";
+        exitBtn.disabled = true;
+
+        enterBtn.addEventListener("click",()=>{
+            window.open(`/chat/private?receiverId=${item.memberId}`,"_blank","noopener,noreferrer");
+
+            setTimeout(()=>{
+                initParticipantList();
+            },1000)
+
+        })
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

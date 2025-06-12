@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +24,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // isDeleted 고려
         if (member.getIsDeleted()) {
-            throw new UsernameNotFoundException("탈퇴한 계정입니다.");
+            // 👇 로그아웃 요청일 경우엔 허용해주기
+            String requestURI = RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes ?
+                    ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRequestURI() : "";
+
+            if (!requestURI.contains("/auth/logout")) {
+                throw new UsernameNotFoundException("탈퇴한 계정입니다.");
+            }
         }
 
         return new CustomUser(member);
