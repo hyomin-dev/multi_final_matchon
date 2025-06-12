@@ -65,7 +65,7 @@ dependencies {
     //html, js, css 자동 반영
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-
+    testImplementation 'com.h2database:h2'
 
 
 
