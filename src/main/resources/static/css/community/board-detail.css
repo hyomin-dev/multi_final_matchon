@@ -64,7 +64,7 @@
 
 .back-link {
     font-size: 14px;
-    color: #3498db;
+    color: royalblue;
     text-decoration: none;
 }
 
@@ -73,6 +73,25 @@
 }
 
 /* ===== 버튼 스타일 (삭제, 신고, 수정) ===== */
+.comment-btn {
+    background-color: dodgerblue;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.comment-btn:hover {
+    background-color: royalblue;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+}
+
 .board-delete-button {
     background: transparent;
     border: none;
@@ -114,18 +133,23 @@
 }
 
 .edit-link {
+    display: inline-block;
     background-color: forestgreen;
     color: white;
-    padding: 7px 14px;
-    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 15px;
     font-weight: bold;
-    border-radius: 4px;
+    cursor: pointer;
     text-decoration: none;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    transform: translateY(0);
 }
 
 .edit-link:hover {
     background-color: darkgreen;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 60, 0, 0.3)
 }
 
 /* ===== 첨부파일 영역 ===== */

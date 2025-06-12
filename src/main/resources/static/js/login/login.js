@@ -19,7 +19,12 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
         .then(res => {
             if (!res.ok) {
                 return res.json().then(data => {
-                    throw new Error(data.error || "로그인 실패");
+                    if (data.error === "존재하지 않는 사용자입니다." || data.error === "탈퇴한 계정입니다.") {
+                        alert("존재하지 않는 계정입니다. 회원가입 후 이용해주세요.");
+                        window.location.href = "/signup";
+                    } else {
+                        throw new Error(data.error || "로그인 실패");
+                    }
                 });
             }
             return res.json();

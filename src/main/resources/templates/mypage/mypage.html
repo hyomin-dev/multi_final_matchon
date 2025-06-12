@@ -6,260 +6,7 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}">
-
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #fff;
-        }
-
-        .mypage-container {
-            background-color: #fff;
-            display: flex;
-            max-width: 1280px;
-            margin: 50px auto;
-            gap: 40px;
-            padding: 0 20px;
-        }
-
-        .mypage-sidebar {
-            flex: 0 0 220px;
-            text-align: center;
-        }
-
-        .profile-img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            border: 3px solid #ccc;
-        }
-
-        .button-group-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .button-group-vertical button {
-            background-color: dodgerblue;
-            color: white;
-            font-weight: bold;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .button-group-vertical button:hover {
-            background-color: royalblue;
-        }
-        .mypage-main {
-            flex: 1;
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .mypage-main h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #2e5c9a;
-            padding-bottom: 10px;
-        }
-
-        .mypage-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .mypage-table th, .mypage-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .mypage-table th {
-            background-color: #f3f6fa;
-            width: 150px;
-            font-weight: 600;
-        }
-
-        .submit-btn-container {
-            margin-top: 20px;
-            text-align: right;
-        }
-
-        .submit-btn-container button {
-            background-color: dodgerblue;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            display: inline-block;
-            transition: background-color 0.3s;
-        }
-
-        .submit-btn-container button:hover {
-            background-color: royalblue;
-        }
-
-        .category-select {
-            width: 160px;
-            height: 35px;
-            padding: 6px 10px;
-            font-size: 13px;
-            font-weight: 500;
-            color: darkslategray;
-            background-color: #f9f9f9;
-            border: 2px solid dodgerblue;
-            border-radius: 6px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        .category-select:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
-        }
-
-        .withdraw-section {
-            margin-top: auto;
-            padding-top: 30px;
-        }
-
-        .danger-btn {
-            padding: 8px 15px;
-            background-color: white;
-            color: red;
-            border: 2px solid red;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .danger-btn:hover {
-            background-color: mistyrose;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: #fff;
-            padding: 30px 24px;
-            border-radius: 12px;
-            width: 380px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-            border-top: 5px solid #e53935;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content h3 {
-            margin: 0 0 20px 0;
-            font-size: 22px;
-            font-weight: 700;
-            color: #e53935;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .modal-buttons {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .modal-buttons button {
-            flex: 1;
-            padding: 10px 0;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .modal-buttons button:first-child {
-            background-color: #e53935;
-            color: white;
-        }
-
-        .modal-buttons button:first-child:hover {
-            background-color: #c62828;
-        }
-
-        .modal-buttons button:last-child {
-            background-color: #f5f5f5;
-            color: #333;
-            border: 1px solid #ccc;
-        }
-
-        .modal-buttons button:last-child:hover {
-            background-color: #ebebeb;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to   { opacity: 1; transform: scale(1); }
-        }
-
-        /* 탈퇴 팝업 전용 스타일 */
-        .report-modal-title {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: #e53935;
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .report-icon {
-            width: 22px;
-            height: 22px;
-        }
-
-        .withdraw-message {
-            text-align: center;
-            margin-bottom: 12px;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .withdraw-input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
 </head>
 <body>
 
@@ -279,10 +26,10 @@
 
         <div class="button-group-vertical">
             <button type="button" onclick="triggerUpload()"
-                    th:text="${isDefaultProfile} ? '사진 등록' : '사진 수정'"></button>
+                    class="profile" th:text="${isDefaultProfile} ? '사진 등록' : '사진 수정'"></button>
 
             <div th:unless="${isDefaultProfile}">
-                <button type="button" onclick="deleteProfile()">사진 삭제</button>
+                <button type="button" class="delete-button" onclick="deleteProfile()">사진 삭제</button>
             </div>
         </div>
 
@@ -313,7 +60,7 @@
                     </tr>
                 </table>
                 <div class="submit-btn-container">
-                    <button onclick="submitMypage()">수정하기</button>
+                    <button class="edit-button" onclick="submitMypage()">수정하기</button>
                 </div>
             </div>
 
@@ -325,7 +72,7 @@
                         <th>주최 기관 이름</th>
                         <td>
                             <input type="text" id="hostNameInput" th:value="${hostName}" placeholder="기관명 입력" />
-                            <button type="button" onclick="submitHostName()">등록</button>
+                            <button type="button" class="host-submit" onclick="submitHostName()">등록</button>
                             <button type="button" id="scheduleButton">대회 등록하러 가기</button>
                         </td>
                     </tr>
@@ -562,7 +309,9 @@
 
     function logout() {
         fetch("/auth/logout", { method: "POST", credentials: "include" })
-            .then(() => window.location.href = "/main");
+            .finally(() => {
+                window.location.href = "/main";
+            });
     }
 
     function getCookie(name) {
