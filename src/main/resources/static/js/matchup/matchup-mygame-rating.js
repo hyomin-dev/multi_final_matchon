@@ -245,7 +245,12 @@ function autoResize() {
 
 
 function goBack(){
-    window.location.href = "/matchup/mygame/page";
+    if (document.referrer && document.referrer !== location.href) {
+        window.history.back();
+    } else {
+        window.location.href = "/matchup/board";
+    }
+    //window.location.href = "/matchup/mygame/page";
 }
 
 
@@ -258,6 +263,11 @@ function submitCheck(e){
 
     const reviewEle = document.querySelector("#review");
 
+    // 1. 리뷰 글자 수 검사
+    if(isExceedCharlimit(reviewEle.value.length, 300)){
+        e.preventDefault();
+        alert("리뷰는 300자 내로 작성해주세요.")
+    }
 
 
     if(mannerScoreEle.value ===""){
@@ -272,5 +282,13 @@ function submitCheck(e){
     } else{
         alert("매너 후기가 전송되었습니다.");
     }
+}
+
+function isExceedCharlimit(length, limit){
+
+    if(Number(length)>Number(limit))
+        return true;
+    else
+        return false;
 }
 

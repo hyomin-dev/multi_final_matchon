@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
         // 체크x: false
     })
 
-    document.querySelector("#filterBtn").addEventListener("click",()=>{
+    document.querySelector("#filterBtn").addEventListener("click",(e)=>{
         const isSame = lastFilterValues.sportsType === sportsType &&
             lastFilterValues.dateFilter === dateFilter &&
             lastFilterValues.availableFilter === availableFilter;
@@ -404,7 +404,7 @@ function setSportsType(sportsTypeName){
 function markIfPastMatchdatetime(card, item){
     const matchDate = new Date(item.matchDatetime);
     const now = new Date();
-    if(matchDate<now){
+    if(matchDate<=now){
         const tds = card.querySelectorAll("td");
         tds.forEach(td =>{
             td.style.backgroundColor = "lightgray";
@@ -414,8 +414,8 @@ function markIfPastMatchdatetime(card, item){
 
 function goBack() {
 
-    if (document.referrer) {
-        window.location.href = document.referrer;
+    if (document.referrer && document.referrer !== location.href) {
+        window.history.back();
     } else {
         window.location.href = "/matchup/board"; // fallback URL
     }
