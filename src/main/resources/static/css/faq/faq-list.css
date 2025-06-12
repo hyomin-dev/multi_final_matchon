@@ -152,16 +152,18 @@ table tr:hover {
 }
 
 .btnsubmit {
-    background-color: #1c7ed6;
+    background: linear-gradient(to right, #FFB432, #FF7F50);
     color: white;
     font-weight: bold;
     padding: 8px 16px;
     border-radius: 8px;
     text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .btnsubmit:hover {
-    background-color: #125b9b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 193, 7, 0.3);
 }
 
 .titlefaq {

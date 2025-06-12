@@ -105,3 +105,24 @@ function getPasswordValidationMessage(password) {
     if (/(.)\1\1/.test(password)) return "같은 문자를 연속으로 사용할 수 없습니다.";
     return null;
 }
+
+// 역할 선택 시 드롭다운 색상 변경
+function changeRole() {
+    const roleSelect = document.getElementById('roleSelect');
+    const selectedRole = roleSelect.value;
+
+    if (selectedRole === 'user') {
+        roleSelect.style.backgroundColor = 'black';
+        roleSelect.style.color = 'white';
+        roleSelect.style.border = '1px solid black';
+    } else if (selectedRole === 'host') {
+        roleSelect.style.backgroundColor = 'white';
+        roleSelect.style.color = 'black';
+        roleSelect.style.border = '1px solid white';
+    }
+}
+
+// 페이지 로드 시 초기 색상 지정
+document.addEventListener('DOMContentLoaded', () => {
+    changeRole();  // 초기 로딩 시 선택 값에 맞게 배경색 설정
+});

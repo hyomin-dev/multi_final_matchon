@@ -79,12 +79,18 @@
                         <!-- 후기는 JS에서 동적으로 채움 -->
                     </div>
 
+
+                    <!-- ✅ Add this line below the reviewList -->
+                    <p id="noReviewsMessage" style="display: none; text-align:center; color: #777;">아직 후기가 없습니다.</p>
+
+
                     <div id="reviewPagination" class="pagination">
                         <!-- 페이지네이션 버튼이 여기에 렌더링됩니다 -->
                     </div>
                     <div class="review-actions" th:if="${!isTeamLeader}">
                         <button id="writeReviewBtn" class="btn-primary">후기 쓰기</button>
                         <button id="myReviewsBtn" class="btn-secondary">내가 쓴 후기 보기</button>
+                        <button id="backToAllReviewsFromMyBtn" class="btn-cancel" style="display:none;">뒤로가기</button>
                     </div>
 
 
@@ -292,6 +298,7 @@
             });
         }
         const reviewList = document.getElementById('reviewList');
+        const noReviewsMessage = document.getElementById('noReviewsMessage');
         const reviewForm = document.getElementById('reviewForm');
         const reviewListView = document.getElementById('reviewListView');
         const reviewWriteView = document.getElementById('reviewWriteView');
@@ -650,6 +657,8 @@
                     reviewWriteView.style.display = 'none';
                     reviewListView.style.display = 'block';
                     loadPagedReviews(0); // ✅ correct
+                    myReviewsBtn.style.display = 'inline-block';
+                    backToAllReviewsFromMyBtn.style.display = 'none';
                 })
                 .catch(() => alert('후기 작성에 실패했습니다. 다시 시도해주세요.'));
         }
@@ -681,6 +690,8 @@
                 reviewWriteView.style.display = 'none';
                 reviewListView.style.display = 'block';
                 loadPagedReviews(0); // ✅ correct
+                myReviewsBtn.style.display = 'inline-block';
+                backToAllReviewsFromMyBtn.style.display = 'none';
 
             } catch {
                 alert('수정에 실패했습니다.');
@@ -723,11 +734,15 @@
                     .then(res => {
                         if (!res.ok) throw new Error();
                         alert('삭제되었습니다.');
-                        location.reload();
+                        loadPagedReviews(0);
+                        myReviewsBtn.style.display = 'inline-block';
+                        backToAllReviewsFromMyBtn.style.display = 'none';
                     })
                     .catch(() => alert('삭제에 실패했습니다.'));
             }
         });
+
+        const backToAllReviewsFromMyBtn = document.getElementById('backToAllReviewsFromMyBtn');
 
         if (myReviewsBtn) {
             myReviewsBtn.addEventListener('click', (e) => {
@@ -736,31 +751,46 @@
                     .then(res => res.json())
                     .then(data => {
                         const reviews = data.data;
+
+                        // 🔁 Always update reviewList regardless of count
                         if (!reviews.length) {
                             reviewList.innerHTML = '<p class="no-reviews">내가 작성한 후기가 없습니다.</p>';
-                            return;
+                        } else {
+                            reviewList.innerHTML = reviews.map(review => `
+                        <div class="review-item" data-id="${review.id}">
+                            <div class="review-header">
+                                <div class="review-author-info">
+                                    <img src="${review.profileImageUrl || '/img/default-avatar.png'}" alt="User" class="author-avatar">
+                                    <span class="review-author">${review.reviewerName}</span>
+                                </div>
+                                <div class="review-meta">
+                                    <span class="review-rating">${'⭐'.repeat(review.rating)}</span>
+                                    <span class="review-date">${review.createdDate.split('T')[0]}</span>
+                                </div>
+                            </div>
+                            <p class="review-content">${review.content}</p>
+                            <div class="form-actions">
+                                <button class="btn-edit-review btn-secondary" data-id="${review.id}">수정</button>
+                                <button class="btn-delete-review btn-cancel" data-id="${review.id}">삭제</button>
+                            </div>
+                        </div>
+                    `).join('');
                         }
 
-                        reviewList.innerHTML = reviews.map(review => `
-                    <div class="review-item" data-id="${review.id}">
-                        <div class="review-header">
-                            <div class="review-author-info">
-                                <img src="${review.profileImageUrl || '/img/default-avatar.png'}" alt="User" class="author-avatar">
-                                <span class="review-author">${review.reviewerName}</span>
-                            </div>
-                            <div class="review-meta">
-                                <span class="review-rating">${'⭐'.repeat(review.rating)}</span>
-                                <span class="review-date">${review.createdDate.split('T')[0]}</span>
-                            </div>
-                        </div>
-                        <p class="review-content">${review.content}</p>
-                        <div class="form-actions">
-                            <button class="btn-edit-review btn-secondary" data-id="${review.id}">수정</button>
-                            <button class="btn-delete-review btn-cancel" data-id="${review.id}">삭제</button>
-                        </div>
-                    </div>
-                `).join('');
+                        // ✅ Always toggle the buttons
+                        myReviewsBtn.style.display = 'none';
+                        backToAllReviewsFromMyBtn.style.display = 'inline-block';
                     });
+            });
+        }
+
+        // 👈 Add new event listener for back button
+        if (backToAllReviewsFromMyBtn) {
+            backToAllReviewsFromMyBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                loadPagedReviews(0);
+                myReviewsBtn.style.display = 'inline-block';
+                backToAllReviewsFromMyBtn.style.display = 'none';
             });
         }
 
@@ -985,6 +1015,17 @@
                     const pageInfo = data.pageInfo;
 
                     currentReviewPage = page;
+
+
+                    reviewList.innerHTML = ''; // Clear previous content
+
+                    if (!reviews || reviews.length === 0) {
+                        noReviewsMessage.style.display = 'block';
+                        reviewPagination.innerHTML = '';
+                        return;
+                    } else {
+                        noReviewsMessage.style.display = 'none';
+                    }
 
                     // Render reviews
                     reviewList.innerHTML = reviews.map(review => `
