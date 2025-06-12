@@ -21,8 +21,7 @@
         <div class="post-title" th:text="${faqDto.faqTitle}"></div>
 
 
-        <p th:utext="${#strings.replace(faqDto.faqContent, '\n', '<br/>')}" class="faq-content"></p>
-
+        <p th:text="${faqDto.faqContent}"></p>
 
         <th:block th:if="${isAdmin}">
             <div class="btn-box">
