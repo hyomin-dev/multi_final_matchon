@@ -123,7 +123,7 @@ function renderList(items){
                             <div>입장 가능 온도: ${item.minMannerTemperature}</div>
                             <div>현재 내 온도: ${myMannerTemperature}</div>                                      
                         </td>
-                        <td><button class="col-detail" onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'">상세보기</button></td>                   
+                        <td><button class="col-detail-btn" onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'">상세보기</button></td>                   
                         `;
         markIfPastMatchdatetime(card, item);
         boardArea.appendChild(card);

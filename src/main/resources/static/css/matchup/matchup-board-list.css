@@ -175,7 +175,7 @@ label[for="availableOnly"], label:has(#availableOnly) {
     box-shadow: 0 6px 12px rgba(128, 0, 128, 0.3);
 }
 
-.col-detail{
+.col-detail-btn{
     background-color: olivedrab;
     color: white;
     padding: 8px 16px;
@@ -188,7 +188,7 @@ label[for="availableOnly"], label:has(#availableOnly) {
     transition: all 0.3s ease;
 }
 
-.col-detail:hover{
+.col-detail-btn:hover{
     background-color: darkolivegreen;
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 80, 0, 0.3);
