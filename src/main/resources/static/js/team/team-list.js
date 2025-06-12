@@ -1,6 +1,7 @@
 let currentPage = 0;
 
 function loadTeamPage(page) {
+    document.getElementById('backToAllBtn').style.display = 'none';
     const region = document.getElementById('region').value;
     const position = document.getElementById('recruiting-position').value;
     const ratingValue = document.getElementById('rating-filter').value;
