@@ -114,8 +114,18 @@ public class TeamService {
         Member member = memberRepository.findByMemberEmail(user.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + user.getUsername()));
 
+
         if (member.getTeam() != null) {
-            throw new IllegalArgumentException("이미 팀이 있습니다.");
+            throw new IllegalArgumentException("이미 소속된 팀이 있습니다.");
+        }
+
+        boolean exists = teamRepository.existsByTeamNameAndIsDeletedFalse(reqTeamDto.getTeamName());
+        if (exists) {
+            throw new IllegalArgumentException("이미 존재하는 팀 이름입니다.");
+        }
+
+        if (reqTeamDto.getRecruitmentStatus() == null) {
+            throw new IllegalArgumentException("모집 여부를 선택해야 합니다.");
         }
 
         if (reqTeamDto.getTeamRegion() == null) {
@@ -126,9 +136,8 @@ public class TeamService {
             throw new IllegalArgumentException("한 개 이상의 포지션을 선택해야 합니다.");
         }
 
-        if (reqTeamDto.getRecruitmentStatus() == null) {
-            throw new IllegalArgumentException("모집 여부를 선택해야 합니다.");
-        }
+
+
         // Check if the user already has an active team
 
         List<PositionName> positions = reqTeamDto.getRecruitingPositions().stream()
@@ -143,10 +152,6 @@ public class TeamService {
                 })
                 .collect(Collectors.toList());
 
-        boolean exists = teamRepository.existsByTeamNameAndIsDeletedFalse(reqTeamDto.getTeamName());
-        if (exists) {
-            throw new IllegalArgumentException("이미 존재하는 팀 이름입니다.");
-        }
 
         Team newTeam = Team.builder()
                 .teamName(reqTeamDto.getTeamName())

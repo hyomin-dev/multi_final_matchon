@@ -5,14 +5,15 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/team/team-register.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/team/team-edit.css}">
     <script th:src="@{/js/team/team-edit.js}" defer></script>
 </head>
 <body>
 
 <div th:replace="~{common/header::header}"></div>
 
-<div id="wrap">
+<div class="team-edit-wrapper">
+    <div class="team-edit-form">
     <h1>팀 수정</h1>
 
     <form th:action="@{/team/team/update}"  method="post" enctype="multipart/form-data" th:object="${ReqTeamDto}">
@@ -71,6 +72,7 @@
         <button type="submit">수정 완료</button>
         <button type="button" onclick="history.back()">취소</button>
     </form>
+</div>
 </div>
 
 <div th:replace="~{common/footer::footer}"></div>

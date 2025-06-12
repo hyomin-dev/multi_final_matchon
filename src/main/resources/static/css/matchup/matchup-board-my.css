@@ -239,7 +239,7 @@ label[for="availableOnly"], label:has(#availableOnly) {
 .col-sports-facility-address {width: 25%}
 .col-match-date {width: 20%}
 .col-status {width: 6%}
-.col-quota {width: 6%}
+.col-quota {width: 8%}
 .col-temp {width:9%}
 .col-detail {width:8%}
 .col-check-request {width: 8%}

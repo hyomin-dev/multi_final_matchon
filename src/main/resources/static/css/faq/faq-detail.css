@@ -75,3 +75,7 @@
 .btn-edit:hover {
     background-color: darkgreen;
 }
+
+.faq-content {
+    white-space: pre-line;
+}
