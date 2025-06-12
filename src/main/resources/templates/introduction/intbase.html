@@ -2,16 +2,31 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>소개</title>
+    <title>회사 소개</title>
+
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-    <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}" />
-    <link rel="stylesheet" th:href="@{/css/introduction/intcss.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
+    <link rel="stylesheet" th:href="@{/css/introduction/intcss.css}">
 
     <script defer>
-        function toggleDetail(id) {
-            const el = document.getElementById(id);
-            el.classList.toggle('open');
+        function showModalFromData(element) {
+            const title = element.getAttribute("data-title");
+            const content = element.getAttribute("data-content");
+            document.getElementById("modalTitle").innerText = title;
+            document.getElementById("modalContent").innerText = content;
+            document.getElementById("modal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("modal");
+            if (event.target === modal) {
+                closeModal();
+            }
         }
     </script>
 </head>
@@ -22,23 +37,25 @@
 <div id="wrap">
     <h1 class="titleint">INTRODUCTION</h1>
 
-    <div class="rectangle">
-        <div class="intro-card"
-             th:each="group, iterStat : ${introductionGroup}"
-             th:onclick="|toggleDetail('group-${iterStat.index}')|">
+    <div class="intro-grid">
+        <th:block th:each="group : ${introductionGroup}">
+            <th:block th:each="intro : ${group}">
+                <div class="intro-box"
+                     th:attr="data-title=${intro.title}, data-content=${intro.content}"
+                     onclick="showModalFromData(this)">
+                    <h3 th:text="${intro.title}">제목</h3>
+                </div>
+            </th:block>
+        </th:block>
+    </div>
+</div>
 
-            <div class="title-row">
-                <th:block th:each="intro : ${group}">
-                    <h2 th:text="${intro.title}">제목</h2>
-                </th:block>
-            </div>
-
-            <div th:id="|group-${iterStat.index}|" class="content-row">
-                <th:block th:each="intro : ${group}">
-                    <p th:text="${intro.content}">내용</p>
-                </th:block>
-            </div>
-        </div>
+<!-- 모달 -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle">제목</h2>
+        <p id="modalContent">내용</p>
     </div>
 </div>
 
