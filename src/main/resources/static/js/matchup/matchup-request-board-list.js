@@ -366,7 +366,7 @@ function setDecision(card,item){
     })
 
     // 참가 요청에 대한 승인/반려
-    if(matchDate<now){
+    if(matchDate<=now){
         // 참가 승인 불가능
         approvedBtn.classList.add("disabled");
 
@@ -473,8 +473,8 @@ function markIfPastMatchdatetime(card, item){
 }
 
 function goBack(){
-    if (document.referrer) {
-        window.location.href = document.referrer;
+    if (document.referrer && document.referrer !== location.href) {
+        window.history.back();
     } else {
         window.location.href = "/matchup/board";
     }

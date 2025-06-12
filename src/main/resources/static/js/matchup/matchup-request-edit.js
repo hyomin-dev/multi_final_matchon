@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     manageRequestInfo(matchupStatus, matchupRequestSubmittedCount, matchupCancelSubmittedCount, isDeleted, matchDatetime);
     autoResize();
 
-    const form = document.querySelector("form");
+    const form = document.querySelector("#request-info");
     form.addEventListener("submit",(e)=>{
         submitCheck(e, matchDatetime);
     })
@@ -43,15 +43,21 @@ function submitCheck(e, matchDatetime){
     const date = new Date(matchDatetime);
     const now = new Date();
 
+    // 1. 자기소개 글자 수 검사
+    if(isExceedCharlimit(selfIntroEle.value.length, 300)){
+        e.preventDefault();
+        alert("자기소개는 300자 내로 작성해주세요.")
+    }
+
     if(selfIntroEle.value ===""){
         alert("자기 소개를 입력하세요.");
         e.preventDefault();
     }else if(participantCountEle.value === ""){
         alert("참가 인원을 입력하세요.");
         e.preventDefault();
-    }else if(date<now){
-        alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+    }else if(date<=now){
         e.preventDefault();
+        alert("경기 시작 시간이 지나 수정할 수 없습니다.");
     }else{
         alert("요청 수정이 완료되었습니다.");
     }
@@ -244,9 +250,17 @@ function autoResize() {
 
 
 function goBack(){
-    if (document.referrer) {
-        window.location.href = document.referrer;
+    if (document.referrer && document.referrer !== location.href) {
+        window.history.back();
     } else {
         window.location.href = "/matchup/board";
     }
+}
+
+function isExceedCharlimit(length, limit){
+
+    if(Number(length)>Number(limit))
+        return true;
+    else
+        return false;
 }

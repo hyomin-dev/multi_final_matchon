@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // isDeleted 고려
         if (member.getIsDeleted()) {
-            // 로그아웃 요청일 경우엔 허용해주기
+
             String requestURI = RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes ?
                     ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRequestURI() : "";
 

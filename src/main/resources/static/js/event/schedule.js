@@ -31,15 +31,10 @@ const regionLabels = {
 };
 
 async function renderCalendar(year, month) {
-    calendar.innerHTML = "";
-    weekDays.forEach((day, i) => {
-        const header = document.createElement("div");
-        header.classList.add("day-header");
-        if (i === 0) header.classList.add("sunday");
-        if (i === 6) header.classList.add("saturday");
-        header.textContent = day;
-        calendar.appendChild(header);
-    });
+    calendar.replaceChildren();
+
+    const daysFragment = document.createDocumentFragment();
+
 
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const startDay = new Date(year, month, 1).getDay();
@@ -78,7 +73,9 @@ async function renderCalendar(year, month) {
             matched.events.forEach(e => {
                 const label = document.createElement("div");
                 label.classList.add("event-label");
-                label.textContent = e.eventTitle;
+                const displayTitle = e.eventTitle.length > 20 ? e.eventTitle.slice(0, 20) + "..." : e.eventTitle;
+                label.textContent = displayTitle;
+                label.title = e.eventTitle;
                 label.style.backgroundColor = regionColors[e.region] || "#bbb";
 
                 label.addEventListener("click", () => {
@@ -122,17 +119,30 @@ async function renderCalendar(year, month) {
             cell.style.pointerEvents = "none";
         }
 
-        calendar.appendChild(cell);
+        daysFragment.appendChild(cell);
     }
+
+    calendar.appendChild(daysFragment);
 
     monthYear.textContent = `${monthNames[month]} ${year}`;
 }
 
 function changeMonth(offset) {
-    currentMonth += offset;
-    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-    else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-    renderCalendar(currentYear, currentMonth);
+    calendar.classList.add("fade-out");
+
+    setTimeout(() => {
+        currentMonth += offset;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        } else if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+
+        renderCalendar(currentYear, currentMonth);
+        calendar.classList.remove("fade-out");
+    }, 200);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
