@@ -61,8 +61,8 @@ public class EventController {
         LocalDate end = ym.atEndOfMonth().with(DayOfWeek.SATURDAY);
 
         List<EventRequest> events = (region != null)
-                ? eventRepository.findByEventDateBetweenAndEventRegionType(start, end, region)
-                : eventRepository.findByEventDateBetween(start, end);
+                ? eventRepository.findByEventDateBetweenAndEventRegionTypeAndIsDeletedFalse(start, end, region)
+                : eventRepository.findByEventDateBetweenAndIsDeletedFalse(start, end);
 
         List<EventRequest> approvedEvents = events.stream()
                 .filter(e -> e.getEventStatus() == Status.APPROVED)
@@ -170,7 +170,7 @@ public class EventController {
 
         Member member = customUser.getMember();
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createdDate").descending());
-        Page<EventRequest> eventPage = eventRepository.findByMember(member, pageable);
+        Page<EventRequest> eventPage = eventRepository.findByMemberAndIsDeletedFalse(member, pageable);
 
         Page<EventResDto> dtoPage = eventPage.map(e -> new EventResDto(
                 e.getId(),
@@ -255,7 +255,7 @@ public class EventController {
         LocalDate start = ym.atDay(1).with(DayOfWeek.SUNDAY);
         LocalDate end = ym.atEndOfMonth().with(DayOfWeek.SATURDAY);
 
-        List<EventRequest> events = eventRepository.findByEventDateBetween(start, end);
+        List<EventRequest> events = eventRepository.findByEventDateBetweenAndIsDeletedFalse(start, end);
         List<EventRequest> approved = events.stream()
                 .filter(e -> e.getEventStatus() == Status.APPROVED)
                 .toList();

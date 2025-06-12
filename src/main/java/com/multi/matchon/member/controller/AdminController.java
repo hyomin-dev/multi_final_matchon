@@ -173,8 +173,6 @@ public class AdminController {
         EventRequest event = eventRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 대회를 찾을 수 없습니다."));
 
-        eventRepository.updateEventStatus(id, status);
-
         // 승인 or 반려 시 알림 전송
         if (status == Status.APPROVED || status == Status.DENIED) {
             String message = (status == Status.APPROVED) ? "대회가 승인되었습니다." : "대회가 반려되었습니다.";

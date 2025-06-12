@@ -3,6 +3,7 @@ package com.multi.matchon.common.auth.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
@@ -11,6 +12,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MailService {
@@ -19,6 +21,7 @@ public class MailService {
     @Value("${app.domain-url}")
     private String domainUrl;
 
+    @Async("asyncExecutor")
     public void sendTemporaryPassword(String toEmail, String tempPassword) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -51,12 +54,14 @@ public class MailService {
             helper.addInline("matchonLogo", logo);
 
             mailSender.send(message);
+            log.info("임시 비밀번호 메일 전송 성공: {}", toEmail);
 
-        } catch (MessagingException e) {
-            throw new RuntimeException("메일 전송 실패: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("임시 비밀번호 메일 전송 실패 to [{}]: {}", toEmail, e.getMessage(), e);
         }
     }
-    @Async
+
+    @Async("asyncExecutor")
     public void sendNotificationEmail(String toEmail, String subject, String htmlContent) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -71,9 +76,10 @@ public class MailService {
             helper.addInline("matchonLogo", logo);
 
             mailSender.send(message);
+            log.info("알림 메일 전송 성공: {}", toEmail);
 
-        } catch (MessagingException e) {
-            throw new RuntimeException("알림 메일 전송 실패: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("알림 메일 전송 실패 to [{}]: {}", toEmail, e.getMessage(), e);
         }
     }
 
@@ -100,6 +106,7 @@ public class MailService {
         """.formatted(message, redirectUrl);
     }
 
+    @Async("asyncExecutor")
     public void sendAdminNotificationEmail(String toEmail, String subject, String htmlContent) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -113,9 +120,10 @@ public class MailService {
             helper.addInline("matchonLogo", logo);
 
             mailSender.send(message);
+            log.info("관리자 알림 메일 전송 성공: {}", toEmail);
 
-        } catch (MessagingException e) {
-            throw new RuntimeException("관리자 메일 전송 실패: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("관리자 알림 메일 전송 실패 to [{}]: {}", toEmail, e.getMessage(), e);
         }
     }
 
