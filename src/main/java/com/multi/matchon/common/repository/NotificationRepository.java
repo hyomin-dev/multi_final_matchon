@@ -21,7 +21,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             new com.multi.matchon.common.dto.res.ResNotificationDto(
                 t1.id,
                 t1.notificationMessage,
-                t1.createdDate
+                t1.createdDate,
+                null
             )
             from Notification t1
             where t1.receivedMember=:loginMember and t1.isRead=false
