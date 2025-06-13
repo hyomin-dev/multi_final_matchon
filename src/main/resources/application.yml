@@ -42,7 +42,7 @@ spring:
       enabled: false
 
 app:
-  domain-url: localhost
+  domain-url: ${DOMAIN_URL}
 #  ${DOMAIN_URL}
 
 matchon:
