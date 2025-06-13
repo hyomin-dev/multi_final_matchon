@@ -27,13 +27,13 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(name = "member_email", nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name = "member_email", nullable = false, length = 100)
     private String memberEmail;
 
-    @Column(name = "member_password", nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name = "member_password", nullable = false, length = 100)
     private String memberPassword;
 
-    @Column(name = "member_name", nullable = false, columnDefinition = "VARCHAR(50)")
+    @Column(name = "member_name", nullable = false, length = 50)
     private String memberName;
 
     @Column(name = "member_role", nullable = false)
@@ -66,10 +66,10 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Boolean isDeleted = false;
 
-    @Column(name = "previous_password", columnDefinition = "VARCHAR(100)")
+    @Column(name = "previous_password", length = 100)
     private String previousPassword;
 
-    @Column(name = "temporary_password", columnDefinition = "VARCHAR(100)")
+    @Column(name = "temporary_password", length = 100)
     private String temporaryPassword;
 
     @Column(name = "is_temporary_password", nullable = false)

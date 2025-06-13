@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 public abstract class BaseTimeEntity {
 
     @CreationTimestamp
-    @Column(name="created_date", columnDefinition = "VARCHAR(100)")
+    @Column(name="created_date")
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name="modified_date", columnDefinition = "VARCHAR(100)")
+    @Column(name="modified_date")
     private LocalDateTime modifiedDate;
 
 

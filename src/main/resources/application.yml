@@ -44,14 +44,8 @@ spring:
 
 #  ${DOMAIN_URL}
 
-matchon:
-  kakao-api: ${KAKAO_API_KEY}
-
-  dialogflow-key-path: ${DIALOGFLOW_KEY_PATH}
 
 
-#  /app/keys/dialogflow-key.json
-#  ${DIALOGFLOW_KEY_PATH}
 jwt:
   secret: ${JWT_SECRET}
   issuer: ${JWT_ISSUER}
@@ -90,11 +84,17 @@ spring:
     port: 6379
     host: localhost
 
+matchon:
+  kakao-api: ${KAKAO_API_KEY}
+  dialogflow-key-path: ${DIALOGFLOW_KEY_PATH}
+#  /app/keys/dialogflow-key.json
+#  ${DIALOGFLOW_KEY_PATH}
+
 file:
   upload-dir: C:/upload-dir
 
 app:
-  domain-url: localhost
+  domain-url: localhost:8090
 
 ---
 spring:
@@ -122,8 +122,17 @@ spring:
       max-request-size: 20MB
 
 #fdfdsfsdfsdfs
+
+matchon:
+  kakao-api: ${KAKAO_API_KEY}
+  dialogflow-key-path: /app/keys/dialogflow-key.json
+#  /app/keys/dialogflow-key.json
+#  ${DIALOGFLOW_KEY_PATH}
+
+
 app:
   domain-url: ${DOMAIN_URL}
+
 
 
 
