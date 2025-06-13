@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name="recruiting_position", uniqueConstraints = {@UniqueConstraint(name="UK_team_id_position_id",columnNames = {"team_id","position_id"})
+@Table(name="recruiting_position", uniqueConstraints = {@UniqueConstraint(name="UK_team_id_2_position_id",columnNames = {"team_id","position_id"})
 
 })
 //@Setter: JPA entity에서 setter사용은 자제, test용

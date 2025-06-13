@@ -586,16 +586,22 @@ public class ChatService {
         public Integer removeGroupChatsAfterThreeDaysOfMatch () {
             //현재 시간 보다 3일 전 시간 구하기
             LocalDateTime thresholdTime = LocalDateTime.now().minusDays(3);
+            Set<ChatRoom> chatRoomsToDelete = new HashSet<>();
 
             List<ChatParticipant> chatParticipants = chatParticipantRepository.findAfterThreeDaysOfMatchWithChatParticipantAndChatRoom(thresholdTime);
             for (ChatParticipant chatParticipant : chatParticipants) {
                 chatParticipant.deleteParticipant(true);
-                chatParticipant.getChatRoom().deleteChatRoom(true);
+                chatRoomsToDelete.add(chatParticipant.getChatRoom());
             }
+            for(ChatRoom chatRoom: chatRoomsToDelete){
+                chatRoom.deleteChatRoom(true);
+            }
+
 
             return chatParticipants.size();
 
         }
+    @Transactional
     public List<ResMyChatListDto> findAllTeamRelatedChats(Long memberId, Long teamId) {
         if (teamId == null) return Collections.emptyList();
 

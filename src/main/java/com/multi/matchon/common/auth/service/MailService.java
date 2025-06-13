@@ -21,8 +21,27 @@ public class MailService {
     @Value("${app.domain-url}")
     private String domainUrl;
 
+    // 이메일 유효성 검사
+    private boolean isEmailValid(String email) {
+        try {
+            String domain = email.substring(email.indexOf('@') + 1);
+            javax.naming.directory.InitialDirContext ctx = new javax.naming.directory.InitialDirContext();
+            javax.naming.directory.Attributes attrs = ctx.getAttributes("dns:/" + domain, new String[]{"MX"});
+            return attrs != null && attrs.get("MX") != null;
+        } catch (Exception e) {
+            log.warn("이메일 유효성 검사 실패 또는 MX 레코드 없음: {}", email);
+            return false;
+        }
+    }
+
     @Async("asyncExecutor")
     public void sendTemporaryPassword(String toEmail, String tempPassword) {
+
+        if (!isEmailValid(toEmail)) {
+            log.warn("⛔ 임시 비밀번호 메일 전송 실패: 유효하지 않은 이메일 주소 [{}]", toEmail);
+            return;
+        }
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -57,12 +76,18 @@ public class MailService {
             log.info("임시 비밀번호 메일 전송 성공: {}", toEmail);
 
         } catch (Exception e) {
-            log.error("임시 비밀번호 메일 전송 실패 to [{}]: {}", toEmail, e.getMessage(), e);
+            log.warn("임시 비밀번호 메일 전송 중 예외 발생 to [{}]: {}", toEmail, e.getMessage());
         }
     }
 
     @Async("asyncExecutor")
     public void sendNotificationEmail(String toEmail, String subject, String htmlContent) {
+
+        if (!isEmailValid(toEmail)) {
+            log.warn("⛔ 알림 메일 전송 실패: 유효하지 않은 이메일 주소 [{}]", toEmail);
+            return;
+        }
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -79,7 +104,7 @@ public class MailService {
             log.info("알림 메일 전송 성공: {}", toEmail);
 
         } catch (Exception e) {
-            log.error("알림 메일 전송 실패 to [{}]: {}", toEmail, e.getMessage(), e);
+            log.warn("알림 메일 전송 중 예외 발생 to [{}]: {}", toEmail, e.getMessage());
         }
     }
 
@@ -108,6 +133,12 @@ public class MailService {
 
     @Async("asyncExecutor")
     public void sendAdminNotificationEmail(String toEmail, String subject, String htmlContent) {
+
+        if (!isEmailValid(toEmail)) {
+            log.warn("⛔ 관리자 알림 메일 전송 실패: 유효하지 않은 이메일 주소 [{}]", toEmail);
+            return;
+        }
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -123,7 +154,7 @@ public class MailService {
             log.info("관리자 알림 메일 전송 성공: {}", toEmail);
 
         } catch (Exception e) {
-            log.error("관리자 알림 메일 전송 실패 to [{}]: {}", toEmail, e.getMessage(), e);
+            log.warn("관리자 메일 전송 중 예외 발생 to [{}]: {}", toEmail, e.getMessage());
         }
     }
 

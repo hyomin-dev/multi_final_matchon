@@ -39,7 +39,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/", "/main", "/signup", "/signup/**", "/login", "/auth/**", "/api/common/datacontroller/**", "/css/**", "/img/**", "/js/**", "/favicon.ico","/connect/**", "/error", "/aichat", "/api/aichat", "/redirect").permitAll()
+                        .requestMatchers("/", "/main", "/signup", "/signup/**", "/login", "/auth/**", "/api/common/datacontroller/**", "/css/**", "/img/**", "/js/**", "/favicon.ico","/connect/**", "/error", "/aichat", "/api/aichat", "/redirect","/introduction/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 경로
                         .requestMatchers("/community/**").authenticated()//커뮤니티 작성 인증
                         .requestMatchers("/inquiry", "/inquiry/**").authenticated()
