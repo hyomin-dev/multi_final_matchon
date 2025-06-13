@@ -29,7 +29,7 @@ public class ChatRoom extends BaseEntity {
     @Builder.Default
     private Boolean isGroupChat = true;
 
-    @Column(name="chat_room_name", nullable = false, columnDefinition = "VARCHAR(255)")
+    @Column(name="chat_room_name", nullable = false, length = 255)
     private String chatRoomName;
 
     @OneToMany(mappedBy = "chatRoom")

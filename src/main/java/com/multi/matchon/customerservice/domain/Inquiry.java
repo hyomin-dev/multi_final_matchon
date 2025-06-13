@@ -30,7 +30,7 @@ public class Inquiry extends BaseEntity {
     @Column(name = "inquiry_category", nullable = false)
     private CustomerServiceType inquiryCategory;
 
-    @Column(name = "inquiry_title", nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name = "inquiry_title", nullable = false, length = 100)
     private String inquiryTitle;
 
     @Column(name = "inquiry_content", nullable = false, columnDefinition = "TEXT")

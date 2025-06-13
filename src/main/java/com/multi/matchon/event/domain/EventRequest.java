@@ -36,7 +36,7 @@ public class EventRequest extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private EventRegionType eventRegionType;
 
-    @Column(name="event_title",nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name="event_title",nullable = false, length = 100)
     private String eventTitle;
 
     @Column(name = "event_description", nullable = false, columnDefinition = "TEXT")
@@ -46,13 +46,13 @@ public class EventRequest extends BaseEntity {
     @JoinColumn(name="host_profile_id",nullable = false)
     private HostProfile hostProfile;
 
-    @Column(name="event_address", nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name="event_address", nullable = false, length = 100)
     private String eventAddress;
 
-    @Column(name="event_method", nullable = false,columnDefinition = "VARCHAR(100)")
+    @Column(name="event_method", nullable = false, length = 100)
     private String eventMethod;
 
-    @Column(name="event_contact",nullable = false, columnDefinition = "VARCHAR(50)")
+    @Column(name="event_contact",nullable = false, length = 50)
     private String eventContact;
 
     @Column(name="event_status",nullable = false)

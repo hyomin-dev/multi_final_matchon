@@ -22,7 +22,7 @@ public class Team extends BaseEntity {
     @Column(name="team_id")
     private Long id;
 
-    @Column(name = "team_name", nullable = false, columnDefinition = "VARCHAR(200)")
+    @Column(name = "team_name", nullable = false, length = 200)
     private String teamName;
 
     @Column(name="team_region", nullable = false)
