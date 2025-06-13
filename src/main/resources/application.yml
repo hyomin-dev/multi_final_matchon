@@ -46,7 +46,10 @@ app:
 
 matchon:
   kakao-api: ${KAKAO_API_KEY}
-  dialogflow-key-path:  ${DIALOGFLOW_KEY_PATH}
+
+  dialogflow-key-path: ${DIALOGFLOW_KEY_PATH}
+
+
 #  /app/keys/dialogflow-key.json
 #  ${DIALOGFLOW_KEY_PATH}
 jwt:
