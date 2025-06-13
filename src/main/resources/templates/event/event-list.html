@@ -18,6 +18,10 @@
     <div id="eventTableContainer">
         <div th:if="${myEvents.totalElements == 0}" class="no-data">등록된 대회가 없습니다.</div>
 
+        <div class="btn-wrap">
+            <a href="/schedule" class="back-link">돌아가기</a>
+        </div>
+
         <table th:if="${myEvents.totalElements > 0}">
             <thead>
             <tr>
@@ -57,9 +61,6 @@
         </div>
     </div>
 
-    <div class="btn-wrap">
-        <a href="/schedule" class="back-link">돌아가기</a>
-    </div>
 </div>
 <div th:replace="~{common/footer::footer}"></div>
 

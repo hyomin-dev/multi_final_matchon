@@ -14,7 +14,7 @@ h2 {
     text-align: center;
     font-size: 22px;
     font-weight: bold;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid dodgerblue;
     display: inline-block;
     padding-bottom: 5px;
     margin-bottom: 20px;
@@ -22,7 +22,7 @@ h2 {
 
 /* 권역 선택 */
 #region {
-    background-color: #2e5c9a;
+    background-color: royalblue;
     color: white;
     font-size: 14px;
     padding: 6px 12px;
@@ -94,9 +94,8 @@ h2 {
 button {
     margin-top: 20px;
     width: 100%;
-    background-color: #f0f3f8;
-    border: 1px solid #888;
-    color: #000;
+    background-color: dodgerblue;
+    color: #fff;
     font-weight: 500;
     font-size: 14px;
     padding: 10px;
@@ -105,5 +104,24 @@ button {
 }
 
 button:hover {
-    background-color: #d0d4dc;
+    background-color: royalblue;
+}
+
+.address-btn {
+    background-color: forestgreen;
+    color: white;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.address-btn:hover {
+    background-color: darkgreen;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(30, 100, 0, 0.3);
 }
