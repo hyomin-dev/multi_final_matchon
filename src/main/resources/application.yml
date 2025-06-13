@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: prod
+    active: local
   output:
     ansi:
       enabled: ALWAYS
@@ -42,11 +42,12 @@ spring:
       enabled: false
 
 app:
-  domain-url: ${DOMAIN_URL}
+  domain-url: localhost
+#  ${DOMAIN_URL}
 
 matchon:
   kakao-api: ${KAKAO_API_KEY}
-  dialogflow-key-path:  /app/keys/dialogflow-key.json
+  dialogflow-key-path:  ${DIALOGFLOW_KEY_PATH}
 #  /app/keys/dialogflow-key.json
 #  ${DIALOGFLOW_KEY_PATH}
 jwt:
