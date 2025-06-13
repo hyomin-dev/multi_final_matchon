@@ -120,7 +120,9 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
-
+  redis:
+    port: ${REDIS_PROD_PORT}
+    host: ${REDIS_PROD_IP}
 #fdfdsfsdfsdfs
 
 matchon:
