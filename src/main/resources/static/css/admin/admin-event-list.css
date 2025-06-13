@@ -1,6 +1,6 @@
 #wrap {
     max-width: 1400px;
-    margin: 60px auto;
+    margin: 10px auto;
     padding: 20px;
     font-family: 'Noto Sans KR', sans-serif;
 }
@@ -74,30 +74,12 @@ td {
     display: inline-block;
 }
 
-table th:nth-child(1),
-table td:nth-child(1) {
-    width: 50px;
-}
+th:nth-child(1), td:nth-child(1) { width: 10%; }     /* ID */
+th:nth-child(2), td:nth-child(2) { width: 40%; }    /* 유형 */
+th:nth-child(3), td:nth-child(3) { width: 20%; }    /* 신고대상 */
+th:nth-child(4), td:nth-child(4) { width: 20%; }    /* 신고자 */
+th:nth-child(5), td:nth-child(5) { width: 10%; }
 
-table th:nth-child(2),
-table td:nth-child(2) {
-    width: 400px;
-}
-
-table th:nth-child(3),
-table td:nth-child(3) {
-    width: 120px;
-}
-
-table th:nth-child(4),
-table td:nth-child(4) {
-    width: 120px;
-}
-
-table th:nth-child(5),
-table td:nth-child(5) {
-    width: 80px;
-}
 .pagination { margin-top: 20px; text-align: center; }
 .pagination a {
     margin: 0 5px; padding: 6px 12px;
@@ -109,10 +91,6 @@ table td:nth-child(5) {
 .pagination a.active { background-color: dodgerblue; color: white; }
 .detail-link { color: #0077cc; text-decoration: underline; cursor: pointer; }
 .no-data { text-align: center; padding: 30px; font-size: 16px; color: #888; }
-
-.title-cell {
-    text-align: left;
-}
 
 
 .event-title-ellipsis {
@@ -127,11 +105,13 @@ td.title-cell a {
     display: inline-block;
     max-width: 100%;
     white-space: nowrap;
+    font-weight: 500;
     overflow: hidden;
     text-overflow: ellipsis;
     text-decoration: none;
-    color: #007bff;
+    color: darkslategray;
 }
 td.title-cell a:hover {
     text-decoration: underline;
+    color: dodgerblue;
 }
