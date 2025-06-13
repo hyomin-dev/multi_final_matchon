@@ -19,4 +19,17 @@ public class ResChatDto {
     private LocalDateTime createdDate;
     private String exceptionName;
 
+    private Long roomId;
+
+    private String receiverEmail;
+
+
+    public void setRoomId(Long roomId){
+        this.roomId = roomId;
+    }
+
+    public void setReceiverEmail(String receiverEmail){
+        this.receiverEmail = receiverEmail;
+    }
+
 }

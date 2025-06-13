@@ -29,10 +29,6 @@ public class ChatMessage extends BaseEntity {
     @JoinColumn(name="sender_id",nullable = false)
     private Member member;
 
-    @Column(name="all_attachment_enabled")
-    @Builder.Default
-    private Boolean allAttachmentEnabled = false;
-
     @Column(name="content",columnDefinition = "TEXT")
     private String content;
 

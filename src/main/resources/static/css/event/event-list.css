@@ -16,35 +16,60 @@ h2 {
     display: inline-block;
     padding-bottom: 5px;
 }
+
 table {
-    width: 100%;
-    border-collapse: collapse;
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: separate;
+    border-spacing: 0;
     table-layout: fixed;
+    background: #fff;
+    border: 2px solid dodgerblue;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
+
 th, td {
-    border: 1px solid #ccc;
-    padding: 10px;
+    padding: 16px 18px;
     text-align: center;
-    vertical-align: middle;
-    word-break: break-word;
+    font-size: 15px;
+    word-wrap: break-word;
+    border-bottom: 1px solid #ddd;
 }
 
 
 th {
-    background-color: #f3f3f3;
+    background-color: #eaf4fb;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+td {
+    background-color: #ffffff;
+}
+
+tr:hover {
+    background-color: #e1f3ff;
 }
 
 
 .title-cell {
     text-align: left;
+    padding-left: 280px;
+    vertical-align: middle;
 }
 
 .event-title-ellipsis {
     display: inline-block;
+    margin-left: 8px;
     max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #0077cc;
+    text-decoration: underline;
+    cursor: pointer;
 }
 .status-pending {
     background-color: #ddd;
@@ -99,10 +124,44 @@ th:nth-child(4), td:nth-child(4) {
 }
 
 .detail-link {
-    color: #0077cc;
-    text-decoration: underline;
-    cursor: pointer;
+    color: darkslategray;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+.detail-link:hover {
+    color: #1c7ed6;
+    text-decoration: underline;
+}
+
+.btn-wrap .back-link {
+    background-color: black;
+    color: deeppink;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-wrap .back-link:hover {
+    transform: scale(1.05);
+}
+
+.btn-wrap .back-link:active {
+    background-color: ivory;
+    color: aqua;
+    transform: scale(0.98);
+}
+
+
 .no-data {
     text-align: center;
     padding: 30px;
@@ -127,12 +186,13 @@ th:nth-child(4), td:nth-child(4) {
     border-color: #eee;
 }
 .pagination a.active {
-    background-color: #5478b2;
+    background-color: dodgerblue;
     color: white;
 }
 .btn-wrap {
     margin-top: 20px;
     text-align: right;
+    padding-right: 90px;
 }
 .btn-wrap a {
     display: inline-block;
