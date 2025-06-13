@@ -235,7 +235,7 @@ CREATE TABLE board
 
 CREATE TABLE report (
                         report_id           BIGINT AUTO_INCREMENT PRIMARY KEY,
-                        report_type         ENUM('BOARD', 'COMMENT', 'MEMBER') NOT NULL,
+                        report_type         ENUM('BOARD', 'COMMENT') NOT NULL,
                         target_id           BIGINT NOT NULL,
                         reporter_id         BIGINT NOT NULL,
                         reason              VARCHAR(500),
@@ -248,7 +248,8 @@ CREATE TABLE report (
                         created_person      VARCHAR(100),
                         modified_date       DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         modified_person     VARCHAR(100),
-                        CONSTRAINT FK_report_2_member FOREIGN KEY (reporter_id) REFERENCES member(member_id)
+                        CONSTRAINT FK_report_2_member FOREIGN KEY (reporter_id) REFERENCES member(member_id),
+                        CONSTRAINT FK_report_2_target_member FOREIGN KEY (target_member_id) REFERENCES member(member_id)
 );
 
 CREATE TABLE comment
