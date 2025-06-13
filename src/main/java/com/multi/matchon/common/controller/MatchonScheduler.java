@@ -50,7 +50,7 @@ public class MatchonScheduler {
     * 매 시간 마다  그룹 채팅과 참여자들을 is_deleted처리
     * */
     //@Scheduled(cron="0 0 * * * *")
-    @Scheduled(cron="0 * * * * *")
+    @Scheduled(cron="0 0 * * * *")
     public void removeGroupChatsAfterThreeDaysOfMatch(){
         Integer result = chatService.removeGroupChatsAfterThreeDaysOfMatch();
         log.info("삭제한 Matchup 그룹 참여자 수: {}",result);
