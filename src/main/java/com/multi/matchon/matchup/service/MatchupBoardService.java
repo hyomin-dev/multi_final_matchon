@@ -342,7 +342,7 @@ public class MatchupBoardService {
 
         List<Member> applicants = matchupRequestRepository.findByBoardIdAndActiveRequests(findMatchupBoard.getId());
         for(Member applicant: applicants){
-            notificationService.sendNotification(applicant, "[게시글 수정] 참가 요청하신 "+user.getMember().getMemberName()+"님의 게시글이 수정되었습니다.", "/matchup/board/detail?"+"matchup-board-id="+reqMatchupBoardEditDto.getBoardId());
+            notificationService.sendNotificationWithoutMail(applicant, "[게시글 수정] 참가 요청하신 "+user.getMember().getMemberName()+"님의 게시글이 수정되었습니다.", "/matchup/board/detail?"+"matchup-board-id="+reqMatchupBoardEditDto.getBoardId());
         }
 
     }
@@ -369,7 +369,7 @@ public class MatchupBoardService {
          * */
         List<Member> applicants = matchupRequestRepository.findByBoardIdAndActiveRequests(findMatchupBoard.getId());
         for(Member applicant: applicants){
-            notificationService.sendNotification(applicant, "[게시글 삭제] 참가 요청하신 "+user.getMember().getMemberName()+"님의 게시글이 삭제되었습니다.", null);
+            notificationService.sendNotificationWithoutMail(applicant, "[게시글 삭제] 참가 요청하신 "+user.getMember().getMemberName()+"님의 게시글이 삭제되었습니다.", null);
         }
 
         findMatchupBoard.delete(true);
@@ -422,12 +422,12 @@ public class MatchupBoardService {
             count += matchupRequestsToNotifyBeforeThreeHours.stream()
                     .filter(matchupreq ->matchupreq.getMatchupBoard().getId().equals(matchupBoard.getId()))
                     .peek(matchupreq ->{
-                        notificationService.sendNotification(matchupreq.getMember(),"[경기 예정]"+matchupBoard.getMatchDatetime()+"에 경기가 진행될 예정입니다.","/matchup/board/detail?matchup-board-id="+matchupBoard.getId());
+                        notificationService.sendNotificationWithoutMail(matchupreq.getMember(),"[경기 예정]"+matchupBoard.getMatchDatetime()+"에 경기가 진행될 예정입니다.","/matchup/board/detail?matchup-board-id="+matchupBoard.getId());
                     })
                     .count();
 
             // 작성자에게 보내기
-            notificationService.sendNotification(matchupBoard.getWriter(),"[경기 예정]"+matchupBoard.getMatchDatetime()+"에 경기가 진행될 예정입니다.","/matchup/board/detail?matchup-board-id="+matchupBoard.getId());
+            notificationService.sendNotificationWithoutMail(matchupBoard.getWriter(),"[경기 예정]"+matchupBoard.getMatchDatetime()+"에 경기가 진행될 예정입니다.","/matchup/board/detail?matchup-board-id="+matchupBoard.getId());
             count++;
 
             matchupBoard.updateIsNotified(true);
