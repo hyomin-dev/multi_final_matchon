@@ -132,8 +132,8 @@ public class NotificationService {
         }
     }
 
-
-    private void sendNotificationWithoutMail(Member receiver, String message, String targetUrl) {
+    @Transactional
+    public void sendNotificationWithoutMail(Member receiver, String message, String targetUrl) {
         Notification notification = Notification.builder()
                 .receivedMember(receiver)
                 .notificationMessage(message)
