@@ -45,12 +45,6 @@ body {
     transition: all 0.3s ease;
 }
 
-.button-group-vertical button:hover {
-    background-color: royalblue;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
-}
-
 .mypage-main {
     flex: 1;
     background: #fff;
@@ -89,6 +83,7 @@ body {
     background: linear-gradient(to right, #FF5050, #C964E2);
     color: #fff;
 }
+
 .profile:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(128, 0, 128, 0.3);
@@ -99,21 +94,65 @@ body {
     text-align: right;
 }
 
-.submit-btn-container button {
+.host-submit,
+.edit-button {
     background-color: dodgerblue;
     color: white;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    display: inline-block;
-    transition: background-color 0.3s;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
-.submit-btn-container button:hover {
+.host-submit:hover,
+.edit-button:hover {
     background-color: royalblue;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+}
+
+.host-submit {
+    background-color: dodgerblue;
+    color: white;
+    margin-left: 4px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.host-submit:hover {
+    background-color: royalblue;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+}
+
+#scheduleButton {
+    background-color: forestgreen;
+    color: white;
+    margin-left: 4px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+#scheduleButton:hover {
+    background-color: darkgreen;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0, 90, 0, 0.3);
 }
 
 .category-select {
@@ -262,3 +301,25 @@ body {
     font-size: 14px;
     box-sizing: border-box;
 }
+
+.button-group-vertical .delete-button {
+    background-color: orangered;
+    color: white;
+    font-weight: bold;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.button-group-vertical .delete-button:hover {
+    background-color: red;
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(90, 0, 0, 0.3);
+}
+
+
+
+

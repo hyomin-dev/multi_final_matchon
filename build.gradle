@@ -66,6 +66,10 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 
+    implementation 'com.google.protobuf:protobuf-java:3.25.1' // ✅ 이 줄 추가!
+
+
+
 
 
 

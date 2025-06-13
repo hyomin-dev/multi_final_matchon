@@ -24,10 +24,10 @@ public class Notification extends BaseEntity{
     @JoinColumn(name="received_member_id", nullable = false)
     private Member receivedMember;
 
-    @Column(name="notification_message",nullable = false)
+    @Column(name="notification_message",nullable = false, columnDefinition = "TEXT")
     private String notificationMessage;
 
-    @Column(name="target_url",columnDefinition = "VARCHAR(500)")
+    @Column(name="target_url",length = 500)
     private String targetUrl;
 
     @Column(name="is_read",columnDefinition = "BOOLEAN NULL DEFAULT FALSE")

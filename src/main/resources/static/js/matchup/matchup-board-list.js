@@ -123,7 +123,7 @@ function renderList(items){
                             <div>입장 가능 온도: ${item.minMannerTemperature}</div>
                             <div>현재 내 온도: ${myMannerTemperature}</div>                                      
                         </td>
-                        <td><button class="btn-detail" onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'">상세보기</button></td>                   
+                        <td><button class="col-detail-btn" onclick="location.href='/matchup/board/detail?matchup-board-id=${item.boardId}'">상세보기</button></td>                   
                         `;
         markIfPastMatchdatetime(card, item);
         boardArea.appendChild(card);
@@ -209,29 +209,29 @@ function renderPagination(pageInfo, sportsType, region, dateFilter, availableFil
 
 }
 
-function calTime(item, startHour, startMinute){
-
-
-    const [hour, minute, second] = item.matchDuration.split(":");
-    const hourNum = parseInt(hour, 10);
-    const minuteNum = parseInt(minute,10);
-    let extraHour = 0
-    let endMinute = 0;
-    if(startMinute+minuteNum>=60){
-         extraHour = 1;
-         endMinute = (startMinute+minuteNum)%60;
-    }else{
-        endMinute = startMinute+minuteNum;
-    }
-
-    if(startHour+hourNum+extraHour>=24)
-        endHour = (startHour+hourNum+extraHour) %24;
-    else
-        endHour = startHour+hourNum+extraHour;
-
-    return `${endHour}시 ${endMinute}분`
-
-}
+// function calTime(item, startHour, startMinute){
+//
+//
+//     const [hour, minute, second] = item.matchDuration.split(":");
+//     const hourNum = parseInt(hour, 10);
+//     const minuteNum = parseInt(minute,10);
+//     let extraHour = 0
+//     let endMinute = 0;
+//     if(startMinute+minuteNum>=60){
+//          extraHour = 1;
+//          endMinute = (startMinute+minuteNum)%60;
+//     }else{
+//         endMinute = startMinute+minuteNum;
+//     }
+//
+//     if(startHour+hourNum+extraHour>=24)
+//         endHour = (startHour+hourNum+extraHour) %24;
+//     else
+//         endHour = startHour+hourNum+extraHour;
+//
+//     return `${endHour}시 ${endMinute}분`
+//
+// }
 
 function checkStatus(item){
 
@@ -317,14 +317,6 @@ function markIfPastMatchdatetime(card, item){
        })
    }
 
-}
-
-function goBack(){
-    if (document.referrer) {
-        window.location.href = document.referrer;
-    } else {
-        window.location.href = "/matchup/board";
-    }
 }
 
 

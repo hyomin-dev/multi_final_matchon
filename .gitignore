@@ -55,6 +55,7 @@ out/
 # Dialogflow 서비스 계정 키 파일 무시
 *.json
 !src/**        # 예: src 내 다른 JSON은 추적하려면 예외 처리
+# 단, 이 파일은 Git에 포함할 수 있게 예외 처리
 3fb9b0e8-d3eb-4b8f-9fa5-97d566abf91a.json
 
 

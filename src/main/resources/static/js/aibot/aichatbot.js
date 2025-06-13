@@ -176,29 +176,36 @@ function fetchBotReply(message) {
             }
 
             if (message.includes("내 주변 경기장")) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
+                navigator.permissions?.query({ name: 'geolocation' }).then(function(result) {
+                    if (result.state === 'denied') {
+                        appendBotMessage("⚠️ 위치 권한이 차단되어 있어요! 주소창 왼쪽 🔒을 눌러 '위치 권한 허용'으로 변경해 주세요.");
+                        return;
+                    }
 
-                    fetch(`/api/stadiums/nearby?lat=${lat}&lng=${lng}`)
-                        .then(res => res.json())
-                        .then(list => {
-                            if (isFallback) {
-                                const fallbackMsg = chatBox.querySelector(".bot .msg-content");
-                                if (fallbackMsg && fallbackMsg.innerText.includes("죄송")) {
-                                    fallbackMsg.closest(".message").remove();
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+
+                        fetch(`/api/stadiums/nearby?lat=${lat}&lng=${lng}`)
+                            .then(res => res.json())
+                            .then(list => {
+                                if (isFallback) {
+                                    const fallbackMsg = chatBox.querySelector(".bot .msg-content");
+                                    if (fallbackMsg && fallbackMsg.innerText.includes("죄송")) {
+                                        fallbackMsg.closest(".message").remove();
+                                    }
                                 }
-                            }
 
-                            const msg = list.length > 0
-                                ? list.map(s =>
-                                    `📍 <b>${s.stadiumName}</b><br>🏟️ ${s.stadiumAddress}<br>📞 ${s.stadiumTel || '없음'}<br><hr>`
-                                ).join("")
-                                : "❌ 근처에 경기장이 없습니다.";
-                            appendBotMessage(msg);
-                        });
-                }, function () {
-                    appendBotMessage("⚠️ 위치 정보를 가져올 수 없습니다. 위치 권한을 허용해 주세요.");
+                                const msg = list.length > 0
+                                    ? list.map(s =>
+                                        `📍 <b>${s.stadiumName}</b><br>🏟️ ${s.stadiumAddress}<br>📞 ${s.stadiumTel || '없음'}<br><hr>`
+                                    ).join("")
+                                    : "❌ 근처에 경기장이 없습니다.";
+                                appendBotMessage(msg);
+                            });
+                    }, function () {
+                        appendBotMessage("⚠️ 위치 정보를 가져올 수 없습니다. 위치 권한을 허용해 주세요.");
+                    });
                 });
                 return; // 중복 처리 방지
             }

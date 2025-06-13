@@ -19,4 +19,12 @@ public class ResNotificationDto {
     private String notificationMessage;
 
     private LocalDateTime createdDate;
+
+    private String receiverEmail;
+
+    public void setReceiverEmail(String receiverEmail){
+
+        this.receiverEmail = receiverEmail;
+
+    }
 }

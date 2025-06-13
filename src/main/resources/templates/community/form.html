@@ -83,7 +83,7 @@
             <input type="hidden" name="deletedAttachmentIds" id="deletedAttachmentIds"/>
 
             <div style="text-align: center;">
-                <button type="submit" th:text="${boardId != null} ? '수정 완료' : '등록'">등록</button>
+                <button type="submit" th:text="${boardId != null} ? '수정 완료' : '등록'" class="submit-btn">등록</button>
                 <button type="button" onclick="confirmCancel()" class="btn-outline-danger">취소</button>
             </div>
 

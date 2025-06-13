@@ -1,7 +1,9 @@
 package com.multi.matchon.matchup.service;
 
 
+import com.multi.matchon.chat.dto.res.ResChatErrorDto;
 import com.multi.matchon.chat.service.ChatService;
+import com.multi.matchon.chat.service.RedisPubSubService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.domain.Status;
@@ -41,8 +43,9 @@ public class MatchupRequestService {
     private final MatchupRequestRepository matchupRequestRepository;
     private final MemberRepository memberRepository;
     private final ChatService chatService;
-    private final SimpMessageSendingOperations messageTemplate;
+    //private final SimpMessageSendingOperations messageTemplate;
     private final NotificationService notificationService;
+    private final RedisPubSubService redisPubSubService;
 
     // 등록
 
@@ -648,7 +651,13 @@ public class MatchupRequestService {
                 notificationService.sendNotification(findMatchupRequest.getMember() , "[취소 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 승인을 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
 
 
-                messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+//                messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+            ResChatErrorDto resChatErrorDto = ResChatErrorDto.builder()
+                    .errorMessage("Chat 더 이상 그룹 채팅할 수 없습니다.")
+                    .receiverEmail(findMatchupRequest.getMember().getMemberEmail())
+                    .build();
+            redisPubSubService.publish("error",resChatErrorDto);
+
 
         // 최초 요청 → 승인 → 승인 취소 요청 → 승인
         } else if(findMatchupRequest.getMatchupStatus()==Status.CANCELREQUESTED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==1 && !findMatchupRequest.getIsDeleted()){
@@ -664,7 +673,12 @@ public class MatchupRequestService {
              * */
             notificationService.sendNotification(findMatchupRequest.getMember() , "[취소 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 승인을 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
 
-            messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+//            messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+            ResChatErrorDto resChatErrorDto = ResChatErrorDto.builder()
+                    .errorMessage("Chat 더 이상 그룹 채팅할 수 없습니다.")
+                    .receiverEmail(findMatchupRequest.getMember().getMemberEmail())
+                    .build();
+            redisPubSubService.publish("error",resChatErrorDto);
 
         } else{
             throw new CustomException("Matchup 현재 승인이 불가능합니다. 요청 목록을 참고해주세요.");

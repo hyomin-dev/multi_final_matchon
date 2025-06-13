@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: prod
+    active: local
   output:
     ansi:
       enabled: ALWAYS
@@ -27,8 +27,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: matchon2025@gmail.com
-    password: javgtcewnxkwnzmy
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -41,13 +41,11 @@ spring:
     restart:
       enabled: false
 
-app:
-  domain-url: http://localhost:8090
 
-matchon:
-  kakao-api: ${KAKAO_API_KEY}
-  dialogflow-key-path: /app/keys/dialogflow-key.json
-#  ${DIALOGFLOW_KEY_PATH}
+#  ${DOMAIN_URL}
+
+
+
 jwt:
   secret: ${JWT_SECRET}
   issuer: ${JWT_ISSUER}
@@ -82,8 +80,21 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
+  redis:
+    port: 6379
+    host: localhost
+
+matchon:
+  kakao-api: ${KAKAO_API_KEY}
+  dialogflow-key-path: ${DIALOGFLOW_KEY_PATH}
+#  /app/keys/dialogflow-key.json
+#  ${DIALOGFLOW_KEY_PATH}
+
 file:
   upload-dir: C:/upload-dir
+
+app:
+  domain-url: localhost:8090
 
 ---
 spring:
@@ -110,8 +121,17 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
 
+#fdfdsfsdfsdfs
+
+matchon:
+  kakao-api: ${KAKAO_API_KEY}
+  dialogflow-key-path: /app/keys/dialogflow-key.json
+#  /app/keys/dialogflow-key.json
+#  ${DIALOGFLOW_KEY_PATH}
 
 
+app:
+  domain-url: ${DOMAIN_URL}
 
 
 
