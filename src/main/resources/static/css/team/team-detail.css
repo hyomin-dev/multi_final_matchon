@@ -239,8 +239,17 @@
 }
 
 .form-group textarea {
+    max-width: 100%;
+    box-sizing: border-box;
     resize: vertical;
     min-height: 100px;
+}
+
+#wordCountInfo {
+    text-align: right;
+    color: darkgray;
+    font-weight: 500;
+    font-size: 15px;
 }
 
 /* Review Section Styles */
@@ -550,3 +559,36 @@ html, body {
 .info-box p {
     text-align: center;
 }
+
+
+#joinRequestSection,
+#joinRequestListSection {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+
+#joinRequestSection h2,
+#joinRequestListSection h2 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+}
+
+#introduction {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
