@@ -111,8 +111,48 @@ body {
 .host-submit:hover,
 .edit-button:hover {
     background-color: royalblue;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+}
+
+.host-submit {
+    background-color: dodgerblue;
+    color: white;
+    margin-left: 4px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.host-submit:hover {
+    background-color: royalblue;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+}
+
+#scheduleButton {
+    background-color: forestgreen;
+    color: white;
+    margin-left: 4px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+#scheduleButton:hover {
+    background-color: darkgreen;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0, 90, 0, 0.3);
 }
 
 .category-select {
