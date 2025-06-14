@@ -10,7 +10,16 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     form.addEventListener("submit", (event)=>{
         submitCheck(event)
         }
-    )
+    );
+    Swal.fire({
+        text: '게시글이 등록되었습니다.',
+        icon: 'success',
+        confirmButtonText: '확인',
+        width: '300px',
+        customClass: {
+            confirmButton: 'swal2-compact-btn'
+        }
+    });
 
 
 })
@@ -125,12 +134,33 @@ function submitCheck(e){
         e.preventDefault();
     } else{
 
-        let reply = confirm("경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?");
-        if(reply){
-            alert("게시글이 등록되었습니다.");
-        }else{
-            e.preventDefault();
-        }
+       // let reply = confirm("경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?");
+
+        Swal.fire({
+            title: '팀 등록이 필요합니다',
+            text: '경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+                //window.location.href = '/team/team/register'; // 예시: 팀 등록 페이지로 이동
+                Swal.fire('완료!', '게시글이 등록되었습니다.', 'success');
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                //window.history.back();
+                e.preventDefault();
+            }
+        });
+
+        // if(reply){
+        //     //alert("게시글이 등록되었습니다.");
+        //     Swal.fire('완료!', '게시글이 등록되었습니다.', 'success');
+        // }else{
+        //     e.preventDefault();
+        // }
     }
 }
 
@@ -146,11 +176,27 @@ async function getTeam(){
     });
     if(!response.ok){
 
-        let reply = confirm("Matchup 게시글에 글 작성을 하기 위해서는 소속팀이 있어야 합니다. 팀 등록을 하시겠습니까?");
-        if(reply)
-            window.location.href = "/team/team/register";
-        else
-            window.history.back();
+        // let reply = confirm("Matchup 게시글에 글 작성을 하기 위해서는 소속팀이 있어야 합니다. 팀 등록을 하시겠습니까?");
+        Swal.fire({
+            title: '팀 등록이 필요합니다',
+            text: 'Matchup 게시글에 글 작성을 하기 위해서는 소속팀이 있어야 합니다. 팀 등록을 하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '네, 등록할게요',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+                window.location.href = '/team/team/register'; // 예시: 팀 등록 페이지로 이동
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                window.history.back();
+            }
+        });
+        // if(reply)
+        //     window.location.href = "/team/team/register";
+        // else
+        //     window.history.back();
     }
 
     const data = await response.json();

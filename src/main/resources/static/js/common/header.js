@@ -93,8 +93,11 @@ function secureFetch(url, options = {}) {
                                 credentials: 'include'
                             });
                         } else {
-                            alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-                            window.location.href = "/login";
+                            // alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                            // window.location.href = "/login";
+                            Swal.fire('완료!', '세션이 만료되었습니다. 다시 로그인해주세요.', 'success').then(()=>{
+                                window.location.href = "/login";
+                            })
                             throw new Error("세션 만료");
                         }
                     });
@@ -110,8 +113,11 @@ function logout() {
         credentials: 'include'
     })
         .then(res => {
-            alert("로그아웃 되었습니다.");
-            window.location.href = "/main?_=" + new Date().getTime();
+            // alert("로그아웃 되었습니다.");
+            Swal.fire('완료!', '로그아웃 되었습니다.', 'success').then(()=>{
+                window.location.href = "/main?_=" + new Date().getTime();
+            })
+
         });
 
 }
@@ -453,7 +459,9 @@ function createNotiStructure(notificationId, notificationMessage, createdDate) {
                     }
                 }
             } else {
-                alert("알림이 확인되었습니다.");
+                //alert("알림이 확인되었습니다.");
+                Swal.fire('완료!', '알림이 확인되었습니다.', 'success');
+
             }
 
             // 알림 읽으면 읽음 숫자 차감
@@ -499,12 +507,28 @@ function createReadNotiStructure(notificationId, notificationMessage, createdDat
     wrapper.addEventListener("click", async () => {
 
         if(typeof targetUrl === "string" && targetUrl.trim() !== ""){
-            const go = confirm("이 알림과 관련된 페이지로 이동하시겠습니까?");
-            if (go)
-                window.open(targetUrl,"_blank","noopener,noreferrer");
+            // const go = confirm("이 알림과 관련된 페이지로 이동하시겠습니까?");
+            // if (go)
+            //     window.open(targetUrl,"_blank","noopener,noreferrer");
+
+            Swal.fire({
+                title: '페이지 이동',
+                text: '이 알림과 관련된 페이지로 이동하시겠습니까?',
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: '예',
+                cancelButtonText: '아니요'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 사용자가 '네'를 눌렀을 때 처리
+                    window.open(targetUrl,"_blank","noopener,noreferrer");
+                }
+            });
 
         } else {
-            alert("이동할 페이지가 없습니다.");
+            //alert("이동할 페이지가 없습니다.");
+            Swal.fire('완료!', '이동할 페이지가 없습니다.', 'warning');
+
         }
 
 
