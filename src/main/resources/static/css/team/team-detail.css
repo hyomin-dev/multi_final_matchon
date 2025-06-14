@@ -685,6 +685,7 @@ html, body {
 .request-item p {
     margin: 4px 0;
     white-space: pre-wrap;
+
 }
 
 .response-text {
@@ -738,6 +739,7 @@ html, body {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+
 }
 
 .btn-save-response:hover {

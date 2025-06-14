@@ -835,7 +835,9 @@
                                 ? `<div class="response-form">
                 <textarea class="response-text" data-id="${review.id}" placeholder="답변을 입력하세요"></textarea>
                 <p class="response-char-count" data-id="${review.id}">0 / 150자</p>
+
                 <button class="btn-submit-response" data-id="${review.id}">답변 등록</button>
+
 
            </div>`
                                 : '';
@@ -1084,7 +1086,9 @@
                             ? `<div class="response-form">
                <textarea class="response-text" data-id="${review.id}" placeholder="답변을 입력하세요"></textarea>
                  <p class="response-char-count" data-id="${review.id}">0 / 150자</p>
+
                <button class="btn-submit-response" data-id="${review.id}">답변 등록</button>
+
 
            </div>`
                             : '')
@@ -1094,7 +1098,9 @@
 
                     attachNewResponseCharCountHandlers(); // ✅ add this
 
+
                     document.querySelectorAll('.btn-submit-response').forEach(btn => {
+
                         btn.addEventListener('click', () => {
                             const reviewId = btn.dataset.id;
                             const textArea = document.querySelector(`.response-text[data-id="${reviewId}"]`);
