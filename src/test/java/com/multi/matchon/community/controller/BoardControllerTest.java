@@ -1,79 +1,123 @@
 package com.multi.matchon.community.controller;
 
-import com.multi.matchon.community.domain.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.auth.oauth2.JwtProvider;
+import com.multi.matchon.common.util.AwsS3Utils;
+import com.multi.matchon.community.domain.Board;
+import com.multi.matchon.community.domain.Category;
+import com.multi.matchon.community.dto.req.BoardRequest;
 import com.multi.matchon.community.service.BoardService;
 import com.multi.matchon.community.service.CommentService;
 import com.multi.matchon.community.service.ReportService;
-import com.multi.matchon.common.domain.Attachment;
-import com.multi.matchon.common.domain.BoardType;
-import com.multi.matchon.common.repository.AttachmentRepository;
-import com.multi.matchon.common.util.AwsS3Utils;
 import com.multi.matchon.member.domain.Member;
 import com.multi.matchon.member.domain.MemberRole;
+import io.awspring.cloud.s3.S3Operations;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import software.amazon.awssdk.services.s3.S3Client;
 
-import java.util.Collections;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SuppressWarnings("removal")
-@WebMvcTest(BoardController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class BoardControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean private BoardService boardService;
-    @MockBean private CommentService commentService;
-    @MockBean private ReportService reportService;
-    @MockBean private AwsS3Utils awsS3Utils;
-    @MockBean private AttachmentRepository attachmentRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    // 실제 컨텍스트의 서비스 로드 가능하나, 테스트 격리를 위해 MockBean 유지
+    @MockBean
+    private BoardService boardService;
+
+    @MockBean
+    private CommentService commentService;
+
+    @MockBean
+    private ReportService reportService;
+
+    // 외부 연동은 반드시 Mock 처리
+    @MockBean
+    private AwsS3Utils awsS3Utils;
+
+    @MockBean
+    private S3Operations s3Operations;
+
+    @MockBean
+    private S3Client s3Client;
+
+    @MockBean
+    private JwtProvider jwtProvider;
 
     @Test
-    void 게시글_상세_조회_테스트() throws Exception {
-        // given
+    void 게시판_목록_페이지_조회_성공() throws Exception {
+        mockMvc.perform(get("/community")
+                        .param("category", "FREEBOARD")
+                        .param("page", "0"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("community/view"))
+                .andExpect(model().attributeExists("boardsPage"))
+                .andExpect(model().attributeExists("selectedCategory"))
+                .andExpect(model().attributeExists("categories"))
+                .andExpect(model().attributeExists("pinnedPosts"))
+                .andExpect(model().attributeExists("pageNumbers"));
+    }
+
+    @Test
+    @WithMockUser(username = "user", roles = {"USER"})
+    void 일반_사용자는_게시글_작성페이지_접근시_리다이렉트된다() throws Exception {
+        mockMvc.perform(get("/community/new"))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void 관리자_게시글_작성_성공() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("files", "test.txt", "text/plain", "file content".getBytes());
+
+        BoardRequest boardRequest = new BoardRequest("제목", "내용", Category.FREEBOARD, false);
+
+        mockMvc.perform(multipart("/community")
+                        .file(file)
+                        .param("title", boardRequest.getTitle())
+                        .param("content", boardRequest.getContent())
+                        .param("category", boardRequest.getCategory().name())
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void 관리자_게시글_삭제_성공() throws Exception {
         Member member = Member.builder()
                 .id(1L)
-                .memberName("홍길동")
-                .memberRole(MemberRole.USER)
+                .memberName("관리자")
+                .memberRole(MemberRole.ADMIN)
                 .build();
 
-        Board board = Board.builder()
-                .id(1L)
-                .title("테스트 제목")
-                .content("테스트 내용")
-                .category(Category.FREEBOARD)
-                .member(member)
-                .build();
+        given(boardService.findById(1L)).willReturn(
+                Board.builder().id(1L).member(member).build()
+        );
 
-        given(boardService.findById(1L)).willReturn(board);
-        given(attachmentRepository.findAllByBoardTypeAndBoardNumber(BoardType.BOARD, 1L))
-                .willReturn(Collections.emptyList());
-        given(commentService.getCommentsByBoard(board))
-                .willReturn(Collections.emptyList());
+        doNothing().when(boardService).deleteById(1L);
 
-        // AwsS3Utils 내부 메서드가 호출될 경우를 대비한 Mock 처리 (필요한 경우만)
-        given(awsS3Utils.getObjectUrl(anyString(), anyString(), any()))
-                .willReturn("https://s3-fake-url.com/fake.png");
-        doNothing().when(awsS3Utils).saveFile(anyString(), anyString(), any());
-        doNothing().when(awsS3Utils).deleteFile(anyString(), anyString());
-
-        // when + then
-        mockMvc.perform(get("/community/1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("community/detail"))
-                .andExpect(model().attributeExists("board"))
-                .andExpect(model().attributeExists("attachments"))
-                .andExpect(model().attributeExists("commentRequest"))
-                .andExpect(model().attributeExists("comments"));
+        mockMvc.perform(post("/community/1/delete"))
+                .andExpect(status().isOk());
     }
 }

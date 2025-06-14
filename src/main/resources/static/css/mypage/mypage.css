@@ -3,11 +3,17 @@ body {
     background-color: #fff;
 }
 
+
+footer {
+    padding: 0;
+    margin: 0;
+}
+
 .mypage-container {
     background-color: #fff;
     display: flex;
     max-width: 1280px;
-    margin: 50px auto;
+    margin: 60px auto 180px;
     gap: 40px;
     padding: 0 20px;
 }
@@ -118,6 +124,7 @@ body {
 .host-submit {
     background-color: dodgerblue;
     color: white;
+    width: 62px;
     margin-left: 4px;
     padding: 4px 8px;
     border: none;
@@ -184,13 +191,15 @@ body {
     color: red;
     border: 2px solid red;
     border-radius: 6px;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 .danger-btn:hover {
-    background-color: mistyrose;
+    background-color: red;
+    color: #fff;
 }
 
 .modal-overlay {
@@ -303,23 +312,30 @@ body {
 }
 
 .button-group-vertical .delete-button {
-    background-color: orangered;
-    color: white;
-    font-weight: bold;
-    padding: 8px 16px;
+    background: transparent;
     border: none;
-    border-radius: 8px;
-    font-size: 15px;
+    color: #F44336;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 5px 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    border-radius: 4px;
+    transition: background-color 0.3s, transform 0.2s ease;
 }
 
 .button-group-vertical .delete-button:hover {
-    background-color: red;
-    transform: translateY(1px);
-    box-shadow: inset 0 2px 4px rgba(90, 0, 0, 0.3);
+    background-color: mistyrose;
+    color: red;
+    transform: scale(1.03);
 }
 
+.delete-icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 4px;
+    margin-bottom: 3px;
+}
 
 
 
