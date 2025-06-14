@@ -250,7 +250,6 @@ async function initSideBar(){
     const closeBtn = document.getElementById('closeMiniDrawerBtn');
     const miniDrawer = document.getElementById('miniDrawer');
 
-
     const openMiniDrawerHistoryBtn = document.getElementById("openMiniDrawerHistoryBtn");
     const closeMiniDrawerBtnHistoryBtn = document.getElementById("closeMiniDrawerBtnHistoryBtn");
     const miniDrawerHistory = document.getElementById("miniDrawerHistory");

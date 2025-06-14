@@ -45,10 +45,10 @@ public class MatchupBoard extends BaseEntity {
     @Column(name="team_intro",nullable = false,columnDefinition = "TEXT")
     private String teamIntro;
 
-    @Column(name="sports_facility_name",nullable = false,columnDefinition = "VARCHAR(100)")
+    @Column(name="sports_facility_name",nullable = false,length = 100)
     private String sportsFacilityName;
 
-    @Column(name="sports_facility_address",nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name="sports_facility_address",nullable = false, length = 100)
     private String sportsFacilityAddress;
 
     @Column(name="match_datetime",nullable = false)

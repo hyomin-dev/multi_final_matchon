@@ -24,15 +24,17 @@
                     <div th:if="${#authentication.principal.member.memberRole.name() == 'ADMIN'}" class="admin-delete-wrapper">
                         <button type="button"
                                 class="admin-delete-button"
-                                th:onclick="'deletePost(' + ${board.id} + ')'">
+                                th:attr="data-board-id=${board.id}">
                             🛑 관리자 삭제
                         </button>
                     </div>
-
                     <div th:if="${board.member.id == #authentication.principal.member.id and #authentication.principal.member.memberRole.name() != 'ADMIN'}">
-                        <button type="button" class="board-delete-button"
-                                th:onclick="'deletePost(' + ${board.id} + ')'">✖ 삭제
+                        <button type="button"
+                                class="board-delete-button"
+                                th:attr="data-board-id=${board.id}">
+                            ✖ 삭제
                         </button>
+
                     </div>
 
                     <div th:if="${board.member.id != #authentication.principal.member.id}">
@@ -251,26 +253,53 @@
     });
 
     document.addEventListener("click", function (e) {
-        if (e.target.matches(".btn-comment-delete") || e.target.matches(".admin-delete-button")) {
+        // 댓글 삭제용
+        if (e.target.matches(".btn-comment-delete") || (e.target.matches(".admin-delete-button") && e.target.dataset.commentId)) {
             const commentId = e.target.dataset.commentId;
             const boardId = e.target.dataset.boardId;
             const token = localStorage.getItem("accessToken");
             if (!confirm("댓글을 삭제하시겠습니까?")) return;
             fetch(`/community/${boardId}/comments/${commentId}`, {
                 method: "DELETE",
-                headers: {'Authorization': 'Bearer ' + token}
+                headers: { 'Authorization': 'Bearer ' + token }
             }).then(res => {
-                if (res.ok) {
+                if (res.status === 200) {
                     e.target.closest("li").remove();
                 } else {
-                    alert("댓글 삭제 실패");
+                    res.text().then(msg => alert(msg || "댓글 삭제 실패"));
                 }
             }).catch(err => {
                 console.error("댓글 삭제 오류:", err);
                 alert("오류가 발생했습니다.");
             });
         }
+
+        // 게시글 삭제용
+        if ((e.target.matches(".admin-delete-button") && !e.target.dataset.commentId)
+            || e.target.matches(".board-delete-button")) {
+            const boardId = e.target.dataset.boardId;
+            if (!confirm("정말 게시글을 삭제하시겠습니까?")) return;
+            fetch(`/community/${boardId}/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            }).then(response => {
+                if (response.status === 401) {
+                    alert("로그인이 필요한 서비스입니다.");
+                    window.location.href = "/login";
+                } else if (response.ok) {
+                    alert("게시글이 삭제되었습니다.");
+                    window.location.href = "/community";
+                } else {
+                    response.text().then(msg => alert(msg || "게시글 삭제 실패"));
+                }
+            }).catch(error => {
+                console.error("게시글 삭제 요청 오류:", error);
+                alert("오류가 발생했습니다.");
+            });
+        }
     });
+
 
     function openReportModal(type, id) {
         document.getElementById("reportTargetType").value = type;

@@ -1,7 +1,9 @@
 package com.multi.matchon.matchup.service;
 
 
+import com.multi.matchon.chat.dto.res.ResChatErrorDto;
 import com.multi.matchon.chat.service.ChatService;
+import com.multi.matchon.chat.service.RedisPubSubService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 import com.multi.matchon.common.domain.SportsTypeName;
 import com.multi.matchon.common.domain.Status;
@@ -41,8 +43,9 @@ public class MatchupRequestService {
     private final MatchupRequestRepository matchupRequestRepository;
     private final MemberRepository memberRepository;
     private final ChatService chatService;
-    private final SimpMessageSendingOperations messageTemplate;
+    //private final SimpMessageSendingOperations messageTemplate;
     private final NotificationService notificationService;
+    private final RedisPubSubService redisPubSubService;
 
     // 등록
 
@@ -185,7 +188,7 @@ public class MatchupRequestService {
         /*
         * 5. 작성자에게 알림 보내기
         * */
-        notificationService.sendNotification(findMatchupBoard.getWriter() , "[참가 요청]"+user.getMember().getMemberName()+"님의 참가 요청이 있습니다.", "/matchup/request/board?"+"board-id="+findMatchupBoard.getId());
+        notificationService.sendNotificationWithoutMail(findMatchupBoard.getWriter() , "[참가 요청]"+user.getMember().getMemberName()+"님의 참가 요청이 있습니다.", "/matchup/request/board?"+"board-id="+findMatchupBoard.getId());
 
     }
 
@@ -316,7 +319,7 @@ public class MatchupRequestService {
             /*
              * 작성자에게 알림 보내기
              * */
-            notificationService.sendNotification(findMatchupRequest.getMatchupBoard().getWriter() , "[참가 요청 수정]"+findMatchupRequest.getMember().getMemberName()+"님의 참가 요청이 수정되었습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
+            notificationService.sendNotificationWithoutMail(findMatchupRequest.getMatchupBoard().getWriter() , "[참가 요청 수정]"+findMatchupRequest.getMember().getMemberName()+"님의 참가 요청이 수정되었습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
 
         }
         // 재요청인 경우: 상태 업데이트 해야됨
@@ -398,7 +401,7 @@ public class MatchupRequestService {
             /*
              * 3. 작성자에게 알림 보내기
              * */
-            notificationService.sendNotification(findMatchupRequest.getMatchupBoard().getWriter() , "[참가 재요청]"+findMatchupRequest.getMember().getMemberName()+"님이 참가 재요청 했습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
+            notificationService.sendNotificationWithoutMail(findMatchupRequest.getMatchupBoard().getWriter() , "[참가 재요청]"+findMatchupRequest.getMember().getMemberName()+"님이 참가 재요청 했습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
 
         }else if(findMatchupRequest.getMatchupStatus()==Status.DENIED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
 
@@ -478,7 +481,7 @@ public class MatchupRequestService {
             /*
              * 3. 작성자에게 알림 보내기
              * */
-            notificationService.sendNotification(findMatchupRequest.getMatchupBoard().getWriter() , "[참가 재요청]"+findMatchupRequest.getMember().getMemberName()+"님이 참가 재요청 했습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
+            notificationService.sendNotificationWithoutMail(findMatchupRequest.getMatchupBoard().getWriter() , "[참가 재요청]"+findMatchupRequest.getMember().getMemberName()+"님이 참가 재요청 했습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
 
         } else{
             throw new CustomException("Matchup 수정하기 또는 재요청이 불가능합니다. 요청 이력을 참고해주세요.");
@@ -513,7 +516,7 @@ public class MatchupRequestService {
         /*
          * 작성자에게 알림 보내기
          * */
-        notificationService.sendNotification(findMatchupRequest.getMatchupBoard().getWriter() , "[참가 요청 취소]"+findMatchupRequest.getMember().getMemberName()+"님의 참가 요청이 취소되었습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
+        notificationService.sendNotificationWithoutMail(findMatchupRequest.getMatchupBoard().getWriter() , "[참가 요청 취소]"+findMatchupRequest.getMember().getMemberName()+"님의 참가 요청이 취소되었습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
     }
 
 
@@ -572,7 +575,7 @@ public class MatchupRequestService {
         /*
          * 작성자에게 알림 보내기
          * */
-        notificationService.sendNotification(findMatchupRequest.getMatchupBoard().getWriter() , "[승인 취소 요청]"+findMatchupRequest.getMember().getMemberName()+"님이 승인 취소 요청 했습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
+        notificationService.sendNotificationWithoutMail(findMatchupRequest.getMatchupBoard().getWriter() , "[승인 취소 요청]"+findMatchupRequest.getMember().getMemberName()+"님이 승인 취소 요청 했습니다.", "/matchup/request/board?"+"board-id="+findMatchupRequest.getMatchupBoard().getId());
 
     }
 
@@ -606,7 +609,7 @@ public class MatchupRequestService {
                 /*
                  * 신청자에게 알림 보내기
                  * */
-                notificationService.sendNotification(findMatchupRequest.getMember() , "[참가 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청을 승인했습니다. 단체 채팅방에 초대되었습니다. 지금 바로 확인해보세요!", "/chat/group/room?"+"roomId="+findMatchupRequest.getMatchupBoard().getChatRoom().getId());
+                notificationService.sendNotificationWithoutMail(findMatchupRequest.getMember() , "[참가 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청을 승인했습니다. 단체 채팅방에 초대되었습니다. 지금 바로 확인해보세요!", "/chat/group/room?"+"roomId="+findMatchupRequest.getMatchupBoard().getChatRoom().getId());
 
             }
 
@@ -626,7 +629,7 @@ public class MatchupRequestService {
                 /*
                  * 신청자에게 알림 보내기
                  * */
-                notificationService.sendNotification(findMatchupRequest.getMember() , "[참가 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청을 승인했습니다. 단체 채팅방에 초대되었습니다. 지금 바로 확인해보세요!", "/chat/group/room?"+"roomId="+findMatchupRequest.getMatchupBoard().getChatRoom().getId());
+                notificationService.sendNotificationWithoutMail(findMatchupRequest.getMember() , "[참가 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청을 승인했습니다. 단체 채팅방에 초대되었습니다. 지금 바로 확인해보세요!", "/chat/group/room?"+"roomId="+findMatchupRequest.getMatchupBoard().getChatRoom().getId());
 
             }
         }
@@ -645,10 +648,16 @@ public class MatchupRequestService {
                 /*
                  * 신청자에게 알림 보내기
                  * */
-                notificationService.sendNotification(findMatchupRequest.getMember() , "[취소 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 승인을 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
+                notificationService.sendNotificationWithoutMail(findMatchupRequest.getMember() , "[취소 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 승인을 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
 
 
-                messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+//                messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+            ResChatErrorDto resChatErrorDto = ResChatErrorDto.builder()
+                    .errorMessage("Chat 더 이상 그룹 채팅할 수 없습니다.")
+                    .receiverEmail(findMatchupRequest.getMember().getMemberEmail())
+                    .build();
+            redisPubSubService.publish("error",resChatErrorDto);
+
 
         // 최초 요청 → 승인 → 승인 취소 요청 → 승인
         } else if(findMatchupRequest.getMatchupStatus()==Status.CANCELREQUESTED && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==1 && !findMatchupRequest.getIsDeleted()){
@@ -662,9 +671,14 @@ public class MatchupRequestService {
             /*
              * 신청자에게 알림 보내기
              * */
-            notificationService.sendNotification(findMatchupRequest.getMember() , "[취소 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 승인을 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
+            notificationService.sendNotificationWithoutMail(findMatchupRequest.getMember() , "[취소 요청 승인]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 승인을 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
 
-            messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+//            messageTemplate.convertAndSendToUser(findMatchupRequest.getMember().getMemberEmail(),"/queue/errors","Chat 더 이상 그룹 채팅할 수 없습니다.");
+            ResChatErrorDto resChatErrorDto = ResChatErrorDto.builder()
+                    .errorMessage("Chat 더 이상 그룹 채팅할 수 없습니다.")
+                    .receiverEmail(findMatchupRequest.getMember().getMemberEmail())
+                    .build();
+            redisPubSubService.publish("error",resChatErrorDto);
 
         } else{
             throw new CustomException("Matchup 현재 승인이 불가능합니다. 요청 목록을 참고해주세요.");
@@ -694,7 +708,7 @@ public class MatchupRequestService {
             /*
              * 신청자에게 알림 보내기
              * */
-            notificationService.sendNotification(findMatchupRequest.getMember() , "[참가 요청 반려]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청 반려 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
+            notificationService.sendNotificationWithoutMail(findMatchupRequest.getMember() , "[참가 요청 반려]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청 반려 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
 
         // 최초 요청에 대한 반려
         }else if(findMatchupRequest.getMatchupStatus()==Status.PENDING && findMatchupRequest.getMatchupRequestSubmittedCount()==1 && findMatchupRequest.getMatchupCancelSubmittedCount()==0 && !findMatchupRequest.getIsDeleted()){
@@ -704,7 +718,7 @@ public class MatchupRequestService {
             /*
              * 신청자에게 알림 보내기
              * */
-            notificationService.sendNotification(findMatchupRequest.getMember() , "[참가 요청 반려]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청 반려 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
+            notificationService.sendNotificationWithoutMail(findMatchupRequest.getMember() , "[참가 요청 반려]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 참가 요청 반려 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
 
         }
 
@@ -718,7 +732,7 @@ public class MatchupRequestService {
             /*
              * 신청자에게 알림 보내기
              * */
-            notificationService.sendNotification(findMatchupRequest.getMember() , "[취소 요청 반려]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 반려 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
+            notificationService.sendNotificationWithoutMail(findMatchupRequest.getMember() , "[취소 요청 반려]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 반려 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
 
 
         // 최초 요청 → 승인 → 승인 취소 요청 → 반려
@@ -729,7 +743,7 @@ public class MatchupRequestService {
             /*
              * 신청자에게 알림 보내기
              * */
-            notificationService.sendNotification(findMatchupRequest.getMember() , "[취소 요청 반려]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 반려 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
+            notificationService.sendNotificationWithoutMail(findMatchupRequest.getMember() , "[취소 요청 반려]"+findMatchupRequest.getMatchupBoard().getWriter().getMemberName()+"님이 취소 요청 반려 했습니다.", "/matchup/request/detail?"+"request-id="+findMatchupRequest.getId());
 
         } else{
             throw new CustomException("Matchup 현재 반려가 불가능합니다. 요청 목록을 참고해주세요.");

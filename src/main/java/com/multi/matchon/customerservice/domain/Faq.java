@@ -28,7 +28,7 @@ public class Faq extends TimeEntity {
     @Column(name="faq_category", nullable = false)
     private CustomerServiceType faqCategory;
 
-    @Column(name="faq_title", nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name="faq_title", nullable = false, length = 100)
     private String faqTitle;
 
     @Column(name="faq_content",nullable = false, columnDefinition = "TEXT")

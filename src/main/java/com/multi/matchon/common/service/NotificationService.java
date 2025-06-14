@@ -1,5 +1,6 @@
 package com.multi.matchon.common.service;
 
+import com.multi.matchon.chat.service.RedisPubSubService;
 import com.multi.matchon.common.auth.dto.CustomUser;
 
 import com.multi.matchon.common.auth.service.MailService;
@@ -30,6 +31,7 @@ public class NotificationService {
     private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messageTemplate;
     private final MailService mailService;
+    private final RedisPubSubService redisPubSubService;
 
 
     // 조회
@@ -90,10 +92,15 @@ public class NotificationService {
                 .notificationMessage(notification.getNotificationMessage())
                 .createdDate(notification.getCreatedDate())
                 .build();
+//              messageTemplate.convertAndSendToUser(
+//                receiver.getMemberEmail(), "/notify", dto
+//        );
 
-        messageTemplate.convertAndSendToUser(
-                receiver.getMemberEmail(), "/notify", dto
-        );
+        // redis용
+        dto.setReceiverEmail(receiver.getMemberEmail());
+
+        redisPubSubService.publish("noti",dto);
+
 
         // 3. 이메일 수신 동의 시에만 전송
         if (Boolean.TRUE.equals(receiver.getEmailAgreement())) {
@@ -125,8 +132,8 @@ public class NotificationService {
         }
     }
 
-
-    private void sendNotificationWithoutMail(Member receiver, String message, String targetUrl) {
+    @Transactional
+    public void sendNotificationWithoutMail(Member receiver, String message, String targetUrl) {
         Notification notification = Notification.builder()
                 .receivedMember(receiver)
                 .notificationMessage(message)
@@ -140,10 +147,16 @@ public class NotificationService {
                 .notificationMessage(notification.getNotificationMessage())
                 .createdDate(notification.getCreatedDate())
                 .build();
+//           messageTemplate.convertAndSendToUser(
+//                receiver.getMemberEmail(), "/notify", dto
+//        );
 
-        messageTemplate.convertAndSendToUser(
-                receiver.getMemberEmail(), "/notify", dto
-        );
+        // redis용
+        dto.setReceiverEmail(receiver.getMemberEmail());
+
+        redisPubSubService.publish("noti",dto);
+
+
     }
 
 

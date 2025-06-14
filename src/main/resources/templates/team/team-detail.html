@@ -89,7 +89,7 @@
                     </div>
                     <div class="review-actions" th:if="${!isTeamLeader}">
                         <button id="writeReviewBtn" class="btn-primary">후기 쓰기</button>
-                        <button id="myReviewsBtn" class="btn-secondary">내가 쓴 후기 보기</button>
+                        <button id="myReviewsBtn" class="btn-secondary">내가 쓴 후기</button>
                         <button id="backToAllReviewsFromMyBtn" class="btn-cancel" style="display:none;">뒤로가기</button>
                     </div>
 
@@ -156,7 +156,7 @@
                 <div id="join-request-list-section"></div>
 
                 <!-- ✅ Add this for pagination -->
-                <div id="join-request-pagination" style="margin-top: 20px; text-align: center;"></div>
+                <div id="join-request-pagination" class="pagination"></div>
                     <!-- 요청들이 여기에 렌더링될 예정 -->
                 </div>
             </div>
@@ -390,9 +390,9 @@
             // 🔢 번호들
             for (let i = 0; i < totalPages; i++) {
                 pagination.innerHTML += `
-            <button onclick="loadJoinRequests(${i})" ${i === currentPage ? 'style="font-weight:bold;"' : ''}>
-                ${i + 1}
-            </button>`;
+        <button onclick="loadJoinRequests(${i})" class="${i === currentPage ? 'active' : ''}">
+            ${i + 1}
+        </button>`;
             }
 
             // ➡ 다음
@@ -1141,12 +1141,12 @@
                 reviewPagination.innerHTML += `<button onclick="loadPagedReviews(${currentPage - 1})">이전</button>`;
             }
 
-            // 번호 버튼
+            // 번호 버튼 (with .active class)
             for (let i = 0; i < totalPages; i++) {
                 reviewPagination.innerHTML += `
-            <button onclick="loadPagedReviews(${i})" ${i === currentPage ? 'style="font-weight:bold;"' : ''}>
-                ${i + 1}
-            </button>`;
+<button onclick="loadPagedReviews(${i})" class="${i === currentPage ? 'active' : ''}">
+    ${i + 1}
+</button>`;
             }
 
             // 다음 버튼

@@ -19,6 +19,8 @@
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+            min-height: 600px;
+            justify-content: space-between;
         }
         .meta {
             display: flex;
@@ -80,19 +82,41 @@
             display: flex;
             justify-content: center;
             gap: 14px;
-            margin-top: 30px;
+            margin-top: auto;
         }
         .edit-btn, .cancel-btn, .delete-btn {
-            padding: 10px 24px;
-            font-size: 14px;
+            color: white;
+            padding: 8px 16px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
-        .edit-btn { background-color: #007bff; color: white; }
-        .cancel-btn { background-color: #6c757d; color: white; }
-        .delete-btn { background-color: #dc3545; color: white; }
+        .edit-btn {background-color: dodgerblue;}
+
+        .edit-btn:hover {
+            background-color: royalblue;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
+        }
+
+        .cancel-btn {background-color: #c8c8c8;}
+
+        .cancel-btn:hover{
+            background-color: #aaa;
+            transform: translateY(1px);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .delete-btn {background-color: red}
+
+        .delete-btn:hover{
+            background-color: darkred;
+            transform: translateY(1px);
+            box-shadow: inset 0 2px 4px rgba(90, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>

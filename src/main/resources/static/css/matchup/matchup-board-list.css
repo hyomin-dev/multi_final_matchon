@@ -175,6 +175,25 @@ label[for="availableOnly"], label:has(#availableOnly) {
     box-shadow: 0 6px 12px rgba(128, 0, 128, 0.3);
 }
 
+.col-detail-btn{
+    background-color: olivedrab;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.col-detail-btn:hover{
+    background-color: darkolivegreen;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 80, 0, 0.3);
+}
+
 
 
 /* ===== 게시판 테이블 ===== */

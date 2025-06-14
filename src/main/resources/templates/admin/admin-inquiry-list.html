@@ -24,38 +24,41 @@
             margin-bottom: 20px;
         }
         h2 span {
-            border-bottom: 2px solid #000;
+            border-bottom: 2px solid #ccc;
         }
         table {
-            width: 100%;
-            border-collapse: collapse;
+            width: 90%;
+            margin: 30px auto;
+            border-collapse: separate;
+            border-spacing: 0;
             table-layout: fixed;
-            margin: 0 auto;
+            background: #fff;
+            border: 2px solid dodgerblue;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         th, td {
-            border: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
             padding: 10px 6px;
             text-align: center;
             word-break: keep-all;
         }
         th {
-            background-color: #f3f3f3;
+            background-color: aliceblue;
+            color: darkslategray;
         }
         tr:hover {
-            background-color: #f9f9f9;
+            background-color: mintcream;
         }
 
-        th:nth-child(1), td:nth-child(1) { width: 30px; }
-        th:nth-child(2), td:nth-child(2) { width: 80px; }
-        th:nth-child(3), td:nth-child(3) { width: 500px; }
-        th:nth-child(4), td:nth-child(4) { width: 120px; }
-        th:nth-child(5), td:nth-child(5),
-        th:nth-child(6), td:nth-child(6) {
-            width: 120px;
-        }
-        th:nth-child(7), td:nth-child(7) {
-            width: 50px;
-        }
+        th:nth-child(1), td:nth-child(1) { width: 5%; }
+        th:nth-child(2), td:nth-child(2) { width: 10%; }
+        th:nth-child(3), td:nth-child(3) { width: 35%; }    /* 신고대상 */
+        th:nth-child(4), td:nth-child(4) { width: 10%; }    /* 신고자 */
+        th:nth-child(5), td:nth-child(5) { width: 15%; }    /* 신고분류 */
+        th:nth-child(6), td:nth-child(6) { width: 15%; }    /* 상세사유 */
+        th:nth-child(7), td:nth-child(7) { width: 10%; }
 
         a {
             color: #007BFF;
@@ -65,15 +68,17 @@
         .status-completed, .status-pending {
             display: inline-block;
             font-size: 13px;
-            padding: 5px 10px;
-            border-radius: 20px;
+
+            border-radius: 10px;
         }
         .status-completed {
-            background-color: #4CAF50;
+            background-color: dodgerblue;
+            padding: 5px 7px;
             color: #fff;
         }
         .status-pending {
             background-color: #ddd;
+            padding: 5px 10px;
             color: #444;
         }
 
@@ -90,7 +95,7 @@
             color: #000;
         }
         .pagination a.active {
-            background-color: #5478b2;
+            background-color: dodgerblue;
             color: white;
         }
         .pagination a.disabled {
@@ -100,21 +105,23 @@
         }
 
         td.title-cell {
-            text-align: left;
+            text-align: center;
         }
 
 
         .title-link {
+            color: darkslategray;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
             display: inline-block;
             max-width: 100%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            vertical-align: middle;
-            text-decoration: none;
-            color: #000;
         }
         .title-link:hover {
+            color: #1c7ed6;
             text-decoration: underline;
         }
 

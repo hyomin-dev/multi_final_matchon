@@ -1,8 +1,8 @@
 /* 로그인 래퍼 */
 #wrap {
     max-width: 400px;
-    height: auto;
-    margin: 80px auto;
+    max-height: 500px;
+    margin: 80px auto 100px;
     padding: 40px;
     border: 1px solid #ddd;
     border-radius: 10px;

@@ -20,7 +20,7 @@ public abstract class BaseEntity {
     @Column(name="created_date")
     private LocalDateTime createdDate;
 
-    @Column(name="created_person", columnDefinition = "VARCHAR(100)")
+    @Column(name="created_person", length = 100)
     @CreatedBy
     private String createdPerson;
 
@@ -28,7 +28,7 @@ public abstract class BaseEntity {
     @Column(name="modified_date")
     private LocalDateTime modifiedDate;
 
-    @Column(name="modified_person", columnDefinition = "VARCHAR(100)")
+    @Column(name="modified_person", length = 100)
     @LastModifiedBy
     private String modifiedPerson;
 }

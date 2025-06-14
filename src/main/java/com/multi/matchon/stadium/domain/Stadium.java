@@ -17,16 +17,16 @@ public class Stadium extends BaseEntity {
     @Column(name = "stadium_id")
     private Long id;
 
-    @Column(name = "stadium_name", nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name = "stadium_name", nullable = false, length = 100)
     private String stadiumName;
 
-    @Column(name = "stadium_region", nullable = false, columnDefinition = "VARCHAR(100)")
+    @Column(name = "stadium_region", nullable = false, length = 100)
     private String stadiumRegion;
 
-    @Column(name = "stadium_address", nullable = false, columnDefinition = "VARCHAR(255)")
+    @Column(name = "stadium_address", nullable = false, length = 255)
     private String stadiumAddress;
 
-    @Column(name = "stadium_tel", nullable = false, columnDefinition = "VARCHAR(255)")
+    @Column(name = "stadium_tel", nullable = false, length = 255)
     private String stadiumTel;
 
     @Column(name = "is_deleted")
@@ -34,7 +34,7 @@ public class Stadium extends BaseEntity {
     private Boolean isDeleted = false;
 
     // 예: "1_청계중앙공원축구장.jpg"
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 255)
     private String imageUrl;
 
     private Double latitude;

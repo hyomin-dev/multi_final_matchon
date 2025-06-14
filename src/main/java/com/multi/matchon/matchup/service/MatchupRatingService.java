@@ -112,13 +112,13 @@ public class MatchupRatingService {
         /*
          * 작성자에게 알림 보내기
          * */
-        notificationService.sendNotification(ratingMatchupBoard.getWriter() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
+        notificationService.sendNotificationWithoutMail(ratingMatchupBoard.getWriter() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
 
         /*
          * 신청자들에게 알림 보내기
          * */
         for(MatchupRequest mr: matchupRequests){
-            notificationService.sendNotification(mr.getMember() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
+            notificationService.sendNotificationWithoutMail(mr.getMember() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
         }
 
 
@@ -195,13 +195,13 @@ public class MatchupRatingService {
             /*
              * 작성자에게 알림 보내기
              * */
-            notificationService.sendNotification(ratingMatchupBoard.getWriter() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
+            notificationService.sendNotificationWithoutMail(ratingMatchupBoard.getWriter() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
 
             /*
              * 신청자들에게 알림 보내기
              * */
             for(MatchupRequest mr: matchupRequestsWithBoard){
-                notificationService.sendNotification(mr.getMember() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
+                notificationService.sendNotificationWithoutMail(mr.getMember() , "[경기 종료]"+ratingMatchupBoard.getMatchDatetime()+"에 시작한 경기가 종료되었습니다. 참가자들에 대한 매너 온도 평가를 해보세요.", "/matchup/rating/page?"+"boardId="+ratingMatchupBoard.getId());
             }
 
         }
@@ -238,7 +238,7 @@ public class MatchupRatingService {
         /*
          * 작성자에게 알림 보내기
          * */
-        notificationService.sendNotification(target , "[평가 알림]"+user.getMember().getMemberName()+"님으로 부터 매너 온도 평가가 도착했습니다. 확인해보세요.", "/matchup/rating/page?"+"boardId="+reqMatchupRatingDto.getBoardId());
+        notificationService.sendNotificationWithoutMail(target , "[평가 알림]"+user.getMember().getMemberName()+"님으로 부터 매너 온도 평가가 도착했습니다. 확인해보세요.", "/matchup/rating/page?"+"boardId="+reqMatchupRatingDto.getBoardId());
 
     }
 
