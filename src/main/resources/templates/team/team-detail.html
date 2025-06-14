@@ -156,7 +156,7 @@
                 <div id="join-request-list-section"></div>
 
                 <!-- ✅ Add this for pagination -->
-                <div id="join-request-pagination" style="margin-top: 20px; text-align: center;"></div>
+                <div id="join-request-pagination" class="pagination"></div>
                     <!-- 요청들이 여기에 렌더링될 예정 -->
                 </div>
             </div>
@@ -239,6 +239,7 @@
                             <button class="btn-delete-response">삭제</button>
                             <div class="response-edit-form" style="display: none;">
                                 <textarea class="edit-response-text">${review.response}</textarea>
+                                <p class="edit-response-char-count">0 / 150자</p>
                                 <button class="btn-save-response">저장</button>
                                 <button class="btn-cancel-edit">취소</button>
                             </div>
@@ -247,6 +248,7 @@
                 `).join('');
 
                         attachResponseEditHandlers();
+                        attachEditResponseCharCountHandlers();
                     })
                     .catch(err => {
                         console.error('❌ Failed to fetch answered reviews:', err);
@@ -388,9 +390,9 @@
             // 🔢 번호들
             for (let i = 0; i < totalPages; i++) {
                 pagination.innerHTML += `
-            <button onclick="loadJoinRequests(${i})" ${i === currentPage ? 'style="font-weight:bold;"' : ''}>
-                ${i + 1}
-            </button>`;
+        <button onclick="loadJoinRequests(${i})" class="${i === currentPage ? 'active' : ''}">
+            ${i + 1}
+        </button>`;
             }
 
             // ➡ 다음
@@ -435,6 +437,7 @@
 
                         <div class="response-edit-form" style="display: none;">
                             <textarea class="edit-response-text">${review.response}</textarea>
+                            <p class="edit-response-char-count">0 / 150자</p>
                             <button class="btn-save-response">저장</button>
                             <button class="btn-cancel-edit">취소</button>
                         </div>
@@ -443,6 +446,7 @@
             `).join('');
 
                     attachResponseEditHandlers(); // attach editing behavior
+                    attachEditResponseCharCountHandlers();
                 });
 
         }
@@ -479,6 +483,17 @@
                     const box = btn.closest('.response-box');
                     const responseId = box.getAttribute('data-response-id');
                     const updatedText = box.querySelector('.edit-response-text').value.trim();
+                    const MAX_RESPONSE_LENGTH = 150;
+                    // ✅ Empty check
+                    if (!updatedText) {
+                        alert("답변을 입력해주세요.");
+                        return;
+                    }
+
+                    if (updatedText.length > MAX_RESPONSE_LENGTH) {
+                        alert(`답변은 최대 ${MAX_RESPONSE_LENGTH}자까지 입력할 수 있습니다.`);
+                        return;
+                    }
 
                     const res = await fetch(`/team/team/review/response/${responseId}`, {
                         method: 'PUT',
@@ -807,10 +822,16 @@
                     reviewList.innerHTML = reviews.map(review => {
                         const hasResponse = review.response !== null;
                         const responseHtml = hasResponse
-                            ? `<div class="review-response"><strong>답변:</strong> ${review.response}</div>`
+                            ? `<div class="review-response">
+     <strong>답변:</strong> ${review.response}
+     <span class="response-date" style="float: right; color: #888; font-size: 0.85em;">
+         ${review.respondedAt ? review.respondedAt.split('T')[0] : ''}
+     </span>
+   </div>`
                             : isTeamLeader
                                 ? `<div class="response-form">
                 <textarea class="response-text" data-id="${review.id}" placeholder="답변을 입력하세요"></textarea>
+                <p class="response-char-count" data-id="${review.id}">0 / 150자</p>
                 <button class="submit-response" data-id="${review.id}">답변 등록</button>
            </div>`
                                 : '';
@@ -841,6 +862,12 @@
                             const responseText = textArea.value.trim();
                             if (!responseText) return alert("답변을 입력해주세요.");
 
+                            const MAX_RESPONSE_LENGTH = 150;
+                            if (responseText.length > MAX_RESPONSE_LENGTH) {
+                                alert(`답변은 최대 ${MAX_RESPONSE_LENGTH}자까지 입력할 수 있습니다.`);
+                                return;
+                            }
+
                             fetch(`/team/team/review/${reviewId}/response`, {
                                 method: 'POST',
                                 headers: {'Content-Type': 'application/json'},
@@ -853,6 +880,7 @@
                         });
                     });
                 });
+            attachNewResponseCharCountHandlers(); // ✅ add this
         }
         const MAX_CHARS = 200;
         const reviewContent = document.getElementById('reviewContent');
@@ -1042,16 +1070,24 @@
                         </div>
                         <p class="review-content">${review.content}</p>
                        ${review.response
-                        ? `<div class="review-response"><strong>답변:</strong> ${review.response}</div>`
+                        ? `<div class="review-response">
+     <strong>답변:</strong> ${review.response}
+     <span class="response-date" style="float: right; color: #888; font-size: 0.85em;">
+         ${review.respondedAt ? review.respondedAt.split('T')[0] : ''}
+     </span>
+   </div>`
                         : (isTeamLeader
                             ? `<div class="response-form">
                <textarea class="response-text" data-id="${review.id}" placeholder="답변을 입력하세요"></textarea>
+                 <p class="response-char-count" data-id="${review.id}">0 / 150자</p>
                <button class="submit-response" data-id="${review.id}">답변 등록</button>
            </div>`
                             : '')
                     }
                     </div>
                 `).join('');
+
+                    attachNewResponseCharCountHandlers(); // ✅ add this
 
                     document.querySelectorAll('.submit-response').forEach(btn => {
                         btn.addEventListener('click', () => {
@@ -1061,6 +1097,12 @@
 
                             if (!responseText) {
                                 alert("답변을 입력해주세요.");
+                                return;
+                            }
+
+                            const MAX_RESPONSE_LENGTH = 150;
+                            if (responseText.length > MAX_RESPONSE_LENGTH) {
+                                alert(`답변은 최대 ${MAX_RESPONSE_LENGTH}자까지 입력할 수 있습니다.`);
                                 return;
                             }
 
@@ -1099,12 +1141,12 @@
                 reviewPagination.innerHTML += `<button onclick="loadPagedReviews(${currentPage - 1})">이전</button>`;
             }
 
-            // 번호 버튼
+            // 번호 버튼 (with .active class)
             for (let i = 0; i < totalPages; i++) {
                 reviewPagination.innerHTML += `
-            <button onclick="loadPagedReviews(${i})" ${i === currentPage ? 'style="font-weight:bold;"' : ''}>
-                ${i + 1}
-            </button>`;
+<button onclick="loadPagedReviews(${i})" class="${i === currentPage ? 'active' : ''}">
+    ${i + 1}
+</button>`;
             }
 
             // 다음 버튼
@@ -1118,6 +1160,53 @@
             // Only call this if #reviewSection is visible on load, or when tab is clicked
             loadPagedReviews(0);
         });
+        function attachEditResponseCharCountHandlers() {
+            document.querySelectorAll('.edit-response-text').forEach(textarea => {
+                const counter = textarea.parentElement.querySelector('.edit-response-char-count');
+                const MAX_LENGTH = 150;
+
+                const updateCount = () => {
+                    let value = textarea.value;
+                    if (value.length > MAX_LENGTH) {
+                        textarea.value = value.substring(0, MAX_LENGTH); // ✂️ Enforce max
+                    }
+
+                    const len = textarea.value.length;
+                    counter.textContent = `${len} / ${MAX_LENGTH}자`;
+                    counter.style.color = len === MAX_LENGTH ? 'red' : '';
+                };
+
+                updateCount();
+                textarea.addEventListener('input', updateCount);
+            });
+        }
+        function attachNewResponseCharCountHandlers() {
+            document.querySelectorAll('.response-text').forEach(textarea => {
+                const reviewId = textarea.dataset.id;
+                const counter = document.querySelector(`.response-char-count[data-id="${reviewId}"]`);
+                const MAX_LENGTH = 150;
+
+                const updateCount = () => {
+                    let value = textarea.value;
+                    if (value.length > MAX_LENGTH) {
+                        textarea.value = value.substring(0, MAX_LENGTH); // ✂️ Trim excess
+                    }
+
+                    const len = textarea.value.length;
+                    if (counter) {
+                        counter.textContent = `${len} / ${MAX_LENGTH}자`;
+                        counter.style.color = len === MAX_LENGTH ? 'red' : '';
+                    }
+                };
+
+                // Initial count
+                updateCount();
+
+                // Live input handling
+                textarea.addEventListener('input', updateCount);
+            });
+        }
+        window.loadPagedReviews = loadPagedReviews;
     });
 </script>
 </body>
