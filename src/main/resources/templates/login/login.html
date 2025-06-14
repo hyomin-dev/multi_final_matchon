@@ -74,7 +74,7 @@
     const error = urlParams.get('error');
     const dateParam = urlParams.get('date');
 
-    if (error === 'suspended') {
+    if (error === 'suspended')
         const suspendEl = document.getElementById('suspendMessage');
         suspendEl.innerHTML = ''; // 초기화
 
@@ -111,7 +111,6 @@
                 fallbackLine.style.fontWeight = "bold";
                 suspendEl.appendChild(fallbackLine);
             }
-        }
     }
 
 </script>

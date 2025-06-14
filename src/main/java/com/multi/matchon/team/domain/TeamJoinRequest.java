@@ -27,6 +27,8 @@ public class TeamJoinRequest extends BaseEntity {
     @JoinColumn(name="applicant_id",nullable = false)
     private Member member;
 
+
+
     @Column(name="join_request_status",nullable = false)
     @Enumerated(EnumType.STRING)
     private Status joinRequestStatus;

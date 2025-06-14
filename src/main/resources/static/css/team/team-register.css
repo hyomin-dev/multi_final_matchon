@@ -52,7 +52,9 @@
 }
 
 .team-register-form textarea {
-    resize: vertical;
+    resize: none;       /* Prevents user resizing */
+    height: 120px;       /* Fixed height */
+    line-height: 1.5;    /* Optional: Better text spacing */
 }
 
 .team-register-form .field-error,

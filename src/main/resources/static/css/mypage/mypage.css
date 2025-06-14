@@ -130,7 +130,7 @@ footer {
     border: none;
     border-radius: 8px;
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 500;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -150,7 +150,7 @@ footer {
     border: none;
     border-radius: 8px;
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 500;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -194,7 +194,7 @@ footer {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .danger-btn:hover {

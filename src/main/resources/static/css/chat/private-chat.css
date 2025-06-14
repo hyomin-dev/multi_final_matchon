@@ -11,11 +11,12 @@
     font-weight: 600;
     margin-bottom: 30px;
     color: #2c3e50;
+
 }
 
 .container {
-    max-width: 100%;
-    margin: 0 auto;
+    max-width: 55%;
+    margin: 30px auto;
 }
 
 .card {
@@ -37,7 +38,8 @@
 .chat-box {
     flex: 1;  /* ✅ 여기가 핵심: 가능한 높이 모두 차지 */
     overflow-y: auto;
-    border: 1px solid #ddd;
+    border: 2px solid dodgerblue;
+    border-radius: 10px;
     padding: 10px;
     margin-bottom: 10px;
 
@@ -49,7 +51,7 @@
 
 .chat-message {
     margin-bottom: 10px;
-    max-width: 100%;
+    max-width: 66%;
     display: block;
     padding: 10px;
     border-radius: 10px;
@@ -96,17 +98,34 @@
 }
 
 #sendBtn {
-    width: 100%;
-    padding: 10px;
-    background-color: #1976d2;
+    background-color: dodgerblue;
     color: white;
-    border: none;
+    padding: 12px 20px;
+    border: 2px solid #1c6cd9;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
+    text-decoration: none;
+
+    box-shadow: 0 4px #1a5fc8, 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.15s ease-in-out;
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 #sendBtn:hover {
-    background-color: #155fa0;
+    background-color: #1e90ff;
 }
+
+#sendBtn:active {
+    box-shadow: 0 2px #154fa8, 0 2px 4px rgba(0, 0, 0, 0.15);
+    transform: translateY(2px);
+    background-color: #187bcd;
+}
+
+
+
 
 .chat-message.system-message {
     text-align: center;

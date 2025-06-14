@@ -1,8 +1,18 @@
 /* ===== 공통 레이아웃 ===== */
-.page-wrapper {
-    flex: 1;
-    padding: 40px 0;
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
+
+.page-wrapper {
+    flex: 1 0 auto;
+    /*display: flex;*/
+    flex-direction: column;
+}
+
 
 .page-title {
     text-align: center;
