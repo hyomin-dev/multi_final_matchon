@@ -38,6 +38,7 @@ public class ReportService {
             case COMMENT -> commentRepository.findById(targetId)
                     .map(Comment::getMember)
                     .orElseThrow(() -> new IllegalArgumentException("대상 댓글이 존재하지 않습니다."));
+
         };
 
         Report report = Report.builder()

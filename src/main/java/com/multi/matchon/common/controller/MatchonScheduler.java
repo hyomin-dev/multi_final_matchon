@@ -4,22 +4,18 @@ package com.multi.matchon.common.controller;
 import com.multi.matchon.chat.service.ChatService;
 import com.multi.matchon.matchup.service.MatchupBoardService;
 import com.multi.matchon.matchup.service.MatchupRatingService;
-import com.multi.matchon.member.domain.Member;
-import com.multi.matchon.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class MatchonScheduler {
     private final MatchupBoardService matchupBoardService;
-    private int count1=1;
-    private int count2=1;
     private final MatchupRatingService matchupRatingService;
     private final ChatService chatService;
 
