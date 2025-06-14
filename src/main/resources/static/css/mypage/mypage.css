@@ -194,7 +194,7 @@ footer {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .danger-btn:hover {
