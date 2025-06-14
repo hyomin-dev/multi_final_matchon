@@ -7,7 +7,6 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/admin/admin-event-detail.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
-
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
@@ -38,8 +37,9 @@
             <button type="submit" class="btn deny-btn">반려</button>
         </form>
         <th:block th:if="${statusLabel == '승인'}">
-            <form th:action="@{'/admin/event/' + ${event.id} + '/delete'}" method="post" style="display: inline;">
-                <button type="submit" class="btn delete-btn" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
+            <form id="deleteForm" th:action="@{'/admin/event/' + ${event.id} + '/delete'}" method="post" style="display: inline;">
+<!--                <button type="submit" class="btn delete-btn" id="deleteBtn" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>-->
+                <button type="submit" class="btn delete-btn" id="deleteBtn">삭제</button>
             </form>
         </th:block>
     </div>
@@ -84,6 +84,25 @@
             }
         });
     }
+    document.querySelector("#deleteBtn").addEventListener("click",(e)=>{
+        e.preventDefault();
+        Swal.fire({
+            text: '정말 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+                document.querySelector("#deleteForm").submit();
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                e.preventDefault();
+            }
+        });
+    })
+
 
     // 실행
     window.onload = loadKakaoMap;

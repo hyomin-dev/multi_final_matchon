@@ -178,7 +178,9 @@ function setRatingButton(card, item){
     }else{
         ratingBtn.addEventListener("click",(e)=>{
             e.preventDefault();
-            alert("Matchup 아직 매너 온도 평가 세팅되지 않았습니다. 경기 종료 후 다시 시도해보세요.");
+            //alert("Matchup 아직 매너 온도 평가 세팅되지 않았습니다. 경기 종료 후 다시 시도해보세요.");
+            Swal.fire({text: 'Matchup 아직 매너 온도 평가 세팅되지 않았습니다. 경기 종료 후 다시 시도해보세요.', icon: 'warning', confirmButtonText: '확인'});
+
         })
 
     }

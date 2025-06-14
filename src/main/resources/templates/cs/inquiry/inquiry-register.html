@@ -6,7 +6,8 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background-color: #ffffff;
@@ -180,7 +181,9 @@
         const currentLen = input.value.length;
 
         if (currentLen > maxLen) {
-            alert("제목은 100자까지 입력 가능합니다.");
+            //alert("제목은 100자까지 입력 가능합니다.");
+            Swal.fire({text: '제목은 100자까지 입력 가능합니다.', icon: 'warning', confirmButtonText: '확인'})
+
             input.value = input.value.substring(0, maxLen);
             counter.textContent = maxLen;
         } else {

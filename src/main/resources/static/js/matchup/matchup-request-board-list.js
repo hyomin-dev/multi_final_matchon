@@ -326,7 +326,8 @@ function setDecision(card,item){
         if(matchDate<now){
             e.preventDefault();
             e.target.classList.add("disabled");
-            alert("경기 시작 시간이 지나 승인을 할 수 없습니다.");
+            //alert("경기 시작 시간이 지나 승인을 할 수 없습니다.");
+            Swal.fire({text: '경기 시작 시간이 지나 승인을 할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
         }else{
             window.location.href = `/matchup/request/approve?board-id=${item.boardId}&request-id=${item.requestId}`;
         }
@@ -337,7 +338,8 @@ function setDecision(card,item){
         if(matchDate<now){
             e.preventDefault();
             e.target.classList.add("disabled");
-            alert("경기 시작 시간이 지나 반려를 할 수 없습니다.");
+            //alert("경기 시작 시간이 지나 반려를 할 수 없습니다.");
+            Swal.fire({text: '경기 시작 시간이 지나 반려를 할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
         }else{
             window.location.href = `/matchup/request/deny?board-id=${item.boardId}&request-id=${item.requestId}`;
         }
@@ -348,7 +350,8 @@ function setDecision(card,item){
         if(matchDate<now){
             e.preventDefault();
             e.target.classList.add("disabled");
-            alert("경기 시작 시간이 지나 취소 요청 승인을 할 수 없습니다.");
+            //alert("경기 시작 시간이 지나 취소 요청 승인을 할 수 없습니다.");
+            Swal.fire({text: '경기 시작 시간이 지나 취소 요청 승인을 할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
         }else{
             window.location.href = `/matchup/request/approve?board-id=${item.boardId}&request-id=${item.requestId}`;
         }
@@ -359,7 +362,8 @@ function setDecision(card,item){
         if(matchDate<now){
             e.preventDefault();
             e.target.classList.add("disabled");
-            alert("경기 시작 시간이 지나 취소 요청 반려를 할 수 없습니다.");
+            //alert("경기 시작 시간이 지나 취소 요청 반려를 할 수 없습니다.");
+            Swal.fire({text: '경기 시작 시간이 지나 취소 요청 반려를 할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
         }else{
             window.location.href = `/matchup/request/deny?board-id=${item.boardId}&request-id=${item.requestId}`;
         }

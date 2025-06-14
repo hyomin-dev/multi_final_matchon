@@ -20,8 +20,10 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
             if (!res.ok) {
                 return res.json().then(data => {
                     if (data.error === "존재하지 않는 사용자입니다." || data.error === "탈퇴한 계정입니다.") {
-                        alert("존재하지 않는 계정입니다. 회원가입 후 이용해주세요.");
-                        window.location.href = "/signup";
+                        //alert("존재하지 않는 계정입니다. 회원가입 후 이용해주세요.");
+                        Swal.fire({text: '존재하지 않는 계정입니다. 회원가입 후 이용해주세요.', icon: 'warning', confirmButtonText: '확인'}).then(()=>{
+                            window.location.href = "/signup";
+                        });
                     } else {
                         throw new Error(data.error || "로그인 실패");
                     }
@@ -36,9 +38,10 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
                 localStorage.removeItem("showPasswordPopup");
             }
 
-            alert("로그인 성공!");
-
-            window.location.href = "/main";
+            //alert("로그인 성공!");
+            Swal.fire({text: '로그인 성공!', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                window.location.href = "/main";
+            });
         })
 });
 
@@ -106,7 +109,8 @@ document.getElementById("resetForm").addEventListener("submit", function (e) {
             document.getElementById("resetResult").style.color = "#28a745";
         })
         .catch(err => {
-            alert("에러: " + err.message);
+            //alert("에러: " + err.message);
+            Swal.fire({text: "에러: " + err.message, icon: 'warning', confirmButtonText: '확인'});
         });
 });
 

@@ -57,12 +57,28 @@ async function getMyTeamChatRooms() {
                 if(item.isBlock===true){
                     exitBtn.textContent = "해제";
                     exitBtn.addEventListener("click",(e)=>{
-                        let reply = confirm("정말 차단 해제 하시겠습니까?");
-                        if(reply){
-                            window.location.href = `/chat/room/private/team/unblock?roomId=${item.roomId}`;
-                        }else{
-                            e.preventDefault();
-                        }
+                        // let reply = confirm("정말 차단 해제 하시겠습니까?");
+                        // if(reply){
+                        //     window.location.href = `/chat/room/private/team/unblock?roomId=${item.roomId}`;
+                        // }else{
+                        //     e.preventDefault();
+                        // }
+
+                        Swal.fire({
+                            text: '정말 차단 해제 하시겠습니까?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: '예',
+                            cancelButtonText: '아니요'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // 사용자가 '네'를 눌렀을 때 처리
+                                window.location.href = `/chat/room/private/team/unblock?roomId=${item.roomId}`;
+                            } else {
+                                // 사용자가 '아니요' 눌렀을 때
+                                e.preventDefault();
+                            }
+                        });
                     });
 
                     enterBtn.disabled=true;
@@ -70,12 +86,28 @@ async function getMyTeamChatRooms() {
                 }else{
                     exitBtn.textContent = "차단";
                     exitBtn.addEventListener("click",(e)=>{
-                        let reply = confirm("정말 차단 하시겠습니까?");
-                        if(reply){
-                            window.location.href = `/chat/room/private/team/block?roomId=${item.roomId}`;
-                        }else{
-                            e.preventDefault();
-                        }
+                        // let reply = confirm("정말 차단 하시겠습니까?");
+                        // if(reply){
+                        //     window.location.href = `/chat/room/private/team/block?roomId=${item.roomId}`;
+                        // }else{
+                        //     e.preventDefault();
+                        // }
+
+                        Swal.fire({
+                            text: '정말 차단 하시겠습니까?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: '예',
+                            cancelButtonText: '아니요'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // 사용자가 '네'를 눌렀을 때 처리
+                                window.location.href = `/chat/room/private/team/block?roomId=${item.roomId}`;
+                            } else {
+                                // 사용자가 '아니요' 눌렀을 때
+                                e.preventDefault();
+                            }
+                        });
                     });
 
                     enterBtn.addEventListener("click",()=>{

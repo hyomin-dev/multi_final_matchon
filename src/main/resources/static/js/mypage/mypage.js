@@ -50,7 +50,11 @@ function getCookie(name) {
 
 function submitMypage() {
     const token = getCookie("Authorization");
-    if (!token) return alert("로그인이 필요합니다.");
+    if (!token) {
+        //alert("로그인이 필요합니다.");
+        Swal.fire({text: '로그인이 필요합니다.', icon: 'warning', confirmButtonText: '확인'});
+        return
+    }
 
     const data = {
         positionName: document.getElementById("positionSelect").value,
@@ -67,17 +71,26 @@ function submitMypage() {
         body: JSON.stringify(data)
     }).then(res => {
         if (res.ok) {
-            alert("수정 완료!");
-            location.reload(); // 수정 후 반영되도록 새로고침
+            //alert("수정 완료!");
+            Swal.fire({text: '수정 완료!', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                location.reload(); // 수정 후 반영되도록 새로고침
+            });
         } else {
-            res.text().then(msg => alert("오류: " + msg));
-        }
-    });
+            res.text().then(msg => {
+                //alert("오류: " + msg);
+                Swal.fire({text: "오류: " + msg, icon: 'warning', confirmButtonText: '확인'});
+            });
+            }
+        });
 }
 
 function uploadProfile() {
     const file = document.getElementById("profileImageInput").files[0];
-    if (!file) return alert("파일을 선택해주세요.");
+    if (!file) {
+        //alert("파일을 선택해주세요.");
+        Swal.fire({text: '파일을 선택해주세요.', icon: 'warning', confirmButtonText: '확인'});
+        return
+    }
     const formData = new FormData();
     formData.append("profileImage", file);
 
@@ -87,13 +100,20 @@ function uploadProfile() {
         credentials: "include"
     }).then(res => {
         if (res.ok) location.reload();
-        else res.text().then(msg => alert("오류: " + msg));
+        else res.text().then(msg => {
+            //alert("오류: " + msg);
+            Swal.fire({text: "오류: " + msg, icon: 'warning', confirmButtonText: '확인'});
+        });
     });
 }
 
 function submitHostName() {
     const name = document.getElementById("hostNameInput").value.trim();
-    if (!name) return alert("기관명을 입력해주세요.");
+    if (!name) {
+        //alert("기관명을 입력해주세요.");
+        Swal.fire({text: '기관명을 입력해주세요.', icon: 'warning', confirmButtonText: '확인'});
+        return
+    }
     fetch("/mypage/hostName", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -101,6 +121,9 @@ function submitHostName() {
         credentials: "include"
     }).then(res => {
         if (res.ok) location.reload();
-        else res.text().then(msg => alert("오류: " + msg));
+        else res.text().then(msg => {
+            //alert("오류: " + msg);
+            Swal.fire({text: "오류: " + msg, icon: 'warning', confirmButtonText: '확인'});
+        });
     });
 }

@@ -151,7 +151,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function submitSelectedDate() {
     if (!selectedDate) {
-        alert("날짜를 선택해주세요.");
+        //alert("날짜를 선택해주세요.");
+        Swal.fire({text: '⚠날짜를 선택해주세요.', icon: 'warning', confirmButtonText: '확인'})
         return;
     }
 
@@ -159,7 +160,8 @@ function submitSelectedDate() {
     selected.setHours(0, 0, 0, 0);
 
     if (selected < today) {
-        alert("📅 과거 날짜에는 대회를 등록할 수 없습니다.");
+        //alert("📅 과거 날짜에는 대회를 등록할 수 없습니다.");
+        Swal.fire({text: '📅 과거 날짜에는 대회를 등록할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'})
         return;
     }
 

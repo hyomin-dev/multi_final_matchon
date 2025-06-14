@@ -22,7 +22,8 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     const emailCheck = await fetch(`/auth/check-email?email=${encodeURIComponent(email)}`);
     const emailResult = await emailCheck.json();
     if (emailResult.exists) {
-        alert("이미 사용 중인 이메일입니다.");
+        //alert("이미 사용 중인 이메일입니다.");
+        Swal.fire({text: '이미 사용 중인 이메일입니다.', icon: 'warning', confirmButtonText: '확인'});
         return;
     }
 
@@ -40,11 +41,14 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     })
         .then(res => {
             if (res.ok) {
-                alert("회원가입 성공!");
+                //alert("회원가입 성공!");
+                Swal.fire({text: '회원가입 성공!', icon: 'success', confirmButtonText: '확인'});
+
                 window.location.href = "/login";
             } else {
                 return res.json().then(data => {
-                    alert(data.error || "회원가입 실패");
+                    //alert(data.error || "회원가입 실패");
+                    Swal.fire({text: data.error || "회원가입 실패", icon: 'warning', confirmButtonText: '확인'});
                 });
             }
         });

@@ -152,7 +152,9 @@ document.getElementById('myTeamBtn').addEventListener('click', async () => {
         document.getElementById('backToAllBtn').style.display = 'inline-block';
     } catch (err) {
         console.error("❌ 내 팀 정보 로딩 실패:", err);
-        alert("소속된 팀이 없습니다.");
+        //alert("소속된 팀이 없습니다.");
+        Swal.fire({text: '소속된 팀이 없습니다.', icon: 'warning', confirmButtonText: '확인'});
+
         document.getElementById('backToAllBtn').style.display = 'inline-block';
     }
 
