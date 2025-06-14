@@ -144,7 +144,7 @@ function submitCheck(e){
     } else{
 
        // let reply = confirm("경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?");
-
+        e.preventDefault();
         Swal.fire({
             text: '경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?',
             icon: 'warning',
@@ -155,11 +155,18 @@ function submitCheck(e){
             if (result.isConfirmed) {
                 // 사용자가 '네'를 눌렀을 때 처리
                     //alert("게시글이 등록되었습니다.");
-                    Swal.fire({text: '게시글이 등록되었습니다.', icon: 'success', confirmButtonText: '확인'});
-            } else {
-                // 사용자가 '아니요' 눌렀을 때
-                //window.history.back();
-                e.preventDefault();
+                    //Swal.fire({text: '게시글이 등록되었습니다.', icon: 'success', confirmButtonText: '확인'});
+                    // 기본 제출 막기
+                    Swal.fire({
+                        text: '게시글이 등록되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    }).then((result2) => {
+                        if (result2.isConfirmed) {
+                            // 버튼에서 올라가며 가장 가까운 form 찾기
+                            e.target.closest("form").submit();
+                        }
+                    });
             }
         });
 
