@@ -178,7 +178,8 @@ function sendMessage() {
     try{
         stompClient.send(`/publish/${roomId}`, JSON.stringify(content));
     }catch (e){
-        alert("메시지 전송에 실패했습니다.");
+        //alert("메시지 전송에 실패했습니다.");
+        Swal.fire({text: '메시지 전송에 실패했습니다.', icon: 'warning', confirmButtonText: '확인'});
     }
 
     messageInput.value = '';
@@ -408,25 +409,52 @@ function setButton(card,item){
 
         // 차단해제하는 경우
         exitBtn.addEventListener("click",async (e)=>{
-            let reply = confirm("정말 차단 해제 하시겠습니까?");
+            // let reply = confirm("정말 차단 해제 하시겠습니까?");
+            //
+            // if(reply){
+            //     try{
+            //         const response = await fetch(`/chat/room/private/api/unblock?roomId=${item.privateRoomId}`,{
+            //             method: "GET",
+            //             credentials: "include"
+            //         });
+            //         if(!response.ok)
+            //             throw new Error(`HTTP error! Status:${response.status}`);
+            //         initParticipantList();
+            //
+            //     }catch (err){
+            //         console.log(err);
+            //     }
+            //
+            // }else{
+            //     e.preventDefault();
+            // }
 
-            if(reply){
-                try{
-                    const response = await fetch(`/chat/room/private/api/unblock?roomId=${item.privateRoomId}`,{
-                        method: "GET",
-                        credentials: "include"
-                    });
-                    if(!response.ok)
-                        throw new Error(`HTTP error! Status:${response.status}`);
-                    initParticipantList();
+            Swal.fire({
+                text: '정말 차단 해제 하시겠습니까?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '예',
+                cancelButtonText: '아니요'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    // 사용자가 '네'를 눌렀을 때 처리
+                    try{
+                        const response = await fetch(`/chat/room/private/api/unblock?roomId=${item.privateRoomId}`,{
+                            method: "GET",
+                            credentials: "include"
+                        });
+                        if(!response.ok)
+                            throw new Error(`HTTP error! Status:${response.status}`);
+                        initParticipantList();
 
-                }catch (err){
-                    console.log(err);
+                    }catch (err){
+                        console.log(err);
+                    }
+                } else {
+                    // 사용자가 '아니요' 눌렀을 때
+                    e.preventDefault();
                 }
-
-            }else{
-                e.preventDefault();
-            }
+            });
         });
 
 
@@ -440,25 +468,52 @@ function setButton(card,item){
 
         // 차단하는 경우
         exitBtn.addEventListener("click",async (e)=>{
-            let reply = confirm("정말 차단 하시겠습니까?");
+            // let reply = confirm("정말 차단 하시겠습니까?");
+            //
+            // if(reply){
+            //     try{
+            //         const response = await fetch(`/chat/room/private/api/block?roomId=${item.privateRoomId}`,{
+            //             method: "GET",
+            //             credentials: "include"
+            //         });
+            //         if(!response.ok)
+            //             throw new Error(`HTTP error! Status:${response.status}`);
+            //         initParticipantList();
+            //
+            //     }catch (err){
+            //         console.log(err);
+            //     }
+            //
+            // }else{
+            //     e.preventDefault();
+            // }
 
-            if(reply){
-                try{
-                    const response = await fetch(`/chat/room/private/api/block?roomId=${item.privateRoomId}`,{
-                        method: "GET",
-                        credentials: "include"
-                    });
-                    if(!response.ok)
-                        throw new Error(`HTTP error! Status:${response.status}`);
-                    initParticipantList();
+            Swal.fire({
+                text: '정말 차단 하시겠습니까?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '예',
+                cancelButtonText: '아니요'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    // 사용자가 '네'를 눌렀을 때 처리
+                    try{
+                        const response = await fetch(`/chat/room/private/api/block?roomId=${item.privateRoomId}`,{
+                            method: "GET",
+                            credentials: "include"
+                        });
+                        if(!response.ok)
+                            throw new Error(`HTTP error! Status:${response.status}`);
+                        initParticipantList();
 
-                }catch (err){
-                    console.log(err);
+                    }catch (err){
+                        console.log(err);
+                    }
+                } else {
+                    // 사용자가 '아니요' 눌렀을 때
+                    e.preventDefault();
                 }
-
-            }else{
-                e.preventDefault();
-            }
+            });
         });
 
     }else {

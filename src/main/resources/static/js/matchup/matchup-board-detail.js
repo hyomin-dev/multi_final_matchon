@@ -191,7 +191,8 @@ function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCoun
             if(matchDate<=now){
                 e.preventDefault();
                 modifyBtn.href = "#";
-                alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+                //alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+                Swal.fire({text: '경기 시작 시간이 지나 수정할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
             }
        });
 
@@ -200,7 +201,8 @@ function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCoun
             if(matchDate<=now){
                 e.preventDefault();
                 deleteBtn.href = "#";
-                alert("경기 시작 시간이 지나 삭제할 수 없습니다.");
+                //alert("경기 시작 시간이 지나 삭제할 수 없습니다.");
+                Swal.fire({text: '경기 시작 시간이 지나 삭제할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
             }
         });
     } else if(writerEmail !==loginEmail){ // 문의하기, 참가요청 버튼
@@ -212,7 +214,8 @@ function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCoun
             if(matchDate<=now){
                 e.preventDefault();
                 chatBtn.href = "#";
-                alert("경기 시작 시간이 지나 1대1 문의를 할 수 없습니다.")
+                //alert("경기 시작 시간이 지나 1대1 문의를 할 수 없습니다.")
+                Swal.fire({text: '경기 시작 시간이 지나 1대1 문의를 할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
             }
         });
 
@@ -221,15 +224,18 @@ function setButton(matchDatetime, writerEmail, loginEmail,currentParticipantCoun
             if(matchDate<=now){
                 e.preventDefault();
                 requestBtn.href = "#";
-                alert("경기 시작 시간이 지나 참가 요청을 할 수 없습니다.")
+                //alert("경기 시작 시간이 지나 참가 요청을 할 수 없습니다.")
+                Swal.fire({text: '경기 시작 시간이 지나 참가 요청을 할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
             }else if(minMannerTemperature>myMannerTemperature){  // 매너 온도 충족 안된 경우
                 e.preventDefault();
                 requestBtn.href = "#";
-                alert("입장 가능 매너 온도를 충족하지 못해 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+                //alert("입장 가능 매너 온도를 충족하지 못해 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+                Swal.fire({text: '입장 가능 매너 온도를 충족하지 못해 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.', icon: 'warning', confirmButtonText: '확인'});
             }else if(currentParticipantCount >=maxParticipants) {  // 참가 인원 다 찬 경우
                 e.preventDefault();
                 chatBtn.href = "#";
-                alert("현재 참가 요청 인원이 다 모집되어, 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+                //alert("현재 참가 요청 인원이 다 모집되어, 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.")
+                Swal.fire({text: '현재 참가 요청 인원이 다 모집되어, 신청이 불가능합니다. 작성자에게 1:1 문의해보세요.', icon: 'warning', confirmButtonText: '확인'});
             }
         });
 

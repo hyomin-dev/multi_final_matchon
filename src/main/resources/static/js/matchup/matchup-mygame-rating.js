@@ -266,21 +266,26 @@ function submitCheck(e){
     // 1. 리뷰 글자 수 검사
     if(isExceedCharlimit(reviewEle.value.length, 300)){
         e.preventDefault();
-        alert("리뷰는 300자 내로 작성해주세요.")
+        //alert("리뷰는 300자 내로 작성해주세요.");
+        Swal.fire({text: '리뷰는 300자 내로 작성해주세요.', icon: 'warning', confirmButtonText: '확인'});
     }
 
 
     if(mannerScoreEle.value ===""){
-        alert("매너 점수를 입력하세요.");
+        //alert("매너 점수를 입력하세요.");
+        Swal.fire({text: '매너 점수를 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(skillScoreEle.value ===""){
-        alert("실력 점수를 입력하세요.");
+        //alert("실력 점수를 입력하세요.");
+        Swal.fire({text: '실력 점수를 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(reviewEle.value ===""){
-        alert("리뷰를 입력하세요");
+        //alert("리뷰를 입력하세요.");
+        Swal.fire({text: '리뷰를 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else{
-        alert("매너 후기가 전송되었습니다.");
+        //alert("매너 후기가 전송되었습니다.");
+        Swal.fire({text: '매너 후기가 전송되었습니다.', icon: 'warning', confirmButtonText: '확인'});
     }
 }
 

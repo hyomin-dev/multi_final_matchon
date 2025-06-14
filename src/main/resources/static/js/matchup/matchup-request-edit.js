@@ -46,20 +46,25 @@ function submitCheck(e, matchDatetime){
     // 1. 자기소개 글자 수 검사
     if(isExceedCharlimit(selfIntroEle.value.length, 300)){
         e.preventDefault();
-        alert("자기소개는 300자 내로 작성해주세요.")
+        //alert("자기소개는 300자 내로 작성해주세요.");
+        Swal.fire({text: '자기소개는 300자 내로 작성해주세요.', icon: 'warning', confirmButtonText: '확인'});
     }
 
     if(selfIntroEle.value ===""){
-        alert("자기 소개를 입력하세요.");
+        //alert("자기 소개를 입력하세요.");
+        Swal.fire({text: '자기 소개를 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     }else if(participantCountEle.value === ""){
-        alert("참가 인원을 입력하세요.");
+        //alert("참가 인원을 입력하세요.");
+        Swal.fire({text: '참가 인원을 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     }else if(date<=now){
         e.preventDefault();
-        alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+        //alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+        Swal.fire({text: '경기 시작 시간이 지나 수정할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
     }else{
-        alert("요청 수정이 완료되었습니다.");
+        //alert("요청 수정이 완료되었습니다.");
+        Swal.fire({text: '요청 수정이 완료되었습니다.', icon: 'success', confirmButtonText: '확인'});
     }
 
 }
