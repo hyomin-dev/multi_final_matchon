@@ -3,11 +3,17 @@ body {
     background-color: #fff;
 }
 
+
+footer {
+    padding: 0;
+    margin: 0;
+}
+
 .mypage-container {
     background-color: #fff;
     display: flex;
     max-width: 1280px;
-    margin: 50px auto;
+    margin: 120px auto;
     gap: 40px;
     padding: 0 20px;
 }
