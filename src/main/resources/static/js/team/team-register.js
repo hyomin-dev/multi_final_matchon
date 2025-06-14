@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Success: redirect or show message
-            alert('팀이 성공적으로 생성되었습니다!');
+            //alert('팀이 성공적으로 생성되었습니다!');
             Swal.fire({text: '팀이 성공적으로 생성되었습니다!', icon: 'success', confirmButtonText: '확인'}).then(()=>{
                 window.location.href = '/team'; // or wherever you want to redirect
             });
