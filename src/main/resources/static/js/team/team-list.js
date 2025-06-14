@@ -64,23 +64,32 @@ function loadTeamPage(page) {
             });
             container.style.display = 'block';  // ✅ add this right after the forEach loop
 
-            // Previous button
-            if (!pageInfo.isFirst) {
-                paging.innerHTML += `<button onclick="loadTeamPage(${page - 1})">이전</button>`;
-            }
+            paging.innerHTML = '';
+            const pagination = document.createElement('div');
+            pagination.className = 'pagination';
+            paging.appendChild(pagination);
 
-            // Page number buttons
-            for (let i = 0; i < pageInfo.totalPages; i++) {
-                paging.innerHTML += `
-        <button onclick="loadTeamPage(${i})" ${i === page ? 'style="font-weight:bold;"' : ''}>
-            ${i + 1}
-        </button>
+// Previous
+            if (!pageInfo.isFirst) {
+                pagination.innerHTML += `
+        <a href="#" class="page-link" onclick="loadTeamPage(${page - 1}); return false;">이전</a>
     `;
             }
 
-            // Next button
+// Page Numbers
+            for (let i = 0; i < pageInfo.totalPages; i++) {
+                pagination.innerHTML += `
+        <a href="#" class="page-link ${i === page ? 'active' : ''}" onclick="loadTeamPage(${i}); return false;">
+            ${i + 1}
+        </a>
+    `;
+            }
+
+// Next
             if (!pageInfo.isLast) {
-                paging.innerHTML += `<button onclick="loadTeamPage(${page + 1})">다음</button>`;
+                pagination.innerHTML += `
+        <a href="#" class="page-link" onclick="loadTeamPage(${page + 1}); return false;">다음</a>
+    `;
             }
 
             currentPage = page;

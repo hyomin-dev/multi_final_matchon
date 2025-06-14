@@ -689,9 +689,21 @@ public class TeamService {
         }
 
 
+        if (dto.getRecruitingPositions() == null || dto.getRecruitingPositions().isEmpty()) {
+            throw new IllegalArgumentException("한 개 이상의 포지션을 선택해야 합니다.");
+        }
+
+
         Team team = teamRepository.findByIdNotDeleted(dto.getTeamId())
 
                 .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+
+        if (!team.getTeamName().equals(dto.getTeamName())) {
+            boolean exists = teamRepository.existsByTeamNameAndIsDeletedFalse(dto.getTeamName());
+            if (exists) {
+                throw new IllegalArgumentException("이미 존재하는 팀 이름입니다.");
+            }
+        }
 
         Member member = memberRepository.findByMemberEmail(user.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));

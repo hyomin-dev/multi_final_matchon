@@ -143,12 +143,6 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-#paging-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
 /* 별점 시각화 */
 .star-rating {
     position: relative;
@@ -181,33 +175,28 @@
     flex-wrap: wrap;
     gap: 6px;
     font-family: 'Segoe UI', sans-serif;
+    margin-bottom: 40px; /* ⬅️ Ensures breathing room above footer */
+
 }
 
-#paging-container a {
-    display: inline-block;
-    min-width: 38px;
+.pagination a {
+    margin: 0 5px;
     padding: 8px 14px;
-    margin: 0 2px;
-    font-size: 15px;
-    color: #333;
-    text-align: center;
-    text-decoration: none;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    background-color: white;
-    transition: all 0.3s ease;
+    border-radius: 4px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
 }
 
-#paging-container a:hover {
-    background-color: #f0f0f0;
-    color: black;
-}
-
-#paging-container a.active {
+.pagination a.active {
     background-color: dodgerblue;
     color: white;
     border-color: dodgerblue;
-    font-weight: bold;
+}
+
+.pagination a:hover {
+    background-color: #e0e0e0;
 }
 
 #paging-container a.disabled {

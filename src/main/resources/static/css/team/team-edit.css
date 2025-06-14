@@ -43,7 +43,9 @@
 }
 
 .team-edit-form textarea {
-    resize: vertical;
+    resize: none;       /* Prevents user resizing */
+    height: 120px;       /* Fixed height */
+    line-height: 1.5;    /* Optional: Better text spacing */
 }
 
 .team-edit-form .field-error,
@@ -94,4 +96,11 @@
     padding: 10px;
     border: 1px solid red;
     margin-bottom: 16px;
+}
+.team-edit-form .button-group button[type="submit"]:hover {
+    background-color: royalblue;
+}
+
+.team-edit-form .button-group button[type="button"]:hover {
+    background-color: #aaa;
 }
