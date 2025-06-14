@@ -29,7 +29,8 @@
                     class="profile" th:text="${isDefaultProfile} ? '사진 등록' : '사진 수정'"></button>
 
             <div th:unless="${isDefaultProfile}">
-                <button type="button" class="delete-button" onclick="deleteProfile()">사진 삭제</button>
+                <button type="button" class="delete-button" onclick="deleteProfile()">
+                    <img src="/img/delete.png" alt="삭제 아이콘" class="delete-icon" />사진 삭제</button>
             </div>
         </div>
 
@@ -73,7 +74,7 @@
                         <td>
                             <input type="text" id="hostNameInput" th:value="${hostName}" placeholder="기관명 입력" />
                             <button type="button" class="host-submit" onclick="submitHostName()">등록</button>
-                            <button type="button" id="scheduleButton">대회 등록하러 가기</button>
+                            <button type="button" id="scheduleButton">대회 등록</button>
                         </td>
                     </tr>
                     <tr>
