@@ -112,7 +112,23 @@
 
 <script>
     function suspendUser(event, memberId, days) {
-        if (!confirm("정말로 회원 계정을 정지하시겠습니까?")) return;
+        //if (!confirm("정말로 회원 계정을 정지하시겠습니까?")) return;
+
+        Swal.fire({
+            text: '정말로 회원 계정을 정지하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                return;
+            }
+        });
 
         const formData = new URLSearchParams();
         formData.append("memberId", memberId);
@@ -129,17 +145,22 @@
         })
             .then(res => {
                 if (res.ok) {
-                    alert("회원 정지가 완료되었습니다.");
-                    location.reload();
+                    //alert("회원 정지가 완료되었습니다.");
+                    Swal.fire({text: '회원 정지가 완료되었습니다.', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                        location.reload();
+                    })
+                    //location.reload();
                 } else {
                     res.json().then(data => {
-                        alert(data.message || "정지 실패");
+                        //alert(data.message || "정지 실패");
+                        Swal.fire({text: data.message || "정지 실패", icon: 'warning', confirmButtonText: '확인'});
                     });
                 }
             })
             .catch(err => {
                 console.error(err);
-                alert("요청 중 오류 발생");
+                //alert("요청 중 오류 발생");
+                Swal.fire({text: '요청 중 오류 발생', icon: 'warning', confirmButtonText: '확인'});
             });
     }
 
@@ -161,7 +182,23 @@
     }
 
     function unsuspendUser(event, memberId) {
-        if (!confirm("정말로 정지를 해제하시겠습니까?")) return;
+        //if (!confirm("정말로 정지를 해제하시겠습니까?")) return;
+
+        Swal.fire({
+            text: '정말로 정지를 해제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                return;
+            }
+        });
 
         const formData = new URLSearchParams();
         formData.append("memberId", memberId);
@@ -175,17 +212,22 @@
         })
             .then(res => {
                 if (res.ok) {
-                    alert("회원 정지가 해제되었습니다.");
-                    restoreSuspendButtons(memberId);
+                    //alert("회원 정지가 해제되었습니다.");
+                    Swal.fire({text: '회원 정지가 해제되었습니다.', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                        restoreSuspendButtons(memberId);
+                    })
+                    //restoreSuspendButtons(memberId);
                 } else {
                     res.json().then(data => {
-                        alert(data.message || "해제 실패");
+                        //alert(data.message || "해제 실패");
+                        Swal.fire({text: data.message || "해제 실패", icon: 'warning', confirmButtonText: '확인'});
                     });
                 }
             })
             .catch(err => {
                 console.error(err);
-                alert("요청 중 오류 발생");
+                //alert("요청 중 오류 발생");
+                Swal.fire({text: '요청 중 오류 발생', icon: 'warning', confirmButtonText: '확인'});
             });
     }
 

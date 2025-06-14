@@ -26,16 +26,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     const text = await response.text();
                     if (text) errorMsg = text;
                 }
-                alert(errorMsg);
+                //alert(errorMsg);
+                Swal.fire({text: errorMsg, icon: 'warning', confirmButtonText: '확인'});
                 return;
             }
 
             // Success: redirect or show message
             alert('팀이 성공적으로 생성되었습니다!');
-            window.location.href = '/team'; // or wherever you want to redirect
+            Swal.fire({text: '팀이 성공적으로 생성되었습니다!', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                window.location.href = '/team'; // or wherever you want to redirect
+            });
 
         } catch (error) {
-            alert('알 수 없는 오류가 발생했습니다.');
+            //alert('알 수 없는 오류가 발생했습니다.');
+            Swal.fire({text: '알 수 없는 오류가 발생했습니다.', icon: 'warning', confirmButtonText: '확인'});
+
             console.error(error);
         }
     });

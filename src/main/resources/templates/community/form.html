@@ -100,9 +100,27 @@
 
 <script th:inline="javascript">
     function confirmCancel() {
-        if (confirm("작성 중인 내용이 삭제됩니다. 목록으로 돌아가시겠습니까?")) {
-            window.location.href = "/community";
-        }
+        // if (confirm("작성 중인 내용이 삭제됩니다. 목록으로 돌아가시겠습니까?")) {
+        //     window.location.href = "/community";
+        // }
+
+        Swal.fire({
+            text: '작성 중인 내용이 삭제됩니다. 목록으로 돌아가시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+                window.location.href = "/community";
+
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+
+            }
+        });
+
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -151,7 +169,9 @@
             const plainText = editor.getMarkdown().replace(/[\n\r]/g, '').trim();
 
             if (!plainText) {
-                alert("내용은 필수입니다.");
+                //alert("내용은 필수입니다.");
+                Swal.fire({text: '내용은 필수입니다.', icon: 'warning', confirmButtonText: '확인'});
+
                 e.preventDefault();
                 return;
             }
@@ -245,13 +265,19 @@
                     deletedIds.add(attachmentId);
                     document.getElementById("deletedAttachmentIds").value = Array.from(deletedIds).join(",");
                 } else if (response.status === 403) {
-                    alert("삭제 권한이 없습니다.");
+                    //alert("삭제 권한이 없습니다.");
+                    Swal.fire({text: '삭제 권한이 없습니다.', icon: 'warning', confirmButtonText: '확인'});
+
                 } else {
-                    alert("삭제 실패");
+                    //alert("삭제 실패");
+                    Swal.fire({text: '삭제 실패', icon: 'warning', confirmButtonText: '확인'});
+
                 }
             }).catch(err => {
                 console.error("삭제 요청 오류:", err);
-                alert("오류 발생");
+                //alert("오류 발생");
+                Swal.fire({text: '오류 발생', icon: 'warning', confirmButtonText: '확인'});
+
             });
         }
     });

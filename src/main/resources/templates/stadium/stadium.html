@@ -223,11 +223,11 @@
             }, function (error) {
                 console.error("현 위치 가져오기 실패", error);
                 //alert('위치 정보를 가져오지 못했습니다.');
-                Swal.fire('완료!', '위치 정보를 가져오지 못했습니다.', 'success');
+                Swal.fire({text: '위치 정보를 가져오지 못했습니다.', icon: 'warning', confirmButtonText: '확인'});
             });
         } else {
             //alert('이 브라우저에서는 Geolocation을 지원하지 않습니다.');
-            Swal.fire('완료!', '이 브라우저에서는 Geolocation을 지원하지 않습니다.', 'success');
+            Swal.fire({text: '이 브라우저에서는 Geolocation을 지원하지 않습니다.', icon: 'warning', confirmButtonText: '확인'});
         }
 
 
@@ -369,8 +369,7 @@
 
             if (!found) {
                 //alert("일치하는 구장이 없습니다.");
-                Swal.fire('완료!', '일치하는 구장이 없습니다.', 'success');
-
+                Swal.fire({text: '일치하는 구장이 없습니다.', icon: 'warning', confirmButtonText: '확인'});
             }
         };
     });
@@ -405,12 +404,12 @@
 
             }, function (error) {
                 //alert('현 위치 정보를 가져올 수 없습니다.');
-                Swal.fire('완료!', '현 위치 정보를 가져올 수 없습니다.', 'success');
+                Swal.fire({text: '현 위치 정보를 가져올 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
 
             });
         } else {
             //alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
-            Swal.fire('완료!', '이 브라우저는 위치 정보를 지원하지 않습니다.', 'success');
+            Swal.fire({text: '이 브라우저는 위치 정보를 지원하지 않습니다.\'', icon: 'warning', confirmButtonText: '확인'});
 
         }
     }

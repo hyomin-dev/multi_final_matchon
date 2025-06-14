@@ -54,12 +54,30 @@
 
             window.location.href = `/chat/my/room?roomId=${roomId}`;
         } catch (err) {
-            alert("채팅방 연결 실패: " + err.message);
+            //alert("채팅방 연결 실패: " + err.message);
+            Swal.fire({text: "채팅방 연결 실패: " + err.message, icon: 'warning', confirmButtonText: '확인'});
+
         }
     });
 
     async function approveRequest(requestId) {
-        if (!confirm("정말로 승인하시겠습니까?")) return;
+        //if (!confirm("정말로 승인하시겠습니까?")) return;
+
+        Swal.fire({
+            text: '정말로 승인하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                return
+            }
+        });
 
         try {
             const res = await fetch(`/team/team/join-request/${requestId}/approve`, {
@@ -70,30 +88,57 @@
 
             if (!res.ok || !result.success) {
                 // ❗ Show backend error message (like "이미 팀이 있는 사용자 입니다")
-                alert(result.message || "가입 승인 중 오류가 발생했습니다.");
+                //alert(result.message || "가입 승인 중 오류가 발생했습니다.");
+                Swal.fire({text: result.message || "가입 승인 중 오류가 발생했습니다.", icon: 'warning', confirmButtonText: '확인'});
+
                 return;
             }
 
-            alert("가입 요청이 승인되었습니다.");
+            //alert("가입 요청이 승인되었습니다.");
+            Swal.fire({text: '가입 요청이 승인되었습니다.', icon: 'success', confirmButtonText: '확인'});
+
             window.location.href = "/team"; // Or redirect to the request list
 
         } catch (err) {
-            alert("승인 중 네트워크 오류가 발생했습니다.");
+            //alert("승인 중 네트워크 오류가 발생했습니다.");
+            Swal.fire({text: '승인 중 네트워크 오류가 발생했습니다.', icon: 'warning', confirmButtonText: '확인'});
+
             console.error(err);
         }
     }
 
 
     function rejectRequest(requestId) {
-        if (!confirm("정말로 거절하시겠습니까?")) return;
+        //if (!confirm("정말로 거절하시겠습니까?")) return;
+
+        Swal.fire({
+            text: '정말로 거절하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                return
+            }
+        });
 
         fetch(`/team/team/join-request/${requestId}/reject`, {
             method: 'POST'
         }).then(res => {
             if (!res.ok) throw new Error();
-            alert("가입 요청이 거절되었습니다.");
+            //alert("가입 요청이 거절되었습니다.");
+            Swal.fire({text: '가입 요청이 거절되었습니다.', icon: 'warning', confirmButtonText: '확인'});
+
             window.location.href = "/team";
-        }).catch(() => alert("거절에 실패했습니다."));
+        }).catch(() => {
+            //alert("거절에 실패했습니다.");
+            Swal.fire({text: '거절에 실패했습니다.', icon: 'warning', confirmButtonText: '확인'});
+        });
     }
 </script>
 

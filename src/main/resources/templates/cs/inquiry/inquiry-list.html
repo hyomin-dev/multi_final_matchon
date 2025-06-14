@@ -103,7 +103,8 @@
 
         keywordInput.addEventListener('input', function () {
             if (this.value.length >= 20) {
-                alert("검색은 최대 20자까지 입력 가능합니다.");
+                //alert("검색은 최대 20자까지 입력 가능합니다.");
+                Swal.fire({text: '검색은 최대 20자까지 입력 가능합니다.', icon: 'warning', confirmButtonText: '확인'})
             }
         });
 

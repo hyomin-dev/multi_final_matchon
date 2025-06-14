@@ -161,8 +161,18 @@
         const scheduleButton = document.getElementById("scheduleButton");
         scheduleButton?.addEventListener("click", () => {
             const hostNameInput = document.getElementById("hostNameInput")?.value.trim();
-            if (!hostNameInput || hostNameInput.toLowerCase() === "null") return alert("기관명을 입력해주세요.");
-            if (!hostName || hostName.trim().toLowerCase() !== hostNameInput.toLowerCase()) return alert("등록 버튼을 먼저 누르세요.");
+            if (!hostNameInput || hostNameInput.toLowerCase() === "null") {
+                //alert("기관명을 입력해주세요.");
+                Swal.fire({text: '기관명을 입력해주세요.', icon: 'warning', confirmButtonText: '확인'});
+
+                return
+            }
+            if (!hostName || hostName.trim().toLowerCase() !== hostNameInput.toLowerCase()){
+                //alert("등록 버튼을 먼저 누르세요.");
+                Swal.fire({text: '등록 버튼을 먼저 누르세요.', icon: 'warning', confirmButtonText: '확인'});
+                return
+            }
+
             location.href = "/schedule";
         });
 
@@ -193,12 +203,19 @@
             credentials: "include"
         }).then(res => {
             if (res.ok) {
-                alert("메일 수신 설정이 변경되었습니다.");
+                //alert("메일 수신 설정이 변경되었습니다.");
+                Swal.fire({text: '메일 수신 설정이 변경되었습니다.', icon: 'success', confirmButtonText: '확인'});
+
             } else {
-                res.text().then(msg => alert("변경 실패: " + msg));
+                res.text().then(msg => {
+                    //alert("변경 실패: " + msg)
+                    Swal.fire({text: "변경 실패: " + msg, icon: 'warning', confirmButtonText: '확인'});
+                });
             }
         }).catch(err => {
-            alert("요청 중 오류가 발생했습니다: " + err.message);
+            //alert("요청 중 오류가 발생했습니다: " + err.message);
+            Swal.fire({text: "요청 중 오류가 발생했습니다: " + err.message, icon: 'warning', confirmButtonText: '확인'});
+
         });
     }
 
@@ -220,18 +237,38 @@
                     if (res.ok) location.reload();
                     else {
                         res.text().then(msg => {
-                            alert("업로드 실패: " + msg);
+                            //alert("업로드 실패: " + msg);
+                            Swal.fire({text: "업로드 실패: " + msg, icon: 'warning', confirmButtonText: '확인'});
+
                         });
                     }
                 }).catch(err => {
-                    alert("서버 오류가 발생했습니다: " + err.message);
+                    //alert("서버 오류가 발생했습니다: " + err.message);
+                    Swal.fire({text: "서버 오류가 발생했습니다: " + err.message, icon: 'warning', confirmButtonText: '확인'});
                 });
             }
         };
     }
 
     function deleteProfile() {
-        if (!confirm("정말로 프로필 사진을 삭제하시겠습니까?")) return;
+        // if (!confirm("정말로 프로필 사진을 삭제하시겠습니까?")) return;
+
+        Swal.fire({
+            text: '정말로 프로필 사진을 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                return;
+            }
+        });
+
         fetch("/mypage/deleteProfile", {
             method: "DELETE",
             credentials: "include"
@@ -241,14 +278,22 @@
                 uploadBtn.textContent = "사진 등록"; // 텍스트 변경
                 location.reload(); // 또는 필요시 새로고침
             } else {
-                res.text().then(msg => alert("삭제 실패: " + msg));
+                res.text().then(msg => {
+                    //alert("삭제 실패: " + msg);
+                    Swal.fire({text: "삭제 실패: " + msg, icon: 'warning', confirmButtonText: '확인'});
+                });
             }
         });
     }
 
     function submitMypage() {
         const token = getCookie("Authorization");
-        if (!token) return alert("로그인이 필요합니다.");
+        if (!token) {
+            //alert("로그인이 필요합니다.");
+            Swal.fire({text: "로그인이 필요합니다.", icon: 'warning', confirmButtonText: '확인'});
+            return
+        }
+
         // const temperature = parseFloat(document.getElementById("temperatureInput").value);
         // if (temperature < 30) return alert("마이온도는 30도 이상이어야 합니다.");
         const data = {
@@ -265,17 +310,31 @@
             body: JSON.stringify(data)
         }).then(res => {
             if (res.ok) location.reload();
-            else res.text().then(msg => alert("오류: " + msg));
+            else res.text().then(msg => {
+                //alert("오류: " + msg);
+                Swal.fire({text: "오류: " + msg, icon: 'warning', confirmButtonText: '확인'});
+            });
+
         });
     }
 
     function submitHostName() {
         const name = document.getElementById("hostNameInput").value.trim();
-        if (!name) return alert("기관명을 입력해주세요.");
+        if (!name) {
+            //alert("기관명을 입력해주세요.");
+            Swal.fire({text: '기관명을 입력해주세요.', icon: 'warning', confirmButtonText: '확인'});
+            return
+        }
+
         fetch(`/mypage/hostName/exist?name=${encodeURIComponent(name)}`)
             .then(res => res.json())
             .then(exists => {
-                if (exists) return alert("이미 등록된 기관명입니다.");
+                if (exists) {
+                    //alert("이미 등록된 기관명입니다.");
+                    Swal.fire({text: '이미 등록된 기관명입니다.', icon: 'warning', confirmButtonText: '확인'});
+                    return
+                }
+
                 fetch("/mypage/hostName", {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -283,7 +342,11 @@
                     credentials: "include"
                 }).then(res => {
                     if (res.ok) location.reload();
-                    else res.text().then(msg => alert("등록 오류: " + msg));
+                    else res.text().then(msg => {
+                        //alert("등록 오류: " + msg);
+                        Swal.fire({text: "등록 오류: " + msg, icon: 'warning', confirmButtonText: '확인'});
+                    });
+
                 });
             });
     }
@@ -298,8 +361,30 @@
 
     function confirmWithdraw() {
         const password = document.getElementById("withdrawPasswordPopup").value.trim();
-        if (!password) return alert("비밀번호를 입력해주세요.");
-        if (!confirm("정말 탈퇴하시겠습니까?")) return;
+        if (!password) {
+            //alert("비밀번호를 입력해주세요.");
+            Swal.fire({text: '비밀번호를 입력해주세요.', icon: 'warning', confirmButtonText: '확인'});
+            return
+        }
+
+        //if (!confirm("정말 탈퇴하시겠습니까?")) return;
+
+        Swal.fire({
+            text: '정말 탈퇴하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                return;
+            }
+        });
+
         fetch("/mypage/withdraw", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -307,7 +392,11 @@
             credentials: "include"
         }).then(res => {
             if (res.ok) logout();
-            else res.text().then(msg => alert("오류: " + msg));
+            else res.text().then(msg => {
+                //alert("오류: " + msg);
+                Swal.fire({text: "오류: " + msg, icon: 'warning', confirmButtonText: '확인'});
+            });
+
         });
     }
 
