@@ -140,10 +140,10 @@ select:focus {
 }
 
 .btn-back {
-    background-color: #a9a9a9;
+    background-color: #ccc;
 }
 .btn-back:hover {
-    background-color: #808080;
+    background-color: #a9a9a9;
     transform: translateY(1px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
