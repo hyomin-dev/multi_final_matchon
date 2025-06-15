@@ -286,9 +286,9 @@
         }
 
         if (deleteBtn) {
-            deleteBtn.addEventListener('click', function () {
+            deleteBtn.addEventListener('click', function (e) {
                 //if (!confirm("정말로 팀을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
-
+                e.preventDefault();
                 Swal.fire({
                     text: '정말로 팀을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
                     icon: 'warning',
@@ -298,30 +298,32 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // 사용자가 '네'를 눌렀을 때 처리
+                        fetch(`/team/team/${teamId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(res => {
+                                if (!res.ok) throw new Error();
+                                //alert('팀이 삭제되었습니다.');
+                                Swal.fire({text: '팀이 삭제되었습니다.', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                                    window.location.href = '/team';
+                                });
 
+
+                            })
+                            .catch(() => {
+                                //alert('삭제에 실패했습니다.');
+                                Swal.fire({text: '삭제에 실패했습니다.', icon: 'warning', confirmButtonText: '확인'});
+                            });
                     } else {
                         // 사용자가 '아니요' 눌렀을 때
                         return;
                     }
                 });
 
-                fetch(`/team/team/${teamId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(res => {
-                        if (!res.ok) throw new Error();
-                        //alert('팀이 삭제되었습니다.');
-                        Swal.fire({text: '팀이 삭제되었습니다.', icon: 'success', confirmButtonText: '확인'});
 
-                        window.location.href = '/team';
-                    })
-                    .catch(() => {
-                        //alert('삭제에 실패했습니다.');
-                        Swal.fire({text: '삭제에 실패했습니다.', icon: 'warning', confirmButtonText: '확인'});
-                    });
             });
         }
         const reviewList = document.getElementById('reviewList');
@@ -551,31 +553,31 @@
                         showCancelButton: true,
                         confirmButtonText: '예',
                         cancelButtonText: '아니요'
-                    }).then((result) => {
+                    }).then(async (result) => {
                         if (result.isConfirmed) {
                             // 사용자가 '네'를 눌렀을 때 처리
+                            const box = btn.closest('.response-box');
+                            const responseId = box.getAttribute('data-response-id');
 
+                            const res = await fetch(`/team/team/review/response/${responseId}`, {
+                                method: 'DELETE'
+                            });
+
+                            if (res.ok) {
+                                //alert('답변이 삭제되었습니다.');
+                                Swal.fire({text: '답변이 삭제되었습니다.', icon: 'success', confirmButtonText: '확인'});
+                                loadMyResponses(); // refresh view
+                            } else {
+                                //alert('삭제 실패');
+                                Swal.fire({text: '삭제 실패', icon: 'warning', confirmButtonText: '확인'});
+                            }
                         } else {
                             // 사용자가 '아니요' 눌렀을 때
                             return;
                         }
                     });
 
-                    const box = btn.closest('.response-box');
-                    const responseId = box.getAttribute('data-response-id');
 
-                    const res = await fetch(`/team/team/review/response/${responseId}`, {
-                        method: 'DELETE'
-                    });
-
-                    if (res.ok) {
-                        //alert('답변이 삭제되었습니다.');
-                        Swal.fire({text: '답변이 삭제되었습니다.', icon: 'success', confirmButtonText: '확인'});
-                        loadMyResponses(); // refresh view
-                    } else {
-                        //alert('삭제 실패');
-                        Swal.fire({text: '삭제 실패', icon: 'warning', confirmButtonText: '확인'});
-                    }
                 });
             });
 
@@ -815,7 +817,21 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // 사용자가 '네'를 눌렀을 때 처리
-
+                        fetch(`/team/team/review/${reviewId}`, {
+                            method: 'DELETE'
+                        })
+                            .then(res => {
+                                if (!res.ok) throw new Error();
+                                //alert('삭제되었습니다.');
+                                Swal.fire({text: '삭제되었습니다.', icon: 'success', confirmButtonText: '확인'});
+                                loadPagedReviews(0);
+                                myReviewsBtn.style.display = 'inline-block';
+                                backToAllReviewsFromMyBtn.style.display = 'none';
+                            })
+                            .catch(() => {
+                                //alert('삭제에 실패했습니다.');
+                                Swal.fire({text: '삭제에 실패했습니다.', icon: 'warning', confirmButtonText: '확인'});
+                            });
                     } else {
                         // 사용자가 '아니요' 눌렀을 때
                         return;
@@ -823,21 +839,7 @@
                 });
 
 
-                fetch(`/team/team/review/${reviewId}`, {
-                    method: 'DELETE'
-                })
-                    .then(res => {
-                        if (!res.ok) throw new Error();
-                        //alert('삭제되었습니다.');
-                        Swal.fire({text: '삭제되었습니다.', icon: 'success', confirmButtonText: '확인'});
-                        loadPagedReviews(0);
-                        myReviewsBtn.style.display = 'inline-block';
-                        backToAllReviewsFromMyBtn.style.display = 'none';
-                    })
-                    .catch(() => {
-                        //alert('삭제에 실패했습니다.');
-                        Swal.fire({text: '삭제에 실패했습니다.', icon: 'warning', confirmButtonText: '확인'});
-                    });
+
             }
         });
 
