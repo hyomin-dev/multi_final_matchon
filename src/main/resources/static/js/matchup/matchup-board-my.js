@@ -256,7 +256,8 @@ function setRatingSettingButton(card, item){
                 if(!response.ok)
                     throw new Error(`HTTP error! Status:${response.status}`)
                 else{
-                    alert("평가 세팅이 완료되었습니다.");
+                    //alert("평가 세팅이 완료되었습니다.");
+                    Swal.fire({text: '평가 세팅이 완료되었습니다.', icon: 'success', confirmButtonText: '확인'});
                 }
             }catch (err){
                 console.log(err);
