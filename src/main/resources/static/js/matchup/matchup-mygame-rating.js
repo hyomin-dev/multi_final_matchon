@@ -262,6 +262,7 @@ function submitCheck(e){
     const skillScoreEle = document.querySelector("#skillScore");
 
     const reviewEle = document.querySelector("#review");
+    const sendReviewModalEle = document.querySelector("#sendReviewModal");
 
     // 1. 리뷰 글자 수 검사
     if(isExceedCharlimit(reviewEle.value.length, 300)){
@@ -286,7 +287,7 @@ function submitCheck(e){
     } else{
         //alert("매너 후기가 전송되었습니다.");
         //Swal.fire({text: '매너 후기가 전송되었습니다.', icon: 'warning', confirmButtonText: '확인'});
-
+        sendReviewModalEle.style.display = "none";
         e.preventDefault(); // 기본 제출 막기
         Swal.fire({
             text: '매너 후기가 전송되었습니다.',
