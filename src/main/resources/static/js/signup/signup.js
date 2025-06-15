@@ -42,9 +42,11 @@ document.getElementById("signupForm").addEventListener("submit", async function(
         .then(res => {
             if (res.ok) {
                 //alert("회원가입 성공!");
-                Swal.fire({text: '회원가입 성공!', icon: 'success', confirmButtonText: '확인'});
+                Swal.fire({text: '회원가입 성공!', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                    window.location.href = "/login";
+                });
 
-                window.location.href = "/login";
+
             } else {
                 return res.json().then(data => {
                     //alert(data.error || "회원가입 실패");
