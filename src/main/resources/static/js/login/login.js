@@ -36,7 +36,7 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
                 localStorage.removeItem("showPasswordPopup");
             }
 
-            alert("로그인 성공!");
+            alert("로그인을 시도했습니다.");
 
             window.location.href = "/main";
         })
