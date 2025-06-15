@@ -55,7 +55,18 @@ function submitCheck(e, matchDatetime){
         e.preventDefault();
     }else{
         //lert("요청 등록이 완료되었습니다.");
-        Swal.fire({text: '요청 등록이 완료되었습니다.', icon: 'success', confirmButtonText: '확인'});
+        //Swal.fire({text: '요청 등록이 완료되었습니다.', icon: 'success', confirmButtonText: '확인'});
+        e.preventDefault(); // 기본 제출 막기
+        Swal.fire({
+            text: '요청 등록이 완료되었습니다.',
+            icon: 'success',
+            confirmButtonText: '확인'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 버튼에서 올라가며 가장 가까운 form 찾기
+                e.target.closest("form").submit();
+            }
+        });
     }
 }
 

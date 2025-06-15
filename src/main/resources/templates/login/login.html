@@ -28,20 +28,17 @@
     </form>
 
     <a href="#" id="openResetPopup" class="link">비밀번호를 잊으셨습니까?</a>
-
 </div>
 
-<!-- ✅ 팝업 영역은 #wrap 바깥에 위치 -->
+<!-- 팝업 오버레이 -->
 <div id="popupOverlay" class="popup-overlay"></div>
 
 <!-- 임시 비밀번호 발송 팝업 -->
 <div id="resetPopup" class="popup">
-
     <h3 class="popup-title">
         <span>임시 비밀번호</span>
         <img th:src="@{/img/forgot.png}" alt="비밀번호 문의 아이콘" class="icon-help" />
     </h3>
-
     <form id="resetForm">
         <input type="email" id="resetEmail" placeholder="가입한 이메일 입력" required />
         <button type="submit">임시 비밀번호 발송</button>
@@ -64,57 +61,7 @@
 
 <div th:replace="~{common/footer::footer}"></div>
 
-<script th:inline="javascript">
-    const redirectAfterLogin = /*[[${redirectUrl}]]*/ '';
-    if (redirectAfterLogin && redirectAfterLogin !== '/signup') {
-        localStorage.setItem("loginRedirectUrl", decodeURIComponent(redirectAfterLogin));
-    } else {
-        localStorage.removeItem("loginRedirectUrl"); // 회원가입 등에서 들어온 경우 제거
-    }
+<!-- 로그인 처리 및 팝업 로직 -->
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error');
-    const dateParam = urlParams.get('date');
-
-    if (error === 'suspended')
-        const suspendEl = document.getElementById('suspendMessage');
-        suspendEl.innerHTML = ''; // 초기화
-
-        // 첫 줄: 계정이 정지되었습니다.
-        const mainLine = document.createElement("div");
-        mainLine.textContent = "계정이 정지되었습니다.";
-        mainLine.style.color = "red";
-        mainLine.style.fontWeight = "bold";
-        suspendEl.appendChild(mainLine);
-
-        // 둘째 줄: 복구일 표시
-        if (dateParam) {
-            try {
-                const restoreDate = new Date(dateParam);
-                const formatted = restoreDate.toLocaleString("ko-KR", {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-
-                const dateLine = document.createElement("div");
-                dateLine.textContent = `복구일: ${formatted}`;
-                dateLine.style.color = "red";
-                dateLine.style.marginTop = "4px";
-                dateLine.style.fontWeight = "bold";
-                suspendEl.appendChild(dateLine);
-            } catch (e) {
-                const fallbackLine = document.createElement("div");
-                fallbackLine.textContent = `복구일: ${dateParam}`;
-                fallbackLine.style.color = "red";
-                fallbackLine.style.fontWeight = "bold";
-                suspendEl.appendChild(fallbackLine);
-            }
-    }
-
-</script>
 </body>
 </html>
