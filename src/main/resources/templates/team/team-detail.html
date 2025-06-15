@@ -286,7 +286,7 @@
         }
 
         if (deleteBtn) {
-            deleteBtn.addEventListener('click', function () {
+            deleteBtn.addEventListener('click', function (e) {
                 //if (!confirm("정말로 팀을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
 
                 Swal.fire({
@@ -314,9 +314,11 @@
                     .then(res => {
                         if (!res.ok) throw new Error();
                         //alert('팀이 삭제되었습니다.');
-                        Swal.fire({text: '팀이 삭제되었습니다.', icon: 'success', confirmButtonText: '확인'});
+                        Swal.fire({text: '팀이 삭제되었습니다.', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                            window.location.href = '/team';
+                        });
 
-                        window.location.href = '/team';
+
                     })
                     .catch(() => {
                         //alert('삭제에 실패했습니다.');

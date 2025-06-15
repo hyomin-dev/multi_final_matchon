@@ -95,9 +95,11 @@
             }
 
             //alert("가입 요청이 승인되었습니다.");
-            Swal.fire({text: '가입 요청이 승인되었습니다.', icon: 'success', confirmButtonText: '확인'});
+            Swal.fire({text: '가입 요청이 승인되었습니다.', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                window.location.href = "/team"; // Or redirect to the request list
+            });
 
-            window.location.href = "/team"; // Or redirect to the request list
+
 
         } catch (err) {
             //alert("승인 중 네트워크 오류가 발생했습니다.");
@@ -132,9 +134,11 @@
         }).then(res => {
             if (!res.ok) throw new Error();
             //alert("가입 요청이 거절되었습니다.");
-            Swal.fire({text: '가입 요청이 거절되었습니다.', icon: 'warning', confirmButtonText: '확인'});
+            Swal.fire({text: '가입 요청이 거절되었습니다.', icon: 'warning', confirmButtonText: '확인'}).then(()=>{
+                window.location.href = "/team";
+            });
 
-            window.location.href = "/team";
+
         }).catch(() => {
             //alert("거절에 실패했습니다.");
             Swal.fire({text: '거절에 실패했습니다.', icon: 'warning', confirmButtonText: '확인'});

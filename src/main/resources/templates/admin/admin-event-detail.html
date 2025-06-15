@@ -52,6 +52,7 @@
     /*<![CDATA[*/
     let kakaoApiKey = /*[[${@environment.getProperty('matchon.kakao-api')}]]*/ '';
     let eventAddress = /*[[${event.eventAddress}]]*/ '';
+    let statusLabel = /*[[${statusLabel}]]*/'';
     /*]]>*/
 </script>
 
@@ -84,24 +85,27 @@
             }
         });
     }
-    document.querySelector("#deleteBtn").addEventListener("click",(e)=>{
-        e.preventDefault();
-        Swal.fire({
-            text: '정말 삭제하시겠습니까?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: '예',
-            cancelButtonText: '아니요'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // 사용자가 '네'를 눌렀을 때 처리
-                document.querySelector("#deleteForm").submit();
-            } else {
-                // 사용자가 '아니요' 눌렀을 때
-                e.preventDefault();
-            }
-        });
-    })
+    if(statusLabel==='승인'){
+        document.querySelector("#deleteBtn").addEventListener("click",(e)=>{
+            e.preventDefault();
+            Swal.fire({
+                text: '정말 삭제하시겠습니까?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '예',
+                cancelButtonText: '아니요'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 사용자가 '네'를 눌렀을 때 처리
+                    document.querySelector("#deleteForm").submit();
+                } else {
+                    // 사용자가 '아니요' 눌렀을 때
+                    e.preventDefault();
+                }
+            });
+        })
+    }
+
 
 
     // 실행
