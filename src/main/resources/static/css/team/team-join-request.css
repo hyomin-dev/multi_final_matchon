@@ -66,20 +66,19 @@
 
 #startChatBtn:hover {
     background-color: royalblue;
-}
-#startChatBtn {
-    background-color: dodgerblue;
-    color: white;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 0 10px;
-    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 10px rgba(30, 144, 255, 0.3); /* 💡 blue 계열 그림자 */
+    transform: translateY(-1px);
 }
 
-#startChatBtn:hover {
-    background-color: royalblue;
+.btn-approve:hover {
+    background-color: #45a049; /* 조금 더 짙은 녹색 */
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+    transform: translateY(-1px);
+
+}
+
+.btn-reject:hover {
+    background-color: #d32f2f; /* 더 짙은 붉은색 */
+    box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+    transform: translateY(-1px);
 }
