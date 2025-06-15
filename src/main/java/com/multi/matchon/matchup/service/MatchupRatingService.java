@@ -214,7 +214,9 @@ public class MatchupRatingService {
      * 매너 온도 평가 등록, 마이페이지 업데이트
      * */
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void registerMatchupRating(@Valid ReqMatchupRatingDto reqMatchupRatingDto, CustomUser user) {
+    public void registerMatchupRating(
+            @Valid ReqMatchupRatingDto reqMatchupRatingDto,
+            CustomUser user) {
 
         if(!reqMatchupRatingDto.getEvalId().equals(user.getMember().getId()))
             throw new CustomException("Matchup 매너온도 평가를 할 권한이 없습니다.");
