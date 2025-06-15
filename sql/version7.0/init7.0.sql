@@ -247,6 +247,7 @@ VALUES
      'K리그, 대표팀, 프리미어리그 등 다양한 축구 이야기를 나누는 공간입니다.\n\n⚽ 게시물 예시\n- 경기 리뷰\n- 선수 이적 소식\n- 팬 토크/직관 후기 등\n\n📌 유의 사항\n- 팀/선수 비방 금지\n- 과열 논쟁/인신공격 금지\n- 불법 스트리밍 링크 금지\n\n건강한 축구 커뮤니티가 되도록 함께해 주세요.',
      FALSE, 'matchon2025@gmail.com', NOW(), 'matchon2025@gmail.com', NOW(),
      'FOOTBALL_TALK', FALSE, TRUE, 11);
+    -- 추가데이터 끝
 
 INSERT INTO report (report_type, target_id, reporter_id, reason, reason_type,
                     suspended, target_is_admin, target_member_id, target_writer_name,
