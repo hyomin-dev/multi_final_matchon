@@ -6,6 +6,8 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/team/team-edit.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script th:src="@{/js/team/team-edit.js}" defer></script>
 </head>
 <body>
@@ -68,9 +70,10 @@
 
         <label>팀 이미지</label>
         <input type="file" name="teamImageFile" accept="image/*" />
-
-        <button type="submit">수정 완료</button>
-        <button type="button" onclick="history.back()">취소</button>
+        <div class="button-group">
+            <button type="submit" class="write-button">수정 완료</button>
+            <button type="button" class="cancel-button" onclick="history.back()">취소</button>
+        </div>
     </form>
 </div>
 </div>

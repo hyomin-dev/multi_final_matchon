@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (res.ok && modal) {
                         modal.style.display = "flex";
                     } else {
-                        alert("로그인 후 사용 가능합니다.");
+                        //alert("로그인 후 사용 가능합니다.");
+                        Swal.fire({text: '로그인 후 사용 가능합니다.', icon: 'warning', confirmButtonText: '확인'});
                     }
                 });
         }

@@ -9,6 +9,8 @@
     <link rel="stylesheet" th:href="@{/css/aibot/aichatbot.css}" />
     <link rel="stylesheet" th:href="@{/css/login/popup.css}" />
     <script th:src="@{/js/login/login.js}" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <div th:replace="~{common/header::header}"></div>
@@ -74,7 +76,7 @@
     const error = urlParams.get('error');
     const dateParam = urlParams.get('date');
 
-    if (error === 'suspended') {
+    if (error === 'suspended')
         const suspendEl = document.getElementById('suspendMessage');
         suspendEl.innerHTML = ''; // 초기화
 
@@ -111,7 +113,6 @@
                 fallbackLine.style.fontWeight = "bold";
                 suspendEl.appendChild(fallbackLine);
             }
-        }
     }
 
 </script>

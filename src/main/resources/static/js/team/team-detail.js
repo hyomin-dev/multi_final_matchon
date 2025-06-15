@@ -59,11 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.success) {
                     window.location.href = `/chat/room/${data.data.roomId}`;
                 } else {
-                    alert('채팅방 생성에 실패했습니다. 다시 시도해주세요.');
+                    //alert('채팅방 생성에 실패했습니다. 다시 시도해주세요.');
+                    Swal.fire({text: '채팅방 생성에 실패했습니다. 다시 시도해주세요.', icon: 'warning', confirmButtonText: '확인'});
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('채팅 기능 사용 중 오류가 발생했습니다.');
+                //alert('채팅 기능 사용 중 오류가 발생했습니다.');
+                Swal.fire({text: '채팅 기능 사용 중 오류가 발생했습니다.', icon: 'warning', confirmButtonText: '확인'});
             }
         });
     }
@@ -108,15 +110,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
                 if (data.success) {
-                    alert('팀 가입 신청이 완료되었습니다.');
+                    //alert('팀 가입 신청이 완료되었습니다.');
+                    Swal.fire({text: '팀 가입 신청이 완료되었습니다.', icon: 'warning', confirmButtonText: '확인'});
+
                     modal.style.display = 'none';
                     joinTeamForm.reset();
                 } else {
-                    alert(data.message || '팀 가입 신청에 실패했습니다. 다시 시도해주세요.');
+                    //alert(data.message || '팀 가입 신청에 실패했습니다. 다시 시도해주세요.');
+                    Swal.fire({text: data.message || '팀 가입 신청에 실패했습니다. 다시 시도해주세요.', icon: 'warning', confirmButtonText: '확인'});
+
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('팀 가입 신청 중 오류가 발생했습니다.');
+                //alert('팀 가입 신청 중 오류가 발생했습니다.');
+                Swal.fire({text: '팀 가입 신청 중 오류가 발생했습니다.', icon: 'warning', confirmButtonText: '확인'});
+
             }
         });
     }
@@ -155,7 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const rating = +document.querySelector('input[name="rating"]:checked')?.value;
 
             if (!rating || content.trim() === '') {
-                alert('별점과 내용을 모두 입력해주세요.');
+                //alert('별점과 내용을 모두 입력해주세요.');
+                Swal.fire({text: '별점과 내용을 모두 입력해주세요.', icon: 'warning', confirmButtonText: '확인'});
                 return;
             }
 
@@ -168,11 +177,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (!response.ok) throw new Error();
 
-                alert('후기가 등록되었습니다!');
-                location.reload();
+                //alert('후기가 등록되었습니다!');
+                Swal.fire({text: '후기가 등록되었습니다!', icon: 'warning', confirmButtonText: '확인'}).then(()=>{
+                    location.reload();
+                });
+
             } catch (err) {
                 console.error(err);
-                alert('후기 등록에 실패했습니다.');
+                //alert('후기 등록에 실패했습니다.');
+                Swal.fire({text: '후기 등록에 실패했습니다..', icon: 'warning', confirmButtonText: '확인'});
+
             }
         });
     }

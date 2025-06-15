@@ -22,16 +22,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const text = await response.text();
                     if (text) errorMsg = text;
                 }
-                alert(errorMsg);
+                //alert(errorMsg);
+                Swal.fire({text: errorMsg, icon: 'warning', confirmButtonText: '확인'});
+
                 return;
             }
 
-            alert('팀이 성공적으로 수정되었습니다!');
-            window.location.href = '/team'; // or your desired redirect
+            //alert('팀이 성공적으로 수정되었습니다!');
+            Swal.fire({text: '팀이 성공적으로 수정되었습니다!', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                window.location.href = '/team'; // or your desired redirect
+            });
 
         } catch (err) {
             console.error('❌ 팀 수정 중 오류 발생:', err);
-            alert('알 수 없는 오류가 발생했습니다.');
+            //alert('알 수 없는 오류가 발생했습니다.');
+            Swal.fire({text: '알 수 없는 오류가 발생했습니다.', icon: 'warning', confirmButtonText: '확인'});
+
         }
     });
 });

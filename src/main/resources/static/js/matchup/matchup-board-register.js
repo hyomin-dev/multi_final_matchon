@@ -10,8 +10,7 @@ document.addEventListener("DOMContentLoaded",async ()=>{
     form.addEventListener("submit", (event)=>{
         submitCheck(event)
         }
-    )
-
+    );
 
 })
 
@@ -56,81 +55,127 @@ function submitCheck(e){
     // 1. 팀 소개 글자 수 검사
     if(isExceedCharlimit(teamIntroEle.value.length, 300)){
         e.preventDefault();
-        alert("팀 소개는 300자 내로 작성해주세요.")
+        //alert("팀 소개는 300자 내로 작성해주세요.");
+        Swal.fire({text: '팀 소개는 300자 내로 작성해주세요.', icon: 'warning', confirmButtonText: '확인'});
     }
 
     // 2. 경기장명 글자 수 검사
     if(isExceedCharlimit(sportsFacilityNameEle.value.length, 100)){
         e.preventDefault();
-        alert("경기장명은 100자 내로 작성해주세요.")
+        //alert("경기장명은 100자 내로 작성해주세요.")
+        Swal.fire({text: '경기장명은 100자 내로 작성해주세요.', icon: 'warning', confirmButtonText: '확인'});
     }
 
     // 3. 경기장 주소 글자 수 검사
     if(isExceedCharlimit(sportsFacilityAddress.value.length, 100)){
         e.preventDefault();
-        alert("경기장 주소는 100자 내로 작성해주세요.")
+        //alert("경기장 주소는 100자 내로 작성해주세요.");
+        Swal.fire({text: '경기장 주소는 100자 내로 작성해주세요.', icon: 'warning', confirmButtonText: '확인'});
     }
 
     // 4. 경기 방식 소개 글자 수 검사
     if(isExceedCharlimit(sportsFacilityAddress.value.length, 1000)){
         e.preventDefault();
-        alert("경기 방식 소개 1000자 내로 작성해주세요.")
+        //alert("경기 방식 소개 1000자 내로 작성해주세요.");
+        Swal.fire({text: '경기 방식 소개 1000자 내로 작성해주세요.', icon: 'warning', confirmButtonText: '확인'});
     }
 
 
     if(sportsTypeNameEle.value ===""){
-        alert("종목을 선택하세요.");
+        //alert("종목을 선택하세요.");
+        Swal.fire({text: '종목을 선택하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(teamNameEle.value ===""){
-        alert("팀 이름을 입력하세요.");
+        //alert("팀 이름을 입력하세요.");
+        Swal.fire({text: '팀 이름을 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(teamIntroEle.value ===""){
-        alert("팀 소개를 입력하세요");
+        //alert("팀 소개를 입력하세요.");
+        Swal.fire({text: '팀 소개를 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(reservationFileEle.value === ""){
-        alert("경기장 예약 내역 파일을 업로드 해주세요.");
+        //alert("경기장 예약 내역 파일을 업로드 해주세요.");
+        Swal.fire({text: '경기장 예약 내역 파일을 업로드 해주세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(sportsFacilityNameEle.value ===""){
-        alert("경기장명을 입력하세요");
+        //alert("경기장명을 입력하세요.");
+        Swal.fire({text: '경기장명을 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(sportsFacilityAddress.value ===""){
-        alert("경기장 주소를 입력하세요.");
+        //alert("경기장 주소를 입력하세요.");
+        Swal.fire({text: '경기장 주소를 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(matchDatetimeEle.value === ""){
-        alert("경기 시작 시간을 입력하세요.");
+        //alert("경기 시작 시간을 입력하세요.");
+        Swal.fire({text: '경기 시작 시간을 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(new Date(matchDatetimeEle.value)< new Date()){
-        alert(`경기 시작 시간은 현재 시간 이후만 가능합니다. 다시 작성해주세요.`)
+        //alert(`경기 시작 시간은 현재 시간 이후만 가능합니다. 다시 작성해주세요.`);
+        Swal.fire({text: '경기 시작 시간은 현재 시간 이후만 가능합니다. 다시 작성해주세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(matchDurationEle.value ===""){
-        alert("경기 진행 시간을 입력하세요.");
+        //alert("경기 진행 시간을 입력하세요.");
+        Swal.fire({text: '경기 진행 시간을 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(currentParticipantCountEle.value ===""){
-        alert("현재 참가 인원을 입력하세요");
+        //alert("현재 참가 인원을 입력하세요.");
+        Swal.fire({text: '현재 참가 인원을 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(maxParticipantsEle.value ===""){
-        alert("총 모집 인원을 입력하세요");
+        //alert("총 모집 인원을 입력하세요.");
+        Swal.fire({text: '총 모집 인원을 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(Number(currentParticipantCountEle.value) >=Number(maxParticipantsEle.value)){
-        alert(`현재 참가 인원은 총 모집 인원보다 적어야 합니다.`)
+        //alert(`현재 참가 인원은 총 모집 인원보다 적어야 합니다.`);
+        Swal.fire({text: '현재 참가 인원은 총 모집 인원보다 적어야 합니다.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(minMannerTemperatureEle.value ===""){
-        alert("하한 매너 온도를 입력하세요.");
+        //alert("하한 매너 온도를 입력하세요.");
+        Swal.fire({text: '하한 매너 온도를 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(Number(minMannerTemperatureEle.value) > Number(myMannerTemperature)){
-        alert(`하한 매너 온도는 작성자의 매너온도(${myMannerTemperature})이하로 지정해주세요.`)
+        //alert(`하한 매너 온도는 작성자의 매너온도(${myMannerTemperature})이하로 지정해주세요.`);
+        Swal.fire({text: `하한 매너 온도는 작성자의 매너온도(${myMannerTemperature})이하로 지정해주세요.`, icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else if(matchDescriptionEle.value ===""){
-        alert("경기 방식 소개를 입력하세요");
+        //alert("경기 방식 소개를 입력하세요.");
+        Swal.fire({text: '경기 방식 소개를 입력하세요.', icon: 'warning', confirmButtonText: '확인'});
         e.preventDefault();
     } else{
 
-        let reply = confirm("경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?");
-        if(reply){
-            alert("게시글이 등록되었습니다.");
-        }else{
-            e.preventDefault();
-        }
+       // let reply = confirm("경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?");
+        e.preventDefault();
+        Swal.fire({
+            text: '경기 날짜와 진행 시간은 수정이 불가능합니다. 진행하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+                    //alert("게시글이 등록되었습니다.");
+                    //Swal.fire({text: '게시글이 등록되었습니다.', icon: 'success', confirmButtonText: '확인'});
+                    // 기본 제출 막기
+                    Swal.fire({
+                        text: '게시글이 등록되었습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    }).then((result2) => {
+                        if (result2.isConfirmed) {
+                            // 버튼에서 올라가며 가장 가까운 form 찾기
+                            e.target.closest("form").submit();
+                        }
+                    });
+            }
+        });
+
+        // if(reply){
+        //     //alert("게시글이 등록되었습니다.");
+        //     Swal.fire('완료!', '게시글이 등록되었습니다.', 'success');
+        // }else{
+        //     e.preventDefault();
+        // }
     }
 }
 
@@ -146,11 +191,28 @@ async function getTeam(){
     });
     if(!response.ok){
 
-        let reply = confirm("Matchup 게시글에 글 작성을 하기 위해서는 소속팀이 있어야 합니다. 팀 등록을 하시겠습니까?");
-        if(reply)
-            window.location.href = "/team/team/register";
-        else
-            window.history.back();
+        // let reply = confirm("Matchup 게시글에 글 작성을 하기 위해서는 소속팀이 있어야 합니다. 팀 등록을 하시겠습니까?");
+        // if(reply)
+        //     window.location.href = "/team/team/register";
+        // else
+        //     window.history.back();
+        Swal.fire({
+            title: '팀 등록이 필요합니다',
+            text: 'Matchup 게시글에 글 작성을 하기 위해서는 소속팀이 있어야 합니다. 팀 등록을 하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '네, 등록할게요',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 사용자가 '네'를 눌렀을 때 처리
+                window.location.href = '/team/team/register'; // 예시: 팀 등록 페이지로 이동
+            } else {
+                // 사용자가 '아니요' 눌렀을 때
+                window.history.back();
+            }
+        });
+
     }
 
     const data = await response.json();
