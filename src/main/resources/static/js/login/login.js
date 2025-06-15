@@ -99,8 +99,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             icon: 'warning',
                             confirmButtonText: '확인',
                             allowOutsideClick: false
+                        }).then(()=>{
+                            window.location.href = "/signup";
                         });
-                        window.location.href = "/signup";
+
                     } else if (data.error === "계정이 정지되었습니다.") {
                         const restoreDate = data.restoreDate || '';
                         window.location.href = `/login?error=suspended&date=${encodeURIComponent(restoreDate)}`;
