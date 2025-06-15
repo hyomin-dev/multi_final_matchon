@@ -141,25 +141,24 @@ th:nth-child(4), td:nth-child(4) {
 }
 
 .btn-wrap .back-link {
-    background-color: black;
-    color: deeppink;
+    display: inline-block;
+    background-color: #c8c8c8;
+    color: white;
+    font-weight: bold;
     padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 600;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-    transition: transform 0.2s ease, background-color 0.3s ease;
-    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .btn-wrap .back-link:hover {
-    transform: scale(1.05);
+    background-color: #aaa;
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.btn-wrap .back-link:active {
-    background-color: ivory;
-    color: aqua;
-    transform: scale(0.98);
-}
 
 
 .no-data {
