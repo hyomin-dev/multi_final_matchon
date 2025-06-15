@@ -213,7 +213,7 @@ public class MatchupRatingService {
     /*
      * 매너 온도 평가 등록, 마이페이지 업데이트
      * */
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public void registerMatchupRating(
             @Valid ReqMatchupRatingDto reqMatchupRatingDto,
             CustomUser user) {
