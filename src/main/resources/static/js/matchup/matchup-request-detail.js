@@ -352,7 +352,8 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
             e.preventDefault();
             e.target.href = "#";
             e.target.classList.add("disabled");
-            alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+            //alert("경기 시작 시간이 지나 수정할 수 없습니다.");
+            Swal.fire({text: '경기 시작 시간이 지나 수정할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
         }
     });
 
@@ -362,7 +363,8 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
             e.preventDefault();
             e.target.href = "#";
             e.target.classList.add("disabled");
-            alert("경기 시작 시간이 지나 취소할 수 없습니다.")
+            //alert("경기 시작 시간이 지나 취소할 수 없습니다.");
+            Swal.fire({text: '경기 시작 시간이 지나 취소할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
         }
     });
 
@@ -372,7 +374,8 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
             e.preventDefault();
             e.target.href = "#";
             e.target.classList.add("disabled");
-            alert("경기 시작 시간이 지나 재 요청할 수 없습니다.")
+            //alert("경기 시작 시간이 지나 재 요청할 수 없습니다.");
+            Swal.fire({text: '경기 시작 시간이 지나 재 요청할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
         }
     });
 
@@ -382,7 +385,8 @@ function setUserButton(matchupStatus, matchupRequestSubmittedCount, matchupCance
             e.preventDefault();
             e.target.href = "#";
             e.target.classList.add("disabled");
-            alert("경기 시작 시간이 지나 승인 취소 요청할 수 없습니다.")
+            //alert("경기 시작 시간이 지나 승인 취소 요청할 수 없습니다.");
+            Swal.fire({text: '경기 시작 시간이 지나 승인 취소 요청할 수 없습니다.', icon: 'warning', confirmButtonText: '확인'});
         }
     });
 

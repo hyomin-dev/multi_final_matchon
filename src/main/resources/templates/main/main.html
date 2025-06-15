@@ -9,7 +9,8 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/aibot/aichatbot.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/login/login.css}">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -267,7 +268,8 @@
                     if (res.ok) {
                         modal.style.display = "block";
                     } else {
-                        alert("로그인 후 사용 가능합니다.");
+                        // alert("로그인 후 사용 가능합니다.");
+                        Swal.fire({text: '로그인 후 사용 가능합니다.', icon: 'warning', confirmButtonText: '확인'});
                     }
                 });
             });
@@ -285,8 +287,10 @@
             method: 'POST',
             credentials: 'include'
         }).then(() => {
-            alert("로그아웃 되었습니다.");
-            window.location.href = "/main";
+            // alert("로그아웃 되었습니다.");
+            Swal.fire({text: '로그아웃 되었습니다.', icon: 'success', confirmButtonText: '확인'}).then(()=>{
+                window.location.href = "/main";
+            });
         });
     }
 
