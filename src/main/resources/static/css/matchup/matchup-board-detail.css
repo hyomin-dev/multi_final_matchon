@@ -99,7 +99,7 @@ select:focus {
 /* 공통 버튼 레이아웃 */
 .button-group a.btn {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 6px 16px;
     font-size: 14px;
     border-radius: 7px;
     border: none;
@@ -107,7 +107,7 @@ select:focus {
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    margin: 5px;
+    margin: 6px;
     transition: all 0.3s ease;
 }
 
