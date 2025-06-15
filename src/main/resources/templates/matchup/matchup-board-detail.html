@@ -117,7 +117,7 @@
 
       <div class="button-group">
         <!-- 작성자 본인에게만 보이는 수정/삭제 버튼 -->
-        <a class="btn" id="modifyBtn" th:href="@{/matchup/board/edit(boardId=${resMatchupBoardDto.boardId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail == #authentication.name} ? 'display:inline' : 'display:none'">
+        <a class="btn btn-modify" id="modifyBtn" th:href="@{/matchup/board/edit(boardId=${resMatchupBoardDto.boardId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail == #authentication.name} ? 'display:inline' : 'display:none'">
           수정하기
         </a>
 
@@ -126,11 +126,11 @@
         </a>
 
         <!-- 작성자가 아닌 사용자에게만 보이는 문의/참가요청 버튼 -->
-        <a class="btn" id="chat1-1Btn" th:href="@{/chat/private(receiverId=${resMatchupBoardDto.writerId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail != #authentication.name} ? 'display:inline' : 'display:none'" target="_blank">
+        <a class="btn btn-chat" id="chat1-1Btn" th:href="@{/chat/private(receiverId=${resMatchupBoardDto.writerId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail != #authentication.name} ? 'display:inline' : 'display:none'" target="_blank">
           문의하기
         </a>
 
-        <a class="btn" id="requestBtn" th:href="@{/matchup/request(boardId=${resMatchupBoardDto.boardId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail != #authentication.name} ? 'display:inline' : 'display:none'">
+        <a class="btn btn-request" id="requestBtn" th:href="@{/matchup/request(boardId=${resMatchupBoardDto.boardId})}" th:style="${resMatchupBoardDto.matchDatetime > T(java.time.LocalDateTime).now() and resMatchupBoardDto.writerEmail != #authentication.name} ? 'display:inline' : 'display:none'">
           참가요청
         </a>
 
