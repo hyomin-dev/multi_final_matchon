@@ -262,28 +262,28 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 // 사용자가 '네'를 눌렀을 때 처리
-
+                fetch("/mypage/deleteProfile", {
+                    method: "DELETE",
+                    credentials: "include"
+                }).then(res => {
+                    if (res.ok) {
+                        const uploadBtn = document.querySelector(".button-group button");
+                        uploadBtn.textContent = "사진 등록"; // 텍스트 변경
+                        location.reload(); // 또는 필요시 새로고침
+                    } else {
+                        res.text().then(msg => {
+                            //alert("삭제 실패: " + msg);
+                            Swal.fire({text: "삭제 실패: " + msg, icon: 'warning', confirmButtonText: '확인'});
+                        });
+                    }
+                });
             } else {
                 // 사용자가 '아니요' 눌렀을 때
                 return;
             }
         });
 
-        fetch("/mypage/deleteProfile", {
-            method: "DELETE",
-            credentials: "include"
-        }).then(res => {
-            if (res.ok) {
-                const uploadBtn = document.querySelector(".button-group button");
-                uploadBtn.textContent = "사진 등록"; // 텍스트 변경
-                location.reload(); // 또는 필요시 새로고침
-            } else {
-                res.text().then(msg => {
-                    //alert("삭제 실패: " + msg);
-                    Swal.fire({text: "삭제 실패: " + msg, icon: 'warning', confirmButtonText: '확인'});
-                });
-            }
-        });
+
     }
 
     function submitMypage() {
@@ -366,6 +366,7 @@
             Swal.fire({text: '비밀번호를 입력해주세요.', icon: 'warning', confirmButtonText: '확인'});
             return
         }
+        document.getElementById("withdrawModal").style.display = 'none';
 
         //if (!confirm("정말 탈퇴하시겠습니까?")) return;
 
@@ -374,30 +375,30 @@
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: '예',
-            cancelButtonText: '아니요'
-        }).then((result) => {
+            cancelButtonText: '아니요',
+        }).then(async (result) => {
             if (result.isConfirmed) {
                 // 사용자가 '네'를 눌렀을 때 처리
+                await fetch("/mypage/withdraw", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({ password }),
+                    credentials: "include"
+                }).then(res => {
+                    if (res.ok) logout();
+                    else res.text().then(msg => {
+                        //alert("오류: " + msg);
+                        Swal.fire({text: "오류: " + msg, icon: 'warning', confirmButtonText: '확인'});
+                    });
 
+                });
             } else {
                 // 사용자가 '아니요' 눌렀을 때
                 return;
             }
         });
 
-        fetch("/mypage/withdraw", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ password }),
-            credentials: "include"
-        }).then(res => {
-            if (res.ok) logout();
-            else res.text().then(msg => {
-                //alert("오류: " + msg);
-                Swal.fire({text: "오류: " + msg, icon: 'warning', confirmButtonText: '확인'});
-            });
 
-        });
     }
 
     function logout() {
