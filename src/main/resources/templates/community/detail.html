@@ -340,8 +340,11 @@
             body: `type=${type}&targetId=${id}&reasonType=${selectedReasonType}&reason=${encodeURIComponent(detailReason)}`
         }).then(res => {
             if (res.status === 401) {
-                Swal.fire({text: '로그인이 필요합니다.', icon: 'warning', confirmButtonText: '확인'})
-                    .then(() => location.href = "/login");
+                //alert("로그인이 필요합니다.");
+                Swal.fire({text: '로그인이 필요합니다.', icon: 'warning', confirmButtonText: '확인'}).then(()=>{
+                    location.href = "/login";
+                });
+
             } else if (res.ok) {
                 Swal.fire({text: '신고가 접수되었습니다.', icon: 'success', confirmButtonText: '확인'});
                 closeReportModal();

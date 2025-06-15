@@ -525,7 +525,7 @@ function createReadNotiStructure(notificationId, notificationMessage, createdDat
     miniDrawerHistory.insertBefore(wrapper, headerHistory.nextSibling);
 
 
-    wrapper.addEventListener("click", async () => {
+    wrapper.addEventListener("click", async (e) => {
 
         if(typeof targetUrl === "string" && targetUrl.trim() !== ""){
             // const go = confirm("이 알림과 관련된 페이지로 이동하시겠습니까?");
@@ -544,7 +544,7 @@ function createReadNotiStructure(notificationId, notificationMessage, createdDat
                     window.open(targetUrl,"_blank","noopener,noreferrer");
                 } else {
                     // 사용자가 '아니요' 눌렀을 때
-                    e.preventDefault();
+
                 }
             });
 
