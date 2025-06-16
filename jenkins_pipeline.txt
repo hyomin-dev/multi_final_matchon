@@ -1,0 +1,186 @@
+pipeline {
+    agent any
+    // parameters {
+    //     string(name: 'DB_ENDPOINT', defaultValue: '', description: '데이터베이스 엔드포인트')
+    //     string(name: 'DB_NAME', defaultValue: '', description: '데이터베이스 이름')
+    //     string(name: 'DB_PASSWORD', defaultValue: '', description: '데이터베이스 비밀번호')
+    //     string(name: 'DB_USERNAME', defaultValue: '', description: '데이터베이스 사용자명')
+
+    //      }
+    environment {
+        AWS_REGION = 'sa-east-1'
+        AWS_ACCOUNT_ID = '118320467932'
+        ECR_REPO_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/docker_repo"
+        IMAGE_NAME = 'matchon'
+        IMAGE_TAG = 'latest'
+        AWS_CREDENTIAL_NAME = 'aws_credentials'
+        JWT_SECRET = credentials('JWT_SECRET')
+        JWT_ISSUER = credentials('JWT_ISSUER')
+        DB_PROD_URL = credentials('DB_PROD_URL')
+        DB_PROD_USER = credentials('DB_PROD_USER')
+        DB_PROD_PASSWORD = credentials('DB_PROD_PASSWORD')
+        AWS_ACCESS_KEY = credentials('AWS_ACCESS_KEY')
+        AWS_SECRET_KEY = credentials('AWS_SECRET_KEY')
+        KAKAO_API_KEY = credentials('KAKAO_API_KEY')
+        S3_BUCKET = credentials('S3_BUCKET')
+        S3_BASE_URL = credentials('S3_BASE_URL')
+        MAIL_USERNAME = credentials('MAIL_USERNAME')
+        MAIL_PASSWORD = credentials('MAIL_PASSWORD')
+        DOMAIN_URL = credentials('DOMAIN_URL')
+        REDIS_PROD_PORT = credentials('REDIS_PROD_PORT')
+        REDIS_PROD_IP = credentials('REDIS_PROD_IP')
+        DIALOGFLOW_KEY_PATH = "src/main/resources/keys/dialogflow-key.json"
+        SPRING_PROFILES_ACTIVE = 'prod'
+
+    }
+    stages {
+          stage('Checkout') {
+            steps {
+                deleteDir() // 🔥 워크스페이스 삭제
+                 checkout([$class: 'GitSCM',
+                  branches: [[name: '*/release']],
+                  userRemoteConfigs: [[
+                      url: 'https://github.com/hyomin-dev/multi_final_matchon.git',
+                      credentialsId: 'github_token'
+                  ]]
+                 ])
+            }
+        }
+        stage('Prepare Dialogflow Key') {
+                    steps {
+                        withCredentials([file(credentialsId: 'dialogflow-key', variable: 'DIALOGFLOW_KEY')]) {
+                            sh '''
+                               mkdir -p keys
+                               chmod -R 777 keys   # 🔥 권한 부여
+                               cp $DIALOGFLOW_KEY keys/dialogflow-key.json
+                            '''
+                        }
+                    }
+                }
+        stage('Prepare application.yml') {
+            steps {
+                script {
+
+                    // application.yml 치환
+                    sh '''
+                        sed -i "s#\\\${DB_PROD_URL}#${DB_PROD_URL}#g" $WORKSPACE/src/main/resources/application.yml
+                        sed -i "s#\\\${DB_PROD_USER}#${DB_PROD_USER}#g" $WORKSPACE/src/main/resources/application.yml
+                        sed -i "s#\\\${DB_PROD_PASSWORD}#${DB_PROD_PASSWORD}#g" $WORKSPACE/src/main/resources/application.yml
+                        sed -i "s#\\\${JWT_SECRET}#${JWT_SECRET}#g" $WORKSPACE/src/main/resources/application.yml
+                        sed -i "s#\\\${JWT_ISSUER}#${JWT_ISSUER}#g" $WORKSPACE/src/main/resources/application.yml
+                        sed -i "s#\\\${AWS_ACCESS_KEY}#${AWS_ACCESS_KEY}#g" $WORKSPACE/src/main/resources/application.yml
+                        sed -i "s#\\\${AWS_SECRET_KEY}#${AWS_SECRET_KEY}#g" $WORKSPACE/src/main/resources/application.yml
+
+                       cat $WORKSPACE/src/main/resources/application.yml                    '''
+                }
+            }
+        }
+       stage('Build Application') {
+            steps {
+                sh '''
+                    chmod +x gradlew
+                    ./gradlew clean build -x test
+                '''
+                echo 'Build completed successfully.'
+            }
+            //  ./gradlew clean build -x test || true  //테스트무시할떄
+
+        }
+        stage('Docker Build') {
+            steps {
+                script {
+                    sh """
+                        docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .
+                        docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_REPO_URI}:${BUILD_NUMBER}
+                    """
+                }
+            }
+            post {
+                success {
+                    echo 'Docker Build succeeded.'
+                }
+                failure {
+                    error 'Docker Build failed.' // exit pipeline
+                }
+            }
+        }
+
+        stage('AWS ECR Login'){
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_credentials']]) {
+
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                }
+            }
+        }
+
+        stage('ECR Push') {
+            steps {
+                script {
+                    // Docker 이미지 태그 및 푸시
+                    sh """
+                        docker push ${ECR_REPO_URI}:${BUILD_NUMBER}
+                    """
+                }
+            }
+             post {
+                success {
+                    echo 'Image upload to ECR succeeded.'
+                }
+                failure {
+                    error 'Image upload to ECR failed.'
+                }
+            }
+        }
+       stage('Deploy to AWS EC2 VMs') {
+            steps {
+                script {
+                    def deployHosts = ['18.230.61.241'] // 배포할 EC2 주소(public, private 둘다 가능)
+                    deployHosts.each { host ->
+                        sshagent(credentials: ['deploy-ssh-key']) {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no ubuntu@${host} '
+                                    set -x
+                                    export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
+                                    export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
+                                    aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REPO_URI} &&
+                                    sudo docker pull ${ECR_REPO_URI}:${BUILD_NUMBER} &&
+                                    sudo docker stop ${IMAGE_NAME} || true &&
+                                    sudo docker rm -f ${IMAGE_NAME} || true &&
+                                    sudo docker run -d --restart always -p 80:8090 --name ${IMAGE_NAME} \
+                                        -e SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} \
+                                        -e DB_PROD_URL=${DB_PROD_URL} \
+                                        -e DB_PROD_USER=${DB_PROD_USER} \
+                                        -e DB_PROD_PASSWORD=${DB_PROD_PASSWORD} \
+                                        -e JWT_SECRET=${JWT_SECRET} \
+                                        -e JWT_ISSUER=${JWT_ISSUER} \
+                                        -e AWS_ACCESS_KEY=${AWS_ACCESS_KEY} \
+                                        -e AWS_SECRET_KEY=${AWS_SECRET_KEY} \
+                                        -e KAKAO_API_KEY=${KAKAO_API_KEY} \
+                                        -e S3_BUCKET=${S3_BUCKET} \
+                                        -e S3_BASE_URL=${S3_BASE_URL} \
+                                        -e MAIL_USERNAME=${MAIL_USERNAME} \
+                                        -e MAIL_PASSWORD=${MAIL_PASSWORD} \
+                                        -e DOMAIN_URL=${DOMAIN_URL} \
+                                        -e REDIS_PROD_PORT=${REDIS_PROD_PORT} \
+                                        -e REDIS_PROD_IP=${REDIS_PROD_IP} \
+                                        ${ECR_REPO_URI}:${BUILD_NUMBER}
+                                '
+                            """
+                        }
+                    }
+                }
+            }
+            post {
+                success {
+                    echo 'Application successfully deployed to EC2.'
+                }
+                failure {
+                    error 'Application deployment to EC2 failed.'
+                }
+            }
+        }
+
+
+    }
+}
